@@ -2,6 +2,7 @@ package library
 
 import (
 	"cmp"
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,7 +11,7 @@ import (
 	"path"
 	"path/filepath"
 	"slices"
-	"strconv"
+
 	"strings"
 	"syscall"
 	"time"
@@ -140,7 +141,12 @@ func (l *Library) conflictCheck(existing, target string, links []importLink) Imp
 	var stamp []string
 	add := func(p string) {
 		c.Replaces = append(c.Replaces, ImportExisting{Path: p, Link: isLink(p)})
-		stamp = append(stamp, fingerprint(p))
+		f, err := fingerprint(p)
+		if err != nil && c.Blocked == "" {
+			// 认不清它现在的样子，就没法保证确认之后它没被改过
+			c.Blocked = locales.ImportReplaceUnreadable(l.Display(p))
+		}
+		stamp = append(stamp, f)
 	}
 	if exists(target) {
 		add(target)
@@ -162,21 +168,24 @@ func (l *Library) conflictCheck(existing, target string, links []importLink) Imp
 	return c
 }
 
-// fingerprint 是 p 现在的样子：链接看指向哪里，目录看内容，其他看大小和修改时间。
-func fingerprint(p string) string {
+// fingerprint 是 p 现在的样子：链接看指向哪里，目录和文件看内容。读不全时
+// 返回错误，不拿大小、修改时间凑数：原地改了内容它们可能都不变。
+func fingerprint(p string) (string, error) {
 	fi, err := os.Lstat(p)
 	switch {
 	case err != nil:
-		return "-"
+		return "", err
 	case isLink(p):
-		to, _ := os.Readlink(p)
-		return "L " + to
+		to, err := os.Readlink(p)
+		return "L " + to, err
 	case fi.IsDir():
-		if h, err := TreeHash(p); err == nil {
-			return "D " + h
-		}
+		h, err := TreeHash(p)
+		return "D " + h, err
+	case fi.Mode().IsRegular():
+		b, err := os.ReadFile(p)
+		return fmt.Sprintf("F %x", sha256.Sum256(b)), err
 	}
-	return fmt.Sprintf("F %d %d", fi.Size(), fi.ModTime().UnixNano())
+	return "", fmt.Errorf("%s: %v", p, fi.Mode().Type())
 }
 
 // pointsAt 报告 link 是不是直接指向 target 这个位置（只看第一跳：target
@@ -375,51 +384,74 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 		}
 	}
 
-	var undo, cleanup []func()
+	// 替换时换下来的旧版、旧链接先放进各自的临时目录（replace-*），最后一步才移到
+	// 废纸篓。它们是用户唯一的那一份：只有确认已经换回原处、或已经进了废纸篓，
+	// 才删装它的临时目录；撤回不成时留着，告诉用户在哪里。
+	var undo []func()
+	var heldItems []*heldItem
 	defer func() {
 		if out.Err != nil || out.Conflict != "" {
 			for i := len(undo) - 1; i >= 0; i-- {
 				undo[i]()
 			}
 		}
-		for _, f := range cleanup {
-			f()
+		var kept []string
+		for _, h := range heldItems {
+			if h.safe() {
+				os.RemoveAll(h.tmp)
+			} else {
+				kept = append(kept, l.Display(h.at))
+			}
+		}
+		if len(kept) > 0 {
+			msg := locales.ImportReplaceOldKeptAt(strings.Join(kept, locales.ListSeparator()))
+			if out.Err != nil {
+				out.Err = fmt.Errorf("%w\n%s", out.Err, msg)
+			} else {
+				out.Err = errors.New(msg)
+			}
+			out.Added, out.Replaced, out.Conflict, out.Stale = false, false, "", false
 		}
 	}()
 
 	// 换入：复制到暂存、核对，再不覆盖地改名进去（替换时和已有的原子交换）
 	swap := replacing(target)
-	placed, old, done, err := l.placeImport(sk, target, swap)
+	placed, old, tmp, err := l.placeImport(sk, target, swap)
+	if old != "" {
+		heldItems = append(heldItems, &heldItem{home: l.Home, from: target, at: old, tmp: tmp})
+	}
 	if errors.Is(err, os.ErrExist) {
 		return ImportOutcome{Conflict: target}
 	}
 	if err != nil {
 		return ImportOutcome{Err: fmt.Errorf("%s%w", locales.ImportWriteFailedNoFiles(l.Display(filepath.Dir(target))), err)}
 	}
-	if done != nil {
-		cleanup = append(cleanup, done)
+	if swap {
+		h := heldItems[0]
+		undo = append(undo, func() {
+			// 目标位置还是我们换进去的：原子换回；不是了（被别的工具动过）就
+			// 放回空出来的位置，再不行移到废纸篓
+			if fi, err := os.Lstat(target); err == nil && os.SameFile(fi, placed) && swapDirectories(h.at, target) == nil {
+				h.restored = true
+				return
+			}
+			h.putBack()
+		})
+	} else {
+		undo = append(undo, func() {
+			if fi, err := os.Lstat(target); err == nil && os.SameFile(fi, placed) {
+				os.RemoveAll(target)
+			}
+		})
 	}
-	undo = append(undo, func() {
-		fi, err := os.Lstat(target)
-		if err != nil || !os.SameFile(fi, placed) {
-			return
-		}
-		if !swap {
-			os.RemoveAll(target)
-		} else if swapDirectories(old, target) != nil {
-			// 换不回去：至少别让旧版跟着暂存目录被删掉
-			Trash(l.Home, old)
-		}
-	})
 	real, err := realPath(target)
 	if err != nil {
 		return ImportOutcome{Err: err}
 	}
 
 	// 建链接，记进本应用建的链接（以后「移除」只删自己建的）。替换时链接位置
-	// 上的旧链接先挪进暂存，最后和旧版一起移到废纸篓。
+	// 上的旧链接先挪开，最后和旧版一起移到废纸篓。
 	var made []importLink
-	var aside []string // 挪开的旧链接现在的位置
 	if len(links) > 0 {
 		l.loadNativeData()
 		if l.nativeErr != nil {
@@ -435,18 +467,12 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 				return ImportOutcome{Err: err}
 			}
 			if replacing(k.path) {
-				to, err := l.moveAside(k.path, len(aside))
+				h, err := l.moveAside(k.path)
 				if err != nil {
 					return ImportOutcome{Err: err}
 				}
-				cleanup = append(cleanup, func() { os.RemoveAll(filepath.Dir(filepath.Dir(to))) })
-				from := k.path
-				undo = append(undo, func() {
-					if !exists(from) {
-						os.Rename(to, from)
-					}
-				})
-				aside = append(aside, to)
+				heldItems = append(heldItems, h)
+				undo = append(undo, h.putBack)
 			}
 			from := dir
 			if r, err := realPath(dir); err == nil {
@@ -548,7 +574,11 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 	if recorded == "" && mark.tracked(l.Root) {
 		recorded = mark.entry().SkillFolderHash
 	}
-	var oldMarks []importMark // 替换时这个位置上旧版的应用记录，换回去时写回
+	// 撤回时要写回的：这个位置上原来的应用记录和被换掉的基线
+	var oldMarks []importMark
+	var oldBases []baselineMark
+	var newBase baselineMark
+	based := false
 	st, err := editUpdates(l.Home, func(st *updateStore) error {
 		st.Imports = slices.DeleteFunc(st.Imports, func(m importMark) bool {
 			hit := samePlace(m.Place, target)
@@ -560,7 +590,14 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 		st.Imports = append(st.Imports, mark)
 		if recorded != "" {
 			// 装进来的就是基线：「更新」页不用再从记录推导
-			st.setBaseline(mark.Source, path.Join(sk.RepoPath, "SKILL.md"), target, recorded, sk.Tree)
+			skillPath := path.Join(sk.RepoPath, "SKILL.md")
+			for _, b := range st.Baselines {
+				if b.Source == mark.Source && b.Path == skillDir(skillPath) && samePlace(b.Place, target) {
+					oldBases = append(oldBases, b)
+				}
+			}
+			st.setBaseline(mark.Source, skillPath, target, recorded, sk.Tree)
+			newBase, based = st.Baselines[len(st.Baselines)-1], true
 		}
 		return nil
 	})
@@ -569,47 +606,85 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 	}
 	l.updates, l.updatesErr = st, nil
 	undo = append(undo, func() {
-		if _, err := l.dropImportMarks([]string{target}); err == nil {
-			l.restoreImportMarks(oldMarks)
+		st, err := editUpdates(l.Home, func(st *updateStore) error {
+			st.Imports = slices.DeleteFunc(st.Imports, func(m importMark) bool { return samePlace(m.Place, target) })
+			st.Imports = append(st.Imports, oldMarks...)
+			if based {
+				st.Baselines = slices.DeleteFunc(st.Baselines, func(b baselineMark) bool { return b == newBase })
+				st.Baselines = append(st.Baselines, oldBases...)
+			}
+			return nil
+		})
+		if err == nil {
+			l.updates, l.updatesErr = st, nil
 		}
 	})
 
-	// 最后一步：换下来的移到废纸篓。旧版移不进去就整个换回去；之后只剩旧链接，
-	// 链接移不进废纸篓时直接删掉（只是链接，指向的内容不动）。
-	if swap {
-		if err := Trash(l.Home, old); err != nil {
+	// 最后一步：换下来的移到废纸篓，旧链接在前、旧版最后。任何一项移不进去
+	// 就整个撤回：已经进了废纸篓的旧链接照原样重建，旧版换回原处。
+	for i := len(heldItems) - 1; i >= 0; i-- {
+		h := heldItems[i]
+		if err := Trash(l.Home, h.at); err != nil {
 			return ImportOutcome{Err: fmt.Errorf("%s%w", locales.ImportReplaceTrashFailed(), err)}
 		}
-	}
-	for _, a := range aside {
-		if Trash(l.Home, a) != nil {
-			os.Remove(a)
-		}
+		h.trashed = true
 	}
 	return ImportOutcome{Added: true, Replaced: replace != nil && len(replace.Replaces) > 0, Place: target}
 }
 
-// moveAside 把要替换的旧链接挪进暂存，返回它现在的位置。名字不变，移到废纸篓
-// 后看得出是哪个技能。
-func (l *Library) moveAside(p string, i int) (string, error) {
-	if err := os.MkdirAll(importStaging(l.Home), 0o700); err != nil {
-		return "", err
-	}
-	tmp, err := os.MkdirTemp(importStaging(l.Home), "replaced-")
-	if err != nil {
-		return "", err
-	}
-	to := filepath.Join(tmp, strconv.Itoa(i), filepath.Base(p))
-	if err := os.MkdirAll(filepath.Dir(to), 0o700); err != nil {
-		os.RemoveAll(tmp)
-		return "", err
-	}
-	if err := os.Rename(p, to); err != nil {
-		os.RemoveAll(tmp)
-		return "", err
-	}
-	return to, nil
+// heldItem 是替换时换下来、还没进废纸篓的一项：from 是它原来的位置，at 是
+// 它现在的位置，tmp 是装它的临时目录。link 非空时它是链接，值是它指向哪里：
+// 进了废纸篓又要撤回时照着重建。
+type heldItem struct {
+	home, from, at, tmp, link string
+	trashed, restored         bool
+	moved                     bool // 撤回时没能放回原处，已移到废纸篓
 }
+
+// safe 报告它已经不在临时目录里了（放回原处或进了废纸篓），临时目录可以删。
+func (h *heldItem) safe() bool { return h.trashed || h.restored || h.moved }
+
+// putBack 撤回时把它放回原处；原处已被占了就移到废纸篓。都不成时留在临时目录。
+func (h *heldItem) putBack() {
+	switch {
+	case h.restored || h.moved:
+	case h.trashed:
+		// 只有链接会在撤回前进废纸篓（旧版最后才移）：照原样重建一个
+		if h.link != "" && !exists(h.from) && makeLink(h.link, h.from) == nil {
+			h.restored = true
+		}
+	case !exists(h.from) && renameNoReplace(h.at, h.from) == nil:
+		h.restored = true
+	case Trash(h.home, h.at) == nil:
+		h.moved = true
+	}
+}
+
+// moveAside 把要替换的旧链接挪进它自己的临时目录。名字不变，移到废纸篓后
+// 看得出是哪个技能。
+func (l *Library) moveAside(p string) (*heldItem, error) {
+	to, err := os.Readlink(p)
+	if err != nil {
+		return nil, err
+	}
+	if err := os.MkdirAll(importStaging(l.Home), 0o700); err != nil {
+		return nil, err
+	}
+	tmp, err := os.MkdirTemp(importStaging(l.Home), replacePrefix)
+	if err != nil {
+		return nil, err
+	}
+	at := filepath.Join(tmp, filepath.Base(p))
+	if err := os.Rename(p, at); err != nil {
+		os.RemoveAll(tmp)
+		return nil, err
+	}
+	return &heldItem{home: l.Home, from: p, at: at, tmp: tmp, link: to}, nil
+}
+
+// replacePrefix 是替换时装旧版、旧链接的临时目录的前缀。启动时清暂存不删它们，
+// 只移到废纸篓：里面可能是用户唯一的旧版。
+const replacePrefix = "replace-"
 
 func linkPaths(links []importLink) []string {
 	var out []string
@@ -622,24 +697,24 @@ func linkPaths(links []importLink) []string {
 // placeImport 把暂存的技能复制一份、核对后换进 target，返回放进去的目录的
 // 信息（撤销时认它）。swap 为假时不覆盖地改名进去，target 已有东西时返回
 // os.ErrExist；为真时和 target 上已有的那一项原子交换，old 是换下来的那一项
-// 现在的位置。done 非 nil 时，用完（移走 old 或换回去之后）调它删掉临时目录。
-// 暂存和目标不在同一磁盘时，在目标旁边建隐藏的临时目录再改名。
-func (l *Library) placeImport(sk *ImportSkill, target string, swap bool) (placed fs.FileInfo, old string, done func(), err error) {
+// 现在的位置，tmp 是装它的临时目录，由调用方在它离开后删掉。old 非空时即使
+// 返回错误，旧版也还在 old。暂存和目标不在同一磁盘时，在目标旁边建隐藏的
+// 临时目录再改名。
+func (l *Library) placeImport(sk *ImportSkill, target string, swap bool) (placed fs.FileInfo, old, tmp string, err error) {
 	if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
-		return nil, "", nil, err
+		return nil, "", "", err
 	}
-	try := func(parent string, prefix string) (fs.FileInfo, string, func(), error) {
+	try := func(parent string, prefix string) (fs.FileInfo, string, string, error) {
 		if err := os.MkdirAll(parent, 0o700); err != nil {
-			return nil, "", nil, err
+			return nil, "", "", err
 		}
 		tmp, err := os.MkdirTemp(parent, prefix)
 		if err != nil {
-			return nil, "", nil, err
+			return nil, "", "", err
 		}
-		done := func() { os.RemoveAll(tmp) }
-		fail := func(err error) (fs.FileInfo, string, func(), error) {
-			done()
-			return nil, "", nil, err
+		fail := func(err error) (fs.FileInfo, string, string, error) {
+			os.RemoveAll(tmp)
+			return nil, "", "", err
 		}
 		dir := filepath.Join(tmp, sk.Name)
 		if err := copyDir(sk.Dir, dir); err != nil {
@@ -657,8 +732,8 @@ func (l *Library) placeImport(sk *ImportSkill, target string, swap bool) (placed
 			}
 			syncDirectory(filepath.Dir(target))
 			fi, err := os.Lstat(target)
-			done()
-			return fi, "", nil, err
+			os.RemoveAll(tmp)
+			return fi, "", "", err
 		}
 		if err := swapDirectories(dir, target); err != nil {
 			return fail(err)
@@ -666,19 +741,23 @@ func (l *Library) placeImport(sk *ImportSkill, target string, swap bool) (placed
 		syncDirectory(filepath.Dir(target))
 		fi, err := os.Lstat(target)
 		if err != nil {
-			// 换进去了却认不出来：换回去，当没发生；换不回去就别删暂存，旧版还在里面
+			// 换进去了却认不出来：换回去，当没发生；换不回去旧版就还在 dir
 			if swapDirectories(dir, target) == nil {
 				return fail(err)
 			}
-			return nil, "", nil, err
+			return nil, dir, tmp, err
 		}
-		return fi, dir, done, nil
+		return fi, dir, tmp, nil
 	}
-	fi, old, done, err := try(importStaging(l.Home), "add-")
+	prefix, nearby := "add-", ".skill-manager-add-"
+	if swap {
+		prefix, nearby = replacePrefix, ".skill-manager-"+replacePrefix
+	}
+	fi, old, tmp, err := try(importStaging(l.Home), prefix)
 	if errors.Is(err, syscall.EXDEV) {
-		fi, old, done, err = try(filepath.Dir(target), ".skill-manager-add-")
+		fi, old, tmp, err = try(filepath.Dir(target), nearby)
 	}
-	return fi, old, done, err
+	return fi, old, tmp, err
 }
 
 // syncTree 把目录里的文件和目录都刷到磁盘：中途断电时，换进去的要么没有，要么完整。

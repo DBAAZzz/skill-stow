@@ -951,5 +951,7 @@
   "importReplacedAt": "Replaced the old version in {place}. The old one is in the Trash.",
   "importAddedReplacedNames": "{added, plural, one {Added # skill} other {Added # skills}} ({replaced} replaced, old versions in the Trash) · {p1}",
   "importChangedSinceConfirm": "{name} in {place} changed after you chose to replace it, so it wasn't replaced.",
-  "importChangedSinceConfirmNote": "Compare again, and choose Replace if you still want to."
+  "importChangedSinceConfirmNote": "Compare again, and choose Replace if you still want to.",
+  "importReplaceUnreadable": "{path} can't be read in full, so there's no way to tell whether it changed before replacing. It can't be replaced.",
+  "importReplaceOldKeptAt": "The old version wasn't deleted. It's kept at {paths}."
 }

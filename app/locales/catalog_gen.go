@@ -13773,3 +13773,35 @@ func ImportChangedSinceConfirmNote() string { return In(i18n.Locale()).ImportCha
 func (msgs Messages) ImportChangedSinceConfirmNote() string {
 	return Catalog.Format(msgs.locale, "importChangedSinceConfirmNote", nil)
 }
+
+// ImportReplaceUnreadable says "读不全 {path}，没法确认替换前它没被改过，所以不能替换。"
+// in the language the app shows.
+//
+// 同名冲突卡片：已有的那一项读不全，不能替换
+func ImportReplaceUnreadable(path string) string {
+	return In(i18n.Locale()).ImportReplaceUnreadable(path)
+}
+
+// ImportReplaceUnreadable says "读不全 {path}，没法确认替换前它没被改过，所以不能替换。"
+// in the language of msgs.
+//
+// 同名冲突卡片：已有的那一项读不全，不能替换
+func (msgs Messages) ImportReplaceUnreadable(path string) string {
+	return Catalog.Format(msgs.locale, "importReplaceUnreadable", map[string]any{"path": path})
+}
+
+// ImportReplaceOldKeptAt says "旧版没有删除，留在 {paths}。"
+// in the language the app shows.
+//
+// 替换中途出错、旧版没能放回原处时，告诉用户它在哪里
+func ImportReplaceOldKeptAt(paths string) string {
+	return In(i18n.Locale()).ImportReplaceOldKeptAt(paths)
+}
+
+// ImportReplaceOldKeptAt says "旧版没有删除，留在 {paths}。"
+// in the language of msgs.
+//
+// 替换中途出错、旧版没能放回原处时，告诉用户它在哪里
+func (msgs Messages) ImportReplaceOldKeptAt(paths string) string {
+	return Catalog.Format(msgs.locale, "importReplaceOldKeptAt", map[string]any{"paths": paths})
+}

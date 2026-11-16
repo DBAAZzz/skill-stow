@@ -6222,5 +6222,23 @@
   "@importChangedSinceConfirmNote": {
     "description": "要替换的那一项在确认后变了时的说明",
     "placeholders": {}
+  },
+  "importReplaceUnreadable": "读不全 {path}，没法确认替换前它没被改过，所以不能替换。",
+  "@importReplaceUnreadable": {
+    "description": "同名冲突卡片：已有的那一项读不全，不能替换",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "importReplaceOldKeptAt": "旧版没有删除，留在 {paths}。",
+  "@importReplaceOldKeptAt": {
+    "description": "替换中途出错、旧版没能放回原处时，告诉用户它在哪里",
+    "placeholders": {
+      "paths": {
+        "type": "String"
+      }
+    }
   }
 }

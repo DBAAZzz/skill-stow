@@ -148,11 +148,21 @@ func (e *ImportError) Unwrap() error { return e.Err }
 func importStaging(home string) string { return stagingDir(home) }
 
 // CleanImportStaging 清掉上次没清的读取暂存（中途退出留下的）。启动时调用。
+// 替换中途退出留下的（replace-*）里可能是用户唯一的旧版：只移到废纸篓，
+// 移不进去就留着，不删。
 func CleanImportStaging(home string) {
 	items, _ := os.ReadDir(importStaging(home))
 	for _, it := range items {
-		if n := it.Name(); strings.HasPrefix(n, "import-") || strings.HasPrefix(n, "add-") {
-			os.RemoveAll(filepath.Join(importStaging(home), n))
+		dir := filepath.Join(importStaging(home), it.Name())
+		switch n := it.Name(); {
+		case strings.HasPrefix(n, "import-") || strings.HasPrefix(n, "add-"):
+			os.RemoveAll(dir)
+		case strings.HasPrefix(n, replacePrefix):
+			left, _ := os.ReadDir(dir)
+			for _, e := range left {
+				Trash(home, filepath.Join(dir, e.Name()))
+			}
+			os.Remove(dir) // 只在空了时删得掉
 		}
 	}
 }
