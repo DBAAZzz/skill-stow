@@ -1,4 +1,4 @@
-// Skill 管理器：查看、启用和整理本机各 Agent 的技能。
+// Skill Stow：查看、启用和整理本机各 Agent 的技能。
 //
 //	go tool mygo dev    // 开发，改代码自动重载
 //	go test ./...       // 行为测试；SNAPSHOT_DIR=… 时输出各页截图

@@ -2,7 +2,7 @@
 
 [English](README.md) · 中文
 
-Skill 管理器（Skill Stow）是一个 macOS 桌面应用，在一个窗口里管理本机所有 AI Agent 的技能（skill）：看谁读得到哪个技能、按 Agent 开关、添加、更新、清理。
+Skill Stow 是一个 macOS 桌面应用，在一个窗口里管理本机所有 AI Agent 的技能（skill）：看谁读得到哪个技能、按 Agent 开关、添加、更新、清理。
 
 - **技能库**：自己装的技能和 Agent 自带的技能分开列，技能库在 `~/.agents/skills`。
 - **技能范围 / 项目**：按全局和项目查看，每个 Agent 实际会读到哪些技能。
@@ -36,8 +36,10 @@ Skill 管理器（Skill Stow）是一个 macOS 桌面应用，在一个窗口里
 cd app
 SKILLS_SAMPLE=1 go tool mygo dev  # 用示例数据启动，不读写本机目录
 go tool mygo dev                  # 读本机真实数据，改代码自动重载
-go tool mygo build                # 打包 .app / .dmg 到 app/build/
+go tool mygo build -platform darwin/arm64  # Apple Silicon；产物在 app/build/darwin-arm64/
 ```
+
+需要同时支持 Intel 和 Apple Silicon Mac 时，执行 `go tool mygo build -platform darwin/universal`，产物在 `app/build/darwin-universal/`。
 
 ## 会改动本机哪些文件
 

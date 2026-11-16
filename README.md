@@ -36,8 +36,10 @@ Requires Go 1.27+ (see [`app/go.mod`](app/go.mod) for the exact version). MyGo i
 cd app
 SKILLS_SAMPLE=1 go tool mygo dev  # sample data; never touches your real folders
 go tool mygo dev                  # your real data; reloads on code changes
-go tool mygo build                # package .app / .dmg into app/build/
+go tool mygo build -platform darwin/arm64  # Apple Silicon; output in app/build/darwin-arm64/
 ```
+
+To support both Intel and Apple Silicon Macs, run `go tool mygo build -platform darwin/universal`. Output goes to `app/build/darwin-universal/`.
 
 ## Files the app changes on your machine
 

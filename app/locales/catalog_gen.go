@@ -34,13 +34,13 @@ type Messages struct{ locale string }
 // source language.
 func In(locale string) Messages { return Messages{locale} }
 
-// AppName says "Skill 管理器"
+// AppName says "Skill Stow"
 // in the language the app shows.
 //
 // 应用名，窗口标题和关于里用
 func AppName() string { return In(i18n.Locale()).AppName() }
 
-// AppName says "Skill 管理器"
+// AppName says "Skill Stow"
 // in the language of msgs.
 //
 // 应用名，窗口标题和关于里用
