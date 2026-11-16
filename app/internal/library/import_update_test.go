@@ -17,7 +17,7 @@ func agentVite(t *testing.T) (string, func(string) string, *fakeImport) {
 	f := newFakeImport()
 	f.publish(t, "antfu/skills", antfuSkills)
 	b := readAntfu(t, home, f, "antfu/skills")
-	out := Scan(home).AddImport(b, []string{"vite"}, ImportPlacement{Agents: []string{"claude-code", "kiro"}})
+	out := Scan(home).AddImport(b, []string{"vite"}, ImportPlacement{Agents: []string{"claude-code", "kiro"}}, nil)
 	if !out[0].Added {
 		t.Fatalf("%+v", out)
 	}
@@ -199,7 +199,7 @@ func TestKeepingTheLocalVersionInOnePlaceLeavesTheOtherPlaceAlone(t *testing.T) 
 	f.publish(t, "antfu/skills", antfuSkills)
 	b := readAntfu(t, home, f, "antfu/skills")
 	for _, id := range []string{"claude-code", "kiro"} {
-		if out := Scan(home).AddImport(b, []string{"vite"}, ImportPlacement{Agents: []string{id}}); !out[0].Added {
+		if out := Scan(home).AddImport(b, []string{"vite"}, ImportPlacement{Agents: []string{id}}, nil); !out[0].Added {
 			t.Fatalf("%+v", out)
 		}
 	}

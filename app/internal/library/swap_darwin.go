@@ -44,6 +44,9 @@ var swapAPI = sync.OnceValues(func() (swapFunctions, error) {
 	return api, nil
 })
 
+// canSwapDirectories 报告 swapDirectories 在这个系统上能用。
+const canSwapDirectories = true
+
 func swapDirectories(a, b string) error {
 	api, err := swapAPI()
 	if err != nil {

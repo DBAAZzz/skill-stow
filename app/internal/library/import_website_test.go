@@ -136,7 +136,7 @@ func TestAddingAWebsiteSkillToTheLibraryWritesTheSameRecordAsNpx(t *testing.T) {
 	src, _ := ParseImportInput(site.srv.URL + "/docs")
 	b, err := readSite(t, home, src)
 	must(t, err)
-	out := Scan(home).AddImport(b, []string{"lesson"}, ImportPlacement{Library: true})
+	out := Scan(home).AddImport(b, []string{"lesson"}, ImportPlacement{Library: true}, nil)
 	if !out[0].Added || out[0].Place != h(".agents/skills/lesson") {
 		t.Fatalf("结果 = %+v", out)
 	}
@@ -179,7 +179,7 @@ func TestAddingAWebsiteSkillForOneAgentLeavesTheRecordAlone(t *testing.T) {
 	must(t, err)
 	before, _ := os.ReadFile(h(".agents/.skill-lock.json"))
 	l := Scan(home)
-	out := l.AddImport(b, []string{"quiz"}, ImportPlacement{Agents: []string{"claude-code"}})
+	out := l.AddImport(b, []string{"quiz"}, ImportPlacement{Agents: []string{"claude-code"}}, nil)
 	if !out[0].Added || out[0].Place != h(".claude/skills/quiz") {
 		t.Fatalf("结果 = %+v", out)
 	}
@@ -376,7 +376,7 @@ func TestAV2SkillIsCheckedAgainstItsDigest(t *testing.T) {
 	if p := b.Skill("broken").Problem; p != "下载的内容和网站声明的不一致，稍后重试" {
 		t.Errorf("摘要不符应不能添加：%q", p)
 	}
-	if out := Scan(home).AddImport(b, []string{"broken"}, ImportPlacement{Library: true}); out[0].Added {
+	if out := Scan(home).AddImport(b, []string{"broken"}, ImportPlacement{Library: true}, nil); out[0].Added {
 		t.Error("摘要不符的不能添加")
 	}
 }

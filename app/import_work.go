@@ -435,7 +435,7 @@ func (a *app) addImports() {
 	a.holdBatch(b)
 	a.background(func(post func(func())) {
 		l := library.Scan(home)
-		out := l.AddImport(b, names, p)
+		out := l.AddImport(b, names, p, nil)
 		next := library.Scan(home)
 		rep := next.Updates()
 		post(func() {

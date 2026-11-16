@@ -936,5 +936,8 @@
   "defectNoName": "SKILL.md has no name, so some Agents refuse to load it",
   "collectBreaksWarning": "These references point outside the skill folder and will break once it's copied to the Library:",
   "settingsTidySound": "Play a Sound When Tidying Is Done",
-  "settingsTidySoundHint": "A soft pop after merging copies, clearing records and similar actions"
+  "settingsTidySoundHint": "A soft pop after merging copies, clearing records and similar actions",
+  "importReplaceOwnCopy": "{agent} has its own copy at {path} (not a link), and replacing won't touch it. Merge the copies in My Skills first.",
+  "importReplaceMacOnly": "Replacing an existing skill is only supported on macOS for now",
+  "importReplaceTrashFailed": "Couldn't move the old version to the Trash, so nothing was replaced: "
 }

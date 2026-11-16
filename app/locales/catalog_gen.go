@@ -13553,3 +13553,49 @@ func SettingsTidySoundHint() string { return In(i18n.Locale()).SettingsTidySound
 func (msgs Messages) SettingsTidySoundHint() string {
 	return Catalog.Format(msgs.locale, "settingsTidySoundHint", nil)
 }
+
+// ImportReplaceOwnCopy says "{agent} 的目录里有自己的一份（{path}…"
+// in the language the app shows.
+//
+// 同名冲突卡片：链接位置上是 Agent
+// 自己的目录，不能替换
+func ImportReplaceOwnCopy(agent string, path string) string {
+	return In(i18n.Locale()).ImportReplaceOwnCopy(agent, path)
+}
+
+// ImportReplaceOwnCopy says "{agent} 的目录里有自己的一份（{path}…"
+// in the language of msgs.
+//
+// 同名冲突卡片：链接位置上是 Agent
+// 自己的目录，不能替换
+func (msgs Messages) ImportReplaceOwnCopy(agent string, path string) string {
+	return Catalog.Format(msgs.locale, "importReplaceOwnCopy", map[string]any{"agent": agent, "path": path})
+}
+
+// ImportReplaceMacOnly says "目前只有 macOS 能替换已有的技能"
+// in the language the app shows.
+//
+// 同名冲突卡片：这个系统上不能替换
+func ImportReplaceMacOnly() string { return In(i18n.Locale()).ImportReplaceMacOnly() }
+
+// ImportReplaceMacOnly says "目前只有 macOS 能替换已有的技能"
+// in the language of msgs.
+//
+// 同名冲突卡片：这个系统上不能替换
+func (msgs Messages) ImportReplaceMacOnly() string {
+	return Catalog.Format(msgs.locale, "importReplaceMacOnly", nil)
+}
+
+// ImportReplaceTrashFailed says "旧版没能移到废纸篓，没有替换："
+// in the language the app shows.
+//
+// 替换失败的原因前缀，后面接系统错误
+func ImportReplaceTrashFailed() string { return In(i18n.Locale()).ImportReplaceTrashFailed() }
+
+// ImportReplaceTrashFailed says "旧版没能移到废纸篓，没有替换："
+// in the language of msgs.
+//
+// 替换失败的原因前缀，后面接系统错误
+func (msgs Messages) ImportReplaceTrashFailed() string {
+	return Catalog.Format(msgs.locale, "importReplaceTrashFailed", nil)
+}
