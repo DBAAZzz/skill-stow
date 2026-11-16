@@ -13554,6 +13554,332 @@ func (msgs Messages) SettingsTidySoundHint() string {
 	return Catalog.Format(msgs.locale, "settingsTidySoundHint", nil)
 }
 
+// WelcomeTitle says "欢迎使用 {app}"
+// in the language the app shows.
+//
+// 首次启动的开场动画：第一幕图标下面的标题
+func WelcomeTitle(app string) string { return In(i18n.Locale()).WelcomeTitle(app) }
+
+// WelcomeTitle says "欢迎使用 {app}"
+// in the language of msgs.
+//
+// 首次启动的开场动画：第一幕图标下面的标题
+func (msgs Messages) WelcomeTitle(app string) string {
+	return Catalog.Format(msgs.locale, "welcomeTitle", map[string]any{"app": app})
+}
+
+// WelcomeScattered says "技能散落在各个 Agent 里"
+// in the language the app shows.
+//
+// 首次启动的开场动画：第二幕：演示用的技能卡片一堆堆落下后，底部的标题（不写数量：卡片是演示的，和本机数据对不上）
+func WelcomeScattered() string { return In(i18n.Locale()).WelcomeScattered() }
+
+// WelcomeScattered says "技能散落在各个 Agent 里"
+// in the language of msgs.
+//
+// 首次启动的开场动画：第二幕：演示用的技能卡片一堆堆落下后，底部的标题（不写数量：卡片是演示的，和本机数据对不上）
+func (msgs Messages) WelcomeScattered() string {
+	return Catalog.Format(msgs.locale, "welcomeScattered", nil)
+}
+
+// WelcomeScatteredHint says "收进一处管理：重复的合成一份，断掉的链接也会被找出来"
+// in the language the app shows.
+//
+// 首次启动的开场动画：第二幕标题下面的一句说明
+func WelcomeScatteredHint() string { return In(i18n.Locale()).WelcomeScatteredHint() }
+
+// WelcomeScatteredHint says "收进一处管理：重复的合成一份，断掉的链接也会被找出来"
+// in the language of msgs.
+//
+// 首次启动的开场动画：第二幕标题下面的一句说明
+func (msgs Messages) WelcomeScatteredHint() string {
+	return Catalog.Format(msgs.locale, "welcomeScatteredHint", nil)
+}
+
+// WelcomeSkip says "跳过"
+// in the language the app shows.
+//
+// 首次启动的开场动画：右下角的提示，前面是 esc
+// 键帽：按 Esc 跳过开场
+func WelcomeSkip() string { return In(i18n.Locale()).WelcomeSkip() }
+
+// WelcomeSkip says "跳过"
+// in the language of msgs.
+//
+// 首次启动的开场动画：右下角的提示，前面是 esc
+// 键帽：按 Esc 跳过开场
+func (msgs Messages) WelcomeSkip() string {
+	return Catalog.Format(msgs.locale, "welcomeSkip", nil)
+}
+
+// WelcomeStow says "收好它们"
+// in the language the app shows.
+//
+// 首次启动的开场动画：第二幕结束时的按钮：卡片飞进卡片墙，露出主界面
+func WelcomeStow() string { return In(i18n.Locale()).WelcomeStow() }
+
+// WelcomeStow says "收好它们"
+// in the language of msgs.
+//
+// 首次启动的开场动画：第二幕结束时的按钮：卡片飞进卡片墙，露出主界面
+func (msgs Messages) WelcomeStow() string {
+	return Catalog.Format(msgs.locale, "welcomeStow", nil)
+}
+
+// WelcomeMerged says "{count} 份合成 1 份"
+// in the language the app shows.
+//
+// 首次启动的开场动画：重复的技能卡片合成一张后，卡片底部的淡蓝小标签
+func WelcomeMerged(count int) string { return In(i18n.Locale()).WelcomeMerged(count) }
+
+// WelcomeMerged says "{count} 份合成 1 份"
+// in the language of msgs.
+//
+// 首次启动的开场动画：重复的技能卡片合成一张后，卡片底部的淡蓝小标签
+func (msgs Messages) WelcomeMerged(count int) string {
+	return Catalog.Format(msgs.locale, "welcomeMerged", map[string]any{"count": count})
+}
+
+// WelcomeBroken says "链接断了"
+// in the language the app shows.
+//
+// 首次启动的开场动画：一张卡片演示坏掉的链接时，卡片底部的红字
+func WelcomeBroken() string { return In(i18n.Locale()).WelcomeBroken() }
+
+// WelcomeBroken says "链接断了"
+// in the language of msgs.
+//
+// 首次启动的开场动画：一张卡片演示坏掉的链接时，卡片底部的红字
+func (msgs Messages) WelcomeBroken() string {
+	return Catalog.Format(msgs.locale, "welcomeBroken", nil)
+}
+
+// WelcomeCastTestFirst says "测试用例编写规范与测试先行工作流"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastTestFirst() string { return In(i18n.Locale()).WelcomeCastTestFirst() }
+
+// WelcomeCastTestFirst says "测试用例编写规范与测试先行工作流"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastTestFirst() string {
+	return Catalog.Format(msgs.locale, "welcomeCastTestFirst", nil)
+}
+
+// WelcomeCastVueBestPractices says "Vue 组件拆分、状态管理与组合式 API 规范"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastVueBestPractices() string { return In(i18n.Locale()).WelcomeCastVueBestPractices() }
+
+// WelcomeCastVueBestPractices says "Vue 组件拆分、状态管理与组合式 API 规范"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastVueBestPractices() string {
+	return Catalog.Format(msgs.locale, "welcomeCastVueBestPractices", nil)
+}
+
+// WelcomeCastCodeReview says "按清单审查代码变更，先找正确性问题"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastCodeReview() string { return In(i18n.Locale()).WelcomeCastCodeReview() }
+
+// WelcomeCastCodeReview says "按清单审查代码变更，先找正确性问题"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastCodeReview() string {
+	return Catalog.Format(msgs.locale, "welcomeCastCodeReview", nil)
+}
+
+// WelcomeCastKami says "把文档排成可打印的 PDF 与幻灯片"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastKami() string { return In(i18n.Locale()).WelcomeCastKami() }
+
+// WelcomeCastKami says "把文档排成可打印的 PDF 与幻灯片"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastKami() string {
+	return Catalog.Format(msgs.locale, "welcomeCastKami", nil)
+}
+
+// WelcomeCastContextCompression says "把分析结论讲给没读过代码的人"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastContextCompression() string { return In(i18n.Locale()).WelcomeCastContextCompression() }
+
+// WelcomeCastContextCompression says "把分析结论讲给没读过代码的人"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastContextCompression() string {
+	return Catalog.Format(msgs.locale, "welcomeCastContextCompression", nil)
+}
+
+// WelcomeCastBrainstorming says "动手前先把需求问清楚"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastBrainstorming() string { return In(i18n.Locale()).WelcomeCastBrainstorming() }
+
+// WelcomeCastBrainstorming says "动手前先把需求问清楚"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastBrainstorming() string {
+	return Catalog.Format(msgs.locale, "welcomeCastBrainstorming", nil)
+}
+
+// WelcomeCastApiDesign says "REST 接口命名与错误码约定"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastApiDesign() string { return In(i18n.Locale()).WelcomeCastApiDesign() }
+
+// WelcomeCastApiDesign says "REST 接口命名与错误码约定"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastApiDesign() string {
+	return Catalog.Format(msgs.locale, "welcomeCastApiDesign", nil)
+}
+
+// WelcomeCastDesignLab says "一次生成五种界面方案对比"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastDesignLab() string { return In(i18n.Locale()).WelcomeCastDesignLab() }
+
+// WelcomeCastDesignLab says "一次生成五种界面方案对比"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastDesignLab() string {
+	return Catalog.Format(msgs.locale, "welcomeCastDesignLab", nil)
+}
+
+// WelcomeCastSystematicDebugging says "先复现、再定位、最后修复，不靠猜"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastSystematicDebugging() string {
+	return In(i18n.Locale()).WelcomeCastSystematicDebugging()
+}
+
+// WelcomeCastSystematicDebugging says "先复现、再定位、最后修复，不靠猜"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastSystematicDebugging() string {
+	return Catalog.Format(msgs.locale, "welcomeCastSystematicDebugging", nil)
+}
+
+// WelcomeCastInterfaceCraft says "界面设计的判断方法与审查清单"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastInterfaceCraft() string { return In(i18n.Locale()).WelcomeCastInterfaceCraft() }
+
+// WelcomeCastInterfaceCraft says "界面设计的判断方法与审查清单"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastInterfaceCraft() string {
+	return Catalog.Format(msgs.locale, "welcomeCastInterfaceCraft", nil)
+}
+
+// WelcomeCastGitFlow says "分支与发布流程约定"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastGitFlow() string { return In(i18n.Locale()).WelcomeCastGitFlow() }
+
+// WelcomeCastGitFlow says "分支与发布流程约定"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastGitFlow() string {
+	return Catalog.Format(msgs.locale, "welcomeCastGitFlow", nil)
+}
+
+// WelcomeCastTailwindRules says "Tailwind 类名顺序与拆分规则"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastTailwindRules() string { return In(i18n.Locale()).WelcomeCastTailwindRules() }
+
+// WelcomeCastTailwindRules says "Tailwind 类名顺序与拆分规则"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastTailwindRules() string {
+	return Catalog.Format(msgs.locale, "welcomeCastTailwindRules", nil)
+}
+
+// WelcomeCastMiniprogramGuide says "小程序目录结构与分包约定"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastMiniprogramGuide() string { return In(i18n.Locale()).WelcomeCastMiniprogramGuide() }
+
+// WelcomeCastMiniprogramGuide says "小程序目录结构与分包约定"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastMiniprogramGuide() string {
+	return Catalog.Format(msgs.locale, "welcomeCastMiniprogramGuide", nil)
+}
+
+// WelcomeCastWechatPay says "微信支付接入与回调校验"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastWechatPay() string { return In(i18n.Locale()).WelcomeCastWechatPay() }
+
+// WelcomeCastWechatPay says "微信支付接入与回调校验"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastWechatPay() string {
+	return Catalog.Format(msgs.locale, "welcomeCastWechatPay", nil)
+}
+
+// WelcomeCastI18nCopy says "中英文案对照与术语表"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastI18nCopy() string { return In(i18n.Locale()).WelcomeCastI18nCopy() }
+
+// WelcomeCastI18nCopy says "中英文案对照与术语表"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastI18nCopy() string {
+	return Catalog.Format(msgs.locale, "welcomeCastI18nCopy", nil)
+}
+
+// WelcomeCastSqlReview says "慢查询与索引检查清单"
+// in the language the app shows.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func WelcomeCastSqlReview() string { return In(i18n.Locale()).WelcomeCastSqlReview() }
+
+// WelcomeCastSqlReview says "慢查询与索引检查清单"
+// in the language of msgs.
+//
+// 首次启动的开场动画：演示用的假技能卡片上的一行简介（技能名不翻译）
+func (msgs Messages) WelcomeCastSqlReview() string {
+	return Catalog.Format(msgs.locale, "welcomeCastSqlReview", nil)
+}
+
 // MenuAbout says "关于 {app}"
 // in the language the app shows.
 //

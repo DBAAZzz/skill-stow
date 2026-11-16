@@ -74,6 +74,7 @@ func (a *app) cardGrid(c *ui.Context, cols int, skills []*library.Skill, footer 
 // 画，右边是问题提示。只读的技能是灰底。单击选中，双击阅读。
 func (a *app) skillCard(c *ui.Context, s *library.Skill, footer func()) {
 	card := ui.Column(c).Padding(12, 14).Radius(10).Cursor(ui.CursorPointer).Label(s.Name).Transition(cardFeel())
+	a.noteSlot(card) // 开场的演示卡片往这里落
 	switch {
 	case a.selected == s:
 		card.Background(colBgCard).Shadow(0, 0, 0, 2, colAccent)

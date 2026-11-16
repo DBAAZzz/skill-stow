@@ -745,6 +745,24 @@ func TestSnapshots(t *testing.T) {
 		tt.Frame()
 		writePNG(t, filepath.Join(dir, name+".png"), tt)
 	}
+	// 首次启动的开场：第一幕；第二幕停在按钮（拨到落牌之后，带延迟的姿势
+	// 第一次摆也要播完，再播 2.6 秒）；第三幕飞到一半、快落定
+	a := newApp(load())
+	a.wel.open = true
+	tt := newUITester(a.view, 1280, 800)
+	tt.SetScale(2)
+	tt.Frame()
+	tt.Advance(1350 * time.Millisecond)
+	writePNG(t, filepath.Join(dir, "w1-welcome-hero.png"), tt)
+	a.wel.start = tt.Now().Add(-msd(welReady + 450 - 2600))
+	tt.Frame()
+	tt.Advance(2600 * time.Millisecond)
+	writePNG(t, filepath.Join(dir, "w2-welcome-ready.png"), tt)
+	tt.Key(0, ui.KeyEnter)
+	tt.Advance(620 * time.Millisecond)
+	writePNG(t, filepath.Join(dir, "w3-welcome-stow.png"), tt)
+	tt.Advance(700 * time.Millisecond)
+	writePNG(t, filepath.Join(dir, "w4-welcome-landed.png"), tt)
 }
 
 // snapshotDark 为真（SNAPSHOT_DARK=1）时测试窗口一开始就是深色外观，截图

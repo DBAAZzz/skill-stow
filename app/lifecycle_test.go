@@ -21,7 +21,7 @@ func TestMacOSClosingLastWindowKeepsAppAliveAndDockRestoresMainWindow(t *testing
 	a := newApp(library.Sample())
 	a.keepAliveOverride = &keepAlive
 
-	// Given 启动后打开主窗口，选中一个技能并展开菜单
+	// Given 启动后打开主窗口，选中一个技能并展开菜单与欢迎面板
 	a.openMainWindow()
 	if !a.main.open || !a.main.focused {
 		t.Fatalf("启动后主窗口状态异常：%+v", a.main)
@@ -29,8 +29,9 @@ func TestMacOSClosingLastWindowKeepsAppAliveAndDockRestoresMainWindow(t *testing
 	a.scope = scopeTidy
 	a.selected = a.lib.Get("test-first")
 	*a.menuOpen("browse.filter") = true
-	if !a.windowMenuOpen(menuWinMain) {
-		t.Fatal("前置状态应已打开主窗口菜单")
+	a.wel.open = true
+	if !a.wel.open || !a.windowMenuOpen(menuWinMain) {
+		t.Fatal("前置状态应已打开欢迎面板和主窗口菜单")
 	}
 
 	// When 在 macOS 上关闭主窗口
@@ -40,9 +41,9 @@ func TestMacOSClosingLastWindowKeepsAppAliveAndDockRestoresMainWindow(t *testing
 	if a.quitting {
 		t.Fatal("macOS 关闭主窗口后进程不应退出")
 	}
-	if a.main.open || a.main.focused || a.windowMenuOpen(menuWinMain) {
-		t.Fatalf("主窗口关闭后应清理窗口与弹层状态：main=%+v menu=%v",
-			a.main, a.windowMenuOpen(menuWinMain))
+	if a.main.open || a.main.focused || a.wel.open || a.windowMenuOpen(menuWinMain) {
+		t.Fatalf("主窗口关闭后应清理窗口与弹层状态：main=%+v wel=%v menu=%v",
+			a.main, a.wel.open, a.windowMenuOpen(menuWinMain))
 	}
 
 	// When 点击 Dock 图标激活应用（当前无可见窗口）
