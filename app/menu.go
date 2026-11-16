@@ -159,15 +159,26 @@ func styleMenuPanel(c *ui.Context, panel ui.Element, o menuPanelOpts) {
 	}
 }
 
+// frostedMenu 只在弹层回调的那一次构建里有效。Context、MenuParts、面板这些
+// 构建期的值经闭包取用而不存成字段：mygo vet 不允许结构体保存它们。
 type frostedMenu struct {
-	c        *ui.Context
-	parts    ui.MenuParts
-	entry    *menuEntry
-	panel    ui.Element
-	hasPanel bool
-	padLead  bool
-	prevHi   bool
-	hasHi    bool
+	ctx     func() *ui.Context
+	parts   func() ui.MenuParts
+	panel   func() ui.Element
+	entry   *menuEntry
+	padLead bool
+	prevHi  bool
+	hasHi   bool
+}
+
+func newFrostedMenu(c *ui.Context, parts ui.MenuParts, panel ui.Element, entry *menuEntry, padLead bool) *frostedMenu {
+	return &frostedMenu{
+		ctx:     func() *ui.Context { return c },
+		parts:   func() ui.MenuParts { return parts },
+		panel:   func() ui.Element { return panel },
+		entry:   entry,
+		padLead: padLead,
+	}
 }
 
 type menuHotkey struct {
@@ -201,15 +212,8 @@ func buildFrostedPopup(c *ui.Context, m ui.MenuParts, entry *menuEntry, o menuPa
 		} else {
 			panel.AttachedOrigin().Transition(contextMenuTransition)
 		}
-		fm := &frostedMenu{
-			c:        c,
-			parts:    m,
-			entry:    entry,
-			panel:    panel,
-			hasPanel: true,
-			padLead:  o.padLead,
-			prevHi:   entry != nil && entry.hi,
-		}
+		fm := newFrostedMenu(c, m, panel, entry, o.padLead)
+		fm.prevHi = entry != nil && entry.hi
 		build(fm)
 		if entry != nil {
 			entry.hi = fm.hasHi
@@ -363,14 +367,14 @@ func (fm *frostedMenu) triggered(el ui.Element, o menuItemOpts) bool {
 	if el.Clicked() {
 		return true
 	}
-	if o.disabled || !fm.hasPanel {
+	if o.disabled {
 		return false
 	}
 	hk := resolveMenuHotkey(o)
 	if !hk.valid || (hk.needNoHighlight && fm.prevHi) {
 		return false
 	}
-	if fm.panel.OverlayShortcut(hk.mods, hk.key) {
+	if fm.panel().OverlayShortcut(hk.mods, hk.key) {
 		if !o.keepOpen && fm.entry != nil {
 			fm.entry.open = false
 			fm.entry.hi = false
@@ -410,48 +414,48 @@ func (fm *frostedMenu) submenu(label, value string, opts []menuOpt, subOpts menu
 		fn(&o)
 	}
 	row := fm.row(label, o)
-	fm.parts.Submenu(row, func(panel ui.Element) {
-		styleMenuPanel(fm.c, panel, subOpts)
+	fm.parts().Submenu(row, func(panel ui.Element) {
+		styleMenuPanel(fm.ctx(), panel, subOpts)
 		panel.Margin(-menuPad, 0, 0, menuGap)
 		panel.AttachedOrigin().Transition(submenuTransition)
-		build(&frostedMenu{c: fm.c, parts: fm.parts, entry: fm.entry, panel: panel, hasPanel: true, padLead: subOpts.padLead})
+		build(newFrostedMenu(fm.ctx(), fm.parts(), panel, fm.entry, subOpts.padLead))
 	})
 }
 
 // header 是菜单里一组的标题：半粗的小字，note 是右边的灰色说明。
 func (fm *frostedMenu) header(title, note string) {
-	ui.Row(fm.c).Height(26).Padding(0, menuRowPadX).Gap(8).AlignItems(ui.Center).Shrink(0).Children(func() {
-		ui.Text(fm.c, title).FontSize(11.5).FontWeight(600).TextColor(colTextSecondary).SingleLine()
+	ui.Row(fm.ctx()).Height(26).Padding(0, menuRowPadX).Gap(8).AlignItems(ui.Center).Shrink(0).Children(func() {
+		ui.Text(fm.ctx(), title).FontSize(11.5).FontWeight(600).TextColor(colTextSecondary).SingleLine()
 		if note != "" {
-			ui.Text(fm.c, note).FontSize(11.5).TextColor(colTextMuted).SingleLine()
+			ui.Text(fm.ctx(), note).FontSize(11.5).TextColor(colTextMuted).SingleLine()
 		}
 	})
 }
 
 // note 是菜单里一段灰色说明（不能点）。
 func (fm *frostedMenu) note(text string) {
-	ui.Text(fm.c, text).FontSize(11.5).LineHeight(1.5).TextColor(colTextMuted).Padding(4, menuRowPadX, 6, menuRowPadX)
+	ui.Text(fm.ctx(), text).FontSize(11.5).LineHeight(1.5).TextColor(colTextMuted).Padding(4, menuRowPadX, 6, menuRowPadX)
 }
 
 func (fm *frostedMenu) separator() {
-	ui.Box(fm.c).Height(edgeSpread).Margin(4, 5).Background(colBorderSubtle).Shrink(0)
+	ui.Box(fm.ctx()).Height(edgeSpread).Margin(4, 5).Background(colBorderSubtle).Shrink(0)
 }
 
 func (fm *frostedMenu) row(label string, o menuItemOpts) ui.Element {
-	c := fm.c
+	c := fm.ctx()
 	if o.key != "" {
 		c.Key(o.key)
 	}
 	var el ui.Element
 	switch {
 	case o.isSub:
-		el = fm.parts.SubmenuItem()
+		el = fm.parts().SubmenuItem()
 	case o.roleRadio:
-		el = fm.parts.RadioItem(o.checked)
+		el = fm.parts().RadioItem(o.checked)
 	case o.roleCheck:
-		el = fm.parts.CheckItem(o.checked)
+		el = fm.parts().CheckItem(o.checked)
 	default:
-		el = fm.parts.Item()
+		el = fm.parts().Item()
 	}
 	accessible := o.a11yLabel
 	if accessible == "" {
