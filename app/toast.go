@@ -105,9 +105,8 @@ func (a *app) showToast(t *toast) {
 	}
 	a.changed()
 	// 测试里没有窗口，提示条一直留着，好断言它的内容
-	if d := t.lifetime(); d > 0 && a.win != nil {
-		win := a.win
-		time.AfterFunc(d, func() { win.Update(func() { a.closeToast(t) }) })
+	if d := t.lifetime(); d > 0 && a.live {
+		time.AfterFunc(d, func() { a.post(func() { a.closeToast(t) }) })
 	}
 }
 

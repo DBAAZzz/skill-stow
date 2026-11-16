@@ -16,15 +16,14 @@ import (
 // loadUsage 在后台读会话记录（几百 MB，第一次要一会儿），读完重画。
 func (a *app) loadUsage() {
 	home := a.lib.Home
-	if home == "" || a.win == nil {
+	if home == "" || !a.live {
 		return
 	}
 	go func() {
 		log := library.ReadUsage(home)
-		a.win.Update(func() {
+		a.post(func() {
 			a.usage = log
 			a.lib.SetUsage(log)
-			a.changed()
 		})
 	}()
 }

@@ -41,6 +41,8 @@ const shownDirs = 7
 // settingsState 是设置窗口的状态。
 type settingsState struct {
 	open       bool
+	minimized  bool
+	focused    bool
 	tab        int
 	allAgents  bool      // 「其余 N 个」展开
 	scannedAt  time.Time // 上一次检测 / 检查的时间
@@ -66,14 +68,25 @@ const (
 func (a *app) openSettings() {
 	a.set.err, a.set.linkResult = "", ""
 	a.set.open = true
+	a.set.minimized = false
+	a.set.focused = true
+	if a.main.open {
+		a.main.focused = false
+	}
 	if a.set.tab == tabUpdates && a.lib.Settings.UseGHAuth {
 		a.probeGHAuth(false)
 	}
-	if a.win == nil {
+	if !a.live {
+		a.syncDockProgress(nil)
 		return
 	}
-	if a.setWin != nil {
+	if a.setWin != nil && !a.setWin.IsDestroyed() {
+		a.setWin.SetTitle(settingsTabs[a.set.tab].label())
+		if a.setWin.IsMinimized() {
+			a.setWin.Restore()
+		}
 		a.setWin.Focus()
+		a.changed()
 		return
 	}
 	// 先在屏幕外按当前标签排一遍，量出窗口该有的高度（fitSettings 记在
@@ -81,7 +94,7 @@ func (a *app) openSettings() {
 	// 高度）再显示。藏着的窗口不出帧，没法等它自己量，所以在外面量。
 	// 这样打开时不会先按默认或上次的高度出现、再缩一下。
 	ui.NewTester(a.settingsView, settingsWidth, settingsMaxHeight).Frame()
-	a.setWin = mygo.NewWindow(mygo.WindowOptions{
+	win := mygo.NewWindow(mygo.WindowOptions{
 		Hidden:               true,
 		Title:                settingsTabs[a.set.tab].label(),
 		Width:                settingsWidth,
@@ -96,24 +109,54 @@ func (a *app) openSettings() {
 		BackgroundColor:      "#ececee",
 		Content:              ui.View(a.settingsView),
 	})
+	a.setWin = win
 	a.closeMenusIn(menuWinSettings)
-	a.setWin.SetContentSize(settingsWidth, cmp.Or(a.set.height, 520))
-	a.setWin.Show()
-	a.setWin.OnBlur(func() {
+	win.SetContentSize(settingsWidth, cmp.Or(a.set.height, 520))
+	win.Show()
+	a.syncDockProgress(win)
+	win.OnFocus(func() {
+		a.set.focused = true
+		a.main.focused = false
+	})
+	win.OnBlur(func() {
+		a.set.focused = false
 		a.closeMenusIn(menuWinSettings)
 	})
-	a.setWin.OnClosed(func() {
+	win.OnMinimize(func() {
+		a.set.minimized = true
+		a.set.focused = false
+	})
+	win.OnRestore(func() {
+		a.set.minimized = false
+	})
+	win.OnClose(func(*mygo.CloseEvent) {
+		a.clearDockProgressOnLastWindowClose(win, a.win != nil && !a.win.IsDestroyed())
+	})
+	win.OnClosed(func() {
 		a.closeMenusIn(menuWinSettings)
-		a.setWin, a.set.open = nil, false
+		if a.setWin == win {
+			a.setWin = nil
+		}
+		a.set.open, a.set.minimized, a.set.focused = false, false, false
+		if a.main.open && !a.main.minimized {
+			a.main.focused = true
+		}
 	})
 }
 
 // closeSettings 是 ⌘W。
 func (a *app) closeSettings() {
+	if a.setWin == nil && a.set.open {
+		a.clearDockProgressOnLastWindowClose(nil, a.main.open)
+	}
 	a.closeMenusIn(menuWinSettings)
-	a.set.open = false
-	if a.setWin != nil {
-		a.setWin.Close()
+	a.set.open, a.set.minimized, a.set.focused = false, false, false
+	if a.main.open && !a.main.minimized {
+		a.main.focused = true
+	}
+	if w := a.setWin; w != nil {
+		a.setWin = nil
+		w.Close()
 	}
 }
 
@@ -191,7 +234,7 @@ func (a *app) settingsHeader(c *ui.Context) {
 					if i == tabUpdates && a.lib.Settings.UseGHAuth {
 						a.probeGHAuth(false)
 					}
-					if a.setWin != nil {
+					if a.setWin != nil && !a.setWin.IsDestroyed() {
 						a.setWin.SetTitle(tab.label())
 					}
 				}
@@ -425,19 +468,20 @@ func (a *app) agentDir(ag library.Agent) string {
 
 // chooseAgentDir 选一个技能目录，记下来算一个 Agent。
 func (a *app) chooseAgentDir() {
-	if a.win == nil {
+	if !a.live {
 		a.set.err = locales.SettingsSampleCannotAddDirectory()
 		return
 	}
+	parent := a.dialogParent(true)
 	go func() {
 		dirs, err := mygo.Dialog.Open(mygo.OpenDialogOptions{
-			Parent: a.dialogParent(true), Title: locales.SettingsAddSkillDirectory(), ButtonLabel: locales.ProjectsDialogAdd(), Directory: true,
+			Parent: parent, Title: locales.SettingsAddSkillDirectory(), ButtonLabel: locales.ProjectsDialogAdd(), Directory: true,
 			Message: locales.SettingsChooseSkillDirectory(),
 		})
 		if err != nil || len(dirs) == 0 {
 			return
 		}
-		a.win.Update(func() { a.settingsDo(a.lib.AddAgentDir(dirs[0]), true) })
+		a.post(func() { a.settingsDo(a.lib.AddAgentDir(dirs[0]), true) })
 	}()
 }
 

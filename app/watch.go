@@ -17,9 +17,9 @@ import (
 )
 
 const (
-	defaultWatchDebounce    = 300 * time.Millisecond
-	defaultWatchMaxDelay    = 2 * time.Second
-	activateWatchCooldown   = 5 * time.Second
+	defaultWatchDebounce  = 300 * time.Millisecond
+	defaultWatchMaxDelay  = 2 * time.Second
+	activateWatchCooldown = 5 * time.Second
 )
 
 type pendingWatchScan struct {
@@ -119,9 +119,8 @@ func (a *app) startWatch() {
 			return l, l.Updates()
 		}
 	}
-	if cfg.post == nil && a.win != nil {
-		win := a.win
-		cfg.post = func(fn func()) { win.Update(fn) }
+	if cfg.post == nil && a.live {
+		cfg.post = a.post
 	}
 	if cfg.post == nil {
 		return

@@ -767,7 +767,7 @@ const copiedFor = 1500 * time.Millisecond
 // copyCommand 复制更新命令（画板 ts6-a）：按钮自己变成「已复制」，不弹
 // 提示条；复制失败才弹错误提示条。
 func (a *app) copyCommand(cmd string) {
-	if a.win != nil {
+	if a.live {
 		if err := mygo.Clipboard.Write(transfer.TextData(cmd)); err != nil {
 			a.notify(fromUpdate, toastError, locales.UpdateCopyCommandFailed(err.Error()))
 			return

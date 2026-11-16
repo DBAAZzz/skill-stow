@@ -24,11 +24,15 @@ const (
 
 // app 是窗口的全部状态。
 type app struct {
-	upd    updatePageState
-	imp    importPageState // 添加技能页（import_page.go）
-	lib    *library.Library
-	win    *mygo.Window // 测试里为 nil
-	setWin *mygo.Window // 设置窗口，开着时非 nil
+	upd               updatePageState
+	imp               importPageState // 添加技能页（import_page.go）
+	lib               *library.Library
+	win               *mygo.Window // 测试里为 nil
+	setWin            *mygo.Window // 设置窗口，开着时非 nil
+	main              mainWindowState
+	live              bool
+	quitting          bool
+	keepAliveOverride *bool
 
 	sound     func()           // 放完成提示音，nil 是不放（测试里没有窗口）
 	clock     func() time.Time // 提示音限频用的时钟，nil 是 time.Now（测试里拨动）
@@ -109,11 +113,11 @@ func (a *app) background(work func(post func(func()))) {
 	switch {
 	case a.bg != nil:
 		a.bg(work)
-	case a.win == nil:
+	case !a.live:
 		work(func(fn func()) { fn() })
 		a.changed()
 	default:
-		go work(func(fn func()) { a.win.Update(fn) })
+		go work(func(fn func()) { a.post(fn) })
 	}
 }
 
@@ -149,6 +153,7 @@ func (a *app) cardScroll() *cardScrollState {
 func newApp(lib *library.Library) *app {
 	a := &app{
 		lib:          lib,
+		main:         mainWindowState{open: true, focused: true},
 		scope:        string(library.ScopeMine),
 		expanded:     map[string]bool{},
 		sharedOpen:   map[string]bool{},
@@ -375,7 +380,7 @@ func (a *app) applyScan(lib *library.Library, report library.UpdateReport, reloa
 // 看板里启用的技能也要算进设置里的技能数。
 func (a *app) changed() {
 	for _, w := range []*mygo.Window{a.win, a.setWin} {
-		if w != nil {
+		if w != nil && !w.IsDestroyed() {
 			w.Invalidate()
 		}
 	}
@@ -383,10 +388,16 @@ func (a *app) changed() {
 
 // dialogParent 是系统面板挂在哪个窗口上：设置窗口开着时从设置里打开的挂在它上面。
 func (a *app) dialogParent(fromSettings bool) *mygo.Window {
-	if fromSettings && a.setWin != nil {
+	if fromSettings && a.setWin != nil && !a.setWin.IsDestroyed() {
 		return a.setWin
 	}
-	return a.win
+	if a.win != nil && !a.win.IsDestroyed() {
+		return a.win
+	}
+	if a.setWin != nil && !a.setWin.IsDestroyed() {
+		return a.setWin
+	}
+	return nil
 }
 
 // back 是 Esc：阅读视图回到浏览，浏览时取消选中，打开的集合里没有
@@ -447,13 +458,13 @@ func (a *app) toolbarRow(c *ui.Context, left, right func()) {
 
 // reveal 在 Finder 中显示技能目录（示例数据的目录不存在）。
 func (a *app) reveal(p string) {
-	if a.win != nil {
+	if a.live {
 		mygo.Shell.ShowItemInFolder(expandHome(p))
 	}
 }
 
 func (a *app) openInEditor(p string) {
-	if a.win != nil {
+	if a.live {
 		if err := mygo.Shell.OpenPath(expandHome(p)); err != nil {
 			fmt.Fprintln(os.Stderr, locales.CommonOpenFailedPrefix(), err)
 		}
@@ -468,7 +479,7 @@ func (a *app) openExternalURL(raw string) {
 		a.openURL(raw)
 		return
 	}
-	if a.win != nil {
+	if a.live {
 		if err := mygo.Shell.OpenExternal(raw); err != nil {
 			a.notify(fromLink, toastError, locales.AppCantOpenLink(err.Error()))
 		}

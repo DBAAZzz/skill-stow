@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 
 	"skillmanager/internal/library"
@@ -30,6 +31,11 @@ type tidyState struct {
 	clearRows []library.StaleRecord
 
 	scanning bool // 点了「重新检测」、后台还在扫
+
+	// Dock 进度条状态：wantDock 是业务当前期望显示的进度，appliedDock 是
+	// 最近一次通过有效窗口写入系统 Dock tile 的进度（用于关窗前清理与重开后恢复）。
+	wantDock    mygo.ProgressBar
+	appliedDock mygo.ProgressBar
 }
 
 // busy 报告整理页正在后台批量处理：这时不能再开始另一件，也不能重新检测。
@@ -155,7 +161,7 @@ func (a *app) tidyRescan() {
 	}
 	a.tidy.msg, a.tidy.err = "", ""
 	a.tidy.scanning = true
-	home, gen, live := a.lib.Home, a.watch.scanGen.Load(), a.win != nil
+	home, gen, live := a.lib.Home, a.watch.scanGen.Load(), a.live
 	a.background(func(post func(func())) {
 		start := time.Now()
 		lib := library.Scan(home)

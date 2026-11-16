@@ -183,24 +183,55 @@ func mergedMessage(todo []*library.Skill, total library.MergeResult, errs []stri
 
 // later 过 d 在界面线程上执行 fn 并重画。测试里没有窗口，马上执行。
 func (a *app) later(d time.Duration, fn func()) {
-	if a.win == nil || d <= 0 {
+	if !a.live || d <= 0 {
 		fn()
 		return
 	}
-	win := a.win
-	time.AfterFunc(d, func() { win.Update(fn) })
+	time.AfterFunc(d, func() { a.post(fn) })
 }
 
 // dockProgress 在 Dock 图标上显示进度，切到别的应用也看得见；负数是收起。
 func (a *app) dockProgress(v float64) {
-	if a.win == nil {
+	bar := mygo.ProgressBar{}
+	if v >= 0 {
+		bar = mygo.ProgressBar{
+			State: mygo.ProgressNormal,
+			Value: min(max(v, 0), 1),
+		}
+	}
+	a.tidy.wantDock = bar
+	a.applyDockProgress(a.progressWindow(), bar)
+}
+
+func (a *app) progressWindow() *mygo.Window {
+	return a.dialogParent(false)
+}
+
+func (a *app) applyDockProgress(w *mygo.Window, bar mygo.ProgressBar) {
+	if w != nil && !w.IsDestroyed() {
+		w.SetProgressBar(bar)
+		a.tidy.appliedDock = bar
 		return
 	}
-	if v < 0 {
-		a.win.SetProgressBar(mygo.ProgressBar{})
+	if !a.live && (a.main.open || a.set.open) {
+		a.tidy.appliedDock = bar
+	}
+}
+
+// syncDockProgress 在新建/重开窗口时将 Dock 进度对齐到当前业务期望状态。
+func (a *app) syncDockProgress(w *mygo.Window) {
+	if a.tidy.appliedDock != a.tidy.wantDock {
+		a.applyDockProgress(w, a.tidy.wantDock)
+	}
+}
+
+// clearDockProgressOnLastWindowClose 在最后一个打开的窗口即将销毁前（OnClose）
+// 清除全局 Dock 进度条，避免所有窗口关闭后后台任务结束时因无窗口可调而残留进度。
+func (a *app) clearDockProgressOnLastWindowClose(w *mygo.Window, otherOpen bool) {
+	if otherOpen || a.tidy.appliedDock.State == mygo.ProgressNone {
 		return
 	}
-	a.win.SetProgressBar(mygo.ProgressBar{State: mygo.ProgressNormal, Value: v})
+	a.applyDockProgress(w, mygo.ProgressBar{})
 }
 
 // mergeAllButton 是「全部收成一份」；收的时候它变形成进度胶囊。

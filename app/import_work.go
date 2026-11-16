@@ -86,7 +86,7 @@ func (a *app) openImport() {
 
 // checkClipboard 读一次剪贴板：是能识别的链接或命令时，输入框下面提示粘贴。
 func (a *app) checkClipboard() {
-	if a.win == nil || a.imp.batch != nil || a.imp.cancel != nil {
+	if !a.live || !a.main.open || a.imp.batch != nil || a.imp.cancel != nil {
 		return
 	}
 	b, err := mygo.Clipboard.ReadFormat(transfer.Text)
@@ -482,15 +482,16 @@ func (a *app) addImports() {
 
 // chooseImport 用系统面板选取文件夹或 zip。
 func (a *app) chooseImport() {
-	if a.win == nil {
+	win := a.win
+	if win == nil || win.IsDestroyed() {
 		return
 	}
 	go func() {
-		paths, err := openImportDialog(a.win, defaultImportDialogOptions())
+		paths, err := openImportDialog(win, defaultImportDialogOptions())
 		if err != nil || len(paths) == 0 {
 			return
 		}
-		a.win.Update(func() { a.importPaths(paths) })
+		a.post(func() { a.importPaths(paths) })
 	}()
 }
 

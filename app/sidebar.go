@@ -231,19 +231,20 @@ func (a *app) project() *library.ProjectInfo {
 // chooseProjects 打开系统的选择文件夹面板（可多选），选中的目录记成项目，
 // 重新扫描后列在侧边栏里；show 时打开第一个。
 func (a *app) chooseProjects(show bool) {
-	if a.win == nil {
+	if !a.live {
 		a.set.err = locales.ProjectsSampleCantAdd()
 		return
 	}
+	parent := a.dialogParent(!show)
 	go func() {
 		dirs, err := mygo.Dialog.Open(mygo.OpenDialogOptions{
-			Parent: a.dialogParent(!show), Title: locales.NavAddProject(), ButtonLabel: locales.ProjectsDialogAdd(), Directory: true, Multiple: true,
+			Parent: parent, Title: locales.NavAddProject(), ButtonLabel: locales.ProjectsDialogAdd(), Directory: true, Multiple: true,
 			Message: locales.ProjectsDialogMessage(),
 		})
 		if err != nil || len(dirs) == 0 {
 			return
 		}
-		a.win.Update(func() {
+		a.post(func() {
 			if err := a.lib.AddProjects(dirs); err != nil {
 				a.err, a.set.err = err.Error(), err.Error()
 				a.changed()
