@@ -29,6 +29,7 @@ type Settings struct {
 	SidebarHidden    bool     `json:"sidebarHidden,omitempty"`   // 主窗口的侧边栏收起了
 	QuietTidy        bool     `json:"quietTidy,omitempty"`       // 完成整理时不放提示音
 	ImportListWidth  float32  `json:"importListWidth,omitempty"` // 添加技能页左侧技能列表的宽度，0 为默认
+	WelcomeVersion   int      `json:"welcomeVersion,omitempty"`  // 看过的欢迎面板版本，比当前的小就在启动时再显示
 	// 最近在阅读视图里打开的技能，新的在前，⌘K 空输入时列出
 	RecentSkills []RecentSkill `json:"recentSkills,omitempty"`
 }

@@ -305,6 +305,7 @@ func (a *app) onMainWindowClosed() {
 	a.main.open = false
 	a.main.minimized = false
 	a.main.focused = false
+	a.wel = welcomeState{} // 开场没看完就关了窗口：下次启动再播
 	if !a.keepAliveOnWindowClose() {
 		if a.set.open || a.setWin != nil {
 			a.closeSettings()
@@ -390,7 +391,7 @@ func (a *app) bindLifecycle() {
 	mygo.App.OnDidBecomeActive(a.handleDidBecomeActive)
 }
 
-func (a *app) startLive() {
+func (a *app) startLive(forceWelcome bool) {
 	a.live = true
 	applyLanguage(a.lib.Settings.Language) // 开窗前定下语言，第一帧就是它
 	applyTheme(a.lib.Settings.Theme)       // 外观也是，免得开窗先闪一下另一种
@@ -398,6 +399,8 @@ func (a *app) startLive() {
 	library.Trash = func(_, path string) error { return mygo.Shell.TrashItem(path) }
 	a.sound = playDoneSound
 	a.installAppMenu()
+	// 开场盖在主窗口上，第一帧就要在，不先闪一下主界面
+	a.wel.open = a.needsWelcome(forceWelcome)
 	a.openMainWindow()
 	// 界面换语言时下一帧就重画，但窗口标题和原生菜单是给系统的，要跟着改
 	mygo.App.OnLocaleChanged(func(string) {

@@ -124,6 +124,7 @@ func (a *app) setCard(c *ui.Context, coll *library.Collection, matched int) {
 
 		card := ui.Column(c).Padding(12, 14).Radius(10).Cursor(ui.CursorPointer).Label(coll.Name).Translate(0, -1.5*spread).
 			Transition(cardFeel())
+		a.noteSlot(card) // 开场的演示卡片往这里落
 		switch {
 		case a.coll == coll:
 			card.Background(colBgCard).Shadow(0, 0, 0, 2, colAccent)

@@ -30,6 +30,7 @@ type app struct {
 	win               *mygo.Window // 测试里为 nil
 	setWin            *mygo.Window // 设置窗口，开着时非 nil
 	main              mainWindowState
+	wel               welcomeState // 首次启动的欢迎面板（welcome.go）
 	sysMenu           systemMenuState
 	live              bool
 	quitting          bool
@@ -174,6 +175,9 @@ func (a *app) view(c *ui.Context) {
 	a.menuBuildWin = menuWinMain
 	defer func() { a.menuBuildWin = prevWin }()
 	a.flushPendingWatch()
+	if a.wel.open {
+		a.wel.slots = a.wel.slots[:0] // 这一帧的卡片画的时候重新记
+	}
 	defer func(s *library.Skill) { a.wasSelected = s }(a.selected) // 下一轮 view 用：本轮开始前选中的，点击后同帧重绘时仍为旧值
 	theme(c)
 	vibrant := c.Vibrancy()
@@ -226,6 +230,9 @@ func (a *app) view(c *ui.Context) {
 				// 只有进出阅读视图时上一页才淡出；选中技能后去别的页面不淡出
 				host.ChildExit(ui.Motion{Opacity: 1})
 			}
+			if a.wel.open {
+				host.AnimatePose(a.welcomePagePose()) // 开场时先藏着，收纳时淡入
+			}
 			host.Children(func() {
 				a.paneRoom = 0 // 用了 withPane 的页面会改成详情栏的宽度
 				pg := ui.Column(c.Key(key)).Grow(1).MinHeight(0)
@@ -262,6 +269,7 @@ func (a *app) view(c *ui.Context) {
 	}
 	a.deleteDialogs(c)
 	a.palette(c)
+	a.welcomeLayer(c)
 }
 
 // page 是右边这一页：它的键和画它的函数。

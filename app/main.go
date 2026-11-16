@@ -35,7 +35,7 @@ func main() {
 	}
 	a.bindLifecycle()
 	mygo.App.WhenReady(func() {
-		a.startLive()
+		a.startLive(os.Getenv("SKILLS_WELCOME") != "")
 	})
 	if err := mygo.App.Run(); err != nil {
 		log.Fatal(err)
