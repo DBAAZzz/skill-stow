@@ -6108,5 +6108,26 @@
   "settingsTidySoundHint": "收成一份、清除记录等完成后轻响一声",
   "@settingsTidySoundHint": {
     "description": "设置 › 通用 › 界面：提示音开关下面的说明"
+  },
+  "browseNoSkillsYetTitle": "还没有技能",
+  "@browseNoSkillsYetTitle": {
+    "description": "「我的技能」「全部技能」一个技能都没有时，空状态的标题"
+  },
+  "browseNoSkillsYetBody": "从 GitHub、网站或 Mac 上的文件夹添加技能。",
+  "@browseNoSkillsYetBody": {
+    "description": "「我的技能」空状态标题下面的说明，下面有「添加技能」按钮"
+  },
+  "browseNoSearchResults": "没有“{query}”的结果",
+  "@browseNoSearchResults": {
+    "description": "浏览页搜索没有结果时，空状态的标题；query 是搜索框里的字",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "browseNoSearchResultsHint": "检查一下拼写，或者换个关键词。",
+  "@browseNoSearchResultsHint": {
+    "description": "浏览页搜索没有结果时，标题下面的说明"
   }
 }

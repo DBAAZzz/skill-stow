@@ -282,10 +282,8 @@ func (a *app) setPage(c *ui.Context, coll *library.Collection) {
 	a.withPane(c, func(width float32) {
 		a.modePane(c, func() {
 			switch {
-			case len(skills) == 0 && a.currentFilter().active():
-				emptyFiltered(c, a.clearFilters)
 			case len(skills) == 0:
-				empty(c, locales.CommonNoSkills())
+				a.emptyBrowse(c, false, locales.CommonNoSkills())
 			case a.mode == viewBoard:
 				a.board(c, library.Scope(a.scope), skills, width)
 			default:

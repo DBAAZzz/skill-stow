@@ -73,6 +73,12 @@ var (
 	iconEyeOff      = icon(`<path d="M17.9 17.9A10.1 10.1 0 0 1 12 20c-6 0-10-8-10-8a18.5 18.5 0 0 1 5.1-5.9M9.9 4.2A9.1 9.1 0 0 1 12 4c6 0 10 8 10 8a18.5 18.5 0 0 1-2.2 3.2"/><path d="M14.1 14.1a3 3 0 1 1-4.2-4.2"/><path d="M3 3l18 18"/>`)
 	iconPauseCircle = icon(`<circle cx="12" cy="12" r="8.5"/><path d="M10 9v6M14 9v6"/>`)
 	iconInbox       = icon(`<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>`)
+	// iconEmptyTray 是「还没有技能」空状态的大符号（托盘和落进去的箭头）：
+	// 按 52px 显示画的，描边比 16px 的图标细，放大后和系统符号一样轻。
+	iconEmptyTray = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v8.6M8.7 8.4l3.3 3.3 3.3-3.3"/><path d="M7.3 9.3H6.2a1.8 1.8 0 0 0-1.68 1.16L3.5 13.4v4.6a2.2 2.2 0 0 0 2.2 2.2h12.6a2.2 2.2 0 0 0 2.2-2.2v-4.6l-1.02-2.94A1.8 1.8 0 0 0 17.8 9.3h-1.1"/><path d="M3.5 13.4h4.3l1.3 2.4h5.8l1.3-2.4h4.3"/></svg>`))
+	// iconEmptySearch、iconEmptyFilter 是搜索、筛选没有结果时空状态的大符号。
+	iconEmptySearch = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.3"/><path d="m15.2 15.2 5.3 5.3"/></svg>`))
+	iconEmptyFilter = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M7.6 9.4h8.8M9.2 12.4h5.6M10.8 15.4h2.4"/></svg>`))
 	iconCode        = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 7 3.5 12l5 5M15.5 7 20.5 12l-5 5M13.5 4.5l-3 15"/></svg>`))
 )
 
