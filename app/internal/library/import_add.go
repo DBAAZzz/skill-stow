@@ -390,21 +390,30 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 	var undo []func()
 	var heldItems []*heldItem
 	defer func() {
-		if out.Err != nil || out.Conflict != "" {
+		undone := out.Err != nil || out.Conflict != ""
+		if undone {
 			for i := len(undo) - 1; i >= 0; i-- {
 				undo[i]()
 			}
 		}
+		// 撤回不完整的要说出来：旧版留在哪、哪个旧链接没能照原样建回去
+		var notes []string
 		var kept []string
 		for _, h := range heldItems {
+			switch {
+			case !h.safe():
+				kept = append(kept, l.Display(h.at))
+			case undone && h.trashed && !h.restored:
+				notes = append(notes, locales.ImportReplaceLinkNotRestored(l.Display(h.from), h.link))
+			}
 			if h.safe() {
 				os.RemoveAll(h.tmp)
-			} else {
-				kept = append(kept, l.Display(h.at))
 			}
 		}
 		if len(kept) > 0 {
-			msg := locales.ImportReplaceOldKeptAt(strings.Join(kept, locales.ListSeparator()))
+			notes = append(notes, locales.ImportReplaceOldKeptAt(strings.Join(kept, locales.ListSeparator())))
+		}
+		for _, msg := range notes {
 			if out.Err != nil {
 				out.Err = fmt.Errorf("%w\n%s", out.Err, msg)
 			} else {
@@ -488,10 +497,19 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 				}
 				return ImportOutcome{Err: err}
 			}
+			// 撤回时认链接本身（同一个文件、同样的指向），不解析它指向哪里：
+			// 新版被别的工具挪走时它悬空了，但仍是这次建的，要删掉好让旧链接回来
 			lp := k.path
+			ours, err := os.Lstat(lp)
+			if err != nil {
+				return ImportOutcome{Err: err}
+			}
+			pointer, _ := os.Readlink(lp)
 			undo = append(undo, func() {
-				if r, err := realPath(lp); err == nil && r == real && isLink(lp) {
-					os.Remove(lp)
+				if fi, err := os.Lstat(lp); err == nil && os.SameFile(fi, ours) {
+					if to, err := os.Readlink(lp); err == nil && to == pointer {
+						os.Remove(lp)
+					}
 				}
 			})
 			if was, ok := l.nativeData.Links[k.path]; ok {

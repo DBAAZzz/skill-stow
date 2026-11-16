@@ -6240,5 +6240,17 @@
         "type": "String"
       }
     }
+  },
+  "importReplaceLinkNotRestored": "{path} 没能恢复成原来的链接（原来指向 {to}），旧链接在废纸篓里。",
+  "@importReplaceLinkNotRestored": {
+    "description": "替换中途出错撤回时，某个旧链接没能照原样建回去",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
   }
 }

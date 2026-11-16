@@ -953,5 +953,6 @@
   "importChangedSinceConfirm": "{name} in {place} changed after you chose to replace it, so it wasn't replaced.",
   "importChangedSinceConfirmNote": "Compare again, and choose Replace if you still want to.",
   "importReplaceUnreadable": "{path} can't be read in full, so there's no way to tell whether it changed before replacing. It can't be replaced.",
-  "importReplaceOldKeptAt": "The old version wasn't deleted. It's kept at {paths}."
+  "importReplaceOldKeptAt": "The old version wasn't deleted. It's kept at {paths}.",
+  "importReplaceLinkNotRestored": "{path} couldn't be restored to its original link (it pointed to {to}). The old link is in the Trash."
 }

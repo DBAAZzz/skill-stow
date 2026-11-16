@@ -13805,3 +13805,19 @@ func ImportReplaceOldKeptAt(paths string) string {
 func (msgs Messages) ImportReplaceOldKeptAt(paths string) string {
 	return Catalog.Format(msgs.locale, "importReplaceOldKeptAt", map[string]any{"paths": paths})
 }
+
+// ImportReplaceLinkNotRestored says "{path} 没能恢复成原来的链接（原来指向 {to}），旧链接在废纸篓里。"
+// in the language the app shows.
+//
+// 替换中途出错撤回时，某个旧链接没能照原样建回去
+func ImportReplaceLinkNotRestored(path string, to string) string {
+	return In(i18n.Locale()).ImportReplaceLinkNotRestored(path, to)
+}
+
+// ImportReplaceLinkNotRestored says "{path} 没能恢复成原来的链接（原来指向 {to}），旧链接在废纸篓里。"
+// in the language of msgs.
+//
+// 替换中途出错撤回时，某个旧链接没能照原样建回去
+func (msgs Messages) ImportReplaceLinkNotRestored(path string, to string) string {
+	return Catalog.Format(msgs.locale, "importReplaceLinkNotRestored", map[string]any{"path": path, "to": to})
+}

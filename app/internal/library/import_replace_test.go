@@ -481,3 +481,65 @@ func TestAReplacementThatCannotTrashTheOldVersionPutsEverythingBack(t *testing.T
 		t.Errorf("暂存里不该留东西：%v", left)
 	}
 }
+
+// kiroLinkedReplace：技能库有旧版 vue，Kiro 目录里有个相对链接指向 ~/dev/vue；
+// 替换时旧链接能进废纸篓，旧版进不去，进不去之前 hook 先动手脚。
+func kiroLinkedReplace(t *testing.T, hook func(h func(string) string)) (func(string) string, ImportOutcome) {
+	t.Helper()
+	home, h, b, _ := localReplaceHome(t)
+	writeSkill(t, h("dev/vue"), "开发中的 vue")
+	must(t, os.MkdirAll(h(".kiro/skills"), 0o755))
+	must(t, os.Symlink("../../dev/vue", h(".kiro/skills/vue")))
+	l := Scan(home)
+	p := ImportPlacement{Library: true, Agents: []string{"kiro"}}
+	chk := l.CheckImport(b.Skill("vue"), p)
+	trash := Trash
+	t.Cleanup(func() { Trash = trash })
+	done := false
+	Trash = func(home, path string) error {
+		if isLink(path) {
+			return trash(home, path)
+		}
+		if !done {
+			done = true
+			hook(h)
+		}
+		return errors.New("废纸篓满了")
+	}
+	return h, l.AddImport(b, []string{"vue"}, p, map[string]ImportCheck{"vue": chk})[0]
+}
+
+func TestTheOldLinkComesBackEvenIfTheNewVersionWasMovedAway(t *testing.T) {
+	// Given 旧链接已进废纸篓；旧版进废纸篓前，别的工具把新版挪走了（新链接悬空）
+	h, out := kiroLinkedReplace(t, func(h func(string) string) {
+		must(t, os.Rename(h(".agents/skills/vue"), h(".agents/skills/vue-moved")))
+	})
+
+	// Then 悬空的新链接也是这次建的：撤掉，旧链接照原样建回来
+	if out.Added || out.Err == nil {
+		t.Fatalf("结果 = %+v", out)
+	}
+	if !strings.Contains(readSkillBody(t, h(".agents/skills/vue")), "旧版") {
+		t.Error("旧版应放回原处")
+	}
+	if to, err := os.Readlink(h(".kiro/skills/vue")); err != nil || to != "../../dev/vue" {
+		t.Errorf("Kiro 应照原样读 ~/dev/vue：%q %v", to, err)
+	}
+}
+
+func TestALinkThatCannotBeRebuiltIsReported(t *testing.T) {
+	// Given 撤回前，别的工具在 Kiro 的位置放了自己的东西
+	h, out := kiroLinkedReplace(t, func(h func(string) string) {
+		must(t, os.Remove(h(".kiro/skills/vue")))
+		writeSkill(t, h(".kiro/skills/vue"), "别的工具放的")
+	})
+
+	// Then 不动别人的东西，错误里说清哪个链接没恢复、原来指向哪
+	if out.Added || out.Err == nil || !strings.Contains(out.Err.Error(), "~/.kiro/skills/vue") ||
+		!strings.Contains(out.Err.Error(), "../../dev/vue") {
+		t.Fatalf("要说出没恢复的链接：%+v", out)
+	}
+	if !strings.Contains(readSkillBody(t, h(".kiro/skills/vue")), "别的工具放的") {
+		t.Error("别人的东西不能动")
+	}
+}
