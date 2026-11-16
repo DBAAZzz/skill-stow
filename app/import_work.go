@@ -30,9 +30,10 @@ type importPageState struct {
 
 	batch    *library.ImportBatch
 	picked   map[string]bool
-	focus    string // 右边预览的技能
-	tab      int    // 0 SKILL.md，1 文件
-	file     int    // 文件页选中的文件
+	replace  map[string]library.ImportCheck // 勾上的冲突项：用户确认替换时的那次检查，按 importKey
+	focus    string                         // 右边预览的技能
+	tab      int                            // 0 SKILL.md，1 文件
+	file     int                            // 文件页选中的文件
 	place    library.ImportPlacement
 	placed   bool                           // place 是用户选过或沿用上次的
 	checks   map[string]library.ImportCheck // 按当前 place 查的结果
@@ -58,6 +59,7 @@ type importPageState struct {
 	raw        bool // 「文件」页右上角原文切换
 	widthDirty bool // 冲突卡片的「对比差异」
 	cmpName    string
+	cmpKey     string // 对比的是哪个技能（importKey），对比页上的「用这份替换」用
 
 	clip     string // 剪贴板里能识别的来源，输入框下面一行建议粘贴
 	clipSeen string // 用户关掉或用过的，不再提示
@@ -236,7 +238,7 @@ func (a *app) stopImport() {
 // showBatch 进入选择页：按来源预选；只有一个技能时默认勾上。
 func (a *app) showBatch(b *library.ImportBatch) {
 	st := &a.imp
-	st.batch, st.picked, st.results, st.scanOpen = b, map[string]bool{}, nil, nil
+	st.batch, st.picked, st.replace, st.results, st.scanOpen = b, map[string]bool{}, map[string]library.ImportCheck{}, nil, nil
 	st.resetPreviewSelection()
 	st.fetching, st.fetchErr = map[string]bool{}, map[string]string{}
 	st.ctx, st.stop = context.WithCancel(context.Background())
@@ -291,7 +293,7 @@ func (a *app) discardImport() {
 			b.Discard()
 		}
 	}
-	st.batch, st.picked, st.results, st.checks, st.cmp, st.scanOpen = nil, nil, nil, nil, nil, nil
+	st.batch, st.picked, st.replace, st.results, st.checks, st.cmp, st.scanOpen = nil, nil, nil, nil, nil, nil, nil
 	st.fetching, st.fetchErr, st.stop, st.ctx = nil, nil, nil, nil
 	st.resetPreviewSelection()
 	st.resetPreviewCaches()
@@ -352,11 +354,60 @@ func (a *app) refreshImportChecks() {
 	for _, s := range st.batch.Skills {
 		st.checks[a.importKey(s)] = a.lib.CheckImport(s, st.place)
 	}
+	// 勾上的冲突项只在已有的那一项还是确认时的样子时保留：换了装到哪里、
+	// 或已有的变了，都要用户重新确认
 	for n := range st.picked {
-		if st.checks[n].State != library.ImportNew {
-			delete(st.picked, n)
+		chk := st.checks[n]
+		if chk.State == library.ImportNew {
+			delete(st.replace, n)
+			continue
 		}
+		if r, ok := st.replace[n]; ok && chk.State == library.ImportConflict && chk.SameAs(r) {
+			continue
+		}
+		delete(st.picked, n)
+		delete(st.replace, n)
 	}
+}
+
+// replaceable 报告这个检查结果是能替换的冲突。
+func replaceable(chk library.ImportCheck) bool {
+	return chk.State == library.ImportConflict && chk.Blocked == ""
+}
+
+// setImportReplace 确认或撤回用新版替换已有的同名项。确认时重新检查一次，
+// 记下这次看到的已有项；添加时它变了就不替换。添加时冲突了的技能也从这里
+// 重新决定。
+func (a *app) setImportReplace(k string, on bool) {
+	st := &a.imp
+	if !on {
+		delete(st.replace, k)
+		a.setImportPicked(k, false)
+		return
+	}
+	sk := a.importByKey(k)
+	if sk == nil || st.adding {
+		return
+	}
+	if o, done := st.results[k]; done && !o.Added {
+		delete(st.results, k)
+	}
+	chk := a.lib.CheckImport(sk, st.place)
+	st.checks[k] = chk
+	switch {
+	case chk.State == library.ImportNew: // 已有的不在了：照常添加
+		delete(st.replace, k)
+		a.setImportPicked(k, true)
+	case replaceable(chk):
+		st.replace[k] = chk
+		a.setImportPicked(k, true)
+	}
+}
+
+// importReplacing 报告这个技能勾上了、添加时会替换已有的同名项。
+func (a *app) importReplacing(k string) bool {
+	_, ok := a.imp.replace[k]
+	return ok && a.imp.picked[k]
 }
 
 // setPlacement 换装到哪里：记住作为下次的默认，重新查冲突。
@@ -406,8 +457,23 @@ func (a *app) importAddable() []string {
 		return nil
 	}
 	for _, s := range st.batch.Skills {
-		if st.picked[s.Name] && st.checks[s.Name].State == library.ImportNew && st.results[s.Name].Name == "" {
+		k := a.importKey(s)
+		if !st.picked[k] || st.results[k].Name != "" {
+			continue
+		}
+		if st.checks[k].State == library.ImportNew || a.importReplacing(k) {
 			out = append(out, s.Name)
+		}
+	}
+	return out
+}
+
+// importReplacements 是勾上的技能里要替换的，值是确认时的检查，交给 AddImport。
+func (a *app) importReplacements() map[string]library.ImportCheck {
+	out := map[string]library.ImportCheck{}
+	for _, n := range a.importAddable() {
+		if c, ok := a.imp.replace[n]; ok {
+			out[n] = c
 		}
 	}
 	return out
@@ -431,11 +497,11 @@ func (a *app) addImports() {
 		return
 	}
 	st.adding = true
-	b, p, home := st.batch, st.place, a.lib.Home
+	b, p, home, replace := st.batch, st.place, a.lib.Home, a.importReplacements()
 	a.holdBatch(b)
 	a.background(func(post func(func())) {
 		l := library.Scan(home)
-		out := l.AddImport(b, names, p, nil)
+		out := l.AddImport(b, names, p, replace)
 		next := library.Scan(home)
 		rep := next.Updates()
 		post(func() {
@@ -446,12 +512,16 @@ func (a *app) addImports() {
 			if current && st.results == nil {
 				st.results = map[string]library.ImportOutcome{}
 			}
-			added, failed := 0, 0
+			added, replaced, failed := 0, 0, 0
 			var addedNames []string
 			for _, o := range out {
 				if current {
 					st.results[o.Name] = o
 					delete(st.picked, o.Name)
+					delete(st.replace, o.Name)
+				}
+				if o.Replaced {
+					replaced++
 				}
 				if o.Added {
 					added++
@@ -469,7 +539,11 @@ func (a *app) addImports() {
 			switch {
 			case failed == 0:
 				first := addedNames[0]
-				a.showToast(&toast{source: fromImport, kind: toastOK, text: locales.ImportAddedNames(added, strings.Join(addedNames, locales.ListSeparator())),
+				text := locales.ImportAddedNames(added, strings.Join(addedNames, locales.ListSeparator()))
+				if replaced > 0 {
+					text = locales.ImportAddedReplacedNames(added, replaced, strings.Join(addedNames, locales.ListSeparator()))
+				}
+				a.showToast(&toast{source: fromImport, kind: toastOK, text: text,
 					action: &toastAction{label: locales.ActionView(), run: func() { a.showImported(first) }}})
 			case added == 0:
 				a.notify(fromImport, toastWarn, locales.ImportFailedSkillCount(failed))

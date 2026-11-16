@@ -939,5 +939,17 @@
   "settingsTidySoundHint": "A soft pop after merging copies, clearing records and similar actions",
   "importReplaceOwnCopy": "{agent} has its own copy at {path} (not a link), and replacing won't touch it. Merge the copies in My Skills first.",
   "importReplaceMacOnly": "Replacing an existing skill is only supported on macOS for now",
-  "importReplaceTrashFailed": "Couldn't move the old version to the Trash, so nothing was replaced: "
+  "importReplaceTrashFailed": "Couldn't move the old version to the Trash, so nothing was replaced: ",
+  "actionReplace": "Replace",
+  "actionDontReplace": "Don't Replace",
+  "importReplaceWithIncoming": "Replace with This",
+  "importWillReplace": "Will Replace",
+  "importReplaceTrashNote": "Adding will replace these and move the old ones to the Trash:",
+  "importReplaceLinkOnly": "Link · only the link is moved; what it points to stays",
+  "importAddAndReplaceCount": "Add {add} · Replace {replace}",
+  "importReplaceSkillCount": "{n, plural, one {Replace # Skill} other {Replace # Skills}}",
+  "importReplacedAt": "Replaced the old version in {place}. The old one is in the Trash.",
+  "importAddedReplacedNames": "{added, plural, one {Added # skill} other {Added # skills}} ({replaced} replaced, old versions in the Trash) · {p1}",
+  "importChangedSinceConfirm": "{name} in {place} changed after you chose to replace it, so it wasn't replaced.",
+  "importChangedSinceConfirmNote": "Compare again, and choose Replace if you still want to."
 }

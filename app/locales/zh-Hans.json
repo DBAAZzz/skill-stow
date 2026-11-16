@@ -6130,5 +6130,97 @@
   "@importReplaceTrashFailed": {
     "description": "替换失败的原因前缀，后面接系统错误",
     "placeholders": {}
+  },
+  "actionReplace": "替换",
+  "@actionReplace": {
+    "description": "同名冲突卡片：用要添加的这份替换已有的",
+    "placeholders": {}
+  },
+  "actionDontReplace": "不替换",
+  "@actionDontReplace": {
+    "description": "同名冲突卡片：撤回替换的决定",
+    "placeholders": {}
+  },
+  "importReplaceWithIncoming": "用这份替换",
+  "@importReplaceWithIncoming": {
+    "description": "对比差异页右上角：用要添加的这份替换你的那份",
+    "placeholders": {}
+  },
+  "importWillReplace": "将替换",
+  "@importWillReplace": {
+    "description": "待添加列表：这个技能会替换已有的同名项",
+    "placeholders": {}
+  },
+  "importReplaceTrashNote": "添加时换掉下面这些，旧的移到废纸篓：",
+  "@importReplaceTrashNote": {
+    "description": "同名冲突卡片：确认替换后列出会移到废纸篓的项",
+    "placeholders": {}
+  },
+  "importReplaceLinkOnly": "链接 · 只移走链接，指向的内容不动",
+  "@importReplaceLinkOnly": {
+    "description": "同名冲突卡片：要移走的是链接时的说明",
+    "placeholders": {}
+  },
+  "importAddAndReplaceCount": "添加 {add} 个 · 替换 {replace} 个",
+  "@importAddAndReplaceCount": {
+    "description": "选择页右上角按钮：既有新添加的又有替换的",
+    "placeholders": {
+      "add": {
+        "type": "int"
+      },
+      "replace": {
+        "type": "int"
+      }
+    }
+  },
+  "importReplaceSkillCount": "替换 {n} 个技能",
+  "@importReplaceSkillCount": {
+    "description": "选择页右上角按钮：勾上的都是替换",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "importReplacedAt": "已替换 {place} 里的旧版，旧版在废纸篓。",
+  "@importReplacedAt": {
+    "description": "替换完成",
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "importAddedReplacedNames": "已添加 {added} 个技能（替换了 {replaced} 个，旧版在废纸篓）· {p1}",
+  "@importAddedReplacedNames": {
+    "description": "一批技能添加结束后的结果提示：其中有替换的",
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "replaced": {
+        "type": "int"
+      },
+      "p1": {
+        "type": "String"
+      }
+    }
+  },
+  "importChangedSinceConfirm": "确认替换之后，{place}里的 {name} 又有了改动，这次没有替换。",
+  "@importChangedSinceConfirm": {
+    "description": "添加时发现要替换的那一项在确认后变了",
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "importChangedSinceConfirmNote": "再对比一次，还要替换就再点「替换」。",
+  "@importChangedSinceConfirmNote": {
+    "description": "要替换的那一项在确认后变了时的说明",
+    "placeholders": {}
   }
 }

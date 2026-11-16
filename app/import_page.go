@@ -442,7 +442,12 @@ func (a *app) importSourceBar(c *ui.Context) {
 		ui.Box(c).Width(1).Height(20).Background(colBorderDefault).Margin(0, 2)
 		n := len(a.importAddable())
 		label := locales.ActionAddSkills()
-		if n > 0 {
+		switch r := len(a.importReplacements()); {
+		case r > 0 && r == n:
+			label = locales.ImportReplaceSkillCount(r)
+		case r > 0:
+			label = locales.ImportAddAndReplaceCount(n-r, r)
+		case n > 0:
 			label = locales.ImportAddSkillCount(n)
 		}
 		if st.adding {
@@ -675,6 +680,9 @@ func (a *app) importTag(s *library.ImportSkill) importTagSpec {
 	case library.ImportSame:
 		return importTagSpec{text: locales.ImportAddedUpToDate(), tone: tagToneMuted, icon: symTagMuted}
 	case library.ImportConflict:
+		if a.importReplacing(k) {
+			return importTagSpec{text: locales.ImportWillReplace(), tone: tagToneWarn, icon: symTagWarn}
+		}
 		return importTagSpec{text: locales.ImportNameExists(), tone: tagToneWarn, icon: symTagWarn}
 	case library.ImportInvalid:
 		return importTagSpec{text: locales.ImportCannotAdd(), tone: tagToneCrit, icon: symCritical}
@@ -721,7 +729,13 @@ func (a *app) importList(c *ui.Context) {
 			selectable = append(selectable, k)
 		}
 	}
-	picked := len(a.importAddable())
+	picked := 0 // 能直接添加的里勾上了几个；全选不碰要替换的
+	for _, k := range selectable {
+		if st.picked[k] {
+			picked++
+		}
+	}
+	chosen := len(a.importAddable())
 	ui.Column(c).Grow(1).MinWidth(0).Background(colBgSurface).Children(func() {
 		ui.Row(c).Height(36).Shrink(0).Padding(0, 14).Gap(9).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(colBorderDefault).Children(func() {
 			all := picked > 0 && picked == len(selectable)
@@ -731,7 +745,7 @@ func (a *app) importList(c *ui.Context) {
 					a.setImportPicked(n, !all)
 				}
 			}
-			ui.Text(c, locales.ImportSkillSelectionSummary(len(b.Skills), picked)).FontSize(12).TextColor(colTextSecondary).FontFeatures("tnum").Grow(1).SingleLine()
+			ui.Text(c, locales.ImportSkillSelectionSummary(len(b.Skills), chosen)).FontSize(12).TextColor(colTextSecondary).FontFeatures("tnum").Grow(1).SingleLine()
 			if b.Hidden > 0 {
 				// 指定了技能时只读了那几个；要看仓库里其他的再整个读一遍
 				if linkButton(c, locales.CommonShowAllTotal(len(b.Skills)+b.Hidden)).Tooltip(locales.ImportRepositoryHasMore(b.Hidden)).Clicked() {
@@ -761,14 +775,19 @@ func (a *app) importRow(c *ui.Context, s *library.ImportSkill) {
 	k := a.importKey(s)
 	chk := st.checks[k]
 	o, done := st.results[k]
-	can := chk.State == library.ImportNew && !done
+	conflict := replaceable(chk)
+	can := (chk.State == library.ImportNew || conflict) && !done
 	on := st.picked[k] || chk.State == library.ImportSame || done && o.Added
 	row := ui.ButtonBase(c.Key("row-"+k)).Padding(8, 8).Gap(9).Radius(7).AlignItems(ui.Start).Label(s.Name)
 	selectableRow(row, st.focus == k, colAccentBg)
 	row.Children(func() {
 		box := checkBox(c.Key("chk-"+k), on, false, can, locales.ImportSelectSkill(s.Name))
 		if box.Clicked() && can {
-			a.setImportPicked(k, !st.picked[k])
+			if conflict {
+				a.setImportReplace(k, !st.picked[k])
+			} else {
+				a.setImportPicked(k, !st.picked[k])
+			}
 		}
 		ui.Column(c).Grow(1).MinWidth(0).Gap(3).Children(func() {
 			ui.Row(c).Gap(6).AlignItems(ui.Center).Children(func() {
@@ -857,7 +876,11 @@ func (a *app) importStatusNotes(c *ui.Context, s *library.ImportSkill) {
 				ui.Row(c).Padding(10, 14).Gap(10).AlignItems(ui.Center).Children(func() {
 					ui.Image(c, symOK).Size(16, 16).Shrink(0).AlignSelf(ui.Start).Margin(1, 0, 0, 0)
 					ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
-						ui.Text(c, locales.ImportAddedTo(a.lib.Display(o.Place))).FontSize(12.5).FontWeight(600).TextColor(colTextPrimary)
+						title := locales.ImportAddedTo(a.lib.Display(o.Place))
+						if o.Replaced {
+							title = locales.ImportReplacedAt(a.lib.Display(o.Place))
+						}
+						ui.Text(c, title).FontSize(12.5).FontWeight(600).TextColor(colTextPrimary)
 						ui.Text(c, a.importedNote(s)).FontSize(11.5).LineHeight(1.45).TextColor(colTextSecondary)
 					})
 					if detailHairlineButton(c, "reveal-imported", locales.ActionShowInFinder()).Clicked() {
@@ -865,6 +888,11 @@ func (a *app) importStatusNotes(c *ui.Context, s *library.ImportSkill) {
 					}
 				})
 			})
+		}
+	case done && o.Conflict != "" && o.Stale:
+		render = func() {
+			a.conflictCard(c, s, o.Conflict, locales.ImportChangedSinceConfirm(a.placeName(o.Conflict), s.Name),
+				locales.ImportChangedSinceConfirmNote())
 		}
 	case done && o.Conflict != "":
 		render = func() {
@@ -930,9 +958,13 @@ func riskLabel(r string) string {
 }
 
 // conflictCard 是已有同名的提示（r11 方案 A）：采用与安全审计一致的 #f5f5f7 无边框分组，
-// 16px 图标与正文严格对齐 x=40px 轨道，无内部分割线，右上角提供「对比差异」按钮。
+// 16px 图标与正文严格对齐 x=40px 轨道，无内部分割线，右上角是「对比差异」和
+// 「替换」。确认替换后列出添加时会移到废纸篓的项；不能替换时写原因。
 func (a *app) conflictCard(c *ui.Context, s *library.ImportSkill, existing, title, body string) {
 	b := a.imp.batch
+	k := a.importKey(s)
+	chk := a.imp.checks[k]
+	replacing := a.importReplacing(k)
 	headAlign := ui.Center
 	if body != "" {
 		headAlign = ui.Start
@@ -951,6 +983,15 @@ func (a *app) conflictCard(c *ui.Context, s *library.ImportSkill, existing, titl
 			})
 			if detailHairlineButton(c, "conflict-compare", locales.ActionCompareDifferences()).Clicked() {
 				a.openImportCompare(s, existing)
+			}
+			if a.canDecideReplace(k) {
+				label := locales.ActionReplace()
+				if replacing {
+					label = locales.ActionDontReplace()
+				}
+				if detailHairlineButton(c, "conflict-replace", label).Clicked() {
+					a.setImportReplace(k, !replacing)
+				}
 			}
 		})
 		theirs, meta := a.lib.Display(s.RepoPath), locales.CommonLocal()
@@ -975,7 +1016,37 @@ func (a *app) conflictCard(c *ui.Context, s *library.ImportSkill, existing, titl
 				})
 			}
 		})
+		switch {
+		case chk.State == library.ImportConflict && chk.Blocked != "":
+			ui.Text(c, chk.Blocked).FontSize(11.5).LineHeight(1.45).TextColor(colWarnText).Padding(0, 14, 11, 40)
+		case replacing:
+			ui.Column(c).Padding(0, 14, 11, 40).Gap(3).Children(func() {
+				ui.Text(c, locales.ImportReplaceTrashNote()).FontSize(11.5).TextColor(colWarnText)
+				for _, e := range chk.Replaces {
+					ui.Row(c.Key("trash-" + e.Path)).Gap(10).AlignItems(ui.Center).Children(func() {
+						ui.Text(c, a.lib.Display(e.Path)).FontSize(11.5).Font("monospace").TextColor(colTextBody).Grow(1).MinWidth(0).SingleLine()
+						if e.Link {
+							ui.Text(c, locales.ImportReplaceLinkOnly()).FontSize(11).TextColor(colTextMuted).Shrink(0).SingleLine()
+						}
+					})
+				}
+			})
+		}
 	})
+}
+
+// canDecideReplace 报告这个技能现在能不能确认或撤回替换：已有同名且能替换，
+// 或添加时撞上了同名（重新检查后再决定）。添加中、已添加的不行。
+func (a *app) canDecideReplace(k string) bool {
+	st := &a.imp
+	if st.adding {
+		return false
+	}
+	if o, done := st.results[k]; done {
+		// 撞上的那一项后来又不在了也给按钮：重新决定时照常添加
+		return !o.Added && o.Conflict != "" && (replaceable(st.checks[k]) || st.checks[k].State == library.ImportNew)
+	}
+	return replaceable(st.checks[k])
 }
 
 // openImportCompare 打开「你的」和「要添加的」的对比。
@@ -984,7 +1055,7 @@ func (a *app) openImportCompare(s *library.ImportSkill, existing string) {
 	if r, err := filepath.EvalSymlinks(existing); err == nil {
 		real = r
 	}
-	a.imp.cmpName = s.Name
+	a.imp.cmpName, a.imp.cmpKey = s.Name, a.importKey(s)
 	a.imp.cmp = &compareState{
 		files:    a.lib.Compare(&library.Version{Real: real}, &library.Version{Real: s.Dir}),
 		open:     map[int]bool{},
@@ -1005,6 +1076,19 @@ func (a *app) importComparePage(c *ui.Context) {
 		})
 	}, func() {
 		diffModeSwitch(c, &st.fullFile)
+		if k := a.imp.cmpKey; a.canDecideReplace(k) {
+			replacing := a.importReplacing(k)
+			label := locales.ImportReplaceWithIncoming()
+			if replacing {
+				label = locales.ActionDontReplace()
+			}
+			if updButton(c.Key("compare-replace"), nil, label, false).Clicked() {
+				a.setImportReplace(k, !replacing)
+				if !replacing {
+					a.imp.cmp = nil // 回到选择页，按「添加」时才真的替换
+				}
+			}
+		}
 	})
 	ui.Row(c).Grow(1).MinHeight(0).AlignItems(ui.Stretch).Children(func() {
 		diffFileTree(c, st)

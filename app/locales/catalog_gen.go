@@ -13599,3 +13599,177 @@ func ImportReplaceTrashFailed() string { return In(i18n.Locale()).ImportReplaceT
 func (msgs Messages) ImportReplaceTrashFailed() string {
 	return Catalog.Format(msgs.locale, "importReplaceTrashFailed", nil)
 }
+
+// ActionReplace says "替换"
+// in the language the app shows.
+//
+// 同名冲突卡片：用要添加的这份替换已有的
+func ActionReplace() string { return In(i18n.Locale()).ActionReplace() }
+
+// ActionReplace says "替换"
+// in the language of msgs.
+//
+// 同名冲突卡片：用要添加的这份替换已有的
+func (msgs Messages) ActionReplace() string {
+	return Catalog.Format(msgs.locale, "actionReplace", nil)
+}
+
+// ActionDontReplace says "不替换"
+// in the language the app shows.
+//
+// 同名冲突卡片：撤回替换的决定
+func ActionDontReplace() string { return In(i18n.Locale()).ActionDontReplace() }
+
+// ActionDontReplace says "不替换"
+// in the language of msgs.
+//
+// 同名冲突卡片：撤回替换的决定
+func (msgs Messages) ActionDontReplace() string {
+	return Catalog.Format(msgs.locale, "actionDontReplace", nil)
+}
+
+// ImportReplaceWithIncoming says "用这份替换"
+// in the language the app shows.
+//
+// 对比差异页右上角：用要添加的这份替换你的那份
+func ImportReplaceWithIncoming() string { return In(i18n.Locale()).ImportReplaceWithIncoming() }
+
+// ImportReplaceWithIncoming says "用这份替换"
+// in the language of msgs.
+//
+// 对比差异页右上角：用要添加的这份替换你的那份
+func (msgs Messages) ImportReplaceWithIncoming() string {
+	return Catalog.Format(msgs.locale, "importReplaceWithIncoming", nil)
+}
+
+// ImportWillReplace says "将替换"
+// in the language the app shows.
+//
+// 待添加列表：这个技能会替换已有的同名项
+func ImportWillReplace() string { return In(i18n.Locale()).ImportWillReplace() }
+
+// ImportWillReplace says "将替换"
+// in the language of msgs.
+//
+// 待添加列表：这个技能会替换已有的同名项
+func (msgs Messages) ImportWillReplace() string {
+	return Catalog.Format(msgs.locale, "importWillReplace", nil)
+}
+
+// ImportReplaceTrashNote says "添加时换掉下面这些，旧的移到废纸篓："
+// in the language the app shows.
+//
+// 同名冲突卡片：确认替换后列出会移到废纸篓的项
+func ImportReplaceTrashNote() string { return In(i18n.Locale()).ImportReplaceTrashNote() }
+
+// ImportReplaceTrashNote says "添加时换掉下面这些，旧的移到废纸篓："
+// in the language of msgs.
+//
+// 同名冲突卡片：确认替换后列出会移到废纸篓的项
+func (msgs Messages) ImportReplaceTrashNote() string {
+	return Catalog.Format(msgs.locale, "importReplaceTrashNote", nil)
+}
+
+// ImportReplaceLinkOnly says "链接 · 只移走链接，指向的内容不动"
+// in the language the app shows.
+//
+// 同名冲突卡片：要移走的是链接时的说明
+func ImportReplaceLinkOnly() string { return In(i18n.Locale()).ImportReplaceLinkOnly() }
+
+// ImportReplaceLinkOnly says "链接 · 只移走链接，指向的内容不动"
+// in the language of msgs.
+//
+// 同名冲突卡片：要移走的是链接时的说明
+func (msgs Messages) ImportReplaceLinkOnly() string {
+	return Catalog.Format(msgs.locale, "importReplaceLinkOnly", nil)
+}
+
+// ImportAddAndReplaceCount says "添加 {add} 个 · 替换 {replace} 个"
+// in the language the app shows.
+//
+// 选择页右上角按钮：既有新添加的又有替换的
+func ImportAddAndReplaceCount(add int, replace int) string {
+	return In(i18n.Locale()).ImportAddAndReplaceCount(add, replace)
+}
+
+// ImportAddAndReplaceCount says "添加 {add} 个 · 替换 {replace} 个"
+// in the language of msgs.
+//
+// 选择页右上角按钮：既有新添加的又有替换的
+func (msgs Messages) ImportAddAndReplaceCount(add int, replace int) string {
+	return Catalog.Format(msgs.locale, "importAddAndReplaceCount", map[string]any{"add": add, "replace": replace})
+}
+
+// ImportReplaceSkillCount says "替换 {n} 个技能"
+// in the language the app shows.
+//
+// 选择页右上角按钮：勾上的都是替换
+func ImportReplaceSkillCount(n int) string { return In(i18n.Locale()).ImportReplaceSkillCount(n) }
+
+// ImportReplaceSkillCount says "替换 {n} 个技能"
+// in the language of msgs.
+//
+// 选择页右上角按钮：勾上的都是替换
+func (msgs Messages) ImportReplaceSkillCount(n int) string {
+	return Catalog.Format(msgs.locale, "importReplaceSkillCount", map[string]any{"n": n})
+}
+
+// ImportReplacedAt says "已替换 {place} 里的旧版，旧版在废纸篓。"
+// in the language the app shows.
+//
+// 替换完成
+func ImportReplacedAt(place string) string { return In(i18n.Locale()).ImportReplacedAt(place) }
+
+// ImportReplacedAt says "已替换 {place} 里的旧版，旧版在废纸篓。"
+// in the language of msgs.
+//
+// 替换完成
+func (msgs Messages) ImportReplacedAt(place string) string {
+	return Catalog.Format(msgs.locale, "importReplacedAt", map[string]any{"place": place})
+}
+
+// ImportAddedReplacedNames says "已添加 {added} 个技能（替换了 {replaced} 个，旧版在废纸篓）· {p1}"
+// in the language the app shows.
+//
+// 一批技能添加结束后的结果提示：其中有替换的
+func ImportAddedReplacedNames(added int, replaced int, p1 string) string {
+	return In(i18n.Locale()).ImportAddedReplacedNames(added, replaced, p1)
+}
+
+// ImportAddedReplacedNames says "已添加 {added} 个技能（替换了 {replaced} 个，旧版在废纸篓）· {p1}"
+// in the language of msgs.
+//
+// 一批技能添加结束后的结果提示：其中有替换的
+func (msgs Messages) ImportAddedReplacedNames(added int, replaced int, p1 string) string {
+	return Catalog.Format(msgs.locale, "importAddedReplacedNames", map[string]any{"added": added, "replaced": replaced, "p1": p1})
+}
+
+// ImportChangedSinceConfirm says "确认替换之后，{place}里的 {name} 又有了改动，这次没有替换。"
+// in the language the app shows.
+//
+// 添加时发现要替换的那一项在确认后变了
+func ImportChangedSinceConfirm(place string, name string) string {
+	return In(i18n.Locale()).ImportChangedSinceConfirm(place, name)
+}
+
+// ImportChangedSinceConfirm says "确认替换之后，{place}里的 {name} 又有了改动，这次没有替换。"
+// in the language of msgs.
+//
+// 添加时发现要替换的那一项在确认后变了
+func (msgs Messages) ImportChangedSinceConfirm(place string, name string) string {
+	return Catalog.Format(msgs.locale, "importChangedSinceConfirm", map[string]any{"place": place, "name": name})
+}
+
+// ImportChangedSinceConfirmNote says "再对比一次，还要替换就再点「替换」。"
+// in the language the app shows.
+//
+// 要替换的那一项在确认后变了时的说明
+func ImportChangedSinceConfirmNote() string { return In(i18n.Locale()).ImportChangedSinceConfirmNote() }
+
+// ImportChangedSinceConfirmNote says "再对比一次，还要替换就再点「替换」。"
+// in the language of msgs.
+//
+// 要替换的那一项在确认后变了时的说明
+func (msgs Messages) ImportChangedSinceConfirmNote() string {
+	return Catalog.Format(msgs.locale, "importChangedSinceConfirmNote", nil)
+}
