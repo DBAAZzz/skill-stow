@@ -939,5 +939,9 @@
   "settingsTidySoundHint": "A soft pop after merging copies, clearing records and similar actions",
   "menuAbout": "About {app}",
   "menuCheckAppUpdates": "Check for App Updates…",
-  "menuSettings": "Settings…"
+  "menuSettings": "Settings…",
+  "browseNoSkillsYetBody": "Add skills from GitHub, a website, or a folder on your Mac.",
+  "browseNoSearchResults": "No Results for “{query}”",
+  "browseNoSkillsYetTitle": "No Skills Yet",
+  "browseNoSearchResultsHint": "Check the spelling or try a new search."
 }

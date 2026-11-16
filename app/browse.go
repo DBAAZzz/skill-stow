@@ -306,11 +306,7 @@ func (a *app) sections(skills []*library.Skill) []section {
 
 func (a *app) cards(c *ui.Context, scope library.Scope, skills []*library.Skill, width float32) {
 	if len(skills) == 0 {
-		if a.currentFilter().active() {
-			emptyFiltered(c, a.clearFilters)
-		} else {
-			empty(c, locales.CommonNoSkills())
-		}
+		a.emptyBrowse(c, canAddSkills(scope), locales.CommonNoSkills())
 		return
 	}
 	cols := columnsFor(width)
@@ -497,11 +493,7 @@ func (a *app) board(c *ui.Context, scope library.Scope, skills []*library.Skill,
 	f := a.currentFilter()
 	mine := mineOf(skills)
 	if len(mine) == 0 {
-		if f.active() {
-			emptyFiltered(c, a.clearFilters)
-		} else {
-			empty(c, locales.BrowseBoardDescription())
-		}
+		a.emptyBoard(c, scope, len(skills) == 0)
 		return
 	}
 	agents := a.boardAgents(mine)
@@ -527,11 +519,7 @@ func (a *app) board(c *ui.Context, scope library.Scope, skills []*library.Skill,
 		columns++
 	}
 	if columns == 0 {
-		if f.active() {
-			emptyFiltered(c, a.clearFilters)
-		} else {
-			empty(c, locales.BrowseBoardDescription())
-		}
+		a.emptyBoard(c, scope, false)
 		return
 	}
 	a.boardRow(c, columns, width, func(colW float32) {

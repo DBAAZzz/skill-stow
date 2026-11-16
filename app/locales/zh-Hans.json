@@ -6125,5 +6125,26 @@
   "menuSettings": "设置…",
   "@menuSettings": {
     "description": "macOS 系统应用菜单：打开设置窗口（⌘,）"
-  }
+  },
+  "@browseNoSearchResults": {
+    "description": "浏览页搜索没有结果时，空状态的标题；query 是搜索框里的字",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "browseNoSkillsYetBody": "从 GitHub、网站或 Mac 上的文件夹添加技能。",
+  "@browseNoSkillsYetTitle": {
+    "description": "「我的技能」「全部技能」一个技能都没有时，空状态的标题"
+  },
+  "@browseNoSkillsYetBody": {
+    "description": "「我的技能」空状态标题下面的说明，下面有「添加技能」按钮"
+  },
+  "browseNoSearchResultsHint": "检查一下拼写，或者换个关键词。",
+  "browseNoSearchResults": "没有“{query}”的结果",
+  "@browseNoSearchResultsHint": {
+    "description": "浏览页搜索没有结果时，标题下面的说明"
+  },
+  "browseNoSkillsYetTitle": "还没有技能"
 }

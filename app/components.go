@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/egoist/mygo/ui"
@@ -194,14 +195,83 @@ func empty(c *ui.Context, text string) {
 	})
 }
 
+// emptyState 是内容区没东西可列时的占位，照 macOS 的 ContentUnavailableView：
+// 淡色的大符号、粗体标题、一两行说明，下面可选放按钮。按钮用窗口里普通的
+// 白色按钮，不用蓝色实心的，空状态是提示，不是弹窗。整组比正中略靠上，
+// 看起来才在中间。
+func emptyState(c *ui.Context, glyph *ui.SVG, title, body string, actions func()) {
+	ui.Column(c).Grow(1).Center().Padding(24, 32, 56, 32).Children(func() {
+		// 成组、以标题为名：旁白把它当一块读，按钮固定在组的最下面
+		ui.Column(c).MaxWidth(340).AlignItems(ui.Center).Role(ui.RoleGroup).Label(title).Children(func() {
+			ui.Icon(c, glyph).Size(52, 52).TextColor(colTextDisabled)
+			ui.Text(c, title).FontSize(17).FontWeight(600).TextColor(colTextSecondary).TextAlign(ui.Center).
+				Margin(14, 0, 0, 0)
+			if body != "" {
+				ui.Text(c, body).FontSize(12.5).LineHeight(1.5).TextColor(colTextMuted).TextAlign(ui.Center).
+					Margin(6, 0, 0, 0)
+			}
+			if actions != nil {
+				ui.Row(c).Gap(8).Margin(20, 0, 0, 0).Children(actions)
+			}
+		})
+	})
+}
+
 func emptyFiltered(c *ui.Context, onClear func()) {
-	ui.Column(c).Grow(1).Center().Gap(10).Children(func() {
-		ui.Text(c, locales.BrowseNoFilterMatches()).TextColor(colTextDisabled)
-		btn := pushButton(c, locales.ActionClearFilters())
-		if btn.Clicked() {
+	emptyState(c, iconEmptyFilter, locales.BrowseNoFilterMatches(), "", func() {
+		if dialogButton(c, locales.ActionClearFilters(), false).Clicked() {
 			onClear()
 		}
 	})
+}
+
+// emptyBrowse 是浏览页一个技能都列不出来时的占位，按原因分：搜索没结果、
+// 筛选没结果、库里本来就没有。canAdd 时（我的技能、全部技能）库里没有就
+// 给一个去添加技能页的按钮；只读的范围只说没有。
+func (a *app) emptyBrowse(c *ui.Context, canAdd bool, fallback string) {
+	filtered := a.currentFilter().active()
+	switch query := strings.TrimSpace(a.query); {
+	case query != "":
+		var clear func()
+		if filtered { // 搜索加筛选都没结果：先把筛选去掉可能就有了
+			clear = func() {
+				if dialogButton(c, locales.ActionClearFilters(), false).Clicked() {
+					a.clearFilters()
+				}
+			}
+		}
+		emptyState(c, iconEmptySearch, locales.BrowseNoSearchResults(query), locales.BrowseNoSearchResultsHint(), clear)
+	case filtered:
+		emptyFiltered(c, a.clearFilters)
+	case canAdd:
+		emptyState(c, iconEmptyTray, locales.BrowseNoSkillsYetTitle(), locales.BrowseNoSkillsYetBody(), func() {
+			if dialogButton(c, locales.ActionAddSkills(), false).Clicked() {
+				a.openImport()
+			}
+		})
+	default:
+		empty(c, fallback)
+	}
+}
+
+// emptyBoard 是看板一列都排不出来时的占位。nothing 为真时这一页本来就一个
+// 技能都没有，原因交给 emptyBrowse 分；否则技能是有的，只是排不进看板（只有
+// 插件、内置的，或者列都隐藏了），不能说成搜索没结果或还没有技能。
+func (a *app) emptyBoard(c *ui.Context, scope library.Scope, nothing bool) {
+	switch {
+	case nothing:
+		a.emptyBrowse(c, canAddSkills(scope), locales.BrowseBoardDescription())
+	case a.currentFilter().active():
+		emptyFiltered(c, a.clearFilters)
+	default:
+		empty(c, locales.BrowseBoardDescription())
+	}
+}
+
+// canAddSkills 报告添加的技能会不会出现在 scope 里：我的技能、全部技能会，
+// 内置技能不会。集合页自己传 false，不走这里。
+func canAddSkills(scope library.Scope) bool {
+	return scope == library.ScopeMine || scope == library.ScopeAll
 }
 
 // ——— 看板 ———

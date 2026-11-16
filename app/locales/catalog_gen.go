@@ -13595,3 +13595,63 @@ func MenuSettings() string { return In(i18n.Locale()).MenuSettings() }
 func (msgs Messages) MenuSettings() string {
 	return Catalog.Format(msgs.locale, "menuSettings", nil)
 }
+
+// BrowseNoSkillsYetBody says "从 GitHub、网站或 Mac 上的文件夹添加技能。"
+// in the language the app shows.
+//
+// 「我的技能」空状态标题下面的说明，下面有「添加技能」按钮
+func BrowseNoSkillsYetBody() string { return In(i18n.Locale()).BrowseNoSkillsYetBody() }
+
+// BrowseNoSkillsYetBody says "从 GitHub、网站或 Mac 上的文件夹添加技能。"
+// in the language of msgs.
+//
+// 「我的技能」空状态标题下面的说明，下面有「添加技能」按钮
+func (msgs Messages) BrowseNoSkillsYetBody() string {
+	return Catalog.Format(msgs.locale, "browseNoSkillsYetBody", nil)
+}
+
+// BrowseNoSearchResultsHint says "检查一下拼写，或者换个关键词。"
+// in the language the app shows.
+//
+// 浏览页搜索没有结果时，标题下面的说明
+func BrowseNoSearchResultsHint() string { return In(i18n.Locale()).BrowseNoSearchResultsHint() }
+
+// BrowseNoSearchResultsHint says "检查一下拼写，或者换个关键词。"
+// in the language of msgs.
+//
+// 浏览页搜索没有结果时，标题下面的说明
+func (msgs Messages) BrowseNoSearchResultsHint() string {
+	return Catalog.Format(msgs.locale, "browseNoSearchResultsHint", nil)
+}
+
+// BrowseNoSearchResults says "没有“{query}”的结果"
+// in the language the app shows.
+//
+// 浏览页搜索没有结果时，空状态的标题；query
+// 是搜索框里的字
+func BrowseNoSearchResults(query string) string {
+	return In(i18n.Locale()).BrowseNoSearchResults(query)
+}
+
+// BrowseNoSearchResults says "没有“{query}”的结果"
+// in the language of msgs.
+//
+// 浏览页搜索没有结果时，空状态的标题；query
+// 是搜索框里的字
+func (msgs Messages) BrowseNoSearchResults(query string) string {
+	return Catalog.Format(msgs.locale, "browseNoSearchResults", map[string]any{"query": query})
+}
+
+// BrowseNoSkillsYetTitle says "还没有技能"
+// in the language the app shows.
+//
+// 「我的技能」「全部技能」一个技能都没有时，空状态的标题
+func BrowseNoSkillsYetTitle() string { return In(i18n.Locale()).BrowseNoSkillsYetTitle() }
+
+// BrowseNoSkillsYetTitle says "还没有技能"
+// in the language of msgs.
+//
+// 「我的技能」「全部技能」一个技能都没有时，空状态的标题
+func (msgs Messages) BrowseNoSkillsYetTitle() string {
+	return Catalog.Format(msgs.locale, "browseNoSkillsYetTitle", nil)
+}
