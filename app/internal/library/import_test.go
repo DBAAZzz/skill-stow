@@ -289,7 +289,7 @@ func TestAnInvalidNameCannotBeAdded(t *testing.T) {
 	if c := l.CheckImport(sk, ImportPlacement{Library: true}); c.State != ImportInvalid {
 		t.Errorf("状态 = %v", c.State)
 	}
-	if out := l.AddImport(b, []string{sk.Name}, ImportPlacement{Library: true}); out[0].Added || out[0].Err == nil {
+	if out := l.AddImport(b, []string{sk.Name}, ImportPlacement{Library: true}, nil); out[0].Added || out[0].Err == nil {
 		t.Errorf("不能添加：%+v", out)
 	}
 }
@@ -307,7 +307,7 @@ func TestAddingToTheLibraryWritesTheSameRecordAsNpx(t *testing.T) {
 	commit := f.publish(t, "antfu/skills", antfuSkills)
 	b := readAntfu(t, home, f, "antfu/skills")
 	l := Scan(home)
-	out := l.AddImport(b, []string{"vite"}, ImportPlacement{Library: true})
+	out := l.AddImport(b, []string{"vite"}, ImportPlacement{Library: true}, nil)
 	if !out[0].Added || out[0].Place != h(".agents/skills/vite") {
 		t.Fatalf("结果 = %+v", out)
 	}
@@ -356,7 +356,7 @@ func TestARootSkillIsRecordedWithItsCommitLikeNpx(t *testing.T) {
 	f := newFakeImport()
 	commit := f.publish(t, "tw93/kami", map[string]string{"SKILL.md": "---\nname: kami\ndescription: 排版\n---\n", "assets/a.css": "a"})
 	b := readAntfu(t, home, f, "tw93/kami")
-	out := Scan(home).AddImport(b, []string{"kami"}, ImportPlacement{Library: true})
+	out := Scan(home).AddImport(b, []string{"kami"}, ImportPlacement{Library: true}, nil)
 	if !out[0].Added {
 		t.Fatalf("%+v", out)
 	}
@@ -373,7 +373,7 @@ func TestALeftoverRecordIsReplacedKeepingItsInstallTime(t *testing.T) {
 	f := newFakeImport()
 	f.publish(t, "antfu/skills", antfuSkills)
 	b := readAntfu(t, home, f, "antfu/skills")
-	if out := Scan(home).AddImport(b, []string{"vue"}, ImportPlacement{Library: true}); !out[0].Added {
+	if out := Scan(home).AddImport(b, []string{"vue"}, ImportPlacement{Library: true}, nil); !out[0].Added {
 		t.Fatalf("%+v", out)
 	}
 	var rec map[string]string
@@ -398,7 +398,7 @@ func TestAnExistingSkillIsNeverOverwritten(t *testing.T) {
 	if c := l.CheckImport(b.Skill("vite"), lib); c.State != ImportSame {
 		t.Errorf("内容相同的 vite 应是「已添加 · 最新」：%+v", c)
 	}
-	out := l.AddImport(b, []string{"vue", "slidev"}, lib)
+	out := l.AddImport(b, []string{"vue", "slidev"}, lib, nil)
 	if out[0].Added || out[0].Conflict != h(".agents/skills/vue") || !out[1].Added {
 		t.Errorf("结果 = %+v", out)
 	}
@@ -418,7 +418,7 @@ func TestASkillThatAppearsDuringPreviewIsSkippedAndTheRestAreAdded(t *testing.T)
 	}
 	// 预览时另开终端装了 vue
 	writeSkill(t, h(".agents/skills/vue"), "npx 装的")
-	out := l.AddImport(b, []string{"vue", "slidev"}, ImportPlacement{Library: true})
+	out := l.AddImport(b, []string{"vue", "slidev"}, ImportPlacement{Library: true}, nil)
 	if out[0].Conflict == "" || !out[1].Added {
 		t.Errorf("结果 = %+v", out)
 	}
@@ -438,7 +438,7 @@ func TestAgentModePutsFilesInTheFirstAgentAndLinksTheRest(t *testing.T) {
 	if !slices.Equal(chosen, []string{"claude-code", "kiro"}) || !slices.Equal(also, []string{"cursor"}) {
 		t.Errorf("谁会读到 = %v，顺带 = %v", chosen, also)
 	}
-	out := l.AddImport(b, []string{"slidev"}, p)
+	out := l.AddImport(b, []string{"slidev"}, p, nil)
 	if !out[0].Added || out[0].Place != h(".claude/skills/slidev") {
 		t.Fatalf("%+v", out)
 	}
@@ -477,7 +477,7 @@ func TestLibraryModeLinksTheAgentsTheUserAdded(t *testing.T) {
 	if !slices.Contains(chosen, "codex") || !slices.Contains(chosen, "claude-code") || slices.Contains(chosen, "kiro") {
 		t.Errorf("谁会读到 = %v", chosen)
 	}
-	out := l.AddImport(b, []string{"vite"}, ImportPlacement{Library: true, Agents: []string{"claude-code"}})
+	out := l.AddImport(b, []string{"vite"}, ImportPlacement{Library: true, Agents: []string{"claude-code"}}, nil)
 	if !out[0].Added {
 		t.Fatalf("%+v", out)
 	}
@@ -493,7 +493,7 @@ func TestAnUnreadableRecordFileMeansNothingIsAdded(t *testing.T) {
 	f := newFakeImport()
 	f.publish(t, "antfu/skills", antfuSkills)
 	b := readAntfu(t, home, f, "antfu/skills")
-	out := Scan(home).AddImport(b, []string{"vite"}, ImportPlacement{Library: true, Agents: []string{"claude-code"}})
+	out := Scan(home).AddImport(b, []string{"vite"}, ImportPlacement{Library: true, Agents: []string{"claude-code"}}, nil)
 	if out[0].Added || out[0].Err == nil || !strings.Contains(out[0].Err.Error(), "无法识别") {
 		t.Errorf("%+v", out)
 	}
@@ -520,14 +520,14 @@ func TestALargeRepoDownloadsSkillsOnlyWhenPicked(t *testing.T) {
 		t.Fatalf("大仓库读取时只拿 SKILL.md：%+v", sk)
 	}
 	l := Scan(home)
-	if out := l.AddImport(b, []string{"s07"}, ImportPlacement{Library: true}); !errors.Is(out[0].Err, ErrImportPending) {
+	if out := l.AddImport(b, []string{"s07"}, ImportPlacement{Library: true}, nil); !errors.Is(out[0].Err, ErrImportPending) {
 		t.Errorf("补齐前不能添加：%+v", out)
 	}
 	must(t, b.FetchImportSkill(context.Background(), "s07"))
 	if sk.Partial || !exists(filepath.Join(sk.Dir, "ref.md")) {
 		t.Fatalf("补齐后 = %+v", sk)
 	}
-	if out := l.AddImport(b, []string{"s07"}, ImportPlacement{Library: true}); !out[0].Added || !exists(h(".agents/skills/s07/ref.md")) {
+	if out := l.AddImport(b, []string{"s07"}, ImportPlacement{Library: true}, nil); !out[0].Added || !exists(h(".agents/skills/s07/ref.md")) {
 		t.Errorf("%+v", out)
 	}
 }
@@ -547,7 +547,7 @@ func TestLocalFoldersAreCopiedAndNeverRecordedForNpx(t *testing.T) {
 	if !slices.Equal(b.NotSkills, []string{"docs"}) {
 		t.Errorf("不是技能的 = %v", b.NotSkills)
 	}
-	out := Scan(home).AddImport(b, []string{"release-notes"}, ImportPlacement{Library: true})
+	out := Scan(home).AddImport(b, []string{"release-notes"}, ImportPlacement{Library: true}, nil)
 	if !out[0].Added || !exists(filepath.Join(src, "release-notes/SKILL.md")) {
 		t.Fatalf("应复制、不移动原文件：%+v", out)
 	}
@@ -584,7 +584,7 @@ func TestALinkChainThatEndsOutsideTheSkillCannotBeAdded(t *testing.T) {
 	if p := b.Skills[0].Problem; !strings.Contains(p, "链接") {
 		t.Errorf("问题 = %q", p)
 	}
-	if out := Scan(home).AddImport(b, []string{b.Skills[0].Name}, ImportPlacement{Library: true}); out[0].Added {
+	if out := Scan(home).AddImport(b, []string{b.Skills[0].Name}, ImportPlacement{Library: true}, nil); out[0].Added {
 		t.Error("不应能添加")
 	}
 }
@@ -691,14 +691,14 @@ func TestGitHubStyleZipsAndNestedFoldersAreFound(t *testing.T) {
 	ghZip := h("Downloads/skills-main.zip")
 	must(t, os.MkdirAll(filepath.Dir(ghZip), 0o755))
 	writeZip(t, ghZip, map[string]string{
-		"skills-main/skills/antfu/SKILL.md":             "---\nname: antfu\ndescription: a\n---\n",
-		"skills-main/skills/vue/SKILL.md":               "---\nname: vue\ndescription: v\n---\n",
-		"skills-main/skills/vue/examples/sub/SKILL.md":  "---\nname: nested-sub\ndescription: no\n---\n",
-		"skills-main/.claude/skills/helper/SKILL.md":    "---\nname: helper\ndescription: h\n---\n",
-		"skills-main/instructions/vue.md":               "doc",
-		"skills-main/.github/FUNDING.yml":               "github",
-		"skills-main/node_modules/pkg/SKILL.md":         "---\nname: dep\ndescription: no\n---\n",
-		"skills-main/.git/hooks/SKILL.md":               "---\nname: hook\ndescription: no\n---\n",
+		"skills-main/skills/antfu/SKILL.md":            "---\nname: antfu\ndescription: a\n---\n",
+		"skills-main/skills/vue/SKILL.md":              "---\nname: vue\ndescription: v\n---\n",
+		"skills-main/skills/vue/examples/sub/SKILL.md": "---\nname: nested-sub\ndescription: no\n---\n",
+		"skills-main/.claude/skills/helper/SKILL.md":   "---\nname: helper\ndescription: h\n---\n",
+		"skills-main/instructions/vue.md":              "doc",
+		"skills-main/.github/FUNDING.yml":              "github",
+		"skills-main/node_modules/pkg/SKILL.md":        "---\nname: dep\ndescription: no\n---\n",
+		"skills-main/.git/hooks/SKILL.md":              "---\nname: hook\ndescription: no\n---\n",
 	})
 	b, err := ReadLocalImport(home, []string{ghZip})
 	must(t, err)
@@ -722,7 +722,7 @@ func TestGitHubStyleZipsAndNestedFoldersAreFound(t *testing.T) {
 
 	emptyRepo := h("Downloads/empty-repo-main.zip")
 	writeZip(t, emptyRepo, map[string]string{
-		"empty-repo-main/docs/a.md":     "a",
+		"empty-repo-main/docs/a.md":      "a",
 		"empty-repo-main/.github/ci.yml": "ci",
 	})
 	_, err = ReadLocalImport(home, []string{emptyRepo})

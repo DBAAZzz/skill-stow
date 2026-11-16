@@ -164,7 +164,7 @@ func TestAnExistingSkillIsShownAsAConflictWithACompare(t *testing.T) {
 		t.Errorf("同名冲突横幅不应保留冗余的不会覆盖提示：%v", tt.Texts())
 	}
 	if len(a.importAddable()) != 0 {
-		t.Error("已有同名的不能勾选")
+		t.Error("已有同名的不会自动勾上，要用户确认替换")
 	}
 	must(t, tt.Click("对比差异"))
 	if a.imp.cmp == nil || len(a.imp.cmp.files) == 0 || !tt.HasText("你的和要添加的有 1 个文件不同") {
@@ -255,6 +255,10 @@ func TestImportSnapshots(t *testing.T) {
 	a.imp.focus = "vue"
 	tt.Frame()
 	shot(tt, "import-conflict.png")
+	a.setImportReplace("vue", true)
+	tt.Frame()
+	shot(tt, "import-conflict-replace.png")
+	a.setImportReplace("vue", false)
 
 	must(t, tt.Click("谁会读到"))
 	t.Logf("谁会读到（技能库）：%v", tt.Texts())
