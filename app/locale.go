@@ -51,15 +51,17 @@ func (a *app) setLanguage(id string) {
 	a.lib.Settings.Language = id
 	a.saveSettings()
 	applyLanguage(id)
+	a.retitleWindows()
+	a.refreshAppMenu()
 }
 
 // retitleWindows 按现在的语言重写窗口标题：标题是开窗时交给系统的，界面
 // 重画时不会跟着换。
 func (a *app) retitleWindows() {
-	if a.win != nil {
+	if a.win != nil && !a.win.IsDestroyed() {
 		a.win.SetTitle(locales.AppName())
 	}
-	if a.setWin != nil {
+	if a.setWin != nil && !a.setWin.IsDestroyed() {
 		a.setWin.SetTitle(settingsTabs[a.set.tab].label())
 	}
 }

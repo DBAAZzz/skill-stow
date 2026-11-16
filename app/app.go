@@ -30,9 +30,11 @@ type app struct {
 	win               *mygo.Window // 测试里为 nil
 	setWin            *mygo.Window // 设置窗口，开着时非 nil
 	main              mainWindowState
+	sysMenu           systemMenuState
 	live              bool
 	quitting          bool
 	keepAliveOverride *bool
+	onAbout           func(mygo.AboutPanelOptions)
 
 	sound     func()           // 放完成提示音，nil 是不放（测试里没有窗口）
 	clock     func() time.Time // 提示音限频用的时钟，nil 是 time.Now（测试里拨动）

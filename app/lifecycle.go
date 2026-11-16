@@ -42,6 +42,23 @@ func initAppIdentity() {
 	}
 }
 
+func appDisplayName() string {
+	if n := locales.AppName(); n != "" {
+		return n
+	}
+	if n := mygo.App.Name(); n != "" {
+		return n
+	}
+	return loadBundleMetadata().Name
+}
+
+func appVersion() string {
+	if v := mygo.App.Version(); v != "" {
+		return v
+	}
+	return loadBundleMetadata().Version
+}
+
 // startSingleInstance 先抢单实例锁，拿到锁才执行 load（扫描磁盘或加载示例数据）；
 // 二次启动进程直接返回 false 退出，不触碰本机目录与配置。
 func startSingleInstance(lock func() bool, load func() *library.Library) (*app, bool) {
@@ -51,10 +68,25 @@ func startSingleInstance(lock func() bool, load func() *library.Library) (*app, 
 	return newApp(load()), true
 }
 
+const (
+	appReleasesURL = "https://github.com/DBAAZzz/skill-stow/releases"
+
+	menuIDAbout        = "about"
+	menuIDCheckUpdates = "check-app-updates"
+	menuIDSettings     = "settings"
+)
+
 type mainWindowState struct {
 	open      bool
 	minimized bool
 	focused   bool
+}
+
+type systemMenuState struct {
+	menu         *mygo.Menu
+	about        *mygo.MenuItem
+	checkUpdates *mygo.MenuItem
+	settings     *mygo.MenuItem
 }
 
 func (a *app) keepAliveOnWindowClose() bool {
@@ -75,6 +107,100 @@ func (a *app) post(fn func()) {
 		fn()
 		a.changed()
 	})
+}
+
+func (a *app) aboutOptions() mygo.AboutPanelOptions {
+	meta := loadBundleMetadata()
+	return mygo.AboutPanelOptions{
+		ApplicationName:    appDisplayName(),
+		ApplicationVersion: appVersion(),
+		Copyright:          meta.Copyright,
+	}
+}
+
+func (a *app) showAbout() {
+	opts := a.aboutOptions()
+	if a.onAbout != nil {
+		a.onAbout(opts)
+		return
+	}
+	if a.live {
+		mygo.App.ShowAboutPanel(opts)
+	}
+}
+
+// checkAppUpdates 打开官方 Releases 页面供用户查看和下载新版本。
+func (a *app) checkAppUpdates() {
+	a.openExternalURL(appReleasesURL)
+}
+
+// buildAppMenu 构建 macOS 原生系统菜单栏：保留标准关于、服务、隐藏、退出、文件、编辑、
+// 显示与窗口菜单，加入本地化的「检查应用更新…」与「设置…」（⌘,）。
+func (a *app) buildAppMenu() *mygo.Menu {
+	a.sysMenu.about = &mygo.MenuItem{
+		ID:    menuIDAbout,
+		Label: locales.MenuAbout(appDisplayName()),
+		Click: func(*mygo.MenuItem, *mygo.Window) { a.showAbout() },
+	}
+	a.sysMenu.checkUpdates = &mygo.MenuItem{
+		ID:    menuIDCheckUpdates,
+		Label: locales.MenuCheckAppUpdates(),
+		Click: func(*mygo.MenuItem, *mygo.Window) { a.checkAppUpdates() },
+	}
+	a.sysMenu.settings = &mygo.MenuItem{
+		ID:          menuIDSettings,
+		Label:       locales.MenuSettings(),
+		Accelerator: "CmdOrCtrl+,",
+		Click:       func(*mygo.MenuItem, *mygo.Window) { a.openSettings() },
+	}
+	m := mygo.NewMenu([]*mygo.MenuItem{
+		{
+			Role: mygo.RoleAppMenu,
+			Submenu: []*mygo.MenuItem{
+				a.sysMenu.about,
+				a.sysMenu.checkUpdates,
+				mygo.Separator(),
+				a.sysMenu.settings,
+				mygo.Separator(),
+				{Role: mygo.RoleServices},
+				mygo.Separator(),
+				{Role: mygo.RoleHide},
+				{Role: mygo.RoleHideOthers},
+				{Role: mygo.RoleUnhide},
+				mygo.Separator(),
+				{Role: mygo.RoleQuit},
+			},
+		},
+		{Role: mygo.RoleFileMenu},
+		{Role: mygo.RoleEditMenu},
+		{Role: mygo.RoleViewMenu},
+		{Role: mygo.RoleWindowMenu},
+	})
+	a.sysMenu.menu = m
+	return m
+}
+
+func (a *app) installAppMenu() {
+	if !a.keepAliveOnWindowClose() {
+		return
+	}
+	m := a.buildAppMenu()
+	if a.live {
+		mygo.App.SetMenu(m)
+	}
+}
+
+// refreshAppMenu 在语言切换时同步更新自定义菜单项标题。
+func (a *app) refreshAppMenu() {
+	if a.sysMenu.about != nil {
+		a.sysMenu.about.SetLabel(locales.MenuAbout(appDisplayName()))
+	}
+	if a.sysMenu.checkUpdates != nil {
+		a.sysMenu.checkUpdates.SetLabel(locales.MenuCheckAppUpdates())
+	}
+	if a.sysMenu.settings != nil {
+		a.sysMenu.settings.SetLabel(locales.MenuSettings())
+	}
 }
 
 func (a *app) mainWindowOptions() mygo.WindowOptions {
@@ -271,10 +397,12 @@ func (a *app) startLive() {
 	// 收成一份时移走的拷贝进系统的废纸篓，能「放回原处」
 	library.Trash = func(_, path string) error { return mygo.Shell.TrashItem(path) }
 	a.sound = playDoneSound
+	a.installAppMenu()
 	a.openMainWindow()
-	// 界面换语言时下一帧就重画，但窗口标题是给系统的，要跟着改
+	// 界面换语言时下一帧就重画，但窗口标题和原生菜单是给系统的，要跟着改
 	mygo.App.OnLocaleChanged(func(string) {
 		a.retitleWindows()
+		a.refreshAppMenu()
 	})
 	a.loadUsage()
 	a.buildSearchIndex() // ⌘K 搜正文用，启动时在后台读一遍

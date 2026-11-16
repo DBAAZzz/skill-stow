@@ -6108,5 +6108,22 @@
   "settingsTidySoundHint": "收成一份、清除记录等完成后轻响一声",
   "@settingsTidySoundHint": {
     "description": "设置 › 通用 › 界面：提示音开关下面的说明"
+  },
+  "menuAbout": "关于 {app}",
+  "@menuAbout": {
+    "description": "macOS 系统应用菜单：打开关于面板",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "menuCheckAppUpdates": "检查应用更新…",
+  "@menuCheckAppUpdates": {
+    "description": "macOS 系统应用菜单：打开发布页面检查应用版本更新"
+  },
+  "menuSettings": "设置…",
+  "@menuSettings": {
+    "description": "macOS 系统应用菜单：打开设置窗口（⌘,）"
   }
 }

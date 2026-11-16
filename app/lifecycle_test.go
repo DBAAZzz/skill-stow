@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
@@ -282,6 +283,121 @@ func TestNonMacOSClosingMainWindowClosesSettingsAndQuits(t *testing.T) {
 	if a.main.open || a.set.open || !a.quitting {
 		t.Fatalf("非 macOS 关闭主窗口应同步收起设置窗口并退出：main=%+v set=%+v quitting=%v",
 			a.main, a.set, a.quitting)
+	}
+}
+
+func TestMacOSSystemMenuIncludesAboutSettingsUpdatesAndFollowsLanguage(t *testing.T) {
+	t.Cleanup(func() { testLocale.Store("") })
+	initAppIdentity()
+
+	meta := loadBundleMetadata()
+	if meta.Name == "" || meta.Version == "" {
+		t.Fatalf("mygo.json 元数据缺失：%+v", meta)
+	}
+
+	keepAlive := true
+	a := newApp(library.Sample())
+	a.keepAliveOverride = &keepAlive
+	a.closeMainWindow()
+	a.installAppMenu()
+
+	m := a.sysMenu.menu
+	if m == nil {
+		t.Fatal("macOS 应构建系统应用菜单")
+	}
+
+	// 1. 保留默认顶层菜单（应用、文件、编辑、显示、窗口）及标准角色
+	var topRoles []mygo.MenuRole
+	for _, it := range m.Items() {
+		topRoles = append(topRoles, it.Role)
+	}
+	wantTop := []mygo.MenuRole{
+		mygo.RoleAppMenu,
+		mygo.RoleFileMenu,
+		mygo.RoleEditMenu,
+		mygo.RoleViewMenu,
+		mygo.RoleWindowMenu,
+	}
+	if !slices.Equal(topRoles, wantTop) {
+		t.Fatalf("顶层系统菜单角色 = %v, want %v", topRoles, wantTop)
+	}
+
+	var appRoles []mygo.MenuRole
+	for _, it := range m.Items()[0].Submenu {
+		if it.Role != "" {
+			appRoles = append(appRoles, it.Role)
+		}
+	}
+	for _, want := range []mygo.MenuRole{mygo.RoleServices, mygo.RoleHide, mygo.RoleHideOthers, mygo.RoleUnhide, mygo.RoleQuit} {
+		if !slices.Contains(appRoles, want) {
+			t.Errorf("应用菜单缺少标准角色 %q：%v", want, appRoles)
+		}
+	}
+
+	var editRoles []mygo.MenuRole
+	for _, it := range m.Items()[2].Submenu {
+		if it.Role != "" {
+			editRoles = append(editRoles, it.Role)
+		}
+	}
+	for _, want := range []mygo.MenuRole{mygo.RoleUndo, mygo.RoleRedo, mygo.RoleCut, mygo.RoleCopy, mygo.RolePaste, mygo.RoleSelectAll} {
+		if !slices.Contains(editRoles, want) {
+			t.Errorf("编辑菜单缺少标准角色 %q：%v", want, editRoles)
+		}
+	}
+
+	// 2. 检查中文（默认源语言）下的自定义菜单项文案与快捷键
+	aboutItem := m.ItemByID(menuIDAbout)
+	updatesItem := m.ItemByID(menuIDCheckUpdates)
+	settingsItem := m.ItemByID(menuIDSettings)
+	if aboutItem == nil || updatesItem == nil || settingsItem == nil {
+		t.Fatalf("缺少自定义菜单项：about=%v updates=%v settings=%v", aboutItem, updatesItem, settingsItem)
+	}
+	if aboutItem.Label != "关于 "+meta.Name {
+		t.Errorf("关于菜单文案 = %q, want %q", aboutItem.Label, "关于 "+meta.Name)
+	}
+	if updatesItem.Label != "检查应用更新…" {
+		t.Errorf("检查更新菜单文案 = %q, want %q", updatesItem.Label, "检查应用更新…")
+	}
+	if settingsItem.Label != "设置…" || settingsItem.Accelerator != "CmdOrCtrl+," {
+		t.Errorf("设置菜单项 = (%q, %q), want (\"设置…\", \"CmdOrCtrl+,\")", settingsItem.Label, settingsItem.Accelerator)
+	}
+
+	// 3. 点击「关于」：显示正确应用名与 mygo.json 当前版本，不散落硬编码
+	var gotAbout mygo.AboutPanelOptions
+	a.onAbout = func(opts mygo.AboutPanelOptions) { gotAbout = opts }
+	aboutItem.Click(aboutItem, nil)
+	if gotAbout.ApplicationName != meta.Name || gotAbout.ApplicationVersion != meta.Version || gotAbout.Copyright != meta.Copyright {
+		t.Fatalf("关于面板参数 = %+v, want Name=%q Version=%q Copyright=%q",
+			gotAbout, meta.Name, meta.Version, meta.Copyright)
+	}
+
+	// 4. 点击「检查应用更新…」：打开仓库官方 Releases 页面
+	var openedURL string
+	a.openURL = func(u string) { openedURL = u }
+	updatesItem.Click(updatesItem, nil)
+	if openedURL != appReleasesURL {
+		t.Fatalf("检查应用更新打开了 %q, want %q", openedURL, appReleasesURL)
+	}
+
+	// 5. 点击「设置…」：即使主窗口未打开也能打开设置窗口
+	settingsItem.Click(settingsItem, nil)
+	if !a.set.open {
+		t.Fatal("点击系统菜单「设置…」应打开设置窗口")
+	}
+
+	// 6. 切换语言到 English 再切回简体中文，自定义菜单即时更新
+	a.openMainWindow()
+	a.setLanguage("en")
+	if aboutItem.Label != "About "+meta.Name || updatesItem.Label != "Check for App Updates…" || settingsItem.Label != "Settings…" {
+		t.Fatalf("切到英文后系统菜单未更新：about=%q updates=%q settings=%q",
+			aboutItem.Label, updatesItem.Label, settingsItem.Label)
+	}
+
+	a.setLanguage("zh-Hans")
+	if aboutItem.Label != "关于 "+meta.Name || updatesItem.Label != "检查应用更新…" || settingsItem.Label != "设置…" {
+		t.Fatalf("切回中文后系统菜单未更新：about=%q updates=%q settings=%q",
+			aboutItem.Label, updatesItem.Label, settingsItem.Label)
 	}
 }
 

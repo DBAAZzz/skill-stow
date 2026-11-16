@@ -13553,3 +13553,45 @@ func SettingsTidySoundHint() string { return In(i18n.Locale()).SettingsTidySound
 func (msgs Messages) SettingsTidySoundHint() string {
 	return Catalog.Format(msgs.locale, "settingsTidySoundHint", nil)
 }
+
+// MenuAbout says "关于 {app}"
+// in the language the app shows.
+//
+// macOS 系统应用菜单：打开关于面板
+func MenuAbout(app string) string { return In(i18n.Locale()).MenuAbout(app) }
+
+// MenuAbout says "关于 {app}"
+// in the language of msgs.
+//
+// macOS 系统应用菜单：打开关于面板
+func (msgs Messages) MenuAbout(app string) string {
+	return Catalog.Format(msgs.locale, "menuAbout", map[string]any{"app": app})
+}
+
+// MenuCheckAppUpdates says "检查应用更新…"
+// in the language the app shows.
+//
+// macOS 系统应用菜单：打开发布页面检查应用版本更新
+func MenuCheckAppUpdates() string { return In(i18n.Locale()).MenuCheckAppUpdates() }
+
+// MenuCheckAppUpdates says "检查应用更新…"
+// in the language of msgs.
+//
+// macOS 系统应用菜单：打开发布页面检查应用版本更新
+func (msgs Messages) MenuCheckAppUpdates() string {
+	return Catalog.Format(msgs.locale, "menuCheckAppUpdates", nil)
+}
+
+// MenuSettings says "设置…"
+// in the language the app shows.
+//
+// macOS 系统应用菜单：打开设置窗口（⌘,）
+func MenuSettings() string { return In(i18n.Locale()).MenuSettings() }
+
+// MenuSettings says "设置…"
+// in the language of msgs.
+//
+// macOS 系统应用菜单：打开设置窗口（⌘,）
+func (msgs Messages) MenuSettings() string {
+	return Catalog.Format(msgs.locale, "menuSettings", nil)
+}
