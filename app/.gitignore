@@ -1,0 +1,8 @@
+# MyGo 开发和打包产物
+.mygo/
+build/
+
+# go build 输出的二进制
+/skillmanager
+
+.DS_Store

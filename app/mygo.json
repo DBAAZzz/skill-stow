@@ -1,0 +1,10 @@
+{
+  "name": "Skill Stow",
+  "identifier": "com.skillmanager.app",
+  "version": "0.1.0",
+  "out": "build",
+  "i18n": {
+    "dir": "locales",
+    "source": "zh-Hans"
+  }
+}

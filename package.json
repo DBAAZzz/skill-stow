@@ -1,0 +1,14 @@
+{
+  "name": "skill-manager-tooling",
+  "private": true,
+  "description": "仓库级开发工具：提交信息按 Conventional Commits 校验（commitlint + husky）。应用本身是 Go，见 app/。",
+  "scripts": {
+    "prepare": "husky",
+    "commitlint": "commitlint --edit"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
+    "husky": "^9.1.7"
+  }
+}

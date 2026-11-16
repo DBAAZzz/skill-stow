@@ -1,0 +1,16 @@
+.DS_Store
+
+# 工具的本地状态
+.superpowers/
+.workbuddy/
+.zcode/
+.claude/
+/tmp
+
+# Ryugi 与第三方 Agent 技能：仅本地保留，不提交到 Git
+.ryugi/
+.artifact-id
+/.agents/
+
+# 提交规范工具（commitlint + husky）
+node_modules/

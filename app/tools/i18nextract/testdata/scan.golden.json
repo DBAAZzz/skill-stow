@@ -1,0 +1,502 @@
+[
+  {
+    "id": "testdata/scan.go:8:15",
+    "file": "testdata/scan.go",
+    "line": 8,
+    "col": 15,
+    "kind": "manual",
+    "goText": "包常量",
+    "zh": "包常量",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg001",
+    "reason": "package-level const/var declaration"
+  },
+  {
+    "id": "testdata/scan.go:9:13",
+    "file": "testdata/scan.go",
+    "line": 9,
+    "col": 13,
+    "kind": "manual",
+    "goText": "包变量",
+    "zh": "包变量",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg002",
+    "reason": "package-level const/var declaration"
+  },
+  {
+    "id": "testdata/scan.go:13:31",
+    "file": "testdata/scan.go",
+    "line": 13,
+    "col": 31,
+    "kind": "manual",
+    "goText": "json:\"名字\"",
+    "zh": "json:\"名字\"",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg003",
+    "reason": "struct tag"
+  },
+  {
+    "id": "testdata/scan.go:17:10",
+    "file": "testdata/scan.go",
+    "line": 17,
+    "col": 10,
+    "kind": "literal",
+    "goText": "你好",
+    "zh": "你好",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg004",
+    "reason": ""
+  },
+  {
+    "id": "testdata/scan.go:18:9",
+    "file": "testdata/scan.go",
+    "line": 18,
+    "col": 9,
+    "kind": "literal",
+    "goText": "你好",
+    "zh": "你好",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg004",
+    "reason": ""
+  },
+  {
+    "id": "testdata/scan.go:19:15",
+    "file": "testdata/scan.go",
+    "line": 19,
+    "col": 15,
+    "kind": "literal",
+    "goText": "列表",
+    "zh": "列表",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg005",
+    "reason": ""
+  },
+  {
+    "id": "testdata/scan.go:20:18",
+    "file": "testdata/scan.go",
+    "line": 20,
+    "col": 18,
+    "kind": "sprintf",
+    "goText": "已选 %d 个，%s，%v，100%%，{'原文'}",
+    "zh": "已选 {count} 个，{name}，{name2}，100%，'{'''原文'''}'",
+    "args": [
+      "len(xs)",
+      "name",
+      "row.Name"
+    ],
+    "placeholders": [
+      {
+        "name": "count",
+        "type": "int"
+      },
+      {
+        "name": "name",
+        "type": "String"
+      },
+      {
+        "name": "name2",
+        "type": "String"
+      }
+    ],
+    "key": "usageMsg006",
+    "reason": ""
+  },
+  {
+    "id": "testdata/scan.go:21:18",
+    "file": "testdata/scan.go",
+    "line": 21,
+    "col": 18,
+    "kind": "sprintf",
+    "goText": "重复 %s %s %s %s",
+    "zh": "重复 {name} {name2} {name3} {p3}",
+    "args": [
+      "name",
+      "row.Name",
+      "name",
+      "strings.TrimSpace(name)"
+    ],
+    "placeholders": [
+      {
+        "name": "name",
+        "type": "String"
+      },
+      {
+        "name": "name2",
+        "type": "String"
+      },
+      {
+        "name": "name3",
+        "type": "String"
+      },
+      {
+        "name": "p3",
+        "type": "String"
+      }
+    ],
+    "key": "usageMsg007",
+    "reason": ""
+  },
+  {
+    "id": "testdata/scan.go:22:18",
+    "file": "testdata/scan.go",
+    "line": 22,
+    "col": 18,
+    "kind": "manual",
+    "goText": "宽度 %5d",
+    "zh": "宽度 %5d",
+    "args": [
+      "n"
+    ],
+    "placeholders": [],
+    "key": "usageMsg008",
+    "reason": "unsupported format verb (flags, width, precision or indexes require manual migration)"
+  },
+  {
+    "id": "testdata/scan.go:23:18",
+    "file": "testdata/scan.go",
+    "line": 23,
+    "col": 18,
+    "kind": "manual",
+    "goText": "精度 %.1f",
+    "zh": "精度 %.1f",
+    "args": [
+      "1.2"
+    ],
+    "placeholders": [],
+    "key": "usageMsg009",
+    "reason": "unsupported format verb (flags, width, precision or indexes require manual migration)"
+  },
+  {
+    "id": "testdata/scan.go:24:18",
+    "file": "testdata/scan.go",
+    "line": 24,
+    "col": 18,
+    "kind": "manual",
+    "goText": "引号 %q",
+    "zh": "引号 %q",
+    "args": [
+      "name"
+    ],
+    "placeholders": [],
+    "key": "usageMsg010",
+    "reason": "unsupported format verb (flags, width, precision or indexes require manual migration)"
+  },
+  {
+    "id": "testdata/scan.go:25:18",
+    "file": "testdata/scan.go",
+    "line": 25,
+    "col": 18,
+    "kind": "manual",
+    "goText": "十六 %x",
+    "zh": "十六 %x",
+    "args": [
+      "n"
+    ],
+    "placeholders": [],
+    "key": "usageMsg011",
+    "reason": "unsupported format verb (flags, width, precision or indexes require manual migration)"
+  },
+  {
+    "id": "testdata/scan.go:26:18",
+    "file": "testdata/scan.go",
+    "line": 26,
+    "col": 18,
+    "kind": "manual",
+    "goText": "索引 %[1]d",
+    "zh": "索引 %[1]d",
+    "args": [
+      "n"
+    ],
+    "placeholders": [],
+    "key": "usageMsg012",
+    "reason": "unsupported format verb (flags, width, precision or indexes require manual migration)"
+  },
+  {
+    "id": "testdata/scan.go:27:18",
+    "file": "testdata/scan.go",
+    "line": 27,
+    "col": 18,
+    "kind": "manual",
+    "goText": "缺参 %d",
+    "zh": "缺参 %d",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg013",
+    "reason": "Sprintf argument count mismatch"
+  },
+  {
+    "id": "testdata/scan.go:28:18",
+    "file": "testdata/scan.go",
+    "line": 28,
+    "col": 18,
+    "kind": "manual",
+    "goText": "多参",
+    "zh": "多参",
+    "args": [
+      "n"
+    ],
+    "placeholders": [],
+    "key": "usageMsg014",
+    "reason": "Sprintf argument count mismatch"
+  },
+  {
+    "id": "testdata/scan.go:29:18",
+    "file": "testdata/scan.go",
+    "line": 29,
+    "col": 18,
+    "kind": "manual",
+    "goText": "尾部 %",
+    "zh": "尾部 %",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg015",
+    "reason": "incomplete format verb"
+  },
+  {
+    "id": "testdata/scan.go:30:17",
+    "file": "testdata/scan.go",
+    "line": 30,
+    "col": 17,
+    "kind": "errorf",
+    "goText": "错误 %s",
+    "zh": "错误 {name}",
+    "args": [
+      "name"
+    ],
+    "placeholders": [
+      {
+        "name": "name",
+        "type": "String"
+      }
+    ],
+    "key": "usageMsg016",
+    "reason": ""
+  },
+  {
+    "id": "testdata/scan.go:31:17",
+    "file": "testdata/scan.go",
+    "line": 31,
+    "col": 17,
+    "kind": "errorsNew",
+    "goText": "失败",
+    "zh": "失败",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg017",
+    "reason": ""
+  },
+  {
+    "id": "testdata/scan.go:32:13",
+    "file": "testdata/scan.go",
+    "line": 32,
+    "col": 13,
+    "kind": "manual",
+    "goText": "相等",
+    "zh": "相等",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg018",
+    "reason": "comparison operand"
+  },
+  {
+    "id": "testdata/scan.go:32:33",
+    "file": "testdata/scan.go",
+    "line": 32,
+    "col": 33,
+    "kind": "manual",
+    "goText": "不等",
+    "zh": "不等",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg019",
+    "reason": "comparison operand"
+  },
+  {
+    "id": "testdata/scan.go:32:52",
+    "file": "testdata/scan.go",
+    "line": 32,
+    "col": 52,
+    "kind": "literal",
+    "goText": "分支",
+    "zh": "分支",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg020",
+    "reason": ""
+  },
+  {
+    "id": "testdata/scan.go:33:21",
+    "file": "testdata/scan.go",
+    "line": 33,
+    "col": 21,
+    "kind": "manual",
+    "goText": "分支键",
+    "zh": "分支键",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg021",
+    "reason": "switch case value"
+  },
+  {
+    "id": "testdata/scan.go:33:42",
+    "file": "testdata/scan.go",
+    "line": 33,
+    "col": 42,
+    "kind": "literal",
+    "goText": "分支体",
+    "zh": "分支体",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg022",
+    "reason": ""
+  },
+  {
+    "id": "testdata/scan.go:34:24",
+    "file": "testdata/scan.go",
+    "line": 34,
+    "col": 24,
+    "kind": "manual",
+    "goText": "映射键",
+    "zh": "映射键",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg023",
+    "reason": "map key"
+  },
+  {
+    "id": "testdata/scan.go:34:37",
+    "file": "testdata/scan.go",
+    "line": 34,
+    "col": 37,
+    "kind": "literal",
+    "goText": "映射值",
+    "zh": "映射值",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg024",
+    "reason": ""
+  },
+  {
+    "id": "testdata/scan.go:35:6",
+    "file": "testdata/scan.go",
+    "line": 35,
+    "col": 6,
+    "kind": "manual",
+    "goText": "前缀",
+    "zh": "前缀",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg025",
+    "reason": "string concatenation"
+  },
+  {
+    "id": "testdata/scan.go:36:13",
+    "file": "testdata/scan.go",
+    "line": 36,
+    "col": 13,
+    "kind": "manual",
+    "goText": "后缀",
+    "zh": "后缀",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg026",
+    "reason": "string concatenation"
+  },
+  {
+    "id": "testdata/scan.go:37:6",
+    "file": "testdata/scan.go",
+    "line": 37,
+    "col": 6,
+    "kind": "manual",
+    "goText": "控件键",
+    "zh": "控件键",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg027",
+    "reason": "Key argument"
+  },
+  {
+    "id": "testdata/scan.go:38:8",
+    "file": "testdata/scan.go",
+    "line": 38,
+    "col": 8,
+    "kind": "manual",
+    "goText": "实例键",
+    "zh": "实例键",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg028",
+    "reason": "Key argument"
+  },
+  {
+    "id": "testdata/scan.go:40:10",
+    "file": "testdata/scan.go",
+    "line": 40,
+    "col": 10,
+    "kind": "manual",
+    "goText": "指令旁",
+    "zh": "指令旁",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg029",
+    "reason": "Go directive adjacent to string"
+  },
+  {
+    "id": "testdata/scan.go:41:16",
+    "file": "testdata/scan.go",
+    "line": 41,
+    "col": 16,
+    "kind": "manual",
+    "goText": "局部常量",
+    "zh": "局部常量",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg030",
+    "reason": "local const requires a constant expression"
+  },
+  {
+    "id": "testdata/scan.go:42:6",
+    "file": "testdata/scan.go",
+    "line": 42,
+    "col": 6,
+    "kind": "literal",
+    "goText": "全角！",
+    "zh": "全角！",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg031",
+    "reason": ""
+  },
+  {
+    "id": "testdata/scan.go:43:6",
+    "file": "testdata/scan.go",
+    "line": 43,
+    "col": 6,
+    "kind": "literal",
+    "goText": "标点。",
+    "zh": "标点。",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg032",
+    "reason": ""
+  },
+  {
+    "id": "testdata/scan.go:45:9",
+    "file": "testdata/scan.go",
+    "line": 45,
+    "col": 9,
+    "kind": "literal",
+    "goText": "结束",
+    "zh": "结束",
+    "args": [],
+    "placeholders": [],
+    "key": "usageMsg033",
+    "reason": ""
+  }
+]

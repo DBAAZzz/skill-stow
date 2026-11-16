@@ -1,0 +1,152 @@
+[
+  {
+    "id": "testdata/errors.go:8:29",
+    "file": "testdata/errors.go",
+    "line": 8,
+    "col": 29,
+    "kind": "manual",
+    "goText": "包级错误",
+    "zh": "包级错误",
+    "args": [],
+    "placeholders": [],
+    "key": "errorMsg001",
+    "reason": "package-level const/var declaration"
+  },
+  {
+    "id": "testdata/errors.go:9:29",
+    "file": "testdata/errors.go",
+    "line": 9,
+    "col": 29,
+    "kind": "manual",
+    "goText": "包级格式 %d",
+    "zh": "包级格式 %d",
+    "args": [],
+    "placeholders": [],
+    "key": "errorMsg002",
+    "reason": "package-level const/var declaration"
+  },
+  {
+    "id": "testdata/errors.go:12:17",
+    "file": "testdata/errors.go",
+    "line": 12,
+    "col": 17,
+    "kind": "errorsNew",
+    "goText": "普通错误",
+    "zh": "普通错误",
+    "args": [],
+    "placeholders": [],
+    "key": "errorMsg003",
+    "reason": ""
+  },
+  {
+    "id": "testdata/errors.go:13:17",
+    "file": "testdata/errors.go",
+    "line": 13,
+    "col": 17,
+    "kind": "errorf",
+    "goText": "错误 %d %s",
+    "zh": "错误 {n} {name}",
+    "args": [
+      "n",
+      "name"
+    ],
+    "placeholders": [
+      {
+        "name": "n",
+        "type": "int"
+      },
+      {
+        "name": "name",
+        "type": "String"
+      }
+    ],
+    "key": "errorMsg004",
+    "reason": ""
+  },
+  {
+    "id": "testdata/errors.go:14:17",
+    "file": "testdata/errors.go",
+    "line": 14,
+    "col": 17,
+    "kind": "errorf",
+    "goText": "错误 %d: %w",
+    "zh": "错误 {n}: ",
+    "args": [
+      "n"
+    ],
+    "placeholders": [
+      {
+        "name": "n",
+        "type": "int"
+      }
+    ],
+    "key": "errorMsg005",
+    "reason": "",
+    "wrapped": "err"
+  },
+  {
+    "id": "testdata/errors.go:15:17",
+    "file": "testdata/errors.go",
+    "line": 15,
+    "col": 17,
+    "kind": "manual",
+    "goText": "错误 %w 后文",
+    "zh": "错误 %w 后文",
+    "args": [],
+    "placeholders": [],
+    "key": "errorMsg006",
+    "reason": "%w must be the final format verb at the end of the message"
+  },
+  {
+    "id": "testdata/errors.go:16:17",
+    "file": "testdata/errors.go",
+    "line": 16,
+    "col": 17,
+    "kind": "manual",
+    "goText": "错误 %w: %w",
+    "zh": "错误 %w: %w",
+    "args": [],
+    "placeholders": [],
+    "key": "errorMsg007",
+    "reason": "multiple %w verbs require manual migration"
+  },
+  {
+    "id": "testdata/errors.go:17:17",
+    "file": "testdata/errors.go",
+    "line": 17,
+    "col": 17,
+    "kind": "manual",
+    "goText": "错误 %q: %w",
+    "zh": "错误 %q: %w",
+    "args": [],
+    "placeholders": [],
+    "key": "errorMsg008",
+    "reason": "unsupported format verb (flags, width, precision or indexes require manual migration)"
+  },
+  {
+    "id": "testdata/errors.go:18:17",
+    "file": "testdata/errors.go",
+    "line": 18,
+    "col": 17,
+    "kind": "manual",
+    "goText": "错误: %w",
+    "zh": "错误: %w",
+    "args": [],
+    "placeholders": [],
+    "key": "errorMsg009",
+    "reason": "Errorf argument count mismatch"
+  },
+  {
+    "id": "testdata/errors.go:19:17",
+    "file": "testdata/errors.go",
+    "line": 19,
+    "col": 17,
+    "kind": "errorf",
+    "goText": "错误 %%w",
+    "zh": "错误 %w",
+    "args": [],
+    "placeholders": [],
+    "key": "errorMsg010",
+    "reason": ""
+  }
+]
