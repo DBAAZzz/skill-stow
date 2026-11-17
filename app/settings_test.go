@@ -433,12 +433,9 @@ func TestSettingsRescanRespectsNewerWatchAndDefersDuringInteractions(t *testing.
 
 	t.Run("preserves_pending_usage_refresh_when_immediate_watch_applies_first", func(t *testing.T) {
 		// Given 设置扫描因打开对比而挂起（reloadUsage=true），随后对比关闭，但在下一帧冲刷前新的一轮 watch 立即落地
-		origLoad := loadUsageAsync
-		refreshes := 0
-		loadUsageAsync = func(*app) { refreshes++ }
-		t.Cleanup(func() { loadUsageAsync = origLoad })
-
 		a, _, h := importApp(t)
+		refreshes := 0
+		a.readUsage = func() { refreshes++ }
 		writeTestSkill(t, h(".claude/skills/alpha"), "alpha", "body")
 		a.rescan()
 		refreshes = 0

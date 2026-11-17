@@ -28,15 +28,16 @@ func (a *app) loadUsage() {
 	}()
 }
 
-// loadUsageAsync 在生产中后台读会话记录，测试里替换以观察触发。
-var loadUsageAsync = (*app).loadUsage
-
 // refreshUsage 在重新扫描后把已有的统计对到新的库上，再去读新的记录。
 func (a *app) refreshUsage() {
 	if a.usage != nil {
 		a.lib.SetUsage(a.usage)
 	}
-	loadUsageAsync(a)
+	if a.readUsage != nil {
+		a.readUsage()
+		return
+	}
+	a.loadUsage()
 }
 
 // usageAgents 是「Claude Code 和 Codex」：留有调用记录的 Agent。
