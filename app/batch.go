@@ -175,7 +175,7 @@ func batchToggle(c *ui.Context, on bool, label string, iconOnly bool) ui.Element
 	b.Shadow(0, 0, 0, edgeSpread, colAccent.Alpha(0.35))
 	b.Children(func() {
 		ui.Icon(c, iconBatch).Size(13, 13).ContentTransition(labelTransition)
-		ui.Text(c, locales.BatchExit()).FontSize(12).SingleLine().ContentTransition(labelTransition)
+		ui.Text(c, locales.BatchExit()).FontSize(13).SingleLine().ContentTransition(labelTransition)
 	})
 	return b
 }
@@ -209,7 +209,7 @@ func batchDeleteButton(c *ui.Context, label string, disabled bool) ui.Element {
 	}
 	b.Children(func() {
 		ui.Icon(c, iconTrash).Size(13, 13)
-		ui.Text(c, label).FontSize(12).FontWeight(500).FontFeatures("tnum").SingleLine().ContentTransition(labelTransition)
+		ui.Text(c, label).FontSize(13).FontWeight(500).FontFeatures("tnum").SingleLine().ContentTransition(labelTransition)
 	})
 	return b
 }

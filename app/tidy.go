@@ -267,7 +267,7 @@ func statusLine(c *ui.Context, icon *ui.SVG, color ui.Color, text string) {
 	ui.Row(c).Padding(8, 24).Gap(6).AlignItems(ui.Center).Shrink(0).TextColor(color).
 		BorderWidth(0, 0, 1, 0).BorderColor(colBorderDefault).Children(func() {
 		ui.Icon(c, icon).Size(12, 12)
-		ui.Text(c, text).FontSize(12).Grow(1)
+		ui.Text(c, text).FontSize(13).Grow(1)
 	})
 }
 

@@ -437,7 +437,7 @@ func (a *app) agentsTab(c *ui.Context) {
 			}
 			more := ui.ButtonBase(c).Padding(8, 12).Justify(ui.Start).BorderWidth(1, 0, 0, 0).BorderColor(colBorderSubtle).
 				TextColor(colAccent).Label(text)
-			more.Children(func() { ui.Text(c, text).FontSize(12).SingleLine() })
+			more.Children(func() { ui.Text(c, text).FontSize(13).SingleLine() })
 			if more.Clicked() {
 				a.set.allAgents = !a.set.allAgents
 			}
@@ -571,7 +571,7 @@ func (a *app) projectsTab(c *ui.Context) {
 			BorderWidth(1, 0, 0, 0).BorderColor(colBorderSubtle).TextColor(colAccent).Label(locales.ActionAddFolderEllipsis())
 		add.Children(func() {
 			ui.Icon(c, iconPlus).Size(13, 13)
-			ui.Text(c, locales.ActionAddFolderEllipsis()).FontSize(12).SingleLine()
+			ui.Text(c, locales.ActionAddFolderEllipsis()).FontSize(13).SingleLine()
 			ui.Spacer(c)
 			ui.Text(c, locales.SettingsFolderSelectionHint()).FontSize(12).TextColor(colTextMuted).SingleLine()
 		})
@@ -695,7 +695,7 @@ func pushButton(c *ui.Context, label string) ui.Element {
 	hairline(b, 0.18)
 	lift(b, 1, 1.5, 0.08)
 	b.Children(func() {
-		ui.Text(c, label).FontSize(12).TextColor(colTextPrimary).SingleLine().ContentTransition(labelTransition)
+		ui.Text(c, label).FontSize(13).TextColor(colTextPrimary).SingleLine().ContentTransition(labelTransition)
 	})
 	return b
 }

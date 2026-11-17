@@ -63,7 +63,7 @@ func (a *app) sidebar(c *ui.Context, vibrant bool) {
 		tintBg(add, ink(0), ink(0.06), ink(0.11))
 		add.Children(func() {
 			ui.Icon(c, iconFolderAdd).Size(16, 16)
-			ui.Text(c, locales.NavAddProject()).FontSize(12).SingleLine()
+			ui.Text(c, locales.NavAddProject()).FontSize(13).SingleLine()
 		})
 		if add.Clicked() {
 			a.chooseProjects(true)
@@ -205,7 +205,7 @@ func (a *app) projectItems(c *ui.Context) {
 		}
 		b := ui.ButtonBase(c).Height(sideRowHeight).Radius(6).Center().Shrink(0).Label(text)
 		b.TextColor(tint(b, "fg", colTextMuted, colTextSecondary, colTextPrimary))
-		b.Children(func() { ui.Text(c, text).FontSize(12).SingleLine() })
+		b.Children(func() { ui.Text(c, text).FontSize(13).SingleLine() })
 		if b.Clicked() {
 			a.allProjects = !a.allProjects
 		}

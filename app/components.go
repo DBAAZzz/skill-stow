@@ -135,8 +135,8 @@ func (a *app) skillCard(c *ui.Context, s *library.Skill, footer func()) {
 		// 从阅读视图回来时名称从大标题飞回这里，简介和底栏等它差不多
 		// 落定再淡入
 		back := a.readerBack == s
-		fadeIn(ui.Column(c).Height(36).Margin(4, 0, 0, 0), back, cardSettle).Children(func() {
-			descText(c, s).FontSize(12).FixedLineHeight(18).MaxLines(2)
+		fadeIn(ui.Column(c).Height(40).Margin(4, 0, 0, 0), back, cardSettle).Children(func() {
+			descText(c, s).FontSize(13).FixedLineHeight(20).MaxLines(2)
 		})
 		// 指针停在我的技能上时，底部淡出，换成从下面浮上来的操作（del6-c）
 		shown := float32(0)
@@ -382,7 +382,7 @@ func styleDashedButton(c *ui.Context, b ui.Element, open bool, label string) {
 	}
 	b.Children(func() {
 		ui.Icon(c, iconPlus).Size(12, 12)
-		ui.Text(c, label).FontSize(12)
+		ui.Text(c, label).FontSize(13)
 	})
 }
 
@@ -484,7 +484,7 @@ func caption(c *ui.Context, text string) {
 func errorLine(c *ui.Context, text string) {
 	ui.Row(c).Gap(6).AlignItems(ui.Start).Margin(8, 2, 0, 2).TextColor(colWarnText).Children(func() {
 		ui.Icon(c, iconWarn).Size(12, 12).Margin(2, 0, 0, 0)
-		ui.Text(c, text).FontSize(12).LineHeight(1.45).Grow(1)
+		ui.Text(c, text).FontSize(13).LineHeight(1.45).Grow(1)
 	})
 }
 
@@ -496,7 +496,7 @@ func callout(c *ui.Context, title, body, action string) bool {
 			ui.Icon(c, iconWarn).Size(14, 14)
 			ui.Text(c, title).FontSize(13).FontWeight(600)
 		})
-		ui.Text(c, body).FontSize(12).LineHeight(1.5).TextColor(colTextBody).Margin(5, 0, 0, 0)
+		ui.Text(c, body).FontSize(13).LineHeight(1.5).TextColor(colTextBody).Margin(5, 0, 0, 0)
 		if action != "" {
 			clicked = linkButton(c, action).Margin(6, 0, 0, 0).AlignSelf(ui.Start).Clicked()
 		}
@@ -512,7 +512,7 @@ func doneBox(c *ui.Context, title, body string) {
 			ui.Text(c, title).FontSize(13).FontWeight(600)
 		})
 		if body != "" {
-			ui.Text(c, body).FontSize(12).LineHeight(1.5).TextColor(colTextBody).Margin(4, 0, 0, 20)
+			ui.Text(c, body).FontSize(13).LineHeight(1.5).TextColor(colTextBody).Margin(4, 0, 0, 20)
 		}
 	})
 }
@@ -522,7 +522,7 @@ func warnLine(c *ui.Context, icon *ui.SVG, text, action string) bool {
 	clicked := false
 	ui.Row(c).Margin(14, 0, 0, 0).Gap(6).AlignItems(ui.Center).TextColor(colWarnText).Children(func() {
 		ui.Icon(c, icon).Size(13, 13)
-		ui.Text(c, text).FontSize(12).FontWeight(500).Grow(1)
+		ui.Text(c, text).FontSize(13).FontWeight(500).Grow(1)
 		clicked = linkButton(c, action).Clicked()
 	})
 	return clicked

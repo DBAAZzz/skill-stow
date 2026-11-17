@@ -406,7 +406,7 @@ func readOnlyNote(c *ui.Context, text string) {
 	box(c, func() {
 		ui.Row(c).Padding(10, 12).Gap(8).AlignItems(ui.Start).TextColor(colTextSecondary).Children(func() {
 			ui.Icon(c, iconLock).Size(13, 13).Margin(2, 0, 0, 0)
-			ui.Text(c, text).FontSize(12).LineHeight(1.5).Grow(1)
+			ui.Text(c, text).FontSize(13).LineHeight(1.5).Grow(1)
 		})
 	})
 }

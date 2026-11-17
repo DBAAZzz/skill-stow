@@ -921,7 +921,7 @@ func (a *app) skillMDPreview(c *ui.Context, s *library.Skill, f library.File) {
 				ui.Text(c, heading).FontSize(14).FontWeight(700).TextColor(colTextPrimary)
 			}
 			for i, l := range lines {
-				t := ui.Text(c.Key(i), l.text).FontSize(12).LineHeight(1.5)
+				t := ui.Text(c.Key(i), l.text).FontSize(13).LineHeight(1.5)
 				if l.heading {
 					t.FontSize(13).FontWeight(600).TextColor(colTextPrimary).Margin(4, 0, 0, 0)
 				} else {

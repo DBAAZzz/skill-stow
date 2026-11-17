@@ -28,9 +28,9 @@ func (a *app) collectDialog(c *ui.Context) {
 	dialog(c, &a.collectOpen, locales.CollectTitle(s.Name), body, func() {
 		ui.Column(c).Margin(12, 0, 0, 0).Gap(8).Children(func() {
 			ui.Text(c, locales.CollectCopiesIndependent()).
-				FontSize(12).LineHeight(1.55).TextColor(colWarnText)
+				FontSize(13).LineHeight(1.55).TextColor(colWarnText)
 			if breaks := a.lib.CollectBreaks(s); len(breaks) > 0 {
-				ui.Text(c, locales.CollectBreaksWarning()).FontSize(12).LineHeight(1.55).TextColor(colWarnText)
+				ui.Text(c, locales.CollectBreaksWarning()).FontSize(13).LineHeight(1.55).TextColor(colWarnText)
 				for _, ref := range breaks {
 					pathText(c, ref)
 				}

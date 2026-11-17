@@ -972,7 +972,7 @@ func updButton(c *ui.Context, ic *ui.SVG, label string, danger bool) ui.Element 
 		if ic != nil {
 			ui.Icon(c, ic).Size(13, 13).TextColor(fg)
 		}
-		ui.Text(c, label).FontSize(12).TextColor(fg).SingleLine().ContentTransition(labelTransition)
+		ui.Text(c, label).FontSize(13).TextColor(fg).SingleLine().ContentTransition(labelTransition)
 	})
 	return b
 }
@@ -995,7 +995,7 @@ func updGhostButton(c *ui.Context, label string) ui.Element {
 	tintSolid(b, colBgSubtle)
 	b.Border(1, ink(0.1)).Shadow(0, 1, 1, 0, shadow(0.03))
 	b.Children(func() {
-		ui.Text(c, label).FontSize(12).TextColor(colTextSecondary).SingleLine().ContentTransition(labelTransition)
+		ui.Text(c, label).FontSize(13).TextColor(colTextSecondary).SingleLine().ContentTransition(labelTransition)
 	})
 	return b
 }

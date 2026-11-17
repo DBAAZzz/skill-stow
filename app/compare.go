@@ -107,7 +107,7 @@ func (a *app) compareVersionSwitcher(c *ui.Context, st *compareState, vs []libra
 				}
 				btn.Children(func() {
 					versionBadge(c, v, k, 14)
-					t := ui.Text(c, name).FontSize(12).SingleLine()
+					t := ui.Text(c, name).FontSize(13).SingleLine()
 					if active {
 						t.FontWeight(500).TextColor(colTextPrimary)
 					} else {
@@ -240,7 +240,7 @@ func diffFileTree(c *ui.Context, st *compareState) {
 					}
 					row.Children(func() {
 						ui.Icon(c, iconDoc).Size(13, 13).TextColor(colTextMuted)
-						nameTxt := ui.Text(c, item.name).FontSize(12).SingleLine().Grow(1).MinWidth(0)
+						nameTxt := ui.Text(c, item.name).FontSize(13).SingleLine().Grow(1).MinWidth(0)
 						if selected {
 							nameTxt.FontWeight(500).TextColor(colTextPrimary)
 						} else {
@@ -396,7 +396,7 @@ func diffActionButton(c *ui.Context, label string, primary bool) ui.Element {
 			InsetShadow(0, 0.5, 0, 0, white.Alpha(0.3))
 		hairline(b, 0.22)
 		lift(b, 1, 1.5, 0.12)
-		b.Children(func() { ui.Text(c, label).FontSize(12).FontWeight(500).SingleLine().ContentTransition(labelTransition) })
+		b.Children(func() { ui.Text(c, label).FontSize(13).FontWeight(500).SingleLine().ContentTransition(labelTransition) })
 		return b
 	}
 	b := ui.ButtonBase(c).Height(26).Padding(0, 11).Radius(6).Center().Shrink(0).Label(label)
@@ -404,7 +404,7 @@ func diffActionButton(c *ui.Context, label string, primary bool) ui.Element {
 	hairline(b, 0.18)
 	lift(b, 1, 1.5, 0.08)
 	b.Children(func() {
-		ui.Text(c, label).FontSize(12).TextColor(colTextPrimary).SingleLine().ContentTransition(labelTransition)
+		ui.Text(c, label).FontSize(13).TextColor(colTextPrimary).SingleLine().ContentTransition(labelTransition)
 	})
 	return b
 }

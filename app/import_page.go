@@ -373,7 +373,7 @@ func (a *app) importPickPage(c *ui.Context) {
 	if b.Source.IgnoredArgs {
 		ui.Row(c).Padding(7, 16).Gap(6).AlignItems(ui.Center).Background(colAccentBg).BorderWidth(0, 0, 1, 0).BorderColor(colBorderDefault).Children(func() {
 			ui.Icon(c, iconTerminal).Size(13, 13).TextColor(colAccent)
-			ui.Text(c, locales.ImportCommandOptionsIgnored()).FontSize(12).TextColor(colTextPrimary)
+			ui.Text(c, locales.ImportCommandOptionsIgnored()).FontSize(13).TextColor(colTextPrimary)
 		})
 	}
 	a.importSplit(c)
@@ -554,7 +554,7 @@ func (a *app) readersMenu(c *ui.Context) {
 			if len(all) == 0 {
 				text = locales.ImportChooseAgents()
 			}
-			ui.Text(c, text).FontSize(12).TextColor(colTextPrimary).SingleLine()
+			ui.Text(c, text).FontSize(13).TextColor(colTextPrimary).SingleLine()
 			ui.Icon(c, iconChevronDown).Size(11, 11).TextColor(colTextSecondary)
 		})
 	}, func(fm *frostedMenu) {

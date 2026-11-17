@@ -173,8 +173,8 @@ func (a *app) setCard(c *ui.Context, coll *library.Collection, matched int) {
 				ui.Spacer(c)
 				countPill(c, matched, len(coll.Skills))
 			})
-			ui.Column(c).Height(36).Margin(4, 0, 0, 0).Children(func() {
-				ui.Text(c, coll.Preview(6)).FontSize(12).FixedLineHeight(18).MaxLines(2).TextColor(colTextSecondary)
+			ui.Column(c).Height(40).Margin(4, 0, 0, 0).Children(func() {
+				ui.Text(c, coll.Preview(6)).FontSize(13).FixedLineHeight(20).MaxLines(2).TextColor(colTextSecondary)
 			})
 			ui.Row(c).Height(18).Margin(10, 0, 0, 0).Gap(5).AlignItems(ui.Center).TextColor(colTextMuted).Children(func() {
 				a.setFooter(c, coll, 16, 3)

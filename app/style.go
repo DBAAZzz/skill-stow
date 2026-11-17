@@ -132,7 +132,7 @@ func flags(c *ui.Context, s *library.Skill) {
 func linkButton(c *ui.Context, label string) ui.Element {
 	b := ui.ButtonBase(c).Cursor(ui.CursorPointer).Label(label)
 	b.TextColor(tint(b, "text", colAccent, colAccent, darker(colAccent, 0.35)))
-	b.Children(func() { ui.Text(c, label).FontSize(12).SingleLine().ContentTransition(labelTransition) })
+	b.Children(func() { ui.Text(c, label).FontSize(13).SingleLine().ContentTransition(labelTransition) })
 	return b
 }
 
@@ -162,7 +162,7 @@ func toolButton(c *ui.Context, icon *ui.SVG, label string, iconOnly bool) ui.Ele
 	b.Children(func() {
 		ui.Icon(c, icon).Size(13, 13).ContentTransition(labelTransition)
 		if !iconOnly {
-			ui.Text(c, label).FontSize(12).SingleLine().ContentTransition(labelTransition)
+			ui.Text(c, label).FontSize(13).SingleLine().ContentTransition(labelTransition)
 		}
 	})
 	return b
@@ -182,7 +182,7 @@ func busyButton(c *ui.Context, icon *ui.SVG, label string, busy bool) ui.Element
 		} else {
 			ui.Icon(c, icon).Size(13, 13)
 		}
-		ui.Text(c, label).FontSize(12).SingleLine().ContentTransition(labelTransition)
+		ui.Text(c, label).FontSize(13).SingleLine().ContentTransition(labelTransition)
 	})
 	return b
 }
@@ -218,7 +218,7 @@ func segmented(c *ui.Context, selected *int, labels ...string) ui.Element {
 		for i, label := range labels {
 			s := seg.Segment(i).Size(segW, segH).Radius(4).Center().Label(label)
 			s.Children(func() {
-				t := ui.Text(c, label).FontSize(12).SingleLine().TextColor(colTextBody)
+				t := ui.Text(c, label).FontSize(13).SingleLine().TextColor(colTextBody)
 				if i == *selected {
 					t.TextColor(colTextPrimary).FontWeight(500)
 				} else if s.Pressed() {
