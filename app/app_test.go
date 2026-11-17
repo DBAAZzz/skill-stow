@@ -441,7 +441,7 @@ func TestSettingsWindow(t *testing.T) {
 		t.Fatal("齿轮应打开设置")
 	}
 	// 设置是单独的窗口，用自己的 Tester
-	st := newUITester(a.settingsView, settingsWidth, settingsMaxHeight)
+	st := newUITester(a.settingsView, settingsWidth, settingsHeight)
 	for _, want := range []string{"技能库", "~/.agents/skills · 20 个技能", "在 Finder 中显示", "检查并修复", "主题", "浅色", "跟随系统", "语言"} {
 		if !st.HasText(want) {
 			t.Errorf("通用缺少 %q：%q", want, st.Texts())
@@ -459,7 +459,6 @@ func TestSettingsWindow(t *testing.T) {
 	if !st.HasText("检查了 0 个链接，都是好的。") {
 		t.Errorf("应显示检查结果：%q", a.set.linkResult)
 	}
-	general := a.set.height
 
 	// Agent 管理：关掉 WorkBuddy 后看板里没有它的列
 	if err := st.Click("Agent 管理"); err != nil {
@@ -470,9 +469,6 @@ func TestSettingsWindow(t *testing.T) {
 		if !st.HasText(want) {
 			t.Errorf("Agent 管理缺少 %q：%q", want, st.Texts())
 		}
-	}
-	if a.set.height <= general {
-		t.Errorf("Agent 管理比通用高，窗口应跟着变高：%d → %d", general, a.set.height)
 	}
 	if err := st.Click("在界面里显示 WorkBuddy"); err != nil {
 		t.Fatal(err)
@@ -500,18 +496,19 @@ func TestSettingsWindow(t *testing.T) {
 			t.Errorf("项目缺少 %q：%q", want, st.Texts())
 		}
 	}
-	if err := st.Click("还有 20 个…"); err != nil {
-		t.Fatal(err)
-	}
-	if !st.HasText(".agent/skills/") {
-		t.Error("展开后应列出全部目录")
-	}
 	// 每一行自己的移除按钮（示例数据不能真的移除，显示原因）
 	if err := st.Click("移除 v3-waterfall"); err != nil {
 		t.Fatal(err)
 	}
 	if !st.HasText("示例数据不能移除项目") {
 		t.Errorf("应显示移除失败的原因：%q", a.set.err)
+	}
+	st.Scroll(480, 300, 0, 280)
+	if err := st.Click("还有 20 个…"); err != nil {
+		t.Fatal(err)
+	}
+	if !st.HasText(".agent/skills/") {
+		t.Error("展开后应列出全部目录")
 	}
 
 	if err := st.Click("技能更新"); err != nil {
@@ -719,12 +716,11 @@ func TestSnapshots(t *testing.T) {
 		}
 		writePNG(t, filepath.Join(dir, s.name+".png"), tt)
 	}
-	// 设置窗口四个标签，窗口高度按内容
+	// 设置窗口四个标签，固定 760×540
 	for i, name := range []string{"s1-general", "s2-agents", "s3-projects", "s4-updates"} {
 		a := newApp(load())
 		a.set.tab = i
-		newUITester(a.settingsView, settingsWidth, settingsMaxHeight).Frame() // 量出高度
-		tt := newUITester(a.settingsView, settingsWidth, a.set.height)
+		tt := newUITester(a.settingsView, settingsWidth, settingsHeight)
 		tt.SetScale(2)
 		tt.Frame()
 		writePNG(t, filepath.Join(dir, name+".png"), tt)

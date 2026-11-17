@@ -8,7 +8,7 @@ func TestUserPicksDarkThenLightThemeInSettings(t *testing.T) {
 	var applied []string
 	applyTheme = func(id string) { applied = append(applied, id) }
 	t.Cleanup(func() { applyTheme = func(string) {} })
-	st := newUITester(a.settingsView, settingsWidth, settingsMaxHeight)
+	st := newUITester(a.settingsView, settingsWidth, settingsHeight)
 	if a.lib.Settings.Theme != themeAuto {
 		t.Fatalf("默认应跟随系统，得到 %q", a.lib.Settings.Theme)
 	}

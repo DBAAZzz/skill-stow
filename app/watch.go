@@ -23,15 +23,17 @@ const (
 )
 
 type pendingWatchScan struct {
-	lib    *library.Library
-	report library.UpdateReport
-	gen    uint64
+	lib         *library.Library
+	report      library.UpdateReport
+	gen         uint64
+	reloadUsage bool
 }
 
 type watchState struct {
-	hub     atomic.Pointer[diskWatcher]
-	scanGen atomic.Uint64
-	pending *pendingWatchScan
+	hub       atomic.Pointer[diskWatcher]
+	scanGen   atomic.Uint64
+	scanEpoch uint64 // 每次 applyScan 或 watch 暂存 pending 递增，防较早发起的设置扫描回盖较新结果
+	pending   *pendingWatchScan
 }
 
 type watchConfig struct {
@@ -198,12 +200,14 @@ func (a *app) applyWatchScan(lib *library.Library, rep library.UpdateReport, bas
 		a.triggerWatchScan()
 		return
 	}
+	reload := a.watch.pending != nil && a.watch.pending.reloadUsage
 	if a.isWatchApplyDeferred() {
-		a.watch.pending = &pendingWatchScan{lib: lib, report: rep, gen: baseGen}
+		a.watch.scanEpoch++
+		a.watch.pending = &pendingWatchScan{lib: lib, report: rep, gen: baseGen, reloadUsage: reload}
 		return
 	}
 	a.watch.pending = nil
-	a.applyScan(lib, rep, false)
+	a.applyScan(lib, rep, reload)
 	a.ensureSourceIcons()
 }
 
@@ -216,7 +220,7 @@ func (a *app) flushPendingWatch() {
 	if p.gen != a.watch.scanGen.Load() {
 		return
 	}
-	a.applyScan(p.lib, p.report, false)
+	a.applyScan(p.lib, p.report, p.reloadUsage)
 	a.ensureSourceIcons()
 }
 

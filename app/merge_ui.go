@@ -181,8 +181,15 @@ func mergedMessage(todo []*library.Skill, total library.MergeResult, errs []stri
 	return msg, errMsg
 }
 
-// later 过 d 在界面线程上执行 fn 并重画。测试里没有窗口，马上执行。
+// later 过 d 在界面线程上执行 fn 并重画。测试里没有窗口，马上执行（除非接管 delay）。
 func (a *app) later(d time.Duration, fn func()) {
+	if a.delay != nil {
+		a.delay(d, func() {
+			fn()
+			a.changed()
+		})
+		return
+	}
 	if !a.live || d <= 0 {
 		fn()
 		return

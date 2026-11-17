@@ -1063,7 +1063,7 @@ func (a *app) updateSettings(c *ui.Context) {
 	}
 	groupLabel(c, locales.UpdateNetworkAndOldVersions(), true)
 	setBox(c, func() {
-		setRow(c, true).Children(func() {
+		setRow(c).Children(func() {
 			rowText(c, locales.UpdateNetworkProxy(), locales.UpdateSystemProxyHint(), false)
 			label := locales.CommonChoose()
 			for _, o := range proxyChoices {
@@ -1080,14 +1080,14 @@ func (a *app) updateSettings(c *ui.Context) {
 				}
 			})
 		})
-		setRow(c, false).Children(func() {
+		setRow(c).Children(func() {
 			rowText(c, locales.UpdateManualProxy(), locales.UpdateProxyExample(), false)
 			ui.TextInputBase(c, &a.lib.Settings.UpdateProxy).Width(210).Height(24).Padding(2, 6).Background(colBgCard).BorderWidth(1).BorderColor(colBorderDefault).Radius(5).Placeholder("http://127.0.0.1:7890").Label(locales.UpdateProxyAddress()).Disabled(a.upd.cancel != nil)
 			if pushButton(c, locales.ActionSave()).Disabled(a.upd.cancel != nil).Clicked() {
 				a.saveSettings()
 			}
 		})
-		setRow(c, false).Children(func() {
+		setRow(c).Children(func() {
 			rowText(c, locales.UpdateOldVersions(), locales.UpdateNoUndo(), false)
 			label := locales.CommonChoose()
 			if a.lib.Settings.UpdateOldVersion == "trash" {
@@ -1109,7 +1109,7 @@ func (a *app) updateSettings(c *ui.Context) {
 
 	groupLabel(c, locales.UpdateGitHubAuthorization(), false)
 	setBox(c, func() {
-		setRow(c, true).Children(func() {
+		setRow(c).Children(func() {
 			rowText(c, locales.UpdateUseGhLogin(), locales.UpdateGhLoginHint(), false)
 			if toggle(c, &a.lib.Settings.UseGHAuth, locales.UpdateToggleGhLogin()).Disabled(a.upd.cancel != nil).Changed() {
 				a.saveSettings()

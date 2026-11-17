@@ -43,7 +43,7 @@ func TestUserSwitchesTheInterfaceToEnglishInSettings(t *testing.T) {
 	// Given 在设置里，界面是中文
 	a, _ := newTester(t)
 	t.Cleanup(func() { testLocale.Store("") })
-	st := newUITester(a.settingsView, settingsWidth, settingsMaxHeight)
+	st := newUITester(a.settingsView, settingsWidth, settingsHeight)
 
 	// When 在「语言」里选 English
 	clickMenuButton(t, st, "语言")

@@ -10254,6 +10254,36 @@ func (msgs Messages) ActionDetectAgain() string {
 	return Catalog.Format(msgs.locale, "actionDetectAgain", nil)
 }
 
+// SettingsDetecting says "正在检测…"
+// in the language the app shows.
+//
+// 设置里点击「重新检测」正在检测 Agent
+// 时按钮显示的文案。
+func SettingsDetecting() string { return In(i18n.Locale()).SettingsDetecting() }
+
+// SettingsDetecting says "正在检测…"
+// in the language of msgs.
+//
+// 设置里点击「重新检测」正在检测 Agent
+// 时按钮显示的文案。
+func (msgs Messages) SettingsDetecting() string {
+	return Catalog.Format(msgs.locale, "settingsDetecting", nil)
+}
+
+// SettingsDetected says "已检测"
+// in the language the app shows.
+//
+// 设置里重新检测 Agent 完成后按钮短暂显示的完成文案。
+func SettingsDetected() string { return In(i18n.Locale()).SettingsDetected() }
+
+// SettingsDetected says "已检测"
+// in the language of msgs.
+//
+// 设置里重新检测 Agent 完成后按钮短暂显示的完成文案。
+func (msgs Messages) SettingsDetected() string {
+	return Catalog.Format(msgs.locale, "settingsDetected", nil)
+}
+
 // SettingsAgentNotFound says "没找到你用的 Agent？"
 // in the language the app shows.
 //
@@ -10434,6 +10464,34 @@ func ActionCheckAgain() string { return In(i18n.Locale()).ActionCheckAgain() }
 // 设置中管理手动添加的项目文件夹时显示的文案。
 func (msgs Messages) ActionCheckAgain() string {
 	return Catalog.Format(msgs.locale, "actionCheckAgain", nil)
+}
+
+// SettingsChecking says "正在检查…"
+// in the language the app shows.
+//
+// 设置里点击「重新检查」正在检查项目时按钮显示的文案。
+func SettingsChecking() string { return In(i18n.Locale()).SettingsChecking() }
+
+// SettingsChecking says "正在检查…"
+// in the language of msgs.
+//
+// 设置里点击「重新检查」正在检查项目时按钮显示的文案。
+func (msgs Messages) SettingsChecking() string {
+	return Catalog.Format(msgs.locale, "settingsChecking", nil)
+}
+
+// SettingsChecked says "已检查"
+// in the language the app shows.
+//
+// 设置里重新检查项目完成后按钮短暂显示的完成文案。
+func SettingsChecked() string { return In(i18n.Locale()).SettingsChecked() }
+
+// SettingsChecked says "已检查"
+// in the language of msgs.
+//
+// 设置里重新检查项目完成后按钮短暂显示的完成文案。
+func (msgs Messages) SettingsChecked() string {
+	return Catalog.Format(msgs.locale, "settingsChecked", nil)
 }
 
 // SettingsManualFolders says "手动添加的文件夹"

@@ -33,6 +33,10 @@ func (a *app) refreshUsage() {
 	if a.usage != nil {
 		a.lib.SetUsage(a.usage)
 	}
+	if a.readUsage != nil {
+		a.readUsage()
+		return
+	}
 	a.loadUsage()
 }
 

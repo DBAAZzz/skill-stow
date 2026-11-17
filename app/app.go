@@ -104,11 +104,14 @@ type app struct {
 	srcIcons    map[string]ui.ImageSource
 	srcIconBusy map[string]bool
 
-	// bg 替换 background 的做法：测试里停在半路，看进行中的界面
-	bg       func(work func(post func(func())))
-	openURL  func(string)
-	watchCfg *watchConfig
-	watch    watchState
+	// bg / delay 替换 background / later 的做法：测试里停在半路，看进行中或完成后的界面；
+	// readUsage 替换 refreshUsage 里的 loadUsage，测试里数它被叫了几次
+	bg        func(work func(post func(func())))
+	delay     func(d time.Duration, fn func())
+	readUsage func()
+	openURL   func(string)
+	watchCfg  *watchConfig
+	watch     watchState
 }
 
 // background 在后台跑 work；work 改界面状态都通过 post，post 在界面线程
@@ -369,6 +372,7 @@ func (a *app) useScan(lib *library.Library, report library.UpdateReport) {
 
 func (a *app) applyScan(lib *library.Library, report library.UpdateReport, reloadUsage bool) {
 	defer a.changed()
+	a.watch.scanEpoch++
 	a.set.scannedAt = time.Now()
 	if a.lib != nil && lib != nil {
 		// 设置只在界面线程上改、改完就写盘，内存里这份最新；后台扫描是在

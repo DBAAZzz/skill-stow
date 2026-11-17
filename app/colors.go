@@ -22,7 +22,7 @@ var (
 	// 表面
 	colBgSurface, colBgPage, colBgPane, colBgSubtle, colBgFill,
 	colBgCard, colBgControl, colBgThumb, colBgSidebar, colBgWindow,
-	colBgTitlebar, colBgSideVeil, colBgGlass, colBgToastGlass, colBgScrim,
+	colBgSideVeil, colBgGlass, colBgToastGlass, colBgScrim,
 	colBgLogo ui.Color
 
 	// 文字
@@ -72,8 +72,7 @@ var tones = []tone{
 	{&colBgControl, "#ffffff", "#38383a"},                               // 按钮、下拉、勾选框；框架 Theme.Surface
 	{&colBgThumb, "#ffffff", "#5c5c60"},                                 // 分段控件滑块
 	{&colBgSidebar, "#efeff1", "#262628"},                               // 侧边栏（没有毛玻璃时）、搜索框
-	{&colBgWindow, "#ececee", "#202022"},                                // 设置窗口的底
-	{&colBgTitlebar, "#e4e4e7", "#2a2a2c"},                              // 设置窗口顶栏
+	{&colBgWindow, "#ececee", "#202022"},                                // 欢迎页舞台渐变的下端，比页面底深一档
 	{&colBgSideVeil, "rgba(255,255,255,0.45)", "rgba(30,30,30,0.40)"},   // 盖在毛玻璃侧边栏上：壁纸再深再亮，侧栏都停在同一档灰
 	{&colBgGlass, "rgba(249,249,251,0.48)", "rgba(30,30,32,0.32)"},      // 菜单、⌘K 的毛玻璃叠色
 	{&colBgToastGlass, "rgba(250,250,252,0.74)", "rgba(40,40,42,0.72)"}, // toast 的毛玻璃叠色
@@ -200,6 +199,17 @@ func setPalette(dark bool) {
 	for i, t := range tones {
 		*t.c = vals[i]
 	}
+}
+
+// windowBackground 是原生窗口的底色，写成 light-dark(浅, 深)：内容画出来前
+// 系统先拿它铺底，取自 tones 才和页面底色对得上。c 必须是 tones 里的颜色。
+func windowBackground(c *ui.Color) string {
+	for _, t := range tones {
+		if t.c == c {
+			return "light-dark(" + t.light + ", " + t.dark + ")"
+		}
+	}
+	panic("colors.go: windowBackground needs a palette color")
 }
 
 // ink 是叠在底色上的一层：悬停、按下、细线。浅色界面叠黑，深色叠白。

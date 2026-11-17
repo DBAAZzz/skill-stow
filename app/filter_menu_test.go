@@ -238,7 +238,7 @@ func TestFrostedActionMenusOperateAcrossUpdateInspectorAndBoard(t *testing.T) {
 func TestFrostedSelectButtonsOperateInSettingsGeneralAndUpdates(t *testing.T) {
 	// Scenario 1: 设置「通用」标签里的「语言」下拉选择器
 	a, _ := newTester(t)
-	st := newUITester(a.settingsView, 520, 560)
+	st := newUITester(a.settingsView, settingsWidth, settingsHeight)
 	clickMenuButton(t, st, "语言")
 	if !st.HasText("简体中文") || !st.HasText("English") {
 		t.Fatalf("语言菜单应使用窗口内统一菜单渲染选项：%q", st.Texts())
@@ -449,7 +449,7 @@ func TestSettingsMenusDoNotLeakAndBlockWatchSyncAfterClosing(t *testing.T) {
 	a.set.open = true
 	a.set.tab = tabUpdates
 	a.lib.Settings.UpdateProxyMode = "system"
-	st := newUITester(a.settingsView, settingsWidth, settingsMaxHeight)
+	st := newUITester(a.settingsView, settingsWidth, settingsHeight)
 	st.Frame()
 	clickMenuButton(t, st, "网络代理")
 	if !a.anyMenuOpen() || !a.isWatchApplyDeferred() {
@@ -610,8 +610,7 @@ func TestMenuAndFilterSnapshots(t *testing.T) {
 	aSet.set.tab = tabUpdates
 	aSet.lib.Settings.UpdateProxyMode = "system"
 	aSet.lib.Settings.UpdateOldVersion = "trash"
-	newUITester(aSet.settingsView, settingsWidth, settingsMaxHeight).Frame()
-	ttSet := newUITester(aSet.settingsView, settingsWidth, aSet.set.height)
+	ttSet := newUITester(aSet.settingsView, settingsWidth, settingsHeight)
 	ttSet.SetScale(2)
 	ttSet.Frame()
 	clickMenuButton(t, ttSet, "网络代理")
@@ -620,8 +619,7 @@ func TestMenuAndFilterSnapshots(t *testing.T) {
 
 	aGen := newApp(library.Sample())
 	aGen.set.tab = tabGeneral
-	newUITester(aGen.settingsView, settingsWidth, settingsMaxHeight).Frame()
-	ttGen := newUITester(aGen.settingsView, settingsWidth, aGen.set.height)
+	ttGen := newUITester(aGen.settingsView, settingsWidth, settingsHeight)
 	ttGen.SetScale(2)
 	ttGen.Frame()
 	clickMenuButton(t, ttGen, "语言")
