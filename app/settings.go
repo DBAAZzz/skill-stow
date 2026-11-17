@@ -49,18 +49,18 @@ type settingsState struct {
 	linkResult string    // 「检查并修复」的结果
 	allDirs    bool      // 「在项目里查看的目录」展开
 	err        string
-	height     int // 窗口内容按当前标签该有的高度，上一帧量出来的
 	ghProbing  bool
 	ghChecked  bool
 	ghOK       bool
 	ghNote     string
 }
 
-// 设置窗口的宽、顶栏高和最高（再高就滚动）。
+// 设置窗口的固定宽高与左侧导航栏宽度（2A 无界融底左右分栏）。
 const (
-	settingsWidth     = 660
-	settingsBarHeight = 86
-	settingsMaxHeight = 760
+	settingsWidth      = 760
+	settingsHeight     = 540
+	settingsSideWidth  = 192
+	settingsDragHeight = 48
 )
 
 // openSettings 打开设置窗口：一个单独的原生窗口（左上角是系统的红绿灯），
@@ -89,29 +89,26 @@ func (a *app) openSettings() {
 		a.changed()
 		return
 	}
-	// 先在屏幕外按当前标签排一遍，量出窗口该有的高度（fitSettings 记在
-	// a.set.height）；窗口藏着建好，调到这个高度（盖过 StateKey 记住的上次
-	// 高度）再显示。藏着的窗口不出帧，没法等它自己量，所以在外面量。
-	// 这样打开时不会先按默认或上次的高度出现、再缩一下。
-	ui.NewTester(a.settingsView, settingsWidth, settingsMaxHeight).Frame()
 	win := mygo.NewWindow(mygo.WindowOptions{
 		Hidden:               true,
 		Title:                settingsTabs[a.set.tab].label(),
 		Width:                settingsWidth,
-		Height:               cmp.Or(a.set.height, 520),
+		Height:               settingsHeight,
 		UseContentSize:       true,
 		StateKey:             "settings",
-		TitleBarStyle:        mygo.TitleBarHidden,
-		TrafficLightPosition: &mygo.Point{X: 16, Y: 14},
+		TitleBarStyle:        mygo.TitleBarHiddenInset,
+		TitleBarHeight:       settingsDragHeight,
+		TrafficLightPosition: &mygo.Point{X: 18, Y: (settingsDragHeight - trafficLightSize) / 2},
 		DisableResize:        true,
 		DisableMaximize:      true,
 		DisableFullScreen:    true,
-		BackgroundColor:      "#ececee",
+		BackgroundColor:      "light-dark(#f5f5f7, #1e1e1e)",
 		Content:              ui.View(a.settingsView),
 	})
 	a.setWin = win
 	a.closeMenusIn(menuWinSettings)
-	win.SetContentSize(settingsWidth, cmp.Or(a.set.height, 520))
+	// 覆盖 StateKey 可能记住的旧版本尺寸，确保始终以固定 760×540 打开。
+	win.SetContentSize(settingsWidth, settingsHeight)
 	win.Show()
 	a.syncDockProgress(win)
 	win.OnFocus(func() {
@@ -160,72 +157,62 @@ func (a *app) closeSettings() {
 	}
 }
 
-// settingsView 是设置窗口的内容：顶栏（标题、标签）和当前标签。
-// 窗口高度跟着内容走，换标签时顶边不动，像 macOS 的设置窗口。
+// settingsView 是设置窗口的内容：统一底色下左右分栏，无竖向与顶栏分割线。
 func (a *app) settingsView(c *ui.Context) {
 	prevWin := a.menuBuildWin
 	a.menuBuildWin = menuWinSettings
 	defer func() { a.menuBuildWin = prevWin }()
 	theme(c)
-	c.Root().Background(colBgWindow)
+	c.Root().Background(colBgPage)
 	c.OnWindowShortcut(ui.Cmd, ui.KeyW, a.closeSettings)
-	ui.Column(c).Fill().Children(func() {
-		a.settingsHeader(c)
-		ui.Scroll(c).Grow(1).MinHeight(0).Scrollbars(false).Children(func() {
-			body := ui.Column(c.Key(a.set.tab)).Padding(18, 24, 22, 24).Children(func() {
-				switch a.set.tab {
-				case tabAgents:
-					a.agentsTab(c)
-				case tabUpdates:
-					a.updateSettings(c)
-				case tabProjects:
-					a.projectsTab(c)
-				default:
-					a.generalTab(c)
-				}
-				if a.set.err != "" {
-					errorLine(c, a.set.err)
-				}
+	ui.Row(c).Fill().AlignItems(ui.Stretch).Children(func() {
+		a.settingsSidebar(c)
+		ui.Column(c).Grow(1).MinWidth(0).Children(func() {
+			ui.Box(c).Height(settingsContentTop(c)).Shrink(0).DragWindow()
+			ui.Scroll(c).Grow(1).MinHeight(0).Scrollbars(false).Children(func() {
+				ui.Column(c.Key(a.set.tab)).Padding(0, 24, 22, 14).Children(func() {
+					switch a.set.tab {
+					case tabAgents:
+						a.agentsTab(c)
+					case tabUpdates:
+						a.updateSettings(c)
+					case tabProjects:
+						a.projectsTab(c)
+					default:
+						a.generalTab(c)
+					}
+					if a.set.err != "" {
+						errorLine(c, a.set.err)
+					}
+				})
 			})
-			a.fitSettings(c, body.Bounds().H)
 		})
 	})
 }
 
-// fitSettings 按上一帧量出的内容高度调整窗口。
-func (a *app) fitSettings(c *ui.Context, bodyH float32) {
-	if bodyH <= 0 {
-		c.Invalidate() // 第一帧还没量出来：再要一帧（openSettings 在屏幕外量时也靠它）
-		return
+func settingsContentTop(c *ui.Context) float32 {
+	if bar := c.TitleBar(); bar.Right > 0 {
+		// Windows/Linux 的窗口按钮在右上角：右侧内容顶部让出控件带高度
+		return max(bar.Height, 20)
 	}
-	h := min(settingsBarHeight+int(bodyH+0.99), settingsMaxHeight)
-	if h == a.set.height {
-		return
-	}
-	a.set.height = h
-	if w := a.setWin; w != nil {
-		go w.SetContentSize(settingsWidth, h) // 不在构建这一帧时改窗口
-	}
+	return 20
 }
 
-// settingsHeader 是窗口顶栏（.tb）：标题、标签，可以拖动窗口。
-// 红绿灯是系统画的，在左上角。
-func (a *app) settingsHeader(c *ui.Context) {
-	ui.Column(c).Height(settingsBarHeight).Shrink(0).Background(colBgTitlebar).BorderWidth(0, 0, 1, 0).BorderColor(colBorderSidebar).
-		AlignItems(ui.Center).DragWindow().Children(func() {
-		ui.Text(c, settingsTabs[a.set.tab].label()).FontWeight(600).TextColor(colTextBody).Margin(10, 0, 0, 0)
-		ui.Spacer(c)
-		ui.Row(c).Gap(4).Margin(0, 0, 6, 0).Children(func() {
+// settingsSidebar 是左侧导航栏：红绿灯下方直接排开 4 个设置分类，与右侧共用底色。
+func (a *app) settingsSidebar(c *ui.Context) {
+	ui.Column(c).Width(settingsSideWidth).Shrink(0).Padding(0, 10, 14, 10).Children(func() {
+		ui.Box(c).Height(max(c.TitleBar().Height, settingsDragHeight)).Shrink(0).DragWindow()
+		ui.Column(c).Gap(2).Children(func() {
 			for i, tab := range settingsTabs {
 				on := a.set.tab == i
-				b := ui.ButtonBase(c.Key(i)).Size(88, 46).Radius(7).Gap(3).Column().AlignItems(ui.Center).Justify(ui.Center).Label(tab.label())
+				b := ui.ButtonBase(c.Key(i)).Height(32).Padding(0, 10).Radius(8).Gap(8).Justify(ui.Start).AlignItems(ui.Center).Label(tab.label())
 				selectableRow(b, on, colInkSelected)
 				b.Children(func() {
-					icon := ui.Icon(c, tab.icon).Size(20, 20).TextColor(colTextSecondary)
-					text := ui.Text(c, tab.label()).FontSize(11).TextColor(colTextSecondary).SingleLine()
+					icon := ui.Icon(c, tab.icon).Size(16, 16).TextColor(colTextSecondary)
+					text := ui.Text(c, tab.label()).FontSize(13).TextColor(colTextBody).SingleLine()
 					if on {
-						icon.TextColor(colAccent)
-						text.TextColor(colTextPrimary)
+						icon.TextColor(colTextPrimary)
+						text.TextColor(colTextPrimary).FontWeight(500)
 					}
 				})
 				if b.Clicked() {
@@ -240,6 +227,7 @@ func (a *app) settingsHeader(c *ui.Context) {
 				}
 			}
 		})
+		ui.Box(c).Grow(1).DragWindow()
 	})
 }
 
@@ -273,7 +261,7 @@ func (a *app) generalTab(c *ui.Context) {
 
 	groupLabel(c, locales.SettingsAppearance(), false)
 	setBox(c, func() {
-		setRow(c, true).Padding(10, 12).Children(func() {
+		setRow(c, true).Padding(12, 18).Children(func() {
 			rowText(c, locales.SettingsTheme(), "", false)
 			ui.Row(c).Gap(14).Role(ui.RoleRadioGroup).Label(locales.SettingsTheme()).Children(func() {
 				a.themeTile(c, themeLight, locales.SettingsThemeLight())
@@ -407,12 +395,13 @@ func (a *app) agentsTab(c *ui.Context) {
 
 	groupLabel(c, locales.SettingsInstalledAgents(len(agents)), true)
 	setBox(c, func() {
-		setRow(c, true).Children(func() {
+		setListRow(c).Padding(9, 16).Children(func() {
 			rowText(c, locales.SettingsShowInInterface(), locales.SettingsHiddenAgentNote(), false)
 		})
 		for _, ag := range shown {
+			setListDivider(c.Key("div:" + ag.ID))
 			hidden := a.lib.Hidden(ag.ID)
-			row := setRow(c.Key(ag.ID), false)
+			row := setListRow(c.Key(ag.ID))
 			if hidden {
 				row.TextColor(colTextDisabled)
 			}
@@ -435,7 +424,7 @@ func (a *app) agentsTab(c *ui.Context) {
 			if !a.set.allAgents {
 				text = locales.SettingsOtherAgents(rest, counts[agents[shownAgents].ID])
 			}
-			more := ui.ButtonBase(c).Padding(8, 12).Justify(ui.Start).BorderWidth(1, 0, 0, 0).BorderColor(colBorderSubtle).
+			more := ui.ButtonBase(c).Padding(9, 16).Justify(ui.Start).BorderWidth(1, 0, 0, 0).BorderColor(colBorderSubtle).
 				TextColor(colAccent).Label(text)
 			more.Children(func() { ui.Text(c, text).FontSize(13).SingleLine() })
 			if more.Clicked() {
@@ -492,7 +481,7 @@ func (a *app) projectsTab(c *ui.Context) {
 	d := a.lib.Discovery
 	groupLabel(c, locales.SettingsAutoDiscover(), true)
 	setBox(c, func() {
-		setRow(c, true).Children(func() {
+		setListRow(c).Padding(9, 16).Children(func() {
 			rowText(c, locales.SettingsFindProjectsFromLogs(), locales.SettingsProjectDiscoveryNote(), false)
 			if toggle(c, &set.AutoDiscover, locales.SettingsFindProjectsFromLogs()).Changed() {
 				a.saveSettings()
@@ -500,8 +489,9 @@ func (a *app) projectsTab(c *ui.Context) {
 			}
 		})
 		for _, src := range d.Sources {
+			setListDivider(c.Key("div:" + src.Agent))
 			dim := src.Count < 0 || !set.AutoDiscover
-			row := setRow(c.Key(src.Agent), false)
+			row := setListRow(c.Key(src.Agent))
 			if dim {
 				row.TextColor(colTextDisabled)
 			}
@@ -526,7 +516,7 @@ func (a *app) projectsTab(c *ui.Context) {
 			if set.AutoDiscover {
 				before, after := splitEmph(locales.SettingsDiscoverSummary(d.Total, emphMark))
 				ui.Text(c, before).SingleLine()
-				ui.Text(c, locales.SettingsWithSkills(d.WithSkills)).FontWeight(600).SingleLine()
+				ui.Text(c, locales.SettingsWithSkills(d.WithSkills)).FontWeight(600).TextColor(colTextPrimary).SingleLine()
 				if after != "" {
 					ui.Text(c, after).SingleLine()
 				}
@@ -545,12 +535,15 @@ func (a *app) projectsTab(c *ui.Context) {
 	manual := a.lib.ManualProjects()
 	setBox(c, func() {
 		if len(manual) == 0 {
-			setRow(c, true).Children(func() {
+			setListRow(c).Children(func() {
 				ui.Text(c, locales.SettingsNoManualFolders()).FontSize(12).TextColor(colTextMuted)
 			})
 		}
 		for i, p := range manual {
-			setRow(c.Key(p.Dir), i == 0).Children(func() {
+			if i > 0 {
+				setListDivider(c.Key("div:" + p.Dir))
+			}
+			setListRow(c.Key(p.Dir)).Children(func() {
 				ui.Icon(c, iconFolderFill).Size(18, 18).TextColor(colFolder)
 				rowText(c, p.Name, a.lib.Display(p.Dir), true)
 				switch {
@@ -567,7 +560,7 @@ func (a *app) projectsTab(c *ui.Context) {
 			})
 		}
 		// 底部只有「添加」：移除在每一行上
-		add := ui.ButtonBase(c).Padding(8, 12).Gap(6).AlignItems(ui.Center).Justify(ui.Start).
+		add := ui.ButtonBase(c).Padding(10, 16).Gap(6).AlignItems(ui.Center).Justify(ui.Start).
 			BorderWidth(1, 0, 0, 0).BorderColor(colBorderSubtle).TextColor(colAccent).Label(locales.ActionAddFolderEllipsis())
 		add.Children(func() {
 			ui.Icon(c, iconPlus).Size(13, 13)
@@ -598,7 +591,7 @@ func (a *app) projectsTab(c *ui.Context) {
 			ui.Text(c, locales.SettingsProjectDirectoriesHint()).
 				FontSize(12).LineHeight(1.45).TextColor(colTextMuted).Grow(1).MinWidth(0)
 		})
-		ui.Row(c).Wrap().Gap(6).Padding(0, 12, 12, 12).Children(func() {
+		ui.Row(c).Wrap().Gap(6).Padding(0, 18, 14, 18).Children(func() {
 			shown := dirs
 			if !a.set.allDirs && len(dirs) > shownDirs {
 				shown = dirs[:shownDirs]
@@ -641,26 +634,33 @@ func removeButton(c *ui.Context, label string) ui.Element {
 
 // groupLabel 是一组的标题（.gl）。
 func groupLabel(c *ui.Context, text string, first bool) {
-	l := sectionLabel(c, text).Margin(0, 0, 6, 4)
+	l := ui.Text(c, text).FontSize(12).FontWeight(500).TextColor(colTextMuted).Margin(0, 0, 8, 4)
 	if !first {
-		l.Margin(18, 0, 6, 4)
+		l.Margin(20, 0, 8, 4)
 	}
 }
 
-// setBox 是设置里的白色分组框（.box）。
+// setBox 是设置里的圆角白色分组框（10px 圆角 + 细边与浮起投影）。
 func setBox(c *ui.Context, fn func()) {
-	box := ui.Column(c).Radius(9).Background(colBgCard)
-	hairline(box, 0.1)
+	box := ui.Column(c).Radius(10).Background(colBgCard)
+	hairline(box, 0.06)
+	lift(box, 1, 3, 0.03)
 	box.Clip().Children(fn)
 }
 
-// setRow 是框里的一行（.row），除第一行外上面有分隔线。
-func setRow(c *ui.Context, first bool) ui.Element {
-	row := ui.Row(c).MinHeight(36).Padding(5, 12).Gap(10).AlignItems(ui.Center)
-	if !first {
-		row.BorderWidth(1, 0, 0, 0).BorderColor(colBorderSubtle)
-	}
-	return row
+// setRow 是通用/更新等短卡片里的一行，内部不画横线，靠留白呼吸。
+func setRow(c *ui.Context, _ bool) ui.Element {
+	return ui.Row(c).MinHeight(36).Padding(11, 18).Gap(10).AlignItems(ui.Center)
+}
+
+// setListRow 是 Agent/项目列表卡片里的一行，配合 setListDivider 留出内缩分隔线。
+func setListRow(c *ui.Context) ui.Element {
+	return ui.Row(c).MinHeight(43).Padding(6, 16).Gap(10).AlignItems(ui.Center)
+}
+
+// setListDivider 是列表卡片行间向内缩进的极淡分隔线，不顶到圆角边缘。
+func setListDivider(c *ui.Context) {
+	ui.Box(c).Height(1).Margin(0, 16).Background(colBorderSubtle)
 }
 
 // rowText 是一行左边的名称和下面一行说明；mono 时说明是路径。
@@ -677,10 +677,12 @@ func rowText(c *ui.Context, title, sub string, mono bool) {
 	})
 }
 
-// sumRow 是框底部的灰色汇总行（.sum）。
+// sumRow 是框底部内嵌圆角汇总条，四面保留卡片白边托住，避免底色融进页面。
 func sumRow(c *ui.Context, fn func()) {
-	ui.Row(c).Padding(9, 12).Gap(6).AlignItems(ui.Center).Background(colBgSubtle).
-		BorderWidth(1, 0, 0, 0).BorderColor(colBorderSubtle).FontSize(12).TextColor(colTextSecondary).Children(fn)
+	bar := ui.Row(c).Margin(4, 10, 10, 10).Padding(9, 12).Gap(6).Radius(6).AlignItems(ui.Center).
+		Background(colBgSubtle).FontSize(12).TextColor(colTextBody)
+	hairline(bar, 0.06)
+	bar.Children(fn)
 }
 
 // hint 是框下面的一行灰色说明（.hint2）。

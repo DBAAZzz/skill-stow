@@ -145,7 +145,7 @@ func TestMergingFromCompareChimes(t *testing.T) {
 func TestUserTurnsOffTheChimeInSettings(t *testing.T) {
 	// Given 在设置里，提示音默认开着
 	a, chimes, _ := chimeTester(t)
-	st := newUITester(a.settingsView, settingsWidth, settingsMaxHeight)
+	st := newUITester(a.settingsView, settingsWidth, settingsHeight)
 	if a.lib.Settings.QuietTidy {
 		t.Fatal("提示音默认应开着")
 	}
