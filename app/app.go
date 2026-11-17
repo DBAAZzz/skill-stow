@@ -466,8 +466,8 @@ func (a *app) back() {
 }
 
 // toolbar 是内容区顶部的工具栏：标题、数量，after 放在标题后面（如问题
-// 提示），right 放右侧的控件。
-func (a *app) toolbar(c *ui.Context, title, subtitle string, after, right func()) {
+// 提示），subtitle 画数量和说明（12 号弱色，见 toolbarText），right 放右侧的控件。
+func (a *app) toolbar(c *ui.Context, title string, subtitle, after, right func()) {
 	a.toolbarRow(c, func() {
 		// 标题和数量同一行（r8 评论：不需要单独一行）
 		// 窄的时候副标题先省略，标题和右侧控件不让
@@ -476,11 +476,19 @@ func (a *app) toolbar(c *ui.Context, title, subtitle string, after, right func()
 			if after != nil {
 				ui.Row(c).AlignSelf(ui.Center).Shrink(0).Children(after)
 			}
-			if subtitle != "" {
-				ui.Text(c, subtitle).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").SingleLine().MinWidth(0).Shrink(1)
+			if subtitle != nil {
+				ui.Row(c).Gap(8).AlignItems(ui.Center).MinWidth(0).Shrink(1).FontSize(12).TextColor(colTextMuted).Children(subtitle)
 			}
 		})
 	}, right)
+}
+
+// toolbarText 是工具栏上只有一句话的副标题；text 为空时没有副标题。
+func toolbarText(c *ui.Context, text string) func() {
+	if text == "" {
+		return nil
+	}
+	return func() { ui.Text(c, text).FontFeatures("tnum").SingleLine().MinWidth(0).Shrink(1) }
 }
 
 // toolbarRow 是工具栏本身：left 画标题部分，right 放右侧的控件。高度和右

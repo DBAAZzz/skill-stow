@@ -101,6 +101,14 @@ func cjk(s string) bool {
 // 按文件给出所在行；同一行带 //i18n:ignore 注释的不算（如语言的自称）。
 func cjkLiterals(t *testing.T, dir string) map[string][]int {
 	t.Helper()
+	return literalsMatching(t, dir, cjk, "//i18n:ignore", false)
+}
+
+// literalsMatching 是 dir 下非测试、非生成的 Go 文件里 match 为真的字符串
+// 字面量（runes 为真时也算 rune 字面量），按文件给出所在行；同一行带 ignore
+// 开头的注释的不算。注释本身不扫。
+func literalsMatching(t *testing.T, dir string, match func(string) bool, ignore string, runes bool) map[string][]int {
+	t.Helper()
 	files, err := filepath.Glob(filepath.Join(dir, "*.go"))
 	if err != nil {
 		t.Fatal(err)
@@ -118,18 +126,18 @@ func cjkLiterals(t *testing.T, dir string) map[string][]int {
 		ignored := map[int]bool{}
 		for _, g := range f.Comments {
 			for _, cm := range g.List {
-				if strings.HasPrefix(cm.Text, "//i18n:ignore") {
+				if strings.HasPrefix(cm.Text, ignore) {
 					ignored[fset.Position(cm.Pos()).Line] = true
 				}
 			}
 		}
 		ast.Inspect(f, func(n ast.Node) bool {
 			lit, ok := n.(*ast.BasicLit)
-			if !ok || lit.Kind != token.STRING {
+			if !ok || lit.Kind != token.STRING && !(runes && lit.Kind == token.CHAR) {
 				return true
 			}
 			s, err := strconv.Unquote(lit.Value)
-			if err != nil || !cjk(s) {
+			if err != nil || !match(s) {
 				return true
 			}
 			if line := fset.Position(lit.Pos()).Line; !ignored[line] {

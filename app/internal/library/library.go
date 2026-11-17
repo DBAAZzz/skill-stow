@@ -113,7 +113,8 @@ type Skill struct {
 // ReadOnly 报告技能是否只读：内置、插件装的与项目技能不能在这里启用或修改。
 func (s *Skill) ReadOnly() bool { return s.Source != Mine }
 
-// Origin 是一句话的来源说明，用在详情栏和阅读视图的标题下。
+// Origin 是一句话的来源说明，用在详情栏和阅读视图的标题下。只读不写在
+// 这句话里，界面另画「只读」标签。
 func (s *Skill) Origin() string {
 	switch s.Source {
 	case ViaPlugin:

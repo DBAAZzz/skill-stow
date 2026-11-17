@@ -225,7 +225,7 @@ func (l *Library) CheckLinks() (LinkReport, error) {
 
 // ——— 项目从哪来 ———
 
-// Discovery 是从 Agent 的使用记录里找项目的结果（设置 · 项目）。
+// Discovery 是从 Agent 的使用记录里找项目的结果（设置 › 项目）。
 type Discovery struct {
 	Sources    []DiscoverySource
 	Total      int // 合并去重后的项目数

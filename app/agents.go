@@ -71,7 +71,7 @@ var brands = map[string]brand{
 	"codebuddy":      {icon: agentSVG("codebuddy"), gradient: [2]ui.Color{ui.Hex("#2EA99D"), ui.Hex("#6C4DFF")}, fg: white, scale: 1},
 	"workbuddy":      {icon: agentSVG("workbuddy"), gradient: [2]ui.Color{ui.Hex("#94d378"), ui.Hex("#01C886")}, fg: white, scale: 1},
 	"zcode":          mono("zcode", "#0b0c0f", "#fff", 1),
-	"vscode":         colored("vscode-color", 0.7), // 设置 · 项目里的 VS Code 系编辑器
+	"vscode":         colored("vscode-color", 0.7), // 设置 › 项目里的 VS Code 系编辑器
 	"droid":          letter("D", "#ee6018"),
 	"roo":            mono("roocode", "#000", "#fff", 0.75),
 	"kilo":           mono("kilocode", "#F8F676", "#1A1A18", 0.7),

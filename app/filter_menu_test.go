@@ -6,6 +6,7 @@ import (
 	"go/token"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -498,11 +499,11 @@ func TestFilterPrunesCollectionSelectionAndUpdatesCollectionCounts(t *testing.T)
 	openFilterMenu(t, tt)
 	clickMenuItem(t, tt, "有可用更新")
 
-	// Then 筛选后集合卡片角标与分节计数均与工具栏（2 个 · 1 个集合）一致，不混用未筛选总数 3
-	if !tt.HasText("2 个 · 1 个集合") || !tt.HasText("1/3") {
+	// Then 筛选后集合卡片角标与分节计数均与工具栏（2 个，1 个集合）一致，不混用未筛选总数 3
+	if !tt.HasText("2 个") || !tt.HasText("1 个集合") || !tt.HasText("1/3") {
 		t.Fatalf("筛选态集合卡片计数应体现实匹配 1/3 与工具栏一致：%q", tt.Texts())
 	}
-	if !tt.HasText("1 · 1 个集合") {
+	if !hasTextRun(tt, "通用", "1", "1 个集合") {
 		t.Fatalf("筛选态分节计数应与匹配技能数一致，而非集合总数 3：%q", tt.Texts())
 	}
 
@@ -524,7 +525,7 @@ func TestFilterPrunesCollectionSelectionAndUpdatesCollectionCounts(t *testing.T)
 	a.upd.report.Items = append(a.upd.report.Items, library.UpdateItem{Name: "doc-coauthoring", State: library.UpdReady})
 	tt.Frame()
 	doubleClick(t, tt, "anthropics/skills")
-	if !tt.HasText("集合 · 显示 1 / 3 个技能 · 都在通用里") {
+	if !tt.HasText("显示 1 / 3 个技能") || !tt.HasText("都在通用里") {
 		t.Fatalf("打开集合页标题副文案应显示筛选匹配数与总数：%q", tt.Texts())
 	}
 	must(t, tt.Click("doc-coauthoring"))
@@ -717,4 +718,16 @@ func TestBrowseFilterIsIndependentPerScopeMineAndBuiltin(t *testing.T) {
 	if !tt.HasText("vue-best-practices") || tt.HasText("tailwind-rules") {
 		t.Fatalf("清除「内置」筛选不应清掉「我的」筛选：%q", tt.Texts())
 	}
+}
+
+// hasTextRun 报告界面文字里有没有依次相连的这几段，比如分节标题后面紧跟
+// 它的技能数和集合数。
+func hasTextRun(tt *ui.Tester, run ...string) bool {
+	texts := tt.Texts()
+	for i := range texts {
+		if len(texts)-i >= len(run) && slices.Equal(texts[i:i+len(run)], run) {
+			return true
+		}
+	}
+	return false
 }

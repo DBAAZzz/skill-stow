@@ -14,7 +14,10 @@ import (
 // 分列的看板。项目技能只读；有技能被全局链接时项目名旁边有感叹号。
 func (a *app) projectPage(c *ui.Context, p *library.ProjectInfo) {
 	skills := library.Filter(p.Skills, a.query)
-	a.toolbar(c, p.Name, locales.ProjectReadOnlySkills(len(p.Skills)), func() {
+	a.toolbar(c, p.Name, func() {
+		ui.Text(c, locales.CommonSkillCount(len(p.Skills))).FontFeatures("tnum").SingleLine()
+		readOnlyTag(c)
+	}, func() {
 		if n := len(p.Linked()); n > 0 && alertButton(c, locales.ProjectGlobalLinksHint(n)).Clicked() {
 			a.showLinked(p)
 		}
@@ -37,7 +40,7 @@ func (a *app) projectPage(c *ui.Context, p *library.ProjectInfo) {
 				a.projectBoard(c, p)
 			default:
 				a.cardArea(c, width, func() {
-					sectionHeader(c, locales.ProjectSkills(), fmt.Sprint(len(skills)), func() {
+					sectionHeader(c, locales.ProjectSkills(), fmt.Sprint(len(skills)), 0, func() {
 						if a.selected == nil {
 							ui.Text(c, locales.ProjectReadersHint()).SingleLine()
 						}

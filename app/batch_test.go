@@ -89,7 +89,7 @@ func TestPickingACollectionDeletesAllItsSkills(t *testing.T) {
 	// Then 选择条写出含几个集合、一共几个技能
 	coll := a.lib.Get("doc-coauthoring").Collection
 	n := len(coll.Skills) + 1
-	if !tt.HasText("已选 2 项") || !tt.HasText("（含 1 个集合 · 共 "+fmt.Sprint(n)+" 个技能）") {
+	if !tt.HasText("已选 2 项") || !tt.HasText("（含 1 个集合，共 "+fmt.Sprint(n)+" 个技能）") {
 		t.Fatalf("选择条不对：%q", tt.Texts())
 	}
 

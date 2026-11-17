@@ -83,7 +83,7 @@ var issueNotes = map[library.Issue]func() string{
 func (a *app) tidyPage(c *ui.Context) {
 	p := a.lib.Problems()
 	total := a.issueTotal(&p)
-	a.toolbar(c, locales.NavTidy(), "", func() {
+	a.toolbar(c, locales.NavTidy(), nil, func() {
 		if total > 0 {
 			ui.Row(c).AlignItems(ui.Baseline).FontSize(12).TextColor(colTextMuted).Label(locales.TidyIssueCount(total)).Children(func() {
 				// 数字单独画，变的时候滚动；它在句子里的位置随语言变
