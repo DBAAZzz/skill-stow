@@ -174,9 +174,8 @@ func (a *app) strip(c *ui.Context, s *library.Skill) {
 			})
 		}
 		ui.Spacer(c)
-		// 回到浏览，详情栏显示这个技能
 		if linkButton(c, locales.ReaderManage()).Clicked() {
-			a.closeReader()
+			a.manage(s)
 		}
 	})
 }

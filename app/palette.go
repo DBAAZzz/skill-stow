@@ -231,13 +231,7 @@ func (a *app) choosePalette(it paletteItem, reveal bool) {
 	if s == nil {
 		return
 	}
-	a.goTo(a.scopeOf(s))
-	// 列表要看得见它：工具栏的搜索词清掉，在集合里的就打开那个集合
-	a.query = ""
-	if s.Collection != nil {
-		a.openSet(s.Collection)
-	}
-	a.selected, a.anchor = s, s.ID
+	a.showInList(s)
 	if reveal {
 		return
 	}
@@ -245,6 +239,17 @@ func (a *app) choosePalette(it paletteItem, reveal bool) {
 	if it.hit.File != "" {
 		a.file = max(0, slices.IndexFunc(s.Files, func(f library.File) bool { return f.Path == it.hit.File }))
 	}
+}
+
+// showInList 换到技能所在的列表并选中它，详情栏显示它。
+func (a *app) showInList(s *library.Skill) {
+	a.goTo(a.scopeOf(s))
+	// 列表要看得见它：工具栏的搜索词清掉，在集合里的就打开那个集合
+	a.query = ""
+	if s.Collection != nil {
+		a.openSet(s.Collection)
+	}
+	a.selected, a.anchor = s, s.ID
 }
 
 // scopeOf 是技能在侧边栏的哪一页。

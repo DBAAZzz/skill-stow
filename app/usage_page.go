@@ -595,22 +595,9 @@ func (a *app) usageSkillMenu(fm *frostedMenu, s *library.Skill) {
 	a.deleteItem(fm, s)
 }
 
-// openFromUsage 从使用情况页进入阅读视图：先换到技能所在的页面，返回时
-// 回到那一页（和打开集合一样）。file 是先显示第几个文件。
+// openFromUsage 从使用情况页进入阅读视图，返回时回到使用情况页。file 是
+// 先显示第几个文件。
 func (a *app) openFromUsage(s *library.Skill, file int) {
-	switch s.Source {
-	case library.Builtin:
-		a.scope = string(library.ScopeBuiltin)
-	case library.Project:
-		p := a.lib.Project(s.ProjectDir)
-		if p == nil {
-			return
-		}
-		a.scope = projectScope(p)
-	default:
-		a.scope = string(library.ScopeMine)
-	}
-	a.inColl = nil
 	a.open(s)
 	if file > 0 && file < len(s.Files) {
 		a.file = file

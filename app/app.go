@@ -283,10 +283,11 @@ func (a *app) page(c *ui.Context) (string, func()) {
 		return "updates", func() { a.updatePage(c) }
 	case a.scope == scopeImport:
 		return "import", func() { a.importPage(c) }
-	case a.scope == scopeUsage:
-		return "usage", func() { a.usagePage(c) }
+	// 阅读视图盖在使用情况页上面：从那里打开的技能，返回时回到使用情况页
 	case a.reading != nil:
 		return "reader", func() { a.reader(c, a.reading) }
+	case a.scope == scopeUsage:
+		return "usage", func() { a.usagePage(c) }
 	case p != nil:
 		return "project", func() { a.projectPage(c, p) }
 	case a.inColl != nil:
@@ -310,6 +311,15 @@ func (a *app) open(s *library.Skill) {
 // closeReader 从阅读视图回到浏览，详情栏显示这个技能，它的卡片从正文收回去。
 func (a *app) closeReader() {
 	a.readerBack, a.selected, a.reading = a.reading, a.reading, nil
+}
+
+// manage 是阅读视图的「管理」：回到技能所在的列表，详情栏显示它。从使用
+// 情况页打开的，返回是回使用情况页，这里要换到它所在的列表。
+func (a *app) manage(s *library.Skill) {
+	a.closeReader()
+	if a.scope == scopeUsage {
+		a.showInList(s)
+	}
 }
 
 // enable 启用或停用，失败时记下原因给详情栏显示。
