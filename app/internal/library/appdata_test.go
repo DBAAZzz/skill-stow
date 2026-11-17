@@ -3,6 +3,7 @@ package library
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -75,5 +76,34 @@ func TestReadableAppDataIsNotMovedAside(t *testing.T) {
 	}
 	if n := len(corruptCopies(t, settingsFile(home))) + len(corruptCopies(t, manualFile(home))); n != 0 {
 		t.Errorf("正常文件不应被挪开，留下了 %d 份", n)
+	}
+}
+
+func TestCorruptBackupRenameFailureRedactsHomePath(t *testing.T) {
+	if os.Geteuid() == 0 {
+		t.Skip("root 不受目录只读权限限制")
+	}
+	home := t.TempDir()
+	dir := appDir(home)
+	write(t, dir, "settings.json", "{broken", 0o644)
+	must(t, os.MkdirAll(filepath.Join(dir, "logs"), 0o755))
+	// 让 dir 只读，触发 os.Rename 失败；logs 子目录仍可写以记录事件
+	must(t, os.Chmod(dir, 0o555))
+	t.Cleanup(func() { os.Chmod(dir, 0o755) })
+
+	Scan(home)
+
+	all := readEvents(dir)
+	var found bool
+	for _, e := range all {
+		if e.Cat == "appdata" && e.Op == "corrupt" {
+			found = true
+			if strings.Contains(e.Data["backup"], home) {
+				t.Errorf("备份改名失败的 Data 不应含主目录：%q", e.Data["backup"])
+			}
+		}
+	}
+	if !found {
+		t.Fatal("应记一条 appdata.corrupt 事件")
 	}
 }

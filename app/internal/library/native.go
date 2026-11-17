@@ -513,6 +513,23 @@ func atomicConfigWrite(file, src string) error {
 	return os.Rename(tmp, file)
 }
 
+// writeAgentConfig 写 Agent 的原生配置，前后各记一条事件（只记指纹，不记
+// 原文）：只有开始没有结束，就是写到一半应用退出了。
+func (l *Library) writeAgentConfig(agent, file, before, after string) error {
+	id := newEventID()
+	l.Log(Event{Level: LevelInfo, Cat: "native", Op: "write.start", ID: id, Target: agent,
+		Data: map[string]string{"file": file, "before": digest(before)}})
+	err := atomicConfigWrite(file, after)
+	end := Event{Level: LevelInfo, Cat: "native", Op: "write.end", ID: id, Target: agent,
+		Data: map[string]string{"file": file, "after": digest(after)}}
+	if err != nil {
+		end.Level, end.Msg = LevelError, err.Error()
+		end.Kind, _ = errorKind(err)
+	}
+	l.Log(end)
+	return err
+}
+
 func (l *Library) setNative(s *Skill, id string, on bool) error {
 	name, path := s.nativeTarget(id)
 	key := nativeKey(id, name, path)
@@ -619,7 +636,7 @@ func (l *Library) setNative(s *Skill, id string, on bool) error {
 	if result != on {
 		return errors.New(locales.NativeToggleOverridden())
 	}
-	if err = atomicConfigWrite(c.file, out); err != nil {
+	if err = l.writeAgentConfig(id, c.file, c.src, out); err != nil {
 		return err
 	}
 	readback := readNativeConfig(c.file, id == "codex")

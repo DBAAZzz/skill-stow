@@ -87,7 +87,8 @@ func (l *Library) onDiskNow(name string) bool {
 // ClearRecords 从安装记录里去掉这几行的条目，不动任何技能文件或链接。每行
 // 写之前重读，再确认一遍那个技能确实不在了：期间装回来的跳过。一行失败
 // 不影响其他行。返回去掉了几条。
-func (l *Library) ClearRecords(rows ...StaleRecord) (int, error) {
+func (l *Library) ClearRecords(rows ...StaleRecord) (_ int, err error) {
+	defer l.track("tidy", "clear-records", "")(&err)
 	n := 0
 	var errs []error
 	for _, r := range rows {

@@ -151,7 +151,8 @@ func (l *Library) DeleteImpact(s *Skill) []Impact {
 // Delete 删除这些技能：原件移到废纸篓，删掉指向它的链接，去掉 npx skills 的
 // 安装记录和本应用写进 Agent 配置的停用记录。有一个不能删就一个都不删。
 // 原件移进废纸篓之后的步骤出错时，照样返回 Deletion，可以撤销。
-func (l *Library) Delete(skills ...*Skill) (*Deletion, error) {
+func (l *Library) Delete(skills ...*Skill) (_ *Deletion, err error) {
+	defer l.track("delete", "delete", skillNames(skills))(&err)
 	var names []string
 	for _, s := range skills {
 		if err := l.CanDelete(s); err != nil {
@@ -274,7 +275,8 @@ func (l *Library) ownDisables(s *Skill) []string {
 
 // Undo 把一次删除放回去，后删的先放。原位置已经有同名的就不覆盖，报错。
 // 部分失败时只标记已放回的项，再次 Undo 只重试未放回的项。
-func (l *Library) Undo(d *Deletion) error {
+func (l *Library) Undo(d *Deletion) (err error) {
+	defer l.track("delete", "undo", "")(&err)
 	if d.spent {
 		return ErrUndoExpired
 	}

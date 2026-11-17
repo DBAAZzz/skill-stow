@@ -519,7 +519,8 @@ type UpdateProgress struct {
 	Active      bool
 }
 
-func (l *Library) CheckUpdates(ctx context.Context, remote Remote, progress func(UpdateProgress)) error {
+func (l *Library) CheckUpdates(ctx context.Context, remote Remote, progress func(UpdateProgress)) (err error) {
+	defer l.track("update", "check", "")(&err)
 	if !updateJob.TryLock() {
 		return ErrBusy
 	}
@@ -634,6 +635,7 @@ func (l *Library) checkRepo(ctx context.Context, remote Remote, src SourceID, it
 	if err != nil {
 		n := noteOf(err)
 		r.Fail, r.Failure = err.Error(), &n
+		l.Log(operationEvent("update", "check-repo", src.Repo, time.Since(r.At), err))
 		var re *RemoteError
 		if errors.As(err, &re) && re.Kind == RemoteQuota {
 			r.Reset = re.Reset

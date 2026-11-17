@@ -303,6 +303,9 @@ type Library struct {
 	zcodeProjects  map[string][]zcodeLayer // 项目目录 → 要叠在用户配置上的 ZCode 项目配置
 	zcodeChains    map[string][]string     // 项目目录 → 会放 ZCode 项目配置的目录（含没有配置的项目）
 	records        *InstallRecords         // npx skills 的全局安装记录；没有或读不了为 nil
+	recovered      []string                // 这次扫描时坏了、挪到旁边的数据文件
+	unreadable     []string                // 扫描时存在却读不了的目录
+	scanTook       time.Duration
 }
 
 // Display 把主目录换成 ~，用于界面显示路径。分隔符统一成 /。
@@ -360,7 +363,8 @@ func (l *Library) Tidy(s *Skill) error {
 }
 
 // Enable 只控制已经可发现的技能，不创建或删除链接。
-func (l *Library) Enable(s *Skill, agent string, on bool) error {
+func (l *Library) Enable(s *Skill, agent string, on bool) (err error) {
+	defer l.track("native", toggleOp(on), s.Name+" @ "+agent)(&err)
 	if s.ReadOnly() {
 		return errors.New(locales.LibraryReadOnlyToggle())
 	}
@@ -377,7 +381,7 @@ func (l *Library) Enable(s *Skill, agent string, on bool) error {
 		s.SetEnabled(agent, on)
 		return nil
 	}
-	err := l.setNative(s, agent, on)
+	err = l.setNative(s, agent, on)
 	if err != nil {
 		st := s.State(agent)
 		if st.Kind != StateUnknown {

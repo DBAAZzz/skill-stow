@@ -203,6 +203,7 @@ func (a *app) settingsView(c *ui.Context) {
 			})
 		})
 	})
+	a.diagnosticsDialog(c)
 }
 
 func settingsContentTop(c *ui.Context) float32 {
@@ -304,6 +305,8 @@ func (a *app) generalTab(c *ui.Context) {
 			}
 		})
 	})
+
+	a.supportGroup(c)
 }
 
 // checkLinks 是「检查并修复」：修好了就重新扫描。
@@ -853,6 +856,7 @@ func (a *app) saveSettings() {
 	a.set.err = ""
 	if err := a.lib.SaveSettings(); err != nil {
 		a.set.err = err.Error()
+		a.logSettingsError("save-settings", a.set.err)
 	}
 }
 
@@ -879,6 +883,7 @@ func (a *app) settingsDo(err error, rescan bool) {
 	a.set.err = ""
 	if err != nil {
 		a.set.err = err.Error()
+		a.logSettingsError("settings", a.set.err)
 		return
 	}
 	if rescan {

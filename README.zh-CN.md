@@ -49,7 +49,7 @@ go tool mygo build -platform darwin/arm64  # Apple Silicon；产物在 app/build
 - 「添加到 Agent」会在 Agent 的技能目录里建链接；「移除」只删本应用建的链接。
 - 「整理」里的删除、修复链接会改动技能目录。
 
-应用自己的设置和记录放在 `~/Library/Application Support/Skill Stow/`。不想动本机，就用 `SKILLS_SAMPLE=1`。
+应用自己的设置、记录和事件日志（`logs/`，上限约 1 MB）放在 `~/Library/Application Support/Skill Stow/`。日志只记应用改了什么、哪里失败了，不含技能内容、配置原文和 token。遇到问题时用「帮助 › 反馈问题…」，诊断信息会先给你预览再复制。不想动本机，就用 `SKILLS_SAMPLE=1`。
 
 ## 参与开发
 

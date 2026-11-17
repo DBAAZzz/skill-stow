@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"runtime"
 	"strings"
 	"time"
@@ -288,7 +287,7 @@ var sidebarShortcut = func() ui.Modifiers {
 func (a *app) toggleSidebar() {
 	a.lib.Settings.SidebarHidden = !a.lib.Settings.SidebarHidden
 	if err := a.lib.SaveSettings(); err != nil {
-		log.Println("save sidebar state:", err)
+		a.logSettingsError("save-settings", err.Error())
 	}
 }
 

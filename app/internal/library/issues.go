@@ -148,7 +148,8 @@ func (l *Library) Modified(s *Skill) time.Time {
 }
 
 // DropLink 删掉读技能库的 Agent 自己目录里那个多余的链接。
-func (l *Library) DropLink(s *Skill, agent string) error {
+func (l *Library) DropLink(s *Skill, agent string) (err error) {
+	defer l.track("link", "drop-duplicate", s.Name+" @ "+agent)(&err)
 	if !slices.Contains(s.redundant, agent) {
 		return nil
 	}
@@ -158,14 +159,15 @@ func (l *Library) DropLink(s *Skill, agent string) error {
 	}
 	keep := s.redundant
 	s.redundant = []string{agent}
-	err := l.tidy(s)
+	err = l.tidy(s)
 	s.redundant = keep
 	l.resolve(s)
 	return err
 }
 
 // Relink 把断掉的链接改成指向技能库里的同名技能。
-func (l *Library) Relink(path string) error {
+func (l *Library) Relink(path string) (err error) {
+	defer l.track("link", "relink", path)(&err)
 	name := filepath.Base(path)
 	if !l.inLibrary(name) {
 		return errors.New(locales.IssueLibrarySkillMissing(name))
@@ -188,7 +190,8 @@ func (l *Library) Relink(path string) error {
 }
 
 // RemoveBroken 删掉断掉的链接。只删确实断了的链接。
-func (l *Library) RemoveBroken(path string) error {
+func (l *Library) RemoveBroken(path string) (err error) {
+	defer l.track("link", "remove-broken", path)(&err)
 	if l.disk {
 		if err := l.removeBroken(path); err != nil {
 			return err
@@ -216,7 +219,8 @@ func (l *Library) removeBroken(path string) error {
 }
 
 // Unglobal 删掉全局目录里指向项目技能的链接：技能只在项目里用。
-func (l *Library) Unglobal(s *Skill) error {
+func (l *Library) Unglobal(s *Skill) (err error) {
+	defer l.track("link", "unglobal", s.Name)(&err)
 	if s.Source != Project {
 		return nil
 	}

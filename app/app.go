@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -41,8 +40,9 @@ type app struct {
 	clock     func() time.Time // 提示音限频用的时钟，nil 是 time.Now（测试里拨动）
 	lastChime time.Time        // 上一次放提示音的时间（sound.go）
 
-	toasts   toastStack // 内容区顶部的提示条（toast.go）
-	paneRoom float32    // 这一帧详情栏占的宽度，没开为 0：提示条在它左边居中
+	toasts   toastStack   // 内容区顶部的提示条（toast.go）
+	sup      supportState // 支持与诊断（support.go）
+	paneRoom float32      // 这一帧详情栏占的宽度，没开为 0：提示条在它左边居中
 
 	scope       string // 侧边栏选中的范围（library.Scope）或项目（projectPrefix + 路径）
 	mode        int    // viewCards / viewBoard
@@ -110,6 +110,7 @@ type app struct {
 	delay     func(d time.Duration, fn func())
 	readUsage func()
 	openURL   func(string)
+	copyText  func(string) error // 替换写剪贴板，测试里记下复制了什么
 	watchCfg  *watchConfig
 	watch     watchState
 }
@@ -171,6 +172,7 @@ func newApp(lib *library.Library) *app {
 	if lib.Home != "" {
 		a.upd.report = lib.Updates()
 	}
+	a.noticeRecovered(lib)
 	return a
 }
 
@@ -380,6 +382,7 @@ func (a *app) applyScan(lib *library.Library, report library.UpdateReport, reloa
 		lib.Settings = a.lib.Settings
 	}
 	a.lib = lib
+	a.noticeRecovered(lib)
 	a.upd.report = report
 	a.tidy.stats, a.cmp = nil, nil
 	if reloadUsage {
@@ -514,7 +517,7 @@ func (a *app) reveal(p string) {
 func (a *app) openInEditor(p string) {
 	if a.live {
 		if err := mygo.Shell.OpenPath(expandHome(p)); err != nil {
-			fmt.Fprintln(os.Stderr, locales.CommonOpenFailedPrefix(), err)
+			a.lib.Log(library.Event{Level: library.LevelError, Cat: "ui", Op: "open-path", Target: p, Msg: err.Error()})
 		}
 	}
 }

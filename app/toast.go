@@ -35,11 +35,12 @@ const (
 type toastSource int
 
 const (
-	fromDelete toastSource = iota // 删除技能、撤销删除
-	fromTidy                      // 整理页在后台做完的事
-	fromUpdate                    // 检查、下载、更新
-	fromLink                      // 打开外部链接
-	fromImport                    // 添加技能
+	fromDelete  toastSource = iota // 删除技能、撤销删除
+	fromTidy                       // 整理页在后台做完的事
+	fromUpdate                     // 检查、下载、更新
+	fromLink                       // 打开外部链接
+	fromImport                     // 添加技能
+	fromAppData                    // 应用自己的数据文件坏了、已备份
 )
 
 // toastAction 是提示条右边的文字按钮，如「撤销 ⌘Z」。
@@ -94,6 +95,7 @@ func (a *app) notify(src toastSource, kind toastKind, text string) {
 // showToast 显示 t：同一来源的原地替换，满了先收起最早的；会自己收起的，
 // 到时候收起（被替换掉的不会把替换上来的一起收掉）。
 func (a *app) showToast(t *toast) {
+	a.logToast(t.kind, t.text)
 	s := &a.toasts
 	if i := slices.IndexFunc(s.items, func(o *toast) bool { return o.source == t.source }); i >= 0 {
 		s.items[i] = t

@@ -24,7 +24,8 @@ func (l *Library) CanAddToAgent(s *Skill, id string) bool {
 	_, err := os.Lstat(filepath.Join(l.Home, a.Skills, s.Name))
 	return errors.Is(err, os.ErrNotExist)
 }
-func (l *Library) AddToAgent(s *Skill, id string) error {
+func (l *Library) AddToAgent(s *Skill, id string) (err error) {
+	defer l.track("link", "add", s.Name+" @ "+id)(&err)
 	if !l.CanAddToAgent(s, id) {
 		return errors.New(locales.NativeLinkAlreadyAvailable())
 	}
@@ -76,7 +77,8 @@ func (l *Library) CanRemoveFromAgent(s *Skill, id string) bool {
 	real, err := realPath(p)
 	return err == nil && real == target
 }
-func (l *Library) RemoveFromAgent(s *Skill, id string) error {
+func (l *Library) RemoveFromAgent(s *Skill, id string) (err error) {
+	defer l.track("link", "remove", s.Name+" @ "+id)(&err)
 	if !l.CanRemoveFromAgent(s, id) {
 		return errors.New(locales.NativeRemoveAppLinksOnly())
 	}

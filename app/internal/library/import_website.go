@@ -64,6 +64,7 @@ type wkEntry struct {
 
 // ReadWebsiteImport 读一个网站来源：找索引、下载技能到暂存。
 func ReadWebsiteImport(ctx context.Context, home string, client *http.Client, src ImportSource, progress func(ImportProgress)) (b *ImportBatch, err error) {
+	defer trackIn(home, "import", "read-website", urlHost(src.URL))(&err)
 	report := func(p ImportProgress) {
 		if progress != nil {
 			progress(p)

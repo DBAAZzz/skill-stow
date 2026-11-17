@@ -8,12 +8,12 @@ import (
 
 	"io"
 	"io/fs"
-	"log"
 	"net/url"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
+	"syscall"
 	"time"
 
 	"skillmanager/locales"
@@ -54,13 +54,18 @@ type entry struct {
 var scanHook func()
 
 // Scan 读 home 下的技能：技能库、本机装了的 Agent 的技能目录和插件、
-// Agent 用过的项目。只读磁盘，不写；读不到的位置跳过。
+// Agent 用过的项目。不改技能和 Agent 的文件；读不到的位置跳过，存在却
+// 读不了的记进事件日志。应用自己的数据文件坏了时，原件挪到旁边（readJSON）。
 func Scan(home string) *Library {
 	if scanHook != nil {
 		scanHook()
 	}
+	start := time.Now()
 	l := &Library{Root: filepath.Join(home, libraryDir), Home: home, disk: true, readers: map[string][]string{}}
-	l.Settings = loadSettings(home)
+	var moved string
+	if l.Settings, moved = loadSettings(home); moved != "" {
+		l.recovered = append(l.recovered, moved)
+	}
 	for _, a := range Catalog {
 		if a.installed(home) {
 			l.Agents = append(l.Agents, a)
@@ -83,14 +88,13 @@ func Scan(home string) *Library {
 	s := &scanner{lib: l, home: home}
 	s.scan()
 	recs, err := ReadInstallRecords(home)
-	if err != nil {
-		log.Println(locales.ScanInstallRecordReadFailed(), err)
-	}
 	l.records, l.recordsErr = recs, err
 	l.updates, l.updatesErr = loadUpdates(home)
 	l.collect(lockSources(recs))
 	l.markSameNames()
 	l.refreshNative()
+	l.scanTook = time.Since(start)
+	l.logScanProblems()
 	return l
 }
 
@@ -368,10 +372,7 @@ func (l *Library) resolve(s *Skill) {
 // list 列出目录里的技能。链接解析到真实目录；坏链接记进 Broken。
 // 一项里没有 SKILL.md 而子目录有的，是一组技能，展开一层。
 func (sc *scanner) list(dir string) []entry {
-	items, err := os.ReadDir(dir)
-	if err != nil {
-		return nil
-	}
+	items := sc.readDir(dir)
 	var out []entry
 	for _, it := range items {
 		if strings.HasPrefix(it.Name(), ".") {
@@ -393,8 +394,7 @@ func (sc *scanner) list(dir string) []entry {
 			out = append(out, entry{it.Name(), p, real, link, false})
 			continue
 		}
-		subs, _ := os.ReadDir(real)
-		for _, sub := range subs {
+		for _, sub := range sc.readDir(real) {
 			r := filepath.Join(real, sub.Name())
 			if sub.IsDir() && !strings.HasPrefix(sub.Name(), ".") && isSkill(r) {
 				out = append(out, entry{sub.Name(), filepath.Join(p, sub.Name()), r, false, true})
@@ -402,6 +402,19 @@ func (sc *scanner) list(dir string) []entry {
 		}
 	}
 	return out
+}
+
+// readDir 列出目录。不存在的跳过；存在却读不了的（没有权限、磁盘出错）
+// 也跳过，但记进 Unreadable，否则「技能没出现」时看不出是读失败了。
+func (sc *scanner) readDir(dir string) []os.DirEntry {
+	items, err := os.ReadDir(dir)
+	if err != nil {
+		if !errors.Is(err, fs.ErrNotExist) && !errors.Is(err, syscall.ENOTDIR) && !slices.Contains(sc.lib.unreadable, dir) {
+			sc.lib.unreadable = append(sc.lib.unreadable, dir)
+		}
+		return nil
+	}
+	return items
 }
 
 func isSkill(dir string) bool {
@@ -502,11 +515,7 @@ func (sc *scanner) builtinSkills(a Agent, seen map[string]bool) []*Skill {
 	var out []*Skill
 	for _, rel := range a.Builtin {
 		root := filepath.Join(sc.home, rel)
-		subs, err := os.ReadDir(root)
-		if err != nil {
-			continue
-		}
-		for _, d := range subs {
+		for _, d := range sc.readDir(root) {
 			real, err := realPath(filepath.Join(root, d.Name()))
 			if err != nil || seen[real] || !isSkill(real) {
 				continue
@@ -664,7 +673,11 @@ func (sc *scanner) projects() (out []*ProjectInfo, auto map[string]bool) {
 	source("Codex", "codex", "~/.codex/sessions", codexErr == nil, codex, "")
 	sc.lib.Discovery.Total = len(used)
 
-	for _, m := range readManual(sc.home) {
+	manualList, moved := readManualFile(sc.home)
+	if moved != "" {
+		sc.lib.recovered = append(sc.lib.recovered, moved)
+	}
+	for _, m := range manualList {
 		if p := clean(m.Dir); p != "" {
 			add(p, m.Added)
 			manual[p] = true
@@ -825,10 +838,17 @@ func manualFile(home string) string {
 }
 
 func readManual(home string) []manualProject {
+	list, _ := readManualFile(home)
+	return list
+}
+
+// readManualFile 读手动添加的项目；文件坏了时第二个返回值是挪开的原件。
+func readManualFile(home string) ([]manualProject, string) {
 	var cfg struct {
 		Projects []manualProject `json:"projects"`
 	}
-	return readJSON(manualFile(home), cfg).Projects
+	cfg, moved := readJSON(manualFile(home), cfg)
+	return cfg.Projects, moved
 }
 
 // AddProjects 记下用户手动加的项目目录，重新扫描后列出。

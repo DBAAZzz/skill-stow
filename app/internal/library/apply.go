@@ -486,6 +486,7 @@ func (l *Library) ApplyUpdate(ctx context.Context, remote Remote, it UpdateItem,
 var afterTxSaveHook func()
 
 func (l *Library) applyUpdate(ctx context.Context, remote Remote, it UpdateItem, p *Prepared) (out UpdateOutcome, err error) {
+	defer l.track("update", "apply", it.Name)(&err)
 	if l.Settings.UpdateOldVersion != "trash" && l.Settings.UpdateOldVersion != "delete" {
 		return out, errors.New(locales.UpdateChooseOldVersionAction())
 	}

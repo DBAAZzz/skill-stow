@@ -74,6 +74,9 @@ const (
 	menuIDAbout        = "about"
 	menuIDCheckUpdates = "check-app-updates"
 	menuIDSettings     = "settings"
+	menuIDAppData      = "open-app-data"
+	menuIDDiagnostics  = "copy-diagnostics"
+	menuIDReportIssue  = "report-issue"
 )
 
 type mainWindowState struct {
@@ -87,6 +90,9 @@ type systemMenuState struct {
 	about        *mygo.MenuItem
 	checkUpdates *mygo.MenuItem
 	settings     *mygo.MenuItem
+	appData      *mygo.MenuItem // 「帮助」菜单：支持与诊断（support.go）
+	diagnostics  *mygo.MenuItem
+	reportIssue  *mygo.MenuItem
 }
 
 func (a *app) keepAliveOnWindowClose() bool {
@@ -135,7 +141,8 @@ func (a *app) checkAppUpdates() {
 }
 
 // buildAppMenu 构建 macOS 原生系统菜单栏：保留标准关于、服务、隐藏、退出、文件、编辑、
-// 显示与窗口菜单，加入本地化的「检查应用更新…」与「设置…」（⌘,）。
+// 显示与窗口菜单，加入本地化的「检查应用更新…」与「设置…」（⌘,），以及「帮助」
+// 菜单里的反馈问题、复制诊断信息、打开应用数据文件夹。
 func (a *app) buildAppMenu() *mygo.Menu {
 	a.sysMenu.about = &mygo.MenuItem{
 		ID:    menuIDAbout,
@@ -152,6 +159,21 @@ func (a *app) buildAppMenu() *mygo.Menu {
 		Label:       locales.MenuSettings(),
 		Accelerator: "CmdOrCtrl+,",
 		Click:       func(*mygo.MenuItem, *mygo.Window) { a.openSettings() },
+	}
+	a.sysMenu.appData = &mygo.MenuItem{
+		ID:    menuIDAppData,
+		Label: locales.MenuOpenAppData(),
+		Click: func(*mygo.MenuItem, *mygo.Window) { a.openAppData() },
+	}
+	a.sysMenu.diagnostics = &mygo.MenuItem{
+		ID:    menuIDDiagnostics,
+		Label: locales.MenuCopyDiagnostics(),
+		Click: func(*mygo.MenuItem, *mygo.Window) { a.openDiagnostics(false) },
+	}
+	a.sysMenu.reportIssue = &mygo.MenuItem{
+		ID:    menuIDReportIssue,
+		Label: locales.MenuReportIssue(),
+		Click: func(*mygo.MenuItem, *mygo.Window) { a.openDiagnostics(true) },
 	}
 	m := mygo.NewMenu([]*mygo.MenuItem{
 		{
@@ -175,6 +197,10 @@ func (a *app) buildAppMenu() *mygo.Menu {
 		{Role: mygo.RoleEditMenu},
 		{Role: mygo.RoleViewMenu},
 		{Role: mygo.RoleWindowMenu},
+		{
+			Role:    mygo.RoleHelp,
+			Submenu: []*mygo.MenuItem{a.sysMenu.reportIssue, a.sysMenu.diagnostics, mygo.Separator(), a.sysMenu.appData},
+		},
 	})
 	a.sysMenu.menu = m
 	return m
@@ -200,6 +226,11 @@ func (a *app) refreshAppMenu() {
 	}
 	if a.sysMenu.settings != nil {
 		a.sysMenu.settings.SetLabel(locales.MenuSettings())
+	}
+	if a.sysMenu.appData != nil {
+		a.sysMenu.appData.SetLabel(locales.MenuOpenAppData())
+		a.sysMenu.diagnostics.SetLabel(locales.MenuCopyDiagnostics())
+		a.sysMenu.reportIssue.SetLabel(locales.MenuReportIssue())
 	}
 }
 
@@ -374,6 +405,7 @@ func (a *app) shutdown() {
 		return
 	}
 	a.quitting = true
+	a.lib.LogAppQuit()
 	a.discardDeletion()
 	a.stopWatch()
 }
@@ -413,6 +445,8 @@ func (a *app) startLive(forceWelcome bool) {
 		// well-known 来源行抓站点真图标，缓存里有了就直接用
 		a.iconFetch = library.NewIconFetcher(a.lib.Settings, a.lib.Home)
 		a.initSourceIcons()
+		startSnap, env := a.lib.AppStartSnapshot(), a.diagEnv()
+		a.background(func(func(func())) { startSnap.Log(env) })
 		library.CleanImportStaging(a.lib.Home) // 上次中途退出留下的读取暂存
 		a.recoverUpdates()
 		a.startWatch()

@@ -29,6 +29,7 @@ const (
 
 // ReadLocalImport 读拖入或选取的文件夹、zip（可以一次多个）。
 func ReadLocalImport(home string, paths []string) (b *ImportBatch, err error) {
+	defer trackIn(home, "import", "read-local", fmt.Sprintf("%d paths", len(paths)))(&err)
 	src := ImportSource{Kind: ImportLocal, Paths: paths, Input: strings.Join(paths, "\n")}
 	b, err = newBatch(home, src)
 	if err != nil {

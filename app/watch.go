@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"os"
 	"path/filepath"
 	"slices"
@@ -296,7 +296,7 @@ func (h *diskWatcher) syncLoop() {
 		h.wantPending = false
 		if plan.Truncated && !h.truncLogged {
 			h.truncLogged = true
-			log.Printf("watch: target limit (%d) reached, some targets omitted", library.WatchMaxTargets)
+			library.Warn(h.home, "watch.limit", library.Event{Cat: "watch", Op: "limit", Msg: fmt.Sprintf("target limit (%d) reached, some targets omitted", library.WatchMaxTargets)})
 		}
 
 		var toClose []*watchedEntry
@@ -355,7 +355,7 @@ func (h *diskWatcher) syncLoop() {
 			if r.err != nil {
 				if msg := r.err.Error(); h.failed[r.target.path] != msg {
 					h.failed[r.target.path] = msg
-					log.Printf("watch: failed to watch %s: %v", r.target.path, r.err)
+					library.Warn(h.home, "watch.failed:"+r.target.path, library.Event{Cat: "watch", Op: "failed", Target: r.target.path, Msg: msg})
 				}
 				continue
 			}

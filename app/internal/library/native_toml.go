@@ -1,7 +1,6 @@
 package library
 
 import (
-	"errors"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -9,6 +8,13 @@ import (
 
 	"skillmanager/locales"
 )
+
+// configParseError 保留给界面显示的原生配置解析错误原文；进入日志和诊断时只记种类。
+type configParseError struct {
+	msg string
+}
+
+func (e *configParseError) Error() string { return e.msg }
 
 type tomlSkill struct {
 	path, name string
@@ -27,7 +33,7 @@ func parseTOMLSkills(src string) ([]tomlSkill, error) {
 	src += "\n"
 	for _, span := range tomlTokens.FindAllStringIndex(src, -1) {
 		if span[0] != end {
-			return nil, errors.New(locales.NativeUnterminatedTomlString())
+			return nil, &configParseError{locales.NativeUnterminatedTomlString()}
 		}
 		end = span[1]
 		token := src[span[0]:end]
@@ -41,7 +47,7 @@ func parseTOMLSkills(src string) ([]tomlSkill, error) {
 			depth--
 		}
 		if depth < 0 {
-			return nil, errors.New(locales.NativeMismatchedTomlBrackets())
+			return nil, &configParseError{locales.NativeMismatchedTomlBrackets()}
 		}
 		if token != "\n" || depth != 0 {
 			statement += token
@@ -57,7 +63,7 @@ func parseTOMLSkills(src string) ([]tomlSkill, error) {
 			if tomlSkillTable.MatchString(section) {
 				section = "skills.config"
 				if !strings.HasPrefix(s, "[[") {
-					return nil, errors.New(locales.NativeSkillsConfigMustBeTableArray())
+					return nil, &configParseError{locales.NativeSkillsConfigMustBeTableArray()}
 				}
 				out = append(out, tomlSkill{enabled: true})
 			}
@@ -65,11 +71,11 @@ func parseTOMLSkills(src string) ([]tomlSkill, error) {
 		}
 		key, value, ok := strings.Cut(s, "=")
 		if !ok {
-			return nil, errors.New(locales.NativeTomlParseError(s))
+			return nil, &configParseError{locales.NativeTomlParseError(s)}
 		}
 		key, value = strings.Trim(strings.TrimSpace(key), "\"'"), strings.TrimSpace(value)
 		if section == "skills" && key == "config" || section == "" && (key == "skills.config" || key == "skills") {
-			return nil, errors.New(locales.NativeInlineSkillsConfigUnsupported())
+			return nil, &configParseError{locales.NativeInlineSkillsConfigUnsupported()}
 		}
 		if section != "skills.config" {
 			continue
@@ -82,7 +88,7 @@ func parseTOMLSkills(src string) ([]tomlSkill, error) {
 				text, err = value[1:len(value)-1], nil
 			}
 			if err != nil {
-				return nil, err
+				return nil, &configParseError{err.Error()}
 			}
 			if key == "path" {
 				v.path = text
@@ -91,13 +97,13 @@ func parseTOMLSkills(src string) ([]tomlSkill, error) {
 			}
 		case "enabled":
 			if value != "true" && value != "false" {
-				return nil, errors.New(locales.NativeEnabledMustBeBoolean())
+				return nil, &configParseError{locales.NativeEnabledMustBeBoolean()}
 			}
 			v.enabled = value == "true"
 		}
 	}
 	if end != len(src) || depth != 0 {
-		return nil, errors.New(locales.NativeUnterminatedTomlValue())
+		return nil, &configParseError{locales.NativeUnterminatedTomlValue()}
 	}
 	return out, nil
 }

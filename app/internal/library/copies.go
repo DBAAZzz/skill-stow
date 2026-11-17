@@ -296,7 +296,8 @@ func (l *Library) CanMerge(s *Skill) bool {
 // 它放进技能库（技能库原来那份不一样时，原来那份移到废纸篓）；各 Agent
 // 目录里的副本，主人不读技能库的换成指向技能库的链接，读的移到废纸篓；
 // 早年的目录和整组链接里的不动。移走的都进废纸篓，不直接删除。
-func (l *Library) Merge(s *Skill, keep int) (MergeResult, error) {
+func (l *Library) Merge(s *Skill, keep int) (_ MergeResult, err error) {
+	defer l.track("tidy", "merge", s.Name)(&err)
 	var r MergeResult
 	if s.ReadOnly() || keep < 0 || keep >= len(s.versions) {
 		return r, errors.New(locales.CopiesNothingToMerge())

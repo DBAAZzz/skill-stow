@@ -1,0 +1,46 @@
+name: 问题反馈 / Bug report
+description: 报告 Skill Stow 的问题 / Report a problem with Skill Stow
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        在应用里点「帮助 › 反馈问题…」或「设置 › 通用 › 反馈问题」，诊断信息会先复制到剪贴板，粘贴到下面的「诊断信息」一栏即可。
+        Use Help › Report an Issue… (or Settings › General › Report an Issue) in the app: the diagnostic info is copied to your clipboard, paste it into the Diagnostics field below.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 发生了什么 / What happened
+      description: 你做了什么，看到了什么 / What you did and what you saw
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望的结果 / What you expected
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤 / Steps to reproduce
+      placeholder: |
+        1.
+        2.
+        3.
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 截图 / Screenshots
+      description: 界面显示不对时，截图最有用 / For display problems, a screenshot helps most
+  - type: input
+    id: version
+    attributes:
+      label: 应用版本 / App version
+      placeholder: 0.1.0 (packaged)
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: 诊断信息 / Diagnostics
+      description: 从应用里复制的诊断信息，不含技能内容、配置原文和账号信息 / Copied from the app. Contains no skill contents, config contents or credentials.
+      render: text
+    validations:
+      required: true

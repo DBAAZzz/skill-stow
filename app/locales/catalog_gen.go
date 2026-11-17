@@ -4630,20 +4630,6 @@ func (msgs Messages) UpdateInstallRecordUnknownVersion() string {
 	return Catalog.Format(msgs.locale, "updateInstallRecordUnknownVersion", nil)
 }
 
-// ScanInstallRecordReadFailed says "npx skills 的安装记录读不了："
-// in the language the app shows.
-//
-// 扫描技能时日志显示安装记录读取失败。
-func ScanInstallRecordReadFailed() string { return In(i18n.Locale()).ScanInstallRecordReadFailed() }
-
-// ScanInstallRecordReadFailed says "npx skills 的安装记录读不了："
-// in the language of msgs.
-//
-// 扫描技能时日志显示安装记录读取失败。
-func (msgs Messages) ScanInstallRecordReadFailed() string {
-	return Catalog.Format(msgs.locale, "scanInstallRecordReadFailed", nil)
-}
-
 // ScanVsCodeEditors says "VS Code 系编辑器"
 // in the language the app shows.
 //
@@ -14484,4 +14470,290 @@ func TidyLinksKept(name string) string { return In(i18n.Locale()).TidyLinksKept(
 // 整理操作进度或完成结果。
 func (msgs Messages) TidyLinksKept(name string) string {
 	return Catalog.Format(msgs.locale, "tidyLinksKept", map[string]any{"name": name})
+}
+
+// SupportTitle says "支持与诊断"
+// in the language the app shows.
+//
+// 设置 › 通用：最下面一组的标题
+func SupportTitle() string { return In(i18n.Locale()).SupportTitle() }
+
+// SupportTitle says "支持与诊断"
+// in the language of msgs.
+//
+// 设置 › 通用：最下面一组的标题
+func (msgs Messages) SupportTitle() string {
+	return Catalog.Format(msgs.locale, "supportTitle", nil)
+}
+
+// SupportAppData says "应用数据"
+// in the language the app shows.
+//
+// 设置 › 支持与诊断：应用数据文件夹一行的标题
+func SupportAppData() string { return In(i18n.Locale()).SupportAppData() }
+
+// SupportAppData says "应用数据"
+// in the language of msgs.
+//
+// 设置 › 支持与诊断：应用数据文件夹一行的标题
+func (msgs Messages) SupportAppData() string {
+	return Catalog.Format(msgs.locale, "supportAppData", nil)
+}
+
+// SupportAppDataHint says "设置、记录和日志所在的文件夹"
+// in the language the app shows.
+//
+// 设置 › 支持与诊断：应用数据一行的说明
+func SupportAppDataHint() string { return In(i18n.Locale()).SupportAppDataHint() }
+
+// SupportAppDataHint says "设置、记录和日志所在的文件夹"
+// in the language of msgs.
+//
+// 设置 › 支持与诊断：应用数据一行的说明
+func (msgs Messages) SupportAppDataHint() string {
+	return Catalog.Format(msgs.locale, "supportAppDataHint", nil)
+}
+
+// SupportDiagnostics says "诊断信息"
+// in the language the app shows.
+//
+// 设置 ›
+// 支持与诊断：诊断信息一行的标题，也是预览弹窗的标题
+func SupportDiagnostics() string { return In(i18n.Locale()).SupportDiagnostics() }
+
+// SupportDiagnostics says "诊断信息"
+// in the language of msgs.
+//
+// 设置 ›
+// 支持与诊断：诊断信息一行的标题，也是预览弹窗的标题
+func (msgs Messages) SupportDiagnostics() string {
+	return Catalog.Format(msgs.locale, "supportDiagnostics", nil)
+}
+
+// SupportDiagnosticsHint says "版本、Agent 检测结果和最近的错误，不含技能内容和账号信息"
+// in the language the app shows.
+//
+// 设置 › 支持与诊断：诊断信息一行的说明
+func SupportDiagnosticsHint() string { return In(i18n.Locale()).SupportDiagnosticsHint() }
+
+// SupportDiagnosticsHint says "版本、Agent 检测结果和最近的错误，不含技能内容和账号信息"
+// in the language of msgs.
+//
+// 设置 › 支持与诊断：诊断信息一行的说明
+func (msgs Messages) SupportDiagnosticsHint() string {
+	return Catalog.Format(msgs.locale, "supportDiagnosticsHint", nil)
+}
+
+// SupportPreviewAndCopy says "预览并复制…"
+// in the language the app shows.
+//
+// 设置 › 支持与诊断：打开诊断信息预览的按钮
+func SupportPreviewAndCopy() string { return In(i18n.Locale()).SupportPreviewAndCopy() }
+
+// SupportPreviewAndCopy says "预览并复制…"
+// in the language of msgs.
+//
+// 设置 › 支持与诊断：打开诊断信息预览的按钮
+func (msgs Messages) SupportPreviewAndCopy() string {
+	return Catalog.Format(msgs.locale, "supportPreviewAndCopy", nil)
+}
+
+// SupportReportIssue says "反馈问题"
+// in the language the app shows.
+//
+// 设置 › 支持与诊断：反馈问题一行的标题
+func SupportReportIssue() string { return In(i18n.Locale()).SupportReportIssue() }
+
+// SupportReportIssue says "反馈问题"
+// in the language of msgs.
+//
+// 设置 › 支持与诊断：反馈问题一行的标题
+func (msgs Messages) SupportReportIssue() string {
+	return Catalog.Format(msgs.locale, "supportReportIssue", nil)
+}
+
+// SupportReportIssueHint says "在 GitHub 上新建问题，附上诊断信息"
+// in the language the app shows.
+//
+// 设置 › 支持与诊断：反馈问题一行的说明
+func SupportReportIssueHint() string { return In(i18n.Locale()).SupportReportIssueHint() }
+
+// SupportReportIssueHint says "在 GitHub 上新建问题，附上诊断信息"
+// in the language of msgs.
+//
+// 设置 › 支持与诊断：反馈问题一行的说明
+func (msgs Messages) SupportReportIssueHint() string {
+	return Catalog.Format(msgs.locale, "supportReportIssueHint", nil)
+}
+
+// SupportReportOnGitHub says "前往 GitHub…"
+// in the language the app shows.
+//
+// 设置 ›
+// 支持与诊断：反馈问题的按钮，先预览诊断信息
+func SupportReportOnGitHub() string { return In(i18n.Locale()).SupportReportOnGitHub() }
+
+// SupportReportOnGitHub says "前往 GitHub…"
+// in the language of msgs.
+//
+// 设置 ›
+// 支持与诊断：反馈问题的按钮，先预览诊断信息
+func (msgs Messages) SupportReportOnGitHub() string {
+	return Catalog.Format(msgs.locale, "supportReportOnGitHub", nil)
+}
+
+// SupportPreviewBody says "以下内容只会复制到剪贴板，不会自动上传。发出前可以删掉你不想分享的部分。"
+// in the language the app shows.
+//
+// 诊断信息预览弹窗的说明
+func SupportPreviewBody() string { return In(i18n.Locale()).SupportPreviewBody() }
+
+// SupportPreviewBody says "以下内容只会复制到剪贴板，不会自动上传。发出前可以删掉你不想分享的部分。"
+// in the language of msgs.
+//
+// 诊断信息预览弹窗的说明
+func (msgs Messages) SupportPreviewBody() string {
+	return Catalog.Format(msgs.locale, "supportPreviewBody", nil)
+}
+
+// SupportGenerating says "正在生成…"
+// in the language the app shows.
+//
+// 诊断信息预览弹窗：后台还在生成时的占位
+func SupportGenerating() string { return In(i18n.Locale()).SupportGenerating() }
+
+// SupportGenerating says "正在生成…"
+// in the language of msgs.
+//
+// 诊断信息预览弹窗：后台还在生成时的占位
+func (msgs Messages) SupportGenerating() string {
+	return Catalog.Format(msgs.locale, "supportGenerating", nil)
+}
+
+// SupportCopy says "复制"
+// in the language the app shows.
+//
+// 诊断信息预览弹窗：复制按钮
+func SupportCopy() string { return In(i18n.Locale()).SupportCopy() }
+
+// SupportCopy says "复制"
+// in the language of msgs.
+//
+// 诊断信息预览弹窗：复制按钮
+func (msgs Messages) SupportCopy() string {
+	return Catalog.Format(msgs.locale, "supportCopy", nil)
+}
+
+// SupportCopyAndOpenGitHub says "复制并前往 GitHub"
+// in the language the app shows.
+//
+// 诊断信息预览弹窗：从「反馈问题」打开时的确认按钮
+func SupportCopyAndOpenGitHub() string { return In(i18n.Locale()).SupportCopyAndOpenGitHub() }
+
+// SupportCopyAndOpenGitHub says "复制并前往 GitHub"
+// in the language of msgs.
+//
+// 诊断信息预览弹窗：从「反馈问题」打开时的确认按钮
+func (msgs Messages) SupportCopyAndOpenGitHub() string {
+	return Catalog.Format(msgs.locale, "supportCopyAndOpenGitHub", nil)
+}
+
+// SupportDiagnosticsCopied says "诊断信息已复制"
+// in the language the app shows.
+//
+// 设置 › 支持与诊断：复制诊断信息之后的提示
+func SupportDiagnosticsCopied() string { return In(i18n.Locale()).SupportDiagnosticsCopied() }
+
+// SupportDiagnosticsCopied says "诊断信息已复制"
+// in the language of msgs.
+//
+// 设置 › 支持与诊断：复制诊断信息之后的提示
+func (msgs Messages) SupportDiagnosticsCopied() string {
+	return Catalog.Format(msgs.locale, "supportDiagnosticsCopied", nil)
+}
+
+// SupportDiagnosticsCopiedPaste says "诊断信息已复制，请粘贴到问题的「诊断信息」一栏"
+// in the language the app shows.
+//
+// 设置 › 支持与诊断：复制后打开了 GitHub 问题页
+func SupportDiagnosticsCopiedPaste() string { return In(i18n.Locale()).SupportDiagnosticsCopiedPaste() }
+
+// SupportDiagnosticsCopiedPaste says "诊断信息已复制，请粘贴到问题的「诊断信息」一栏"
+// in the language of msgs.
+//
+// 设置 › 支持与诊断：复制后打开了 GitHub 问题页
+func (msgs Messages) SupportDiagnosticsCopiedPaste() string {
+	return Catalog.Format(msgs.locale, "supportDiagnosticsCopiedPaste", nil)
+}
+
+// SupportCopyFailed says "复制失败：{error}"
+// in the language the app shows.
+//
+// 设置 › 支持与诊断：写剪贴板失败
+func SupportCopyFailed(error string) string { return In(i18n.Locale()).SupportCopyFailed(error) }
+
+// SupportCopyFailed says "复制失败：{error}"
+// in the language of msgs.
+//
+// 设置 › 支持与诊断：写剪贴板失败
+func (msgs Messages) SupportCopyFailed(error string) string {
+	return Catalog.Format(msgs.locale, "supportCopyFailed", map[string]any{"error": error})
+}
+
+// SupportDataFileRecovered says "{file} 已损坏，已恢复为默认设置，原文件保存为 {backup}"
+// in the language the app shows.
+//
+// 提示条：应用自己的数据文件解析不了，已挪到旁边
+func SupportDataFileRecovered(file string, backup string) string {
+	return In(i18n.Locale()).SupportDataFileRecovered(file, backup)
+}
+
+// SupportDataFileRecovered says "{file} 已损坏，已恢复为默认设置，原文件保存为 {backup}"
+// in the language of msgs.
+//
+// 提示条：应用自己的数据文件解析不了，已挪到旁边
+func (msgs Messages) SupportDataFileRecovered(file string, backup string) string {
+	return Catalog.Format(msgs.locale, "supportDataFileRecovered", map[string]any{"file": file, "backup": backup})
+}
+
+// MenuOpenAppData says "打开应用数据文件夹"
+// in the language the app shows.
+//
+// macOS「帮助」菜单：在 Finder 中打开应用数据文件夹
+func MenuOpenAppData() string { return In(i18n.Locale()).MenuOpenAppData() }
+
+// MenuOpenAppData says "打开应用数据文件夹"
+// in the language of msgs.
+//
+// macOS「帮助」菜单：在 Finder 中打开应用数据文件夹
+func (msgs Messages) MenuOpenAppData() string {
+	return Catalog.Format(msgs.locale, "menuOpenAppData", nil)
+}
+
+// MenuCopyDiagnostics says "复制诊断信息…"
+// in the language the app shows.
+//
+// macOS「帮助」菜单：打开诊断信息预览
+func MenuCopyDiagnostics() string { return In(i18n.Locale()).MenuCopyDiagnostics() }
+
+// MenuCopyDiagnostics says "复制诊断信息…"
+// in the language of msgs.
+//
+// macOS「帮助」菜单：打开诊断信息预览
+func (msgs Messages) MenuCopyDiagnostics() string {
+	return Catalog.Format(msgs.locale, "menuCopyDiagnostics", nil)
+}
+
+// MenuReportIssue says "反馈问题…"
+// in the language the app shows.
+//
+// macOS「帮助」菜单：预览诊断信息后前往 GitHub 新建问题
+func MenuReportIssue() string { return In(i18n.Locale()).MenuReportIssue() }
+
+// MenuReportIssue says "反馈问题…"
+// in the language of msgs.
+//
+// macOS「帮助」菜单：预览诊断信息后前往 GitHub 新建问题
+func (msgs Messages) MenuReportIssue() string {
+	return Catalog.Format(msgs.locale, "menuReportIssue", nil)
 }

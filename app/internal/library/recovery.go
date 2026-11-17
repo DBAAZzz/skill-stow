@@ -10,7 +10,8 @@ import (
 	"skillmanager/locales"
 )
 
-func (l *Library) RecoverUpdates() error {
+func (l *Library) RecoverUpdates() (err error) {
+	defer l.track("update", "recover", "")(&err)
 	if !updateJob.TryLock() {
 		return ErrBusy
 	}

@@ -185,6 +185,7 @@ var skipDirs = []string{"node_modules", ".git", "dist", "build", "__pycache__"}
 
 // ReadGitHubImport 读一个 GitHub 来源：目录树里找技能，下载到暂存。
 func ReadGitHubImport(ctx context.Context, home string, r ImportRemote, src ImportSource, progress func(ImportProgress)) (b *ImportBatch, err error) {
+	defer trackIn(home, "import", "read-github", src.Repo)(&err)
 	report := func(p ImportProgress) {
 		if progress != nil {
 			progress(p)

@@ -41,7 +41,8 @@ func (l *Library) CollectTarget(s *Skill) string { return filepath.Join(l.Root, 
 
 // Collect 把项目技能复制进技能库，再把全局链接改指向那份；项目里的原件不动。
 // 技能库里已有同名项时拒绝。调用方随后重新扫描。
-func (l *Library) Collect(s *Skill) error {
+func (l *Library) Collect(s *Skill) (err error) {
+	defer l.track("tidy", "collect", s.Name)(&err)
 	if s.Source != Project || len(s.globalLinks) == 0 {
 		return errors.New(locales.CollectRequiresGlobalLink())
 	}

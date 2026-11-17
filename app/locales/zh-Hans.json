@@ -2116,11 +2116,6 @@
     "description": "清理安装记录时遇到未知格式版本。",
     "placeholders": {}
   },
-  "scanInstallRecordReadFailed": "npx skills 的安装记录读不了：",
-  "@scanInstallRecordReadFailed": {
-    "description": "扫描技能时日志显示安装记录读取失败。",
-    "placeholders": {}
-  },
   "scanVsCodeEditors": "VS Code 系编辑器",
   "@scanVsCodeEditors": {
     "description": "项目发现来源列表显示 VS Code 系编辑器。",
@@ -6469,5 +6464,98 @@
         "type": "String"
       }
     }
+  },
+  "supportTitle": "支持与诊断",
+  "@supportTitle": {
+    "description": "设置 › 通用：最下面一组的标题"
+  },
+  "supportAppData": "应用数据",
+  "@supportAppData": {
+    "description": "设置 › 支持与诊断：应用数据文件夹一行的标题"
+  },
+  "supportAppDataHint": "设置、记录和日志所在的文件夹",
+  "@supportAppDataHint": {
+    "description": "设置 › 支持与诊断：应用数据一行的说明"
+  },
+  "supportDiagnostics": "诊断信息",
+  "@supportDiagnostics": {
+    "description": "设置 › 支持与诊断：诊断信息一行的标题，也是预览弹窗的标题"
+  },
+  "supportDiagnosticsHint": "版本、Agent 检测结果和最近的错误，不含技能内容和账号信息",
+  "@supportDiagnosticsHint": {
+    "description": "设置 › 支持与诊断：诊断信息一行的说明"
+  },
+  "supportPreviewAndCopy": "预览并复制…",
+  "@supportPreviewAndCopy": {
+    "description": "设置 › 支持与诊断：打开诊断信息预览的按钮"
+  },
+  "supportReportIssue": "反馈问题",
+  "@supportReportIssue": {
+    "description": "设置 › 支持与诊断：反馈问题一行的标题"
+  },
+  "supportReportIssueHint": "在 GitHub 上新建问题，附上诊断信息",
+  "@supportReportIssueHint": {
+    "description": "设置 › 支持与诊断：反馈问题一行的说明"
+  },
+  "supportReportOnGitHub": "前往 GitHub…",
+  "@supportReportOnGitHub": {
+    "description": "设置 › 支持与诊断：反馈问题的按钮，先预览诊断信息"
+  },
+  "supportPreviewBody": "以下内容只会复制到剪贴板，不会自动上传。发出前可以删掉你不想分享的部分。",
+  "@supportPreviewBody": {
+    "description": "诊断信息预览弹窗的说明"
+  },
+  "supportGenerating": "正在生成…",
+  "@supportGenerating": {
+    "description": "诊断信息预览弹窗：后台还在生成时的占位"
+  },
+  "supportCopy": "复制",
+  "@supportCopy": {
+    "description": "诊断信息预览弹窗：复制按钮"
+  },
+  "supportCopyAndOpenGitHub": "复制并前往 GitHub",
+  "@supportCopyAndOpenGitHub": {
+    "description": "诊断信息预览弹窗：从「反馈问题」打开时的确认按钮"
+  },
+  "supportDiagnosticsCopied": "诊断信息已复制",
+  "@supportDiagnosticsCopied": {
+    "description": "设置 › 支持与诊断：复制诊断信息之后的提示"
+  },
+  "supportDiagnosticsCopiedPaste": "诊断信息已复制，请粘贴到问题的「诊断信息」一栏",
+  "@supportDiagnosticsCopiedPaste": {
+    "description": "设置 › 支持与诊断：复制后打开了 GitHub 问题页"
+  },
+  "supportCopyFailed": "复制失败：{error}",
+  "@supportCopyFailed": {
+    "description": "设置 › 支持与诊断：写剪贴板失败",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "supportDataFileRecovered": "{file} 已损坏，已恢复为默认设置，原文件保存为 {backup}",
+  "@supportDataFileRecovered": {
+    "description": "提示条：应用自己的数据文件解析不了，已挪到旁边",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      },
+      "backup": {
+        "type": "String"
+      }
+    }
+  },
+  "menuOpenAppData": "打开应用数据文件夹",
+  "@menuOpenAppData": {
+    "description": "macOS「帮助」菜单：在 Finder 中打开应用数据文件夹"
+  },
+  "menuCopyDiagnostics": "复制诊断信息…",
+  "@menuCopyDiagnostics": {
+    "description": "macOS「帮助」菜单：打开诊断信息预览"
+  },
+  "menuReportIssue": "反馈问题…",
+  "@menuReportIssue": {
+    "description": "macOS「帮助」菜单：预览诊断信息后前往 GitHub 新建问题"
   }
 }

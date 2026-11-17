@@ -58,12 +58,13 @@ func DefaultSettings() Settings {
 
 func settingsFile(home string) string { return filepath.Join(appDir(home), "settings.json") }
 
-func loadSettings(home string) Settings {
-	s := readJSON(settingsFile(home), DefaultSettings())
+// loadSettings 读设置；文件坏了时第二个返回值是挪开的原件。
+func loadSettings(home string) (Settings, string) {
+	s, moved := readJSON(settingsFile(home), DefaultSettings())
 	if s.UpdateOldVersion == "" {
 		s.UpdateOldVersion = "trash"
 	}
-	return s
+	return s, moved
 }
 
 // SaveSettings 写下 l.Settings。示例数据只改内存。
@@ -72,24 +73,6 @@ func (l *Library) SaveSettings() error {
 		return nil
 	}
 	return writeJSON(settingsFile(l.Home), l.Settings)
-}
-
-// readJSON 读出 file 里的 JSON；文件不存在或读不了时返回 def。
-//
-// 内容解析不了时也返回 def，并把原件改名挪到旁边（file.corrupt-时间）：
-// 调用方之后会拿 def 写回同一个文件，不挪开的话，用户原来的内容就被
-// 无声覆盖了。
-func readJSON[T any](file string, def T) T {
-	b, err := os.ReadFile(file)
-	if err != nil {
-		return def
-	}
-	v := def
-	if err := json.Unmarshal(b, &v); err != nil {
-		os.Rename(file, file+".corrupt-"+time.Now().Format("20060102-150405"))
-		return def
-	}
-	return v
 }
 
 func writeJSON(file string, v any) error {
@@ -195,7 +178,8 @@ type LinkReport struct {
 
 // CheckLinks 检查装了的 Agent 目录里的链接：断掉的，技能库里有同名技能
 // 就改成指向它，没有的列出来。只改断掉的链接，不碰目录和好的链接。
-func (l *Library) CheckLinks() (LinkReport, error) {
+func (l *Library) CheckLinks() (_ LinkReport, err error) {
+	defer l.track("link", "check", "")(&err)
 	var r LinkReport
 	if !l.disk {
 		return r, nil

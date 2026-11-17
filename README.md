@@ -49,7 +49,7 @@ When the app runs on your real data, it writes to your machine:
 - "Add to …" creates a link in the chosen agent's skill folder. "Remove" deletes only links this app created.
 - Deleting skills and fixing links in "Tidy Up" changes your skill folders.
 
-The app keeps its own settings and records in `~/Library/Application Support/Skill Stow/`. To keep your machine untouched, run with `SKILLS_SAMPLE=1`.
+The app keeps its own settings, records and an event log (`logs/`, capped at about 1 MB) in `~/Library/Application Support/Skill Stow/`. The log records what the app changed and what failed; it never contains skill contents, config contents or tokens. To report a problem, use Help › Report an Issue…, which shows the diagnostic info before copying it. To keep your machine untouched, run with `SKILLS_SAMPLE=1`.
 
 ## Contributing
 

@@ -328,9 +328,11 @@ func (l *Library) AddImport(b *ImportBatch, names []string, p ImportPlacement, r
 		if c, ok := replace[n]; ok {
 			confirmed = &c
 		}
+		start := time.Now()
 		o := l.addImport(b, sk, p, confirmed)
 		o.Name = n
 		out = append(out, o)
+		l.Log(operationEvent("import", "add", n, time.Since(start), o.Err))
 	}
 	return out
 }

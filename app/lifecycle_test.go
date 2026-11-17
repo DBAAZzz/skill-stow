@@ -307,7 +307,7 @@ func TestMacOSSystemMenuIncludesAboutSettingsUpdatesAndFollowsLanguage(t *testin
 		t.Fatal("macOS 应构建系统应用菜单")
 	}
 
-	// 1. 保留默认顶层菜单（应用、文件、编辑、显示、窗口）及标准角色
+	// 1. 保留默认顶层菜单（应用、文件、编辑、显示、窗口），最后是「帮助」
 	var topRoles []mygo.MenuRole
 	for _, it := range m.Items() {
 		topRoles = append(topRoles, it.Role)
@@ -318,6 +318,7 @@ func TestMacOSSystemMenuIncludesAboutSettingsUpdatesAndFollowsLanguage(t *testin
 		mygo.RoleEditMenu,
 		mygo.RoleViewMenu,
 		mygo.RoleWindowMenu,
+		mygo.RoleHelp,
 	}
 	if !slices.Equal(topRoles, wantTop) {
 		t.Fatalf("顶层系统菜单角色 = %v, want %v", topRoles, wantTop)
