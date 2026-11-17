@@ -177,7 +177,7 @@ func (a *app) updateBody(c *ui.Context, width float32) {
 	}
 
 	ui.Scroll(c).Fill().Background(colBgPage).Scrollbars(false).Children(func() {
-		area := pageColumn(c, width, pageMaxWidth, func(float32) {
+		area := pageColumn(c, width, pageMaxWidth, func(colW float32) {
 			ui.Column(c).FillWidth().Gap(22).Children(func() {
 				if st.err != "" {
 					errorLine(c, st.err)
@@ -214,7 +214,7 @@ func (a *app) updateBody(c *ui.Context, width float32) {
 						continue
 					}
 					found = true
-					a.updateGroupSection(c.Key(string(g)), g, items, width)
+					a.updateGroupSection(c.Key(string(g)), g, items, colW)
 				}
 				if st.group != "" && !found {
 					updCard(c).Padding(28, 20).Center().Children(func() {
@@ -310,7 +310,7 @@ func (a *app) updateSummarySection(c *ui.Context) {
 	}
 }
 
-func (a *app) updateGroupSection(c *ui.Context, g library.UpdateGroup, items []library.UpdateItem, width float32) {
+func (a *app) updateGroupSection(c *ui.Context, g library.UpdateGroup, items []library.UpdateItem, colW float32) {
 	st := &a.upd
 	// 一组整个没了（最后一个更新完）或新出现时同样收起、展开
 	ui.Column(c).FillWidth().Gap(7).Transition(updateRowMotion).Children(func() {
@@ -345,10 +345,10 @@ func (a *app) updateGroupSection(c *ui.Context, g library.UpdateGroup, items []l
 				st.tabled[g] = true
 			}
 			if !single {
-				a.updateTableHeader(c, g, width)
+				a.updateTableHeader(c, g, colW)
 			}
 			for i, it := range items {
-				updateRowCell(c, it, func() { a.updateRow(c, it, i == 0, single, width) })
+				updateRowCell(c, it, func() { a.updateRow(c, it, i == 0, single, colW) })
 			}
 		})
 	})
@@ -400,18 +400,20 @@ func groupSubtitle(g library.UpdateGroup) string {
 	}
 }
 
-func updateCols(width float32) (skillW, srcW float32, compact bool) {
+// updateCols 按内容栏宽度 colW（不是整个内容区）定技能名、来源两列的宽度；
+// 太窄时 compact，三列不再定宽、按比例分。
+func updateCols(colW float32) (skillW, srcW float32, compact bool) {
 	switch {
-	case width >= 820:
+	case colW >= 760:
 		return 180, 138, false
-	case width >= 620:
+	case colW >= 580:
 		return 136, 106, false
 	default:
 		return 0, 0, true
 	}
 }
 
-func (a *app) updateTableHeader(c *ui.Context, g library.UpdateGroup, width float32) {
+func (a *app) updateTableHeader(c *ui.Context, g library.UpdateGroup, colW float32) {
 	infoCol := locales.TidyCondition()
 	switch g {
 	case library.GroupReady:
@@ -423,7 +425,7 @@ func (a *app) updateTableHeader(c *ui.Context, g library.UpdateGroup, width floa
 	case library.GroupHandle, library.GroupFailed:
 		infoCol = locales.CommonReason()
 	}
-	skillW, srcW, compact := updateCols(width)
+	skillW, srcW, compact := updateCols(colW)
 	ui.Row(c).Height(34).Padding(0, 16).Gap(14).AlignItems(ui.Center).Background(colBgSubtle).
 		BorderWidth(0, 0, 1, 0).BorderColor(colBorderSubtle).FontSize(12).FontWeight(500).TextColor(colTextMuted).Children(func() {
 		col1 := ui.Text(c, locales.CommonSkills()).SingleLine()
@@ -454,11 +456,11 @@ func hasUpdateAttention(r library.UpdateReport) bool {
 	return false
 }
 
-func (a *app) updateRow(c *ui.Context, it library.UpdateItem, first, single bool, width float32) {
+func (a *app) updateRow(c *ui.Context, it library.UpdateItem, first, single bool, colW float32) {
 	if !first {
 		ui.Box(c).Height(1).Margin(0, 16).Background(colBorderSubtle)
 	}
-	skillW, srcW, compact := updateCols(width)
+	skillW, srcW, compact := updateCols(colW)
 	selected := a.selected != nil && a.selected.Name == it.Name
 	row := ui.Row(c).MinHeight(42).Padding(8, 16).Gap(14).AlignItems(ui.Center)
 	if single {
