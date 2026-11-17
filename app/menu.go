@@ -425,16 +425,16 @@ func (fm *frostedMenu) submenu(label, value string, opts []menuOpt, subOpts menu
 // header 是菜单里一组的标题：半粗的小字，note 是右边的灰色说明。
 func (fm *frostedMenu) header(title, note string) {
 	ui.Row(fm.ctx()).Height(26).Padding(0, menuRowPadX).Gap(8).AlignItems(ui.Center).Shrink(0).Children(func() {
-		ui.Text(fm.ctx(), title).FontSize(11.5).FontWeight(600).TextColor(colTextSecondary).SingleLine()
+		ui.Text(fm.ctx(), title).FontSize(12).FontWeight(600).TextColor(colTextSecondary).SingleLine()
 		if note != "" {
-			ui.Text(fm.ctx(), note).FontSize(11.5).TextColor(colTextMuted).SingleLine()
+			ui.Text(fm.ctx(), note).FontSize(12).TextColor(colTextMuted).SingleLine()
 		}
 	})
 }
 
 // note 是菜单里一段灰色说明（不能点）。
 func (fm *frostedMenu) note(text string) {
-	ui.Text(fm.ctx(), text).FontSize(11.5).LineHeight(1.5).TextColor(colTextMuted).Padding(4, menuRowPadX, 6, menuRowPadX)
+	ui.Text(fm.ctx(), text).FontSize(12).LineHeight(1.5).TextColor(colTextMuted).Padding(4, menuRowPadX, 6, menuRowPadX)
 }
 
 func (fm *frostedMenu) separator() {
@@ -526,14 +526,14 @@ func (fm *frostedMenu) row(label string, o menuItemOpts) ui.Element {
 		if o.detail != "" {
 			ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
 				ui.Text(c, label).FontSize(menuFontSize).SingleLine()
-				ui.Text(c, o.detail).FontSize(11.5).LineHeight(1.4).TextColor(colTextMuted)
+				ui.Text(c, o.detail).FontSize(12).LineHeight(1.4).TextColor(colTextMuted)
 			})
 		} else {
 			ui.Text(c, label).FontSize(menuFontSize).SingleLine().Grow(1).MinWidth(0)
 		}
 
 		if o.subtitle != "" {
-			ui.Text(c, o.subtitle).FontSize(11.5).TextColor(colTextMuted).SingleLine().Shrink(0)
+			ui.Text(c, o.subtitle).FontSize(12).TextColor(colTextMuted).SingleLine().Shrink(0)
 		}
 		if o.trailing != "" {
 			ui.Text(c, o.trailing).FontSize(menuSubSize).TextColor(colTextMuted).SingleLine().Shrink(0)

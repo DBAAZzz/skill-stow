@@ -78,7 +78,7 @@ func groupHeader(c *ui.Context, title string, count int, right func()) ui.Elemen
 
 // groupFoot 是分组下方的灰色说明。
 func groupFoot(c *ui.Context, text string) {
-	ui.Text(c, text).FontSize(11.5).LineHeight(1.4).TextColor(colTextMuted).Padding(7, 10, 0, 10)
+	ui.Text(c, text).FontSize(12).LineHeight(1.4).TextColor(colTextMuted).Padding(7, 10, 0, 10)
 }
 
 // rowBody 画一行的内容；sep 时顶部加一条分隔线。分隔线要画在行里面，
@@ -245,7 +245,7 @@ func dailyChart(c *ui.Context, days []library.Day, st usageStats) {
 				text = locales.UsageThisWeek()
 			}
 			ui.Row(c.Key(w)).Grow(1).Basis(0).MinWidth(0).Children(func() {
-				ui.Text(c, text).FontSize(10.5).TextColor(colTextMuted).FontFeatures("tnum").SingleLine()
+				ui.Text(c, text).FontSize(11).TextColor(colTextMuted).FontFeatures("tnum").SingleLine()
 			})
 		}
 	})
@@ -300,13 +300,13 @@ func statsStrip(c *ui.Context, st usageStats) {
 			col.BorderWidth(0, 0, 0, edgeSpread).BorderColor(colBorderSubtle)
 		}
 		col.Children(func() {
-			ui.Text(c, label).FontSize(11.5).TextColor(colTextMuted).SingleLine()
+			ui.Text(c, label).FontSize(12).TextColor(colTextMuted).SingleLine()
 			ui.Row(c).Gap(3).AlignItems(ui.Baseline).Children(func() {
 				ui.Text(c, value).FontSize(17).FontWeight(600).LetterSpacing(-0.2).TextColor(colTextPrimary).
 					FontFeatures("tnum").SingleLine()
 				ui.Text(c, unit).FontSize(12).TextColor(colTextSecondary).SingleLine()
 				if note != "" {
-					ui.Text(c, note).FontSize(11.5).TextColor(colTextMuted).FontFeatures("tnum").
+					ui.Text(c, note).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").
 						Margin(0, 0, 0, 5).SingleLine()
 				}
 			})
@@ -506,7 +506,7 @@ func (a *app) usedSection(c *ui.Context, now time.Time, used []*library.Skill) {
 	groupHeader(c, locales.UsageUsedSection(), len(used), nil)
 	if len(used) == 0 {
 		usageGroup(c).Children(func() {
-			ui.Text(c, locales.UsageNoCallsYet()).FontSize(12.5).TextColor(colTextMuted).Padding(14)
+			ui.Text(c, locales.UsageNoCallsYet()).FontSize(13).TextColor(colTextMuted).Padding(14)
 		})
 		return
 	}
@@ -538,7 +538,7 @@ func (a *app) usedRow(c *ui.Context, now time.Time, s *library.Skill, most int, 
 		ui.Row(c).Width(236).Shrink(0).Gap(6).AlignItems(ui.Baseline).Children(func() {
 			ui.Text(c, s.Name).FontSize(13).FontWeight(500).SingleLine().MinWidth(0).Shrink(1)
 			if tag := usageSourceTag(s.Source); tag != "" {
-				ui.Text(c, tag).FontSize(11.5).TextColor(tertiary).SingleLine().Shrink(0)
+				ui.Text(c, tag).FontSize(12).TextColor(tertiary).SingleLine().Shrink(0)
 			}
 		})
 		ui.Row(c).Grow(1).MinWidth(0).Height(6).Radius(3).Gap(1.5).Clip().Children(func() {
@@ -637,7 +637,7 @@ func (a *app) unusedSection(c *ui.Context) {
 	}
 	usageGroup(c).Children(func() {
 		if len(skills) == 0 {
-			ui.Text(c, locales.UsageAllUsed()).FontSize(12.5).TextColor(colTextMuted).Padding(14)
+			ui.Text(c, locales.UsageAllUsed()).FontSize(13).TextColor(colTextMuted).Padding(14)
 			return
 		}
 		sets, count, rest := unusedGroups(skills)
@@ -923,7 +923,7 @@ func (a *app) skillMDPreview(c *ui.Context, s *library.Skill, f library.File) {
 			for i, l := range lines {
 				t := ui.Text(c.Key(i), l.text).FontSize(12).LineHeight(1.5)
 				if l.heading {
-					t.FontSize(12.5).FontWeight(600).TextColor(colTextPrimary).Margin(4, 0, 0, 0)
+					t.FontSize(13).FontWeight(600).TextColor(colTextPrimary).Margin(4, 0, 0, 0)
 				} else {
 					t.TextColor(colTextSecondary)
 				}
@@ -979,7 +979,7 @@ func (a *app) previewFiles(c *ui.Context, s *library.Skill) {
 	box(c, func() {
 		if len(s.Files) == 0 {
 			boxRow(c, true).Children(func() {
-				ui.Text(c, locales.FilesUnreadable()).FontSize(12.5).TextColor(colTextMuted)
+				ui.Text(c, locales.FilesUnreadable()).FontSize(13).TextColor(colTextMuted)
 			})
 			return
 		}
@@ -998,7 +998,7 @@ func (a *app) previewFiles(c *ui.Context, s *library.Skill) {
 				}
 				boxRow(c.Key("dir/"+d), rows == 0).MinHeight(30).Padding(0, 12).Children(func() {
 					ui.Icon(c, iconFolder).Size(14, 14).TextColor(colAccent)
-					ui.Text(c, d).FontSize(12.5).SingleLine().Grow(1).MinWidth(0)
+					ui.Text(c, d).FontSize(13).SingleLine().Grow(1).MinWidth(0)
 					ui.Text(c, locales.FilesInFolder(n)).FontSize(11).TextColor(colTextDisabled).FontFeatures("tnum")
 				})
 				rows++
@@ -1017,7 +1017,7 @@ func (a *app) previewFiles(c *ui.Context, s *library.Skill) {
 			}
 			row.Children(func() {
 				ui.Icon(c, iconDoc).Size(14, 14).TextColor(colTextMuted)
-				ui.Text(c, name).FontSize(12.5).SingleLine().Grow(1).MinWidth(0)
+				ui.Text(c, name).FontSize(13).SingleLine().Grow(1).MinWidth(0)
 				ui.Text(c, sizeLabel(f.Size)).FontSize(11).TextColor(colTextDisabled).FontFeatures("tnum")
 			})
 			rows++

@@ -156,9 +156,9 @@ func badge(c *ui.Context, br brand, name string, size float32) {
 // sharedTag 是灰色的「通用」标（u3-a .pill）：技能在通用目录里，readers
 // 都直接读到，鼠标停上去列出它们。size 是旁边 Agent 图标的大小。
 func sharedTag(c *ui.Context, readers []string, size float32) ui.Element {
-	h, icon, font := float32(15), float32(11), float32(10.5)
+	h, icon := float32(15), float32(11)
 	if size >= 16 {
-		h, icon, font = 17, 12, 11
+		h, icon = 17, 12
 	}
 	var names []string
 	for _, id := range readers {
@@ -169,7 +169,7 @@ func sharedTag(c *ui.Context, readers []string, size float32) ui.Element {
 		Background(colBgFill).TextColor(colTextBody).Tooltip(tip)
 	tag.Children(func() {
 		badge(c, sharedBrand, locales.CommonShared(), icon)
-		ui.Text(c, locales.CommonShared()).FontSize(font).FontWeight(500).SingleLine()
+		ui.Text(c, locales.CommonShared()).FontSize(11).FontWeight(500).SingleLine()
 	})
 	return tag
 }
@@ -237,7 +237,7 @@ func agentBadges(c *ui.Context, ids []string, size float32, limit ...int) {
 			agentBadge(c.Key(id), id, size)
 		}
 		if n < len(ids) {
-			ui.Text(c, fmt.Sprintf("+%d", len(ids)-n)).FontSize(size*0.72).TextColor(colTextMuted).FontFeatures("tnum").
+			ui.Text(c, fmt.Sprintf("+%d", len(ids)-n)).FontSize(wholePt(size*0.72)).TextColor(colTextMuted).FontFeatures("tnum").
 				Margin(0, 0, 0, 2).Tooltip(agentNames(ids[n:]))
 		}
 	})
@@ -256,7 +256,7 @@ func agentChip(c *ui.Context, id string, named bool) {
 	chip.Children(func() {
 		agentBadge(c, id, 14)
 		if named {
-			ui.Text(c, library.AgentName(id)).FontSize(11.5).TextColor(colTextBody).SingleLine()
+			ui.Text(c, library.AgentName(id)).FontSize(12).TextColor(colTextBody).SingleLine()
 		}
 	})
 }
@@ -274,7 +274,7 @@ func agentChips(c *ui.Context, ids []string) {
 			agentChip(c.Key(id), id, named)
 		}
 		if n := len(ids) - most; n > 0 {
-			ui.Text(c, fmt.Sprintf("+%d", n)).FontSize(11.5).TextColor(colTextMuted).Margin(0, 0, 0, 2)
+			ui.Text(c, fmt.Sprintf("+%d", n)).FontSize(12).TextColor(colTextMuted).Margin(0, 0, 0, 2)
 		}
 	})
 }

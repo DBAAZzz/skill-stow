@@ -124,7 +124,7 @@ func (a *app) importHead(c *ui.Context, s *library.ImportSkill, files []library.
 			}
 		})
 		if !s.MissingDescription() {
-			ui.Text(c, s.Description).FontSize(12.5).LineHeight(1.5).TextColor(colTextSecondary).MaxLines(3)
+			ui.Text(c, s.Description).FontSize(13).LineHeight(1.5).TextColor(colTextSecondary).MaxLines(3)
 		}
 		ui.Row(c).Gap(10).AlignItems(ui.Center).Margin(2, 0, 0, 0).Children(func() {
 			where := s.RepoPath
@@ -136,9 +136,9 @@ func (a *app) importHead(c *ui.Context, s *library.ImportSkill, files []library.
 			case where == "":
 				where = locales.ImportRepositoryRoot()
 			}
-			ui.Text(c, where).FontSize(11.5).Font("monospace").TextColor(colTextMuted).SingleLine().Shrink(1).MinWidth(0)
+			ui.Text(c, where).FontSize(12).Font("monospace").TextColor(colTextMuted).SingleLine().Shrink(1).MinWidth(0)
 			count := locales.ImportFilesAndSize(s.Count, library.HumanSize(s.Size))
-			ui.Text(c, count).FontSize(11.5).TextColor(colTextMuted).FontFeatures("tnum").SingleLine()
+			ui.Text(c, count).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").SingleLine()
 			ui.Spacer(c)
 			if multi {
 				previewTabs(c, &st.tab, "SKILL.md", locales.ImportFilesHeadingCount(len(files)))
@@ -183,7 +183,7 @@ func (a *app) importFiles(c *ui.Context, s *library.ImportSkill, files []library
 					if d != dir && d != "" {
 						ui.Row(c.Key("dir/"+d)).Height(26).Padding(0, 8).Gap(7).AlignItems(ui.Center).Children(func() {
 							ui.Icon(c, iconFolder).Size(14, 14).TextColor(colAccent)
-							ui.Text(c, d).FontSize(12.5).SingleLine().MinWidth(0)
+							ui.Text(c, d).FontSize(13).SingleLine().MinWidth(0)
 						})
 					}
 					dir = d
@@ -195,7 +195,7 @@ func (a *app) importFiles(c *ui.Context, s *library.ImportSkill, files []library
 					}
 					row.Children(func() {
 						ui.Icon(c, iconDoc).Size(14, 14).TextColor(colTextMuted)
-						ui.Text(c, name).FontSize(12.5).SingleLine().Grow(1).MinWidth(0)
+						ui.Text(c, name).FontSize(13).SingleLine().Grow(1).MinWidth(0)
 						if f.Exec || slices.Contains(s.Exec, f.Path) {
 							ui.Icon(c, iconTerminal).Size(12, 12).TextColor(colWarnText).Tooltip(locales.ImportExecutableHint())
 						}
@@ -244,7 +244,7 @@ func imageFileView(c *ui.Context, f library.File, img ui.ImageSource) {
 			ui.Column(c).Padding(16).Radius(8).Background(colBgSubtle).Center().Children(func() {
 				ui.Image(c, img).MaxWidth(560).MaxHeight(420).Fit(ui.Contain)
 			})
-			ui.Text(c, sizeLabel(f.Size)).FontSize(11.5).TextColor(colTextMuted)
+			ui.Text(c, sizeLabel(f.Size)).FontSize(12).TextColor(colTextMuted)
 		})
 	})
 }

@@ -151,7 +151,7 @@ func (a *app) nativeBoardCard(c *ui.Context, s *library.Skill, id string) {
 	a.pick(c, card, s, "board.card:"+id+":"+s.ID)
 	card.Children(func() {
 		ui.Row(c).Gap(4).AlignItems(ui.Center).Children(func() {
-			ui.Text(c, s.Name).FontSize(12.5).FontWeight(500).Grow(1).MinWidth(0).SingleLine()
+			ui.Text(c, s.Name).FontSize(13).FontWeight(500).Grow(1).MinWidth(0).SingleLine()
 			a.triggerMenu(c, "board.card.more:"+id+":"+s.ID, menuPanelOpts{alignEnd: true}, func(more ui.Element, open bool) {
 				more.Size(20, 18).Center().Radius(4).Label(locales.NativeCardActions(library.AgentName(id), s.Name))
 				styleMenuIconTrigger(more, open, false)
@@ -176,7 +176,7 @@ func (a *app) nativeBoardCard(c *ui.Context, s *library.Skill, id string) {
 				}
 			})
 		})
-		descText(c, s).FontSize(11.5).SingleLine()
+		descText(c, s).FontSize(12).SingleLine()
 		ui.Row(c).Height(16).Margin(7, 0, 0, 0).Gap(4).AlignItems(ui.Center).Children(func() { a.enabledBadges(c, s, id, 13, 6); ui.Spacer(c); flags(c, s) })
 		if len(st.Projects) > 0 {
 			ui.Text(c, locales.NativeStillDisabledIn(strings.Join(st.Projects, locales.ListSeparator()))).FontSize(11).TextColor(colTextMuted)

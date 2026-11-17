@@ -84,7 +84,7 @@ func (a *app) comparePage(c *ui.Context, st *compareState) {
 
 func (a *app) compareVersionSwitcher(c *ui.Context, st *compareState, vs []library.Version) {
 	ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
-		ui.Text(c, locales.ActionCompareCopies()).FontSize(11.5).TextColor(colTextMuted).SingleLine()
+		ui.Text(c, locales.ActionCompareCopies()).FontSize(12).TextColor(colTextMuted).SingleLine()
 		seg := ui.Row(c).Height(26).Padding(2).Gap(1).Radius(8).Background(colBgFill).AlignItems(ui.Center)
 		seg.Children(func() {
 			for k := 1; k < len(vs); k++ {
@@ -142,7 +142,7 @@ func diffModeSwitch(c *ui.Context, fullFile *bool) {
 				*fullFile = opt.full
 			}
 			btn.Children(func() {
-				t := ui.Text(c, opt.label).FontSize(11.5).SingleLine()
+				t := ui.Text(c, opt.label).FontSize(12).SingleLine()
 				if active {
 					t.FontWeight(500).TextColor(colTextPrimary)
 				} else {
@@ -208,10 +208,10 @@ func diffFileTree(c *ui.Context, st *compareState) {
 				if totalDel > 0 || totalAdd > 0 {
 					ui.Row(c).Gap(3).AlignItems(ui.Center).Children(func() {
 						if totalDel > 0 {
-							ui.Text(c, fmt.Sprintf("−%d", totalDel)).FontSize(10.5).TextColor(colDiffDelText).FontFeatures("tnum").SingleLine()
+							ui.Text(c, fmt.Sprintf("−%d", totalDel)).FontSize(11).TextColor(colDiffDelText).FontFeatures("tnum").SingleLine()
 						}
 						if totalAdd > 0 {
-							ui.Text(c, fmt.Sprintf("+%d", totalAdd)).FontSize(10.5).TextColor(colDiffAddText).FontFeatures("tnum").SingleLine()
+							ui.Text(c, fmt.Sprintf("+%d", totalAdd)).FontSize(11).TextColor(colDiffAddText).FontFeatures("tnum").SingleLine()
 						}
 					})
 				}
@@ -331,7 +331,7 @@ func (a *app) localVerSide(c *ui.Context, st *compareState, k int) {
 		versionBadge(c, v, k, 22)
 		ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
 			ui.Row(c).Gap(6).AlignItems(ui.Center).Children(func() {
-				ui.Text(c, versionDisplayName(v, k)).FontSize(12.5).FontWeight(600).SingleLine()
+				ui.Text(c, versionDisplayName(v, k)).FontSize(13).FontWeight(600).SingleLine()
 				if k == 0 {
 					baseTag(c)
 				}
@@ -424,7 +424,7 @@ func (a *app) diffSubhead(c *ui.Context, st *compareState, f library.FileDiff, i
 	ui.Row(c).Height(30).Shrink(0).Padding(0, 14).Gap(8).Background(colBgSurface).
 		BorderWidth(0, 0, 1, 0).BorderColor(colBorderDefault).AlignItems(ui.Center).Children(func() {
 		ui.Icon(c, iconDoc).Size(13, 13).TextColor(colTextMuted)
-		ui.Text(c, f.Path).Font("monospace").FontSize(11.5).FontWeight(600).TextColor(colTextPrimary).SingleLine().MinWidth(0)
+		ui.Text(c, f.Path).Font("monospace").FontSize(12).FontWeight(600).TextColor(colTextPrimary).SingleLine().MinWidth(0)
 		switch {
 		case f.OnlyLeft:
 			if st.updating {
@@ -439,15 +439,15 @@ func (a *app) diffSubhead(c *ui.Context, st *compareState, f library.FileDiff, i
 				diffMiniTag(c, locales.CompareCopyOnly(), colBgFill, colTextSecondary, "")
 			}
 		case f.ModeOnly:
-			ui.Text(c, modeNote(f)).FontSize(11.5).TextColor(colTextSecondary).SingleLine()
+			ui.Text(c, modeNote(f)).FontSize(12).TextColor(colTextSecondary).SingleLine()
 		case f.Left.Unreadable || f.Right.Unreadable:
 			diffMiniTag(c, locales.CommonUnreadable(), colDiffDelRow, colDiffDelText, "")
 		case f.Binary:
 			diffMiniTag(c, locales.CompareDifferentContent(), colBgFill, colTextSecondary, "")
 		default:
 			ui.Row(c).Gap(4).Shrink(0).AlignItems(ui.Center).Children(func() {
-				ui.Text(c, fmt.Sprintf("−%d", f.Deleted)).FontSize(11.5).TextColor(colDiffDelText).FontFeatures("tnum").SingleLine()
-				ui.Text(c, fmt.Sprintf("+%d", f.Added)).FontSize(11.5).TextColor(colDiffAddText).FontFeatures("tnum").SingleLine()
+				ui.Text(c, fmt.Sprintf("−%d", f.Deleted)).FontSize(12).TextColor(colDiffDelText).FontFeatures("tnum").SingleLine()
+				ui.Text(c, fmt.Sprintf("+%d", f.Added)).FontSize(12).TextColor(colDiffAddText).FontFeatures("tnum").SingleLine()
 			})
 		}
 		ui.Spacer(c)
@@ -519,7 +519,7 @@ func (a *app) diffBody(c *ui.Context, st *compareState, f library.FileDiff) {
 					}
 					fold.Children(func() {
 						ui.Icon(c, iconUpDown).Size(12, 12)
-						ui.Text(c, locales.CompareHiddenLines(it.fold)).FontSize(11.5).SingleLine()
+						ui.Text(c, locales.CompareHiddenLines(it.fold)).FontSize(12).SingleLine()
 					})
 					continue
 				}

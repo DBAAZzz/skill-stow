@@ -61,7 +61,7 @@ func (a *app) projectBoard(c *ui.Context, p *library.ProjectInfo) {
 				dirBadge(c, d.Rel, 16)
 				columnTitle(c, library.ProjectDirName(d.Rel), len(skills))
 				ui.Spacer(c)
-				ui.Text(c, d.Rel).Font("monospace").FontSize(10.5).TextColor(colTextMuted).SingleLine()
+				ui.Text(c, d.Rel).Font("monospace").FontSize(11).TextColor(colTextMuted).SingleLine()
 			}, func() {
 				for _, s := range skills {
 					a.boardCard(c.Key(s.ID), s, "project:"+d.Rel, 2, false, func() { flags(c, s) })
@@ -123,7 +123,7 @@ func (a *app) linkedDialog(c *ui.Context) {
 				})
 			}
 		})
-		ui.Text(c, locales.ProjectLinkChoices(links, a.lib.Display(a.lib.Root))).FontSize(11.5).LineHeight(1.55).TextColor(colTextMuted).Margin(12, 0, 0, 0)
+		ui.Text(c, locales.ProjectLinkChoices(links, a.lib.Display(a.lib.Root))).FontSize(12).LineHeight(1.55).TextColor(colTextMuted).Margin(12, 0, 0, 0)
 	}, func() {
 		if dialogButton(c, locales.ActionShowInFinder(), false).Clicked() {
 			a.reveal(p.Dir)

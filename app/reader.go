@@ -123,7 +123,7 @@ func (a *app) fileList(c *ui.Context, s *library.Skill, fresh bool) {
 				if d != dir && d != "" {
 					ui.Row(c.Key("dir/"+d)).Height(26).Padding(0, 8).Gap(7).AlignItems(ui.Center).Children(func() {
 						ui.Icon(c, iconFolder).Size(14, 14).TextColor(colAccent).Shrink(0)
-						ui.Text(c, d).FontSize(12.5).SingleLine().MinWidth(0)
+						ui.Text(c, d).FontSize(13).SingleLine().MinWidth(0)
 					})
 				}
 				dir = d
@@ -136,7 +136,7 @@ func (a *app) fileList(c *ui.Context, s *library.Skill, fresh bool) {
 				}
 				row.Children(func() {
 					ui.Icon(c, iconDoc).Size(14, 14).TextColor(colTextMuted).Shrink(0)
-					ui.Text(c, name).FontSize(12.5).SingleLine().Grow(1).MinWidth(0)
+					ui.Text(c, name).FontSize(13).SingleLine().Grow(1).MinWidth(0)
 					ui.Text(c, sizeLabel(f.Size)).FontSize(11).TextColor(colTextDisabled).FontFeatures("tnum").Shrink(0)
 				})
 			}

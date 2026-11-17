@@ -465,7 +465,7 @@ func (a *app) cardFooter(c *ui.Context, s *library.Skill) {
 			// 不同插件可能带同名技能，标出插件才分得清
 			label += " · " + s.Plugin
 		}
-		ui.Text(c, label).FontSize(11.5).SingleLine()
+		ui.Text(c, label).FontSize(12).SingleLine()
 	case library.Project:
 		ui.Icon(c, iconFolder).Size(12, 12)
 		ui.Text(c, s.Project).Font("monospace").FontSize(11).SingleLine()
@@ -479,9 +479,9 @@ func (a *app) cardFooter(c *ui.Context, s *library.Skill) {
 		}
 		limit := max(6-2*flagged, 2)
 		if s.AllDisabled() {
-			ui.Text(c, locales.CommonDisabled()).FontSize(11.5).TextColor(colTextDisabled)
+			ui.Text(c, locales.CommonDisabled()).FontSize(12).TextColor(colTextDisabled)
 		} else if !a.enabledBadges(c, s, "", 16, limit) {
-			ui.Text(c, locales.CommonNotEnabled()).FontSize(11.5).TextColor(colTextDisabled)
+			ui.Text(c, locales.CommonNotEnabled()).FontSize(12).TextColor(colTextDisabled)
 		}
 	}
 }
@@ -598,15 +598,15 @@ func (a *app) agentColumn(c *ui.Context, width float32, ag library.Agent, skills
 		}
 		if len(disabled) > 0 {
 			ui.Row(c).Padding(8, 5, 2, 5).Gap(6).Children(func() {
-				ui.Text(c, locales.CommonDisabled()).FontSize(11.5).TextColor(colTextMuted)
-				ui.Text(c, fmt.Sprint(len(disabled))).FontSize(11.5).TextColor(colTextMuted)
+				ui.Text(c, locales.CommonDisabled()).FontSize(12).TextColor(colTextMuted)
+				ui.Text(c, fmt.Sprint(len(disabled))).FontSize(12).TextColor(colTextMuted)
 			})
 			for _, s := range disabled {
 				a.nativeBoardCard(c.Key(s.ID), s, ag.ID)
 			}
 		}
 		if len(skills) == 0 {
-			ui.Text(c, locales.BrowseNoOutsideShared()).FontSize(11.5).TextColor(colTextDisabled).Padding(6, 5)
+			ui.Text(c, locales.BrowseNoOutsideShared()).FontSize(12).TextColor(colTextDisabled).Padding(6, 5)
 		}
 		a.triggerMenu(c, "board.col.bottom:"+ag.ID, menuPanelOpts{}, func(btn ui.Element, open bool) {
 			styleDashedButton(c, btn, open, locales.BrowseAddMoreSkills())

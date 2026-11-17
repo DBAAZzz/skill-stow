@@ -87,7 +87,7 @@ func (a *app) updatePage(c *ui.Context) {
 			}
 		} else {
 			if !st.report.Checked.IsZero() {
-				ui.Text(c, locales.UpdateLastChecked(formatCommitTime(st.report.Checked))).FontSize(11.5).TextColor(colTextMuted).FontFeatures("tnum").SingleLine()
+				ui.Text(c, locales.UpdateLastChecked(formatCommitTime(st.report.Checked))).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").SingleLine()
 			}
 			if updButton(c, iconRefresh, locales.UpdateCheck(), false).Clicked() {
 				a.checkUpdates(false)
@@ -257,7 +257,7 @@ func (a *app) updateSummarySection(c *ui.Context) {
 		updCard(c.Key("sum-ready")).Transition(updateRowMotion).Padding(14, 18).Row().Gap(14).AlignItems(ui.Center).Children(func() {
 			squircleIcon(c, iconDownload, 38, squircleBlue)
 			ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
-				ui.Text(c, title).FontSize(14.5).FontWeight(600).FixedLineHeight(20).FontFeatures("tnum").ContentTransition(labelTransition)
+				ui.Text(c, title).FontSize(15).FontWeight(600).FixedLineHeight(20).FontFeatures("tnum").ContentTransition(labelTransition)
 				ui.Text(c, sub).FontSize(12).TextColor(colTextSecondary).ContentTransition(labelTransition)
 			})
 			if filledButton(c, action, colAccent).Disabled(st.cancel != nil).Clicked() {
@@ -288,7 +288,7 @@ func (a *app) updateSummarySection(c *ui.Context) {
 				ui.Icon(c, iconWarn).Size(16, 16)
 			})
 			ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
-				ui.Text(c, locales.UpdateCheckIncomplete()).FontSize(13.5).FontWeight(600).TextColor(colTextPrimary)
+				ui.Text(c, locales.UpdateCheckIncomplete()).FontSize(14).FontWeight(600).TextColor(colTextPrimary)
 				ui.Text(c, locales.UpdateRecheckIncomplete()).FontSize(12).TextColor(colTextSecondary)
 			})
 			if updButton(c, iconRefresh, locales.ActionCheckAgain(), false).Disabled(st.cancel != nil).Clicked() {
@@ -308,7 +308,7 @@ func (a *app) updateSummarySection(c *ui.Context) {
 				ui.Icon(c, iconCheck).Size(16, 16)
 			})
 			ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
-				ui.Text(c, locales.UpdateNothingToUpdate()).FontSize(13.5).FontWeight(600).TextColor(colTextPrimary)
+				ui.Text(c, locales.UpdateNothingToUpdate()).FontSize(14).FontWeight(600).TextColor(colTextPrimary)
 				ui.Text(c, locales.UpdateLastChecked(formatRecentDay(st.report.Checked, time.Now()))).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum")
 			})
 		})
@@ -328,10 +328,10 @@ func (a *app) updateGroupSection(c *ui.Context, g library.UpdateGroup, items []l
 			if st.cancel != nil && st.task == taskUpdate && g == library.GroupReady {
 				ui.Row(c).Height(24).Padding(0, 10, 0, 8).Radius(12).Background(colBgFill).Gap(6).AlignItems(ui.Center).Children(func() {
 					ui.Spinner(c).Size(12, 12).TextColor(colAccent)
-					ui.Text(c, locales.UpdateProgress(st.progress.Done, st.progress.Total)).FontSize(11.5).FontWeight(500).TextColor(colTextPrimary).FontFeatures("tnum").SingleLine()
+					ui.Text(c, locales.UpdateProgress(st.progress.Done, st.progress.Total)).FontSize(12).FontWeight(500).TextColor(colTextPrimary).FontFeatures("tnum").SingleLine()
 				})
 			} else if sub := groupSubtitle(g); sub != "" {
-				ui.Text(c, sub).FontSize(11.5).TextColor(colTextMuted).SingleLine()
+				ui.Text(c, sub).FontSize(12).TextColor(colTextMuted).SingleLine()
 			}
 		})
 
@@ -430,7 +430,7 @@ func (a *app) updateTableHeader(c *ui.Context, g library.UpdateGroup, width floa
 	}
 	skillW, srcW, compact := updateCols(width)
 	ui.Row(c).Height(34).Padding(0, 16).Gap(14).AlignItems(ui.Center).Background(colBgSubtle).
-		BorderWidth(0, 0, 1, 0).BorderColor(colBorderSubtle).FontSize(11.5).FontWeight(500).TextColor(colTextMuted).Children(func() {
+		BorderWidth(0, 0, 1, 0).BorderColor(colBorderSubtle).FontSize(12).FontWeight(500).TextColor(colTextMuted).Children(func() {
 		col1 := ui.Text(c, locales.CommonSkills()).SingleLine()
 		col2 := ui.Text(c, locales.CommonSource()).SingleLine()
 		col3 := ui.Text(c, infoCol).SingleLine()
@@ -484,13 +484,13 @@ func (a *app) updateRow(c *ui.Context, it library.UpdateItem, first, single bool
 			if skill != nil {
 				b := ui.ButtonBase(c).Label(it.Name).MinWidth(0).Shrink(1).Cursor(ui.CursorPointer)
 				b.Children(func() {
-					ui.Text(c, it.Name).FontSize(12.5).FontWeight(500).TextColor(colAccent).SingleLine()
+					ui.Text(c, it.Name).FontSize(13).FontWeight(500).TextColor(colAccent).SingleLine()
 				})
 				if b.Clicked() {
 					a.selected, a.coll, a.picked = skill, nil, true
 				}
 			} else {
-				ui.Text(c, it.Name).FontSize(12.5).FontWeight(500).TextColor(colTextPrimary).SingleLine().MinWidth(0).Shrink(1)
+				ui.Text(c, it.Name).FontSize(13).FontWeight(500).TextColor(colTextPrimary).SingleLine().MinWidth(0).Shrink(1)
 			}
 			if in := a.lib.InstalledIn(it); in != "" {
 				pillTag(c, locales.UpdateInstalledIn(in))
@@ -543,13 +543,13 @@ func (a *app) updateInfoCell(c *ui.Context, it library.UpdateItem) {
 
 	if it.State == library.UpdReady && !it.CommitDate.IsZero() && !it.Stale {
 		ui.Row(c).Gap(12).AlignItems(ui.Center).MinWidth(0).Children(func() {
-			ui.Text(c, formatCommitTime(it.CommitDate)).Font("monospace").FontSize(11.5).TextColor(colTextSecondary).FontFeatures("tnum").SingleLine()
+			ui.Text(c, formatCommitTime(it.CommitDate)).Font("monospace").FontSize(12).TextColor(colTextSecondary).FontFeatures("tnum").SingleLine()
 			if it.Commit != "" {
 				commitMeta(c, it.Commit, colTextBody, colTextMuted)
 			}
 		})
 		if e := a.upd.errors[it.Name]; e != "" {
-			ui.Text(c, e).FontSize(11.5).TextColor(colDangerText)
+			ui.Text(c, e).FontSize(12).TextColor(colDangerText)
 		}
 		return
 	}
@@ -569,7 +569,7 @@ func (a *app) updateInfoCell(c *ui.Context, it library.UpdateItem) {
 		}
 	})
 	if e := a.upd.errors[it.Name]; e != "" {
-		ui.Text(c, e).FontSize(11.5).TextColor(colDangerText)
+		ui.Text(c, e).FontSize(12).TextColor(colDangerText)
 	}
 }
 
@@ -636,13 +636,13 @@ func (a *app) updateSourceRow(c *ui.Context, it library.UpdateItem, first bool) 
 				}).Shrink(1)
 				pillTag(c, locales.CommonItemTotal(max(1, len(it.Names))))
 			})
-			ui.Text(c, sub).FontSize(11.5).TextColor(colTextSecondary).SingleLine()
+			ui.Text(c, sub).FontSize(12).TextColor(colTextSecondary).SingleLine()
 		})
 
 		if it.State == library.UpdWebsite {
 			a.updateActions(c, it)
 		} else {
-			ui.Text(c, locales.CommonNotSupportedYet()).FontSize(11.5).TextColor(colTextMuted).SingleLine()
+			ui.Text(c, locales.CommonNotSupportedYet()).FontSize(12).TextColor(colTextMuted).SingleLine()
 		}
 	})
 }
@@ -715,7 +715,7 @@ func (a *app) updateActions(c *ui.Context, it library.UpdateItem) {
 	case library.UpdStopped:
 		btn(locales.UpdateResumeChecking(), false, func() { a.updateMark(func(l *library.Library) error { return l.ResumeChecking(it) }) })
 	case library.UpdMovedOut:
-		ui.Text(c, locales.UpdateReinstallToUpdate()).FontSize(11.5).TextColor(colTextMuted).SingleLine()
+		ui.Text(c, locales.UpdateReinstallToUpdate()).FontSize(12).TextColor(colTextMuted).SingleLine()
 	case library.UpdRemoved:
 		btn(locales.UpdateKeepLocalStopChecking(), false, func() { a.updateMark(func(l *library.Library) error { return l.StopChecking(it) }) })
 		btn(locales.ActionDeleteSkill(), true, func() {
@@ -787,7 +787,7 @@ func quotaNotice(c *ui.Context, reset time.Time) {
 	ui.Row(c).Height(34).Padding(0, 12).Gap(8).Radius(8).AlignItems(ui.Center).
 		Background(colWarnBg).Border(1, colWarnEdge).Children(func() {
 		ui.Image(c, toastSymbols[toastWarn]).Size(14, 14).Shrink(0)
-		ui.Row(c).Grow(1).MinWidth(0).AlignItems(ui.Baseline).FontSize(12.5).Children(func() {
+		ui.Row(c).Grow(1).MinWidth(0).AlignItems(ui.Baseline).FontSize(13).Children(func() {
 			ui.Text(c, locales.UpdateGitHubRateLimit(reset.Format("15:04"))).TextColor(colWarnText).SingleLine()
 			ui.Text(c, locales.UpdateCheckedResultsRemain()).TextColor(colWarnText).SingleLine().MinWidth(0)
 		})
@@ -855,7 +855,7 @@ func (a *app) updateCompareHeader(c *ui.Context, p *library.Prepared, st *compar
 			squircleIcon(c, iconNavFolder, 22, squircleBlue)
 			ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
 				ui.Row(c).Gap(6).AlignItems(ui.Center).Children(func() {
-					ui.Text(c, locales.CommonLocal()).FontSize(12.5).FontWeight(600).SingleLine()
+					ui.Text(c, locales.CommonLocal()).FontSize(13).FontWeight(600).SingleLine()
 					diffMiniTag(c, localTag, tagBg, tagFg, "")
 					if localMeta != "" {
 						ui.Text(c, localMeta).FontSize(11).TextColor(colTextMuted).FontFeatures("tnum").SingleLine().MinWidth(0)
@@ -883,7 +883,7 @@ func (a *app) updateCompareHeader(c *ui.Context, p *library.Prepared, st *compar
 			squircleIcon(c, iconGitCommit, 22, squircleGit)
 			ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
 				ui.Row(c).Gap(6).AlignItems(ui.Center).Children(func() {
-					ui.Text(c, locales.UpdateUpstreamVersion()).FontSize(12.5).FontWeight(600).SingleLine()
+					ui.Text(c, locales.UpdateUpstreamVersion()).FontSize(13).FontWeight(600).SingleLine()
 					if short := shortCommit(it.Commit); short != "" {
 						a.commitPillLink(c, short, it.CommitURL())
 					}
@@ -907,7 +907,7 @@ func (a *app) updateCompareHeader(c *ui.Context, p *library.Prepared, st *compar
 func (a *app) commitPillLink(c *ui.Context, short, commitURL string) {
 	if commitURL == "" {
 		ui.Row(c).Height(17).Padding(0, 6).Radius(4).Background(colAccentBg).AlignItems(ui.Center).Shrink(0).Children(func() {
-			ui.Text(c, short).Font("monospace").FontSize(10.5).FontWeight(500).TextColor(colAccentText).SingleLine()
+			ui.Text(c, short).Font("monospace").FontSize(11).FontWeight(500).TextColor(colAccentText).SingleLine()
 		})
 		return
 	}
@@ -915,7 +915,7 @@ func (a *app) commitPillLink(c *ui.Context, short, commitURL string) {
 		Cursor(ui.CursorPointer).Label(short).Tooltip(locales.UpdateViewCommit(short))
 	tintSolid(b, colAccentBg)
 	b.Children(func() {
-		ui.Text(c, short).Font("monospace").FontSize(10.5).FontWeight(500).TextColor(colAccentText).SingleLine()
+		ui.Text(c, short).Font("monospace").FontSize(11).FontWeight(500).TextColor(colAccentText).SingleLine()
 	})
 	if b.Clicked() {
 		a.openExternalURL(commitURL)
@@ -947,7 +947,7 @@ func (a *app) updateCompareNotice(c *ui.Context, p *library.Prepared, st *compar
 	ui.Row(c).Shrink(0).Padding(6, 14).Gap(6).AlignItems(ui.Center).Background(bg).
 		BorderWidth(0, 0, 1, 0).BorderColor(border).Children(func() {
 		ui.Icon(c, iconWarn).Size(12, 12).TextColor(fg)
-		ui.Text(c, notice).FontSize(11.5).TextColor(fg).SingleLine().MinWidth(0)
+		ui.Text(c, notice).FontSize(12).TextColor(fg).SingleLine().MinWidth(0)
 	})
 }
 
@@ -1021,13 +1021,13 @@ func squircleIcon(c *ui.Context, ic *ui.SVG, size float32, tone [2]ui.Color) {
 func commitMeta(c *ui.Context, sha string, shaColor, iconColor ui.Color) {
 	ui.Row(c).Gap(4).AlignItems(ui.Center).Shrink(0).Children(func() {
 		ui.Icon(c, iconGitCommit).Size(13, 13).TextColor(iconColor)
-		ui.Text(c, shortCommit(sha)).Font("monospace").FontSize(11.5).FontWeight(500).TextColor(shaColor).SingleLine()
+		ui.Text(c, shortCommit(sha)).Font("monospace").FontSize(12).FontWeight(500).TextColor(shaColor).SingleLine()
 	})
 }
 
 func pillTag(c *ui.Context, text string) {
 	ui.Row(c).Height(17).Padding(0, 6).Radius(4).Background(colBgFill).AlignItems(ui.Center).Shrink(0).Children(func() {
-		ui.Text(c, text).FontSize(10.5).FontWeight(500).TextColor(colTextSecondary).FontFeatures("tnum").SingleLine()
+		ui.Text(c, text).FontSize(11).FontWeight(500).TextColor(colTextSecondary).FontFeatures("tnum").SingleLine()
 	})
 }
 

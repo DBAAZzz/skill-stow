@@ -97,7 +97,7 @@ func (a *app) importHome(c *ui.Context) {
 	if reading {
 		note = locales.ImportDownloadOnce()
 	}
-	ui.Text(c, note).FontSize(11.5).LineHeight(1.45).TextColor(colTextSecondary).Padding(7, 4, 0, 4).ContentTransition(labelTransition)
+	ui.Text(c, note).FontSize(12).LineHeight(1.45).TextColor(colTextSecondary).Padding(7, 4, 0, 4).ContentTransition(labelTransition)
 
 	rest := ui.Column(c).FillWidth()
 	if reading {
@@ -209,7 +209,7 @@ func (a *app) importClipRow(c *ui.Context) {
 		}
 		ui.Icon(c, ic).Size(15, 15).TextColor(colAccent)
 		ui.Row(c).Grow(1).MinWidth(0).Gap(8).AlignItems(ui.Baseline).Children(func() {
-			ui.Text(c, what).FontSize(12.5).SingleLine().Shrink(0)
+			ui.Text(c, what).FontSize(13).SingleLine().Shrink(0)
 			ui.Text(c, clipLabel(st.clip)).FontSize(12).TextColor(colTextSecondary).SingleLine().MinWidth(0).Shrink(1)
 		})
 		if linkButton(c, locales.ImportPasteAndRead()).Shrink(0).Clicked() {
@@ -229,7 +229,7 @@ func (a *app) importErrorRow(c *ui.Context, e *library.ImportError) {
 	importBoxRow(c, "import-error", func() {
 		ui.Image(c, symErrorDot).Size(16, 16).Shrink(0).AlignSelf(ui.Start).Margin(1, 0, 0, 0)
 		ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
-			ui.Text(c, e.Msg).FontSize(12.5).FontWeight(500).LineHeight(1.45)
+			ui.Text(c, e.Msg).FontSize(13).FontWeight(500).LineHeight(1.45)
 			if e.Hint != "" {
 				ui.Text(c, library.Sentence(e.Hint)).FontSize(12).LineHeight(1.45).TextColor(colTextSecondary)
 			}
@@ -253,14 +253,14 @@ func (a *app) importProgress(c *ui.Context) {
 			if short := shortCommit(st.prog.Commit); short != "" {
 				what = locales.ImportDownloading(st.reading, short)
 			}
-			ui.Text(c, what).FontSize(12.5).Grow(1).MinWidth(0).SingleLine().ContentTransition(labelTransition)
+			ui.Text(c, what).FontSize(13).Grow(1).MinWidth(0).SingleLine().ContentTransition(labelTransition)
 			ui.Row(c).Gap(12).Shrink(0).AlignItems(ui.Center).Children(func() {
 				if st.prog.Bytes > 0 {
-					ui.Text(c.Key("bytes"), library.HumanSize(st.prog.Bytes)).FontSize(11.5).TextColor(colTextMuted).
+					ui.Text(c.Key("bytes"), library.HumanSize(st.prog.Bytes)).FontSize(12).TextColor(colTextMuted).
 						FontFeatures("tnum").SingleLine().ContentTransition(countUp)
 				}
 				if n := len(st.prog.Found); n > 0 {
-					ui.Text(c.Key("found"), locales.ImportSkillsFound(n)).FontSize(11.5).TextColor(colTextMuted).
+					ui.Text(c.Key("found"), locales.ImportSkillsFound(n)).FontSize(12).TextColor(colTextMuted).
 						FontFeatures("tnum").SingleLine().ContentTransition(countUp)
 				}
 			})
@@ -277,7 +277,7 @@ func (a *app) importProgress(c *ui.Context) {
 		if len(st.prog.Found) > 0 {
 			ui.Row(c).Wrap().Gap(6).Children(func() {
 				for _, n := range st.prog.Found {
-					ui.Text(c.Key(n), n).FontSize(11.5).Padding(2, 7).Radius(5).Background(colBgSubtle).TextColor(colTextSecondary).
+					ui.Text(c.Key(n), n).FontSize(12).Padding(2, 7).Radius(5).Background(colBgSubtle).TextColor(colTextSecondary).
 						SingleLine().Transition(chipIn)
 				}
 			})
@@ -388,29 +388,29 @@ func (a *app) importSourceBar(c *ui.Context) {
 		BorderWidth(0, 0, 1, 0).BorderColor(colBorderDefault).Children(func() {
 		a.importSourceIcon(c, b)
 		ui.Column(c).Gap(3).MinWidth(0).Shrink(1).Children(func() {
-			ui.Text(c, b.Source.Label()).FontSize(13.5).FontWeight(600).SingleLine()
+			ui.Text(c, b.Source.Label()).FontSize(14).FontWeight(600).SingleLine()
 			ui.Row(c).Gap(4).AlignItems(ui.Center).TextColor(colTextMuted).Children(func() {
-				dot := func() { ui.Text(c, "·").FontSize(11.5).TextColor(colTextDisabled) }
+				dot := func() { ui.Text(c, "·").FontSize(12).TextColor(colTextDisabled) }
 				if b.Source.Kind == library.ImportGitHub {
 					ui.Icon(c, iconBranch).Size(11, 11)
 					ref := b.Source.Ref
 					if ref == "" {
 						ref = locales.ImportDefaultBranch()
 					}
-					ui.Text(c, ref).FontSize(11.5).SingleLine()
+					ui.Text(c, ref).FontSize(12).SingleLine()
 					dot()
-					ui.Text(c, shortCommit(b.Commit)).FontSize(11.5).Font("monospace").SingleLine()
+					ui.Text(c, shortCommit(b.Commit)).FontSize(12).Font("monospace").SingleLine()
 				} else if b.Source.Kind == library.ImportWebsite {
 					ui.Icon(c, iconGlobe).Size(11, 11)
-					ui.Text(c, "well-known "+b.Protocol).FontSize(11.5).SingleLine()
+					ui.Text(c, "well-known "+b.Protocol).FontSize(12).SingleLine()
 					dot()
-					ui.Text(c, locales.ImportWebsiteMutable()).FontSize(11.5).SingleLine().Shrink(1).MinWidth(0)
+					ui.Text(c, locales.ImportWebsiteMutable()).FontSize(12).SingleLine().Shrink(1).MinWidth(0)
 				} else {
 					ui.Icon(c, iconFolder).Size(11, 11)
-					ui.Text(c, locales.CommonLocal()).FontSize(11.5).SingleLine()
+					ui.Text(c, locales.CommonLocal()).FontSize(12).SingleLine()
 				}
 				dot()
-				ui.Text(c, locales.CommonSkillCount(len(b.Skills))).FontSize(11.5).FontFeatures("tnum").SingleLine()
+				ui.Text(c, locales.CommonSkillCount(len(b.Skills))).FontSize(12).FontFeatures("tnum").SingleLine()
 			})
 		})
 		ui.Spacer(c)
@@ -698,9 +698,9 @@ func (a *app) importTag(s *library.ImportSkill) importTagSpec {
 
 func tag(c *ui.Context, spec importTagSpec, compact bool) {
 	st := tagStyleOf(spec.tone)
-	h, padR, padL, gap, font, ico := float32(21), float32(8), float32(5.5), float32(5), float32(11.5), float32(12)
+	h, padR, padL, gap, font, ico := float32(21), float32(8), float32(5.5), float32(5), float32(12), float32(12)
 	if compact {
-		h, padR, padL, gap, font, ico = 19, 7, 5, 4, 10.5, 11
+		h, padR, padL, gap, font, ico = 19, 7, 5, 4, 11, 11
 	}
 	if spec.icon == nil && !spec.loading {
 		padL = padR
@@ -812,7 +812,7 @@ func (a *app) importRow(c *ui.Context, s *library.ImportSkill) {
 			case s.MissingDescription():
 				desc, col = locales.ImportMissingDescriptionHint(), colTextMuted
 			}
-			ui.Text(c, desc).FontSize(11.5).TextColor(col).SingleLine()
+			ui.Text(c, desc).FontSize(12).TextColor(col).SingleLine()
 		})
 		if len(s.Exec) > 0 {
 			ui.Icon(c, iconTerminal).Size(13, 13).TextColor(colTextDisabled).Margin(2, 0, 0, 0).Tooltip(locales.ImportHasExecutables(len(s.Exec)))
@@ -880,8 +880,8 @@ func (a *app) importStatusNotes(c *ui.Context, s *library.ImportSkill) {
 						if o.Replaced {
 							title = locales.ImportReplacedAt(a.lib.Display(o.Place))
 						}
-						ui.Text(c, title).FontSize(12.5).FontWeight(600).TextColor(colTextPrimary)
-						ui.Text(c, a.importedNote(s)).FontSize(11.5).LineHeight(1.45).TextColor(colTextSecondary)
+						ui.Text(c, title).FontSize(13).FontWeight(600).TextColor(colTextPrimary)
+						ui.Text(c, a.importedNote(s)).FontSize(12).LineHeight(1.45).TextColor(colTextSecondary)
 					})
 					if detailHairlineButton(c, "reveal-imported", locales.ActionShowInFinder()).Clicked() {
 						a.reveal(o.Place)
@@ -976,9 +976,9 @@ func (a *app) conflictCard(c *ui.Context, s *library.ImportSkill, existing, titl
 				img.Margin(1, 0, 0, 0)
 			}
 			ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
-				ui.Text(c, title).FontSize(12.5).FontWeight(600).TextColor(colTextPrimary)
+				ui.Text(c, title).FontSize(13).FontWeight(600).TextColor(colTextPrimary)
 				if body != "" {
-					ui.Text(c, body).FontSize(11.5).LineHeight(1.45).TextColor(colTextSecondary)
+					ui.Text(c, body).FontSize(12).LineHeight(1.45).TextColor(colTextSecondary)
 				}
 			})
 			if detailHairlineButton(c, "conflict-compare", locales.ActionCompareDifferences()).Clicked() {
@@ -1010,21 +1010,21 @@ func (a *app) conflictCard(c *ui.Context, s *library.ImportSkill, existing, titl
 		ui.Column(c).Padding(1, 14, 11, 40).Gap(3).Children(func() {
 			for _, r := range [][3]string{{locales.ImportYourCopy(), a.lib.Display(existing), mine}, {locales.ImportIncomingCopy(), theirs, meta}} {
 				ui.Row(c.Key(r[0])).Gap(10).AlignItems(ui.Center).Children(func() {
-					ui.Text(c, r[0]).FontSize(11.5).TextColor(colTextSecondary).Width(56).Shrink(0).SingleLine()
-					ui.Text(c, r[1]).FontSize(11.5).Font("monospace").TextColor(colTextBody).Grow(1).MinWidth(0).SingleLine()
+					ui.Text(c, r[0]).FontSize(12).TextColor(colTextSecondary).Width(56).Shrink(0).SingleLine()
+					ui.Text(c, r[1]).FontSize(12).Font("monospace").TextColor(colTextBody).Grow(1).MinWidth(0).SingleLine()
 					ui.Text(c, r[2]).FontSize(11).Font("monospace").TextColor(colTextMuted).Shrink(0).SingleLine()
 				})
 			}
 		})
 		switch {
 		case chk.State == library.ImportConflict && chk.Blocked != "":
-			ui.Text(c, chk.Blocked).FontSize(11.5).LineHeight(1.45).TextColor(colWarnText).Padding(0, 14, 11, 40)
+			ui.Text(c, chk.Blocked).FontSize(12).LineHeight(1.45).TextColor(colWarnText).Padding(0, 14, 11, 40)
 		case replacing:
 			ui.Column(c).Padding(0, 14, 11, 40).Gap(3).Children(func() {
-				ui.Text(c, locales.ImportReplaceTrashNote()).FontSize(11.5).TextColor(colWarnText)
+				ui.Text(c, locales.ImportReplaceTrashNote()).FontSize(12).TextColor(colWarnText)
 				for _, e := range chk.Replaces {
 					ui.Row(c.Key("trash-" + e.Path)).Gap(10).AlignItems(ui.Center).Children(func() {
-						ui.Text(c, a.lib.Display(e.Path)).FontSize(11.5).Font("monospace").TextColor(colTextBody).Grow(1).MinWidth(0).SingleLine()
+						ui.Text(c, a.lib.Display(e.Path)).FontSize(12).Font("monospace").TextColor(colTextBody).Grow(1).MinWidth(0).SingleLine()
 						if e.Link {
 							ui.Text(c, locales.ImportReplaceLinkOnly()).FontSize(11).TextColor(colTextMuted).Shrink(0).SingleLine()
 						}
@@ -1105,8 +1105,8 @@ func (a *app) importComparePage(c *ui.Context) {
 
 func compareSide(c *ui.Context, title, sub string) {
 	ui.Column(c).Padding(9, 14).Gap(2).Children(func() {
-		ui.Text(c, title).FontSize(12.5).FontWeight(600).SingleLine()
-		ui.Text(c, sub).FontSize(11.5).TextColor(colTextMuted).SingleLine()
+		ui.Text(c, title).FontSize(13).FontWeight(600).SingleLine()
+		ui.Text(c, sub).FontSize(12).TextColor(colTextMuted).SingleLine()
 	})
 }
 
@@ -1126,7 +1126,7 @@ func (a *app) dropLayer(c *ui.Context, host ui.Element) {
 					Shadow(0, 8, 24, 0, shadow(0.12)).Children(func() {
 					squircleIcon(c, iconNavFolder, 28, squircleBlue)
 					ui.Text(c, locales.ImportDropToRead()).FontSize(13).FontWeight(600)
-					ui.Text(c, locales.ImportDropReviewFirst()).FontSize(11.5).TextColor(colTextMuted)
+					ui.Text(c, locales.ImportDropReviewFirst()).FontSize(12).TextColor(colTextMuted)
 				})
 			})
 		})
@@ -1141,7 +1141,7 @@ func previewTabs(c *ui.Context, tab *int, labels ...string) {
 			if *tab == i {
 				btn.Background(colBgThumb).Shadow(0, 1, 2, 0, shadow(0.12))
 			}
-			btn.Children(func() { ui.Text(c, l).FontSize(11.5).SingleLine() })
+			btn.Children(func() { ui.Text(c, l).FontSize(12).SingleLine() })
 			if btn.Clicked() {
 				*tab = i
 			}

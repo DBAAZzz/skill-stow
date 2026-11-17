@@ -209,7 +209,7 @@ func (a *app) cardActions(c *ui.Context, s *library.Skill) {
 func cardAction(c *ui.Context, label string, color ui.Color) ui.Element {
 	b := ui.ButtonBase(c).Cursor(ui.CursorPointer).Label(label)
 	b.TextColor(tint(b, "text", color, color.Alpha(0.72), color.Alpha(0.5)))
-	b.Children(func() { ui.Text(c, label).FontSize(11.5).SingleLine() })
+	b.Children(func() { ui.Text(c, label).FontSize(12).SingleLine() })
 	return b
 }
 
@@ -302,7 +302,7 @@ func (a *app) skillImpacts(c *ui.Context, impacts []library.Impact) {
 			prev = what
 			impactRow(c.Key(i), i == 0, func() {
 				agentBadge(c, im.Agent, 15)
-				ui.Text(c, library.AgentName(im.Agent)).FontSize(12.5).FontWeight(500).Width(96).Shrink(0).SingleLine()
+				ui.Text(c, library.AgentName(im.Agent)).FontSize(13).FontWeight(500).Width(96).Shrink(0).SingleLine()
 				ui.Text(c, shown).FontSize(12).TextColor(colTextSecondary).Grow(1).MinWidth(0).SingleLine()
 			})
 		}
@@ -330,7 +330,7 @@ func (a *app) batchImpacts(c *ui.Context, skills []*library.Skill, impacts map[*
 	for _, s := range skills {
 		names = append(names, s.Name)
 	}
-	ui.Text(c, nameList(names, batchNamesShown)).FontSize(12.5).FontWeight(500).LineHeight(1.5).Margin(8, 0, 0, 0)
+	ui.Text(c, nameList(names, batchNamesShown)).FontSize(13).FontWeight(500).LineHeight(1.5).Margin(8, 0, 0, 0)
 	lost := map[string][]string{} // Agent → 少了的技能
 	var agents []string
 	for _, s := range skills {
@@ -373,7 +373,7 @@ func (a *app) batchImpacts(c *ui.Context, skills []*library.Skill, impacts map[*
 				if len(who) > batchAgentsNamed {
 					names = locales.DeleteAgentListSummary(strings.Join(who[:2], locales.ListSeparator()), len(who))
 				}
-				ui.Text(c, names).FontSize(12.5).FontWeight(500).Shrink(0).SingleLine()
+				ui.Text(c, names).FontSize(13).FontWeight(500).Shrink(0).SingleLine()
 				ui.Text(c, locales.DeleteLoses(nameList(g.lost, batchLostShown))).FontSize(12).TextColor(colTextSecondary).Grow(1).MinWidth(0).SingleLine()
 			})
 		}
@@ -623,9 +623,9 @@ func (a *app) pickBar(c *ui.Context, skills []*library.Skill) {
 	picked := a.pickedOf(skills)
 	blocked := slices.ContainsFunc(skills, func(s *library.Skill) bool { return !a.pickable(s) })
 	ui.Row(c).Shrink(0).Gap(8).Padding(12, 0, 0, 0).AlignItems(ui.Center).BorderWidth(1, 0, 0, 0).BorderColor(colBorderSubtle).Children(func() {
-		ui.Text(c, locales.CommonSelectedCount(len(picked))).FontSize(12.5).FontWeight(500).TextColor(colTextBody).SingleLine()
+		ui.Text(c, locales.CommonSelectedCount(len(picked))).FontSize(13).FontWeight(500).TextColor(colTextBody).SingleLine()
 		if blocked {
-			ui.Text(c, copiesRule()).FontSize(11.5).TextColor(colTextMuted).SingleLine().MinWidth(0).Shrink(1)
+			ui.Text(c, copiesRule()).FontSize(12).TextColor(colTextMuted).SingleLine().MinWidth(0).Shrink(1)
 		}
 		ui.Spacer(c)
 		b := ui.ButtonBase(c).Height(24).Padding(0, 12).Radius(6).Center().Background(colBgControl).TextColor(colDangerText).Label(locales.ActionDeleteEllipsis()).Disabled(len(picked) == 0)
@@ -637,6 +637,6 @@ func (a *app) pickBar(c *ui.Context, skills []*library.Skill) {
 		if b.Clicked() {
 			a.requestDelete(picked...)
 		}
-		b.Children(func() { ui.Text(c, locales.ActionDeleteEllipsis()).FontSize(12.5).SingleLine() })
+		b.Children(func() { ui.Text(c, locales.ActionDeleteEllipsis()).FontSize(13).SingleLine() })
 	})
 }

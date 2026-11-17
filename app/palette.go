@@ -414,7 +414,7 @@ func (a *app) paletteRow(c *ui.Context, it paletteItem, sel, reveal bool) ui.Ele
 				a.paletteSkillIcon(c, it.hit.Skill)
 			}
 		})
-		ui.Text(c, name).FontSize(13.5).TextColor(colTextPrimary).SingleLine().Shrink(0).MaxWidth(260)
+		ui.Text(c, name).FontSize(14).TextColor(colTextPrimary).SingleLine().Shrink(0).MaxWidth(260)
 		sub := it.hit.Snippet
 		if sel && reveal && it.act == nil {
 			sub = a.lib.Display(it.hit.Skill.Dir)
@@ -440,9 +440,9 @@ func (a *app) paletteRow(c *ui.Context, it paletteItem, sel, reveal bool) ui.Ele
 func paletteSub(c *ui.Context, s string, marks [][2]int, path bool) {
 	gray := colTextMuted
 	if path || len(marks) == 0 {
-		t := ui.Text(c, s).FontSize(12.5).TextColor(gray).SingleLine().Grow(1).Shrink(1).MinWidth(0)
+		t := ui.Text(c, s).FontSize(13).TextColor(gray).SingleLine().Grow(1).Shrink(1).MinWidth(0)
 		if path {
-			t.FontSize(11.5).Font("monospace")
+			t.FontSize(12).Font("monospace")
 		}
 		return
 	}
@@ -458,7 +458,7 @@ func paletteSub(c *ui.Context, s string, marks [][2]int, path bool) {
 	if at < len(s) {
 		spans = append(spans, ui.Span{Text: s[at:]})
 	}
-	ui.RichText(c, spans...).FontSize(12.5).TextColor(gray).SingleLine().Grow(1).Shrink(1).MinWidth(0)
+	ui.RichText(c, spans...).FontSize(13).TextColor(gray).SingleLine().Grow(1).Shrink(1).MinWidth(0)
 }
 
 // paletteSkillIcon 是技能的小图标：来源的头像，内置的是 Agent 的图标，
@@ -481,6 +481,6 @@ func (a *app) paletteSkillIcon(c *ui.Context, s *library.Skill) {
 
 // keyCap 是淡灰底的按键，如 ↵、⌘。
 func keyCap(c *ui.Context, key string) {
-	ui.Text(c, key).FontSize(11.5).TextColor(colTextSecondary).SingleLine().Shrink(0).
+	ui.Text(c, key).FontSize(12).TextColor(colTextSecondary).SingleLine().Shrink(0).
 		Height(19).MinWidth(20).Padding(0, 5).Radius(5).Background(ink(0.06)).Center()
 }

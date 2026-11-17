@@ -101,7 +101,7 @@ func (a *app) tidyPage(c *ui.Context) {
 	}, func() {
 		ui.Spacer(c)
 		if !a.tidy.scanning {
-			ui.Text(c, scannedLabel(a.set.scannedAt, time.Now())).FontSize(11.5).TextColor(colTextMuted).SingleLine()
+			ui.Text(c, scannedLabel(a.set.scannedAt, time.Now())).FontSize(12).TextColor(colTextMuted).SingleLine()
 		}
 		label := cond(a.tidy.scanning, locales.TidyRescanning(), locales.ActionDetectAgain())
 		refresh := busyButton(c, iconRefresh, label, a.tidy.scanning)
@@ -304,14 +304,14 @@ func table(c *ui.Context, cols []column, actions float32, n int, cell func(i, co
 		})
 	}
 	header := ui.Row(c).Height(28).Padding(0, 24).Gap(12).AlignItems(ui.Center).Background(colBgPane).
-		BorderWidth(0, 0, 1, 0).BorderColor(colBorderDefault).FontSize(11.5).TextColor(colTextSecondary)
+		BorderWidth(0, 0, 1, 0).BorderColor(colBorderDefault).FontSize(12).TextColor(colTextSecondary)
 	fill(header, func(j int) { ui.Text(c, cols[j].title).FontWeight(500).SingleLine() }, func() {})
 	for i := 0; i < n; i++ {
 		var key any = i
 		if style != nil && style.key != nil {
 			key = style.key(i)
 		}
-		row := ui.Row(c.Key(key)).MinHeight(36).Padding(4, 24).Gap(12).AlignItems(ui.Center).FontSize(12.5)
+		row := ui.Row(c.Key(key)).MinHeight(36).Padding(4, 24).Gap(12).AlignItems(ui.Center).FontSize(13)
 		if i%2 == 1 {
 			row.Background(colBgSubtle)
 		}
@@ -327,7 +327,7 @@ func cellText(c *ui.Context, text string) ui.Element {
 }
 
 func pathText(c *ui.Context, text string) ui.Element {
-	return ui.Text(c, text).Font("monospace").FontSize(11.5).TextColor(colTextSecondary).SingleLine().MinWidth(0)
+	return ui.Text(c, text).Font("monospace").FontSize(12).TextColor(colTextSecondary).SingleLine().MinWidth(0)
 }
 
 // agentNamed 是 Agent 图标加名称。
@@ -395,7 +395,7 @@ func (a *app) diffTable(c *ui.Context, skills []*library.Skill) {
 func (a *app) versionChip(c *ui.Context, s *library.Skill, k int) {
 	v := &s.Versions()[k]
 	ui.Row(c).Height(22).Padding(0, 8).Gap(5).Radius(6).AlignItems(ui.Center).Shrink(0).Background(colBgCard).
-		Border(1, colBorderDefault).FontSize(11.5).Children(func() {
+		Border(1, colBorderDefault).FontSize(12).Children(func() {
 		ui.Text(c, versionLetter(k)).FontWeight(600)
 		if k == 0 {
 			baseTag(c)
@@ -420,7 +420,7 @@ func (a *app) versionAgents(c *ui.Context, v *library.Version, size float32, lim
 
 func baseTag(c *ui.Context) {
 	ui.Row(c).Height(16).Padding(0, 5).Radius(4).Background(colAccentBg).AlignItems(ui.Center).Children(func() {
-		ui.Text(c, locales.CompareBaseline()).FontSize(10.5).TextColor(colAccentText).SingleLine()
+		ui.Text(c, locales.CompareBaseline()).FontSize(11).TextColor(colAccentText).SingleLine()
 	})
 }
 
@@ -553,7 +553,7 @@ func (a *app) incompleteTable(c *ui.Context, skills []*library.Skill) {
 		case 2:
 			cellText(c, s.Defects[0].String()).Shrink(1).Tooltip(defectLines(s.Defects))
 			if n := len(s.Defects) - 1; n > 0 {
-				ui.Text(c, locales.TidyMoreDefects(n)).FontSize(11.5).TextColor(colTextMuted).SingleLine().Shrink(0)
+				ui.Text(c, locales.TidyMoreDefects(n)).FontSize(12).TextColor(colTextMuted).SingleLine().Shrink(0)
 			}
 		}
 	}, func(i int) {

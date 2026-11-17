@@ -178,10 +178,10 @@ func descText(c *ui.Context, s *library.Skill) ui.Element {
 func sectionHeader(c *ui.Context, title, count string, note, right func()) {
 	ui.Row(c).Height(sectionHeaderHeight).Gap(8).AlignItems(ui.Center).Children(func() {
 		ui.Text(c, title).FontSize(14).FontWeight(600).SingleLine().Shrink(0)
-		ui.Text(c, count).FontSize(12.5).TextColor(colTextMuted).FontFeatures("tnum").SingleLine().Shrink(0)
+		ui.Text(c, count).FontSize(13).TextColor(colTextMuted).FontFeatures("tnum").SingleLine().Shrink(0)
 		if note != nil {
 			ui.Row(c).Gap(4).Margin(0, 0, 0, 4).MinWidth(0).Shrink(1).Clip().AlignItems(ui.Center).
-				FontSize(11.5).TextColor(colTextMuted).Children(note)
+				FontSize(12).TextColor(colTextMuted).Children(note)
 		}
 		ui.Spacer(c)
 		if right != nil {
@@ -208,7 +208,7 @@ func emptyState(c *ui.Context, glyph *ui.SVG, title, body string, actions func()
 			ui.Text(c, title).FontSize(17).FontWeight(600).TextColor(colTextSecondary).TextAlign(ui.Center).
 				Margin(14, 0, 0, 0)
 			if body != "" {
-				ui.Text(c, body).FontSize(12.5).LineHeight(1.5).TextColor(colTextMuted).TextAlign(ui.Center).
+				ui.Text(c, body).FontSize(13).LineHeight(1.5).TextColor(colTextMuted).TextAlign(ui.Center).
 					Margin(6, 0, 0, 0)
 			}
 			if actions != nil {
@@ -340,7 +340,7 @@ func columnHeader(c *ui.Context, header func()) {
 
 // columnTitle 是列头的标题和数量。
 func columnTitle(c *ui.Context, title string, count int) {
-	ui.Text(c, title).FontSize(12.5).FontWeight(600).SingleLine().Shrink(1).MinWidth(0)
+	ui.Text(c, title).FontSize(13).FontWeight(600).SingleLine().Shrink(1).MinWidth(0)
 	ui.Text(c, fmt.Sprint(count)).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum")
 }
 
@@ -360,8 +360,8 @@ func (a *app) boardCard(c *ui.Context, s *library.Skill, colKey string, lines in
 	}
 	a.pick(c, card, s, "board.card:"+colKey+":"+s.ID)
 	card.Children(func() {
-		ui.Text(c, s.Name).FontSize(12.5).FontWeight(500).FixedLineHeight(17).SingleLine()
-		desc := descText(c, s).FontSize(11.5).FixedLineHeight(16.5).Margin(1, 0, 0, 0)
+		ui.Text(c, s.Name).FontSize(13).FontWeight(500).FixedLineHeight(17).SingleLine()
+		desc := descText(c, s).FontSize(12).FixedLineHeight(17).Margin(1, 0, 0, 0)
 		if lines > 1 {
 			desc.MaxLines(lines)
 		} else {
@@ -424,7 +424,7 @@ func (a *app) paneHeader(c *ui.Context, s *library.Skill, originIcon *ui.SVG, me
 		} else if originIcon != nil {
 			ui.Icon(c, originIcon).Size(12, 12)
 		}
-		ui.Text(c, a.originText(s)).FontSize(11.5)
+		ui.Text(c, a.originText(s)).FontSize(12)
 	})
 }
 
@@ -470,14 +470,14 @@ func titled(c *ui.Context, title, sub string) {
 	ui.Column(c).Grow(1).MinWidth(0).Gap(titleGap).Children(func() {
 		ui.Text(c, title).FontWeight(500).SingleLine()
 		if sub != "" {
-			ui.Text(c, sub).FontSize(11.5).TextColor(colTextMuted).SingleLine()
+			ui.Text(c, sub).FontSize(12).TextColor(colTextMuted).SingleLine()
 		}
 	})
 }
 
 // caption 是框下面的一行灰色说明（.cap）。
 func caption(c *ui.Context, text string) {
-	ui.Text(c, text).FontSize(11.5).LineHeight(1.5).TextColor(colTextMuted).Margin(7, 2, 0, 2)
+	ui.Text(c, text).FontSize(12).LineHeight(1.5).TextColor(colTextMuted).Margin(7, 2, 0, 2)
 }
 
 // errorLine 是框下面的橙色错误说明。
@@ -494,7 +494,7 @@ func callout(c *ui.Context, title, body, action string) bool {
 	ui.Column(c).Margin(18, 0, 0, 0).Padding(11, 12).Radius(9).Background(colWarnBg).Border(1, colWarnEdge).Children(func() {
 		ui.Row(c).Gap(6).AlignItems(ui.Center).TextColor(colWarnText).Children(func() {
 			ui.Icon(c, iconWarn).Size(14, 14)
-			ui.Text(c, title).FontSize(12.5).FontWeight(600)
+			ui.Text(c, title).FontSize(13).FontWeight(600)
 		})
 		ui.Text(c, body).FontSize(12).LineHeight(1.5).TextColor(colTextBody).Margin(5, 0, 0, 0)
 		if action != "" {
@@ -509,7 +509,7 @@ func doneBox(c *ui.Context, title, body string) {
 	ui.Column(c).Margin(18, 0, 0, 0).Padding(11, 12).Radius(9).Background(colOKBg).Border(1, colOKEdge).Children(func() {
 		ui.Row(c).Gap(6).AlignItems(ui.Center).TextColor(colOKText).Children(func() {
 			ui.Icon(c, iconCheck).Size(14, 14)
-			ui.Text(c, title).FontSize(12.5).FontWeight(600)
+			ui.Text(c, title).FontSize(13).FontWeight(600)
 		})
 		if body != "" {
 			ui.Text(c, body).FontSize(12).LineHeight(1.5).TextColor(colTextBody).Margin(4, 0, 0, 20)
@@ -585,7 +585,7 @@ func dialog(c *ui.Context, open *bool, title, body string, content, buttons func
 		panel.Shadow(0, 24, 60, 0, shadow(0.26))
 		panel.Children(func() {
 			ui.Text(c, title).FontSize(15).FontWeight(600).FixedLineHeight(21)
-			ui.Text(c, body).FontSize(12.5).LineHeight(1.6).TextColor(colTextBody).Margin(6, 0, 0, 0)
+			ui.Text(c, body).FontSize(13).LineHeight(1.6).TextColor(colTextBody).Margin(6, 0, 0, 0)
 			content()
 			ui.Row(c).Gap(8).Justify(ui.End).Margin(18, 0, 0, 0).Children(buttons)
 		})

@@ -351,7 +351,7 @@ func (a *app) themeTile(c *ui.Context, kind, name string) {
 				})
 			}
 		})
-		t := ui.Text(c, name).FontSize(11.5).TextColor(colTextBody)
+		t := ui.Text(c, name).FontSize(12).TextColor(colTextBody)
 		if on {
 			t.TextColor(colTextPrimary).FontWeight(500)
 		}
@@ -573,7 +573,7 @@ func (a *app) projectsTab(c *ui.Context) {
 			ui.Icon(c, iconPlus).Size(13, 13)
 			ui.Text(c, locales.ActionAddFolderEllipsis()).FontSize(12).SingleLine()
 			ui.Spacer(c)
-			ui.Text(c, locales.SettingsFolderSelectionHint()).FontSize(11.5).TextColor(colTextMuted).SingleLine()
+			ui.Text(c, locales.SettingsFolderSelectionHint()).FontSize(12).TextColor(colTextMuted).SingleLine()
 		})
 		if add.Clicked() {
 			a.chooseProjects(false)
@@ -596,7 +596,7 @@ func (a *app) projectsTab(c *ui.Context) {
 	setBox(c, func() {
 		setRow(c, true).Children(func() {
 			ui.Text(c, locales.SettingsProjectDirectoriesHint()).
-				FontSize(11.5).LineHeight(1.45).TextColor(colTextMuted).Grow(1).MinWidth(0)
+				FontSize(12).LineHeight(1.45).TextColor(colTextMuted).Grow(1).MinWidth(0)
 		})
 		ui.Row(c).Wrap().Gap(6).Padding(0, 12, 12, 12).Children(func() {
 			shown := dirs
@@ -670,7 +670,7 @@ func rowText(c *ui.Context, title, sub string, mono bool) {
 		if sub == "" {
 			return
 		}
-		t := ui.Text(c, sub).FontSize(11.5).LineHeight(1.45).TextColor(colTextMuted)
+		t := ui.Text(c, sub).FontSize(12).LineHeight(1.45).TextColor(colTextMuted)
 		if mono {
 			t.Font("monospace").FontSize(11).SingleLine()
 		}
@@ -685,7 +685,7 @@ func sumRow(c *ui.Context, fn func()) {
 
 // hint 是框下面的一行灰色说明（.hint2）。
 func hint(c *ui.Context, fn func()) {
-	ui.Row(c).Margin(6, 4, 0, 4).Gap(2).AlignItems(ui.Center).FontSize(11.5).TextColor(colTextMuted).Children(fn)
+	ui.Row(c).Margin(6, 4, 0, 4).Gap(2).AlignItems(ui.Center).FontSize(12).TextColor(colTextMuted).Children(fn)
 }
 
 // pushButton 是白色的小按钮（.btn）。

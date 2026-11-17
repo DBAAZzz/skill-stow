@@ -125,7 +125,7 @@ func (a *app) infoPane(c *ui.Context, s *library.Skill, note string, noteColor u
 		n := 0
 		row := func(key string, value func()) {
 			boxRow(c.Key(key), n == 0).MinHeight(38).Children(func() {
-				ui.Text(c, key).FontSize(12.5).TextColor(colTextMuted).Width(52).Shrink(0)
+				ui.Text(c, key).FontSize(13).TextColor(colTextMuted).Width(52).Shrink(0)
 				value()
 			})
 			n++
@@ -136,10 +136,10 @@ func (a *app) infoPane(c *ui.Context, s *library.Skill, note string, noteColor u
 					ui.Row(c).Gap(6).AlignItems(ui.Center).Grow(1).MinWidth(0).Children(func() {
 						if rec.SourceType == "github" {
 							ui.Icon(c, iconGitHub).Size(14, 14).Shrink(0).TextColor(colTextPrimary).Label("GitHub")
-							ui.Text(c, rec.Source).FontSize(12.5).MinWidth(0).SingleLine()
+							ui.Text(c, rec.Source).FontSize(13).MinWidth(0).SingleLine()
 							return
 						}
-						ui.Text(c, rec.Source+" · "+rec.SourceType).FontSize(12.5).MinWidth(0).SingleLine()
+						ui.Text(c, rec.Source+" · "+rec.SourceType).FontSize(13).MinWidth(0).SingleLine()
 					})
 				})
 				if url := recordWebURL(rec); url != "" {
@@ -147,7 +147,7 @@ func (a *app) infoPane(c *ui.Context, s *library.Skill, note string, noteColor u
 				}
 				if !rec.InstalledAt.IsZero() {
 					row(locales.InspectorInstalledAt(), func() {
-						ui.Text(c, rec.InstalledAt.Format("2006-01-02")).FontSize(12.5).
+						ui.Text(c, rec.InstalledAt.Format("2006-01-02")).FontSize(13).
 							FontFeatures("tnum").Grow(1).MinWidth(0).SingleLine()
 					})
 				}
@@ -155,10 +155,10 @@ func (a *app) infoPane(c *ui.Context, s *library.Skill, note string, noteColor u
 		}
 		row(locales.CommonLocation(), func() {
 			ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
-				ui.Text(c, a.lib.Display(s.Dir)).Font("monospace").FontSize(11.5).TextColor(colTextBody).
+				ui.Text(c, a.lib.Display(s.Dir)).Font("monospace").FontSize(12).TextColor(colTextBody).
 					SingleLine().Selectable()
 				if note != "" {
-					ui.Text(c, note).FontSize(11.5).TextColor(noteColor)
+					ui.Text(c, note).FontSize(12).TextColor(noteColor)
 				}
 			})
 			// 向外的箭头表示点了会跳出去，悬停提示说清是在 Finder 中显示
@@ -213,7 +213,7 @@ func (a *app) agentToggle(c *ui.Context, s *library.Skill, ag library.Agent, fir
 			}
 		}
 		// 状态词靠右，和开关的距离每行一样
-		word := ui.Text(c, label).Width(52).TextAlign(ui.End).FontSize(11.5).TextColor(color).SingleLine()
+		word := ui.Text(c, label).Width(52).TextAlign(ui.End).FontSize(12).TextColor(color).SingleLine()
 		if st.Kind == library.StateUnsupported && !added {
 			word.Tooltip(locales.InspectorAlwaysOnTip(ag.DisplayName()))
 		}
@@ -337,14 +337,14 @@ func (a *app) projectSkillPane(c *ui.Context, s *library.Skill) {
 						where, dir = locales.InspectorGlobalScope(), a.lib.Display(r.Dir)
 					}
 					titled(c, library.AgentName(r.Agent), where)
-					ui.Text(c, dir).Font("monospace").FontSize(10.5).TextColor(colTextDisabled).SingleLine().Shrink(0)
+					ui.Text(c, dir).Font("monospace").FontSize(11).TextColor(colTextDisabled).SingleLine().Shrink(0)
 					// 读得到不等于启用：Agent 配置里关掉的要写出来
 					if st, ok := a.lib.ProjectAgentState(s, r.Agent); ok && st.Kind != library.StateEnabled {
 						color := colTextMuted
 						if st.Kind == library.StateUnknown {
 							color = colDanger
 						}
-						ui.Text(c, st.Kind.Label()).FontSize(11.5).TextColor(color).SingleLine().Shrink(0)
+						ui.Text(c, st.Kind.Label()).FontSize(12).TextColor(color).SingleLine().Shrink(0)
 					}
 				})
 			}

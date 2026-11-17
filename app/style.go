@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"runtime"
 	"strings"
@@ -246,4 +247,9 @@ func sizeLabel(n int) string {
 		return fmt.Sprintf("%.1f KB", float64(n)/1024)
 	}
 	return fmt.Sprintf("%.1f MB", float64(n)/(1<<20))
+}
+
+// wholePt 把按比例算出的字号取到整数 pt，和其它地方的字号对齐系统规范的整数档位。
+func wholePt(v float32) float32 {
+	return float32(math.Round(float64(v)))
 }

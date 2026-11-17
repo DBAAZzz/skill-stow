@@ -199,7 +199,7 @@ func countPill(c *ui.Context, matched, total int) {
 func (a *app) setFooter(c *ui.Context, coll *library.Collection, size float32, limit int) {
 	if coll.ReadOnly() {
 		agentBadge(c, coll.Provider, 14)
-		ui.Text(c, library.AgentName(coll.Provider)).FontSize(11.5).SingleLine()
+		ui.Text(c, library.AgentName(coll.Provider)).FontSize(12).SingleLine()
 		return
 	}
 	readers := a.readers()
@@ -208,7 +208,7 @@ func (a *app) setFooter(c *ui.Context, coll *library.Collection, size float32, l
 		sharedTag(c, readers, size)
 	}
 	if !a.setFractions(c, coll, size, limit) && !tag {
-		ui.Text(c, locales.CommonNotEnabled()).FontSize(11.5).TextColor(colTextDisabled)
+		ui.Text(c, locales.CommonNotEnabled()).FontSize(12).TextColor(colTextDisabled)
 	}
 }
 
@@ -233,12 +233,12 @@ func (a *app) setFractions(c *ui.Context, coll *library.Collection, size float32
 			ui.Row(c.Key(id)).AlignItems(ui.Center).Children(func() {
 				agentBadge(c, id, size)
 				if k, n := coll.EnabledIn(id), len(coll.Skills); k < n {
-					ui.Text(c, fmt.Sprintf("%d/%d", k, n)).FontSize(10.5).TextColor(colTextMuted).FontFeatures("tnum").Margin(0, 3, 0, 3).SingleLine()
+					ui.Text(c, fmt.Sprintf("%d/%d", k, n)).FontSize(11).TextColor(colTextMuted).FontFeatures("tnum").Margin(0, 3, 0, 3).SingleLine()
 				}
 			})
 		}
 		if rest := len(ids) - len(shown); rest > 0 {
-			ui.Text(c, fmt.Sprintf("+%d", rest)).FontSize(size*0.72).TextColor(colTextMuted).FontFeatures("tnum").Margin(0, 0, 0, 2)
+			ui.Text(c, fmt.Sprintf("+%d", rest)).FontSize(wholePt(size*0.72)).TextColor(colTextMuted).FontFeatures("tnum").Margin(0, 0, 0, 2)
 		}
 	})
 	return true
@@ -336,7 +336,7 @@ func (a *app) setPane(c *ui.Context, coll *library.Collection) {
 	if !coll.Installed.IsZero() {
 		meta += " · " + installedOn(coll.Installed, time.Now())
 	}
-	ui.Text(c, meta).FontSize(11.5).TextColor(colTextMuted).Margin(6, 0, 0, 0)
+	ui.Text(c, meta).FontSize(12).TextColor(colTextMuted).Margin(6, 0, 0, 0)
 
 	if coll.ReadOnly() {
 		label(c, locales.CommonEnabledFor())
@@ -380,7 +380,7 @@ func (a *app) setPane(c *ui.Context, coll *library.Collection) {
 			case library.SetPlugin:
 				how = locales.CollectionAgentPlugin(library.AgentName(coll.Provider))
 			}
-			ui.Text(c, name).FontSize(12.5).FontWeight(500).SingleLine().Selectable()
+			ui.Text(c, name).FontSize(13).FontWeight(500).SingleLine().Selectable()
 			ui.Text(c, how).Font("monospace").FontSize(11).TextColor(colTextMuted).SingleLine()
 		})
 	})
@@ -401,7 +401,7 @@ func (a *app) setSwitches(c *ui.Context, coll *library.Collection) {
 			boxRow(c.Key(ag.ID), i == 0).MinHeight(42).Children(func() {
 				agentBadge(c, ag.ID, 18)
 				ui.Text(c, ag.DisplayName()).FontWeight(500).Grow(1)
-				ui.Text(c, locales.CollectionEnabledCount(coll.EnabledIn(ag.ID), len(coll.Skills))).FontSize(11.5).TextColor(colTextMuted)
+				ui.Text(c, locales.CollectionEnabledCount(coll.EnabledIn(ag.ID), len(coll.Skills))).FontSize(12).TextColor(colTextMuted)
 			})
 		}
 	})

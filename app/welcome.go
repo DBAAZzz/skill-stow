@@ -558,7 +558,7 @@ func (a *app) welCopy(c *ui.Context, g welGeom, t, st int, ready bool) {
 			// 留给落下来的图标的一格；它本身不画，也不跟着别的东西动
 			slot := ui.Box(c.Key("brand")).Size(welBrandSize, welBrandSize)
 			a.wel.brand = slot.Bounds()
-			ui.Text(c, appDisplayName()).FontSize(12.5).FontWeight(600).TextColor(colTextSecondary).SingleLine().
+			ui.Text(c, appDisplayName()).FontSize(13).FontWeight(600).TextColor(colTextSecondary).SingleLine().
 				AnimatePose(welShow(on, 0, 900, 600))
 		})
 		ui.Text(c, locales.WelcomeScattered()).FontSize(30).FontWeight(700).TextColor(colTextPrimary).SingleLine().
@@ -624,8 +624,8 @@ func welDustView(c *ui.Context, g welGeom, t, st int) {
 		}
 		card := welCardFace(c, "dust:"+d.name).ZIndex(1).Blur(2.5*g.s).AnimatePose(pose, anim)
 		card.Children(func() {
-			ui.Text(c, d.name).FontSize(13.5).FontWeight(600).TextColor(colTextPrimary).SingleLine()
-			ui.Text(c, welDesc(d.name)).FontSize(11.5).TextColor(colTextSecondary).SingleLine().Margin(4, 0, 0, 0)
+			ui.Text(c, d.name).FontSize(14).FontWeight(600).TextColor(colTextPrimary).SingleLine()
+			ui.Text(c, welDesc(d.name)).FontSize(12).TextColor(colTextSecondary).SingleLine().Margin(4, 0, 0, 0)
 		})
 	}
 }
@@ -727,9 +727,9 @@ func (a *app) welCardView(c *ui.Context, g welGeom, n, t, st int, w, h float32) 
 	fade := ui.Animation{Duration: 300 * time.Millisecond}
 	card.Children(func() {
 		ui.Column(c).Opacity(dim).Children(func() {
-			name := ui.Text(c, wc.name).FontSize(13.5).FontWeight(600).SingleLine()
+			name := ui.Text(c, wc.name).FontSize(14).FontWeight(600).SingleLine()
 			name.TextColor(name.AnimateColor("c", title, fade))
-			line := ui.Text(c, welDesc(wc.name)).FontSize(11.5).SingleLine().Margin(4, 0, 0, 0)
+			line := ui.Text(c, welDesc(wc.name)).FontSize(12).SingleLine().Margin(4, 0, 0, 0)
 			line.TextColor(line.AnimateColor("c", desc, fade))
 		})
 		ui.Row(c).Absolute().Left(13).Right(13).Bottom(11).AlignItems(ui.Center).Opacity(dim).Children(func() {
@@ -762,7 +762,7 @@ func welCardFoot(c *ui.Context, n, t, st int, settled, dead bool) {
 		pill := ui.Row(c).Height(18).Padding(0, 7).Radius(9).AlignItems(ui.Center).Background(colAccentBg).
 			AnimatePose(welPop(settled && st < 0, 360))
 		pill.Children(func() {
-			ui.Text(c, locales.WelcomeMerged(len(ids))).FontSize(10.5).FontWeight(600).TextColor(colAccentText).
+			ui.Text(c, locales.WelcomeMerged(len(ids))).FontSize(11).FontWeight(600).TextColor(colAccentText).
 				FontFeatures("tnum").SingleLine()
 		})
 	case wc.name == welBrokenName:
@@ -772,7 +772,7 @@ func welCardFoot(c *ui.Context, n, t, st int, settled, dead bool) {
 		}
 		ui.Row(c).Gap(4).AlignItems(ui.Center).TextColor(colDangerText).AnimatePose(pose, anim).Children(func() {
 			ui.Icon(c, issueIcons[library.BrokenLinks].glyph).Size(12, 12)
-			ui.Text(c, locales.WelcomeBroken()).FontSize(10.5).FontWeight(600).SingleLine()
+			ui.Text(c, locales.WelcomeBroken()).FontSize(11).FontWeight(600).SingleLine()
 		})
 	}
 }

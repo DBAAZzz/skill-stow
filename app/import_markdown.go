@@ -67,7 +67,7 @@ func detailHairlineButton(c *ui.Context, key, label string) ui.Element {
 		Center().Shrink(0).Cursor(ui.CursorPointer).Label(label)
 	styleHairlineButton(btn)
 	return btn.Children(func() {
-		ui.Text(c, label).FontSize(11.5).FontWeight(500).TextColor(colTextPrimary).SingleLine()
+		ui.Text(c, label).FontSize(12).FontWeight(500).TextColor(colTextPrimary).SingleLine()
 	})
 }
 
@@ -92,7 +92,7 @@ func importRawToggle(c *ui.Context, raw *bool) {
 	}
 	btn.Children(func() {
 		ui.Icon(c, iconCode).Size(12, 12).TextColor(fg)
-		ui.Text(c, label).FontSize(11.5).FontWeight(500).TextColor(fg).SingleLine()
+		ui.Text(c, label).FontSize(12).FontWeight(500).TextColor(fg).SingleLine()
 	})
 	if btn.Clicked() {
 		*raw = !*raw
@@ -215,8 +215,8 @@ func (a *app) importInspectorGroup(c *ui.Context, s *library.ImportSkill, files 
 			for _, f := range extra {
 				insetGroupRow(c, "fm-"+f.Key, rowIdx == 0, 40, func() {
 					ui.Icon(c, iconDoc).Size(16, 16).TextColor(colTextDisabled).Shrink(0)
-					ui.Text(c, f.Key).FontSize(11.5).Font("monospace").TextColor(colTextMuted).Width(96).Shrink(0).SingleLine()
-					ui.Text(c, f.Value).FontSize(12.5).LineHeight(1.45).TextColor(colTextPrimary).Grow(1).MinWidth(0)
+					ui.Text(c, f.Key).FontSize(12).Font("monospace").TextColor(colTextMuted).Width(96).Shrink(0).SingleLine()
+					ui.Text(c, f.Value).FontSize(13).LineHeight(1.45).TextColor(colTextPrimary).Grow(1).MinWidth(0)
 				})
 				rowIdx++
 			}
@@ -235,10 +235,10 @@ func skillFrontmatterCard(c *ui.Context, fields []library.SkillField) {
 		for _, f := range tools {
 			insetGroupRow(c, "fm-tool-"+f.Key, rowIdx == 0, 40, func() {
 				ui.Icon(c, iconTerminal).Size(16, 16).TextColor(colWarnText).Shrink(0)
-				ui.Text(c, f.Key).FontSize(11.5).Font("monospace").TextColor(colWarnText).Width(96).Shrink(0).SingleLine()
+				ui.Text(c, f.Key).FontSize(12).Font("monospace").TextColor(colWarnText).Width(96).Shrink(0).SingleLine()
 				ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
 					ui.Text(c, f.Value).FontSize(12).FontWeight(500).Font("monospace").TextColor(colWarnText)
-					ui.Text(c, locales.ImportCommandsAllowed()).FontSize(11.5).TextColor(colWarnText)
+					ui.Text(c, locales.ImportCommandsAllowed()).FontSize(12).TextColor(colWarnText)
 				})
 			})
 			rowIdx++
@@ -246,8 +246,8 @@ func skillFrontmatterCard(c *ui.Context, fields []library.SkillField) {
 		for _, f := range extra {
 			insetGroupRow(c, "fm-"+f.Key, rowIdx == 0, 40, func() {
 				ui.Icon(c, iconDoc).Size(16, 16).TextColor(colTextDisabled).Shrink(0)
-				ui.Text(c, f.Key).FontSize(11.5).Font("monospace").TextColor(colTextMuted).Width(96).Shrink(0).SingleLine()
-				v := ui.Text(c, f.Value).FontSize(12.5).LineHeight(1.45).TextColor(colTextPrimary).Grow(1).MinWidth(0)
+				ui.Text(c, f.Key).FontSize(12).Font("monospace").TextColor(colTextMuted).Width(96).Shrink(0).SingleLine()
+				v := ui.Text(c, f.Value).FontSize(13).LineHeight(1.45).TextColor(colTextPrimary).Grow(1).MinWidth(0)
 				if f.Key == "description" {
 					v.TextColor(colTextSecondary).MaxLines(2)
 				}
@@ -363,7 +363,7 @@ func skillCodeBlock(c *ui.Context, cb *markdown.CodeBlockView) {
 		cb.Body(c)
 		if cb.Language != "" {
 			ui.Text(c, cb.Language).
-				Font("monospace").FontSize(10.5).TextColor(colTextDisabled).Unselectable().
+				Font("monospace").FontSize(11).TextColor(colTextDisabled).Unselectable().
 				Background(colBgSubtle.Alpha(0.9)).Padding(1, 4).Radius(3).
 				Absolute().Top(8).Right(12)
 		}
