@@ -17,8 +17,8 @@ import (
 )
 
 var ErrUpdateChanged = textErr(locales.UpdateChanged)
-var ErrUnsupportedFiles = textErr(locales.UpdateUnsupportedFiles)
-var ErrSkillRenamed = textErr(locales.UpdateSkillRenamed)
+var ErrUnsupportedFiles = noteErr(noteUnsupportedFiles)
+var ErrSkillRenamed = noteErr(noteSkillRenamed)
 
 type Prepared struct {
 	Item   UpdateItem
@@ -57,7 +57,7 @@ func (l *Library) prepareUpdate(ctx context.Context, remote Remote, it UpdateIte
 			for i := range l.updates.Check.Skills {
 				s := &l.updates.Check.Skills[i]
 				if s.Name == it.Name && s.Source == it.Source && s.Upstream == it.Upstream && sameEntry(s.Recorded, it.Record.Raw) {
-					s.Blocked, s.Reason = state, err.Error()
+					s.block(state, err)
 				}
 			}
 			err = errors.Join(err, l.updates.save(l.Home))
@@ -443,7 +443,7 @@ func (l *Library) validateSnapshotWith(fresh *Library, it UpdateItem) error {
 		return ErrUpdateChanged
 	}
 	for _, r := range check.Repos {
-		if r.Source != it.Source || !r.Done || r.Fail != "" {
+		if r.Source != it.Source || !r.Done || r.failure() != nil {
 			continue
 		}
 		if r.Commit == it.Commit {

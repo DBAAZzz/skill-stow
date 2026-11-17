@@ -231,15 +231,29 @@ type repoResult struct {
 	Commit     string    `json:"commit,omitempty"`
 	CommitDate time.Time `json:"commitDate,omitempty"`
 	At         time.Time `json:"at"`
-	Done       bool      `json:"done"`            // 这一次查完了（成功或明确失败）
-	Fail       string    `json:"fail,omitempty"`  // 失败原因
-	Reset      time.Time `json:"reset,omitempty"` // 额度恢复时间
+	Done       bool      `json:"done"`              // 这一次查完了（成功或明确失败）
+	Fail       string    `json:"fail,omitempty"`    // 失败原因的原话，给旧版本读；这一版看 failure()
+	Failure    *Note     `json:"failure,omitempty"` // 失败原因
+	Reset      time.Time `json:"reset,omitempty"`   // 额度恢复时间
+}
+
+// failure 是这个仓库没查成的原因，nil 是查成了。旧版本只存了原话：失败时
+// 带着恢复时间的只有额度用完，按它说；其余认不出种类，原样显示。
+func (r repoResult) failure() *Note {
+	switch {
+	case r.Failure != nil:
+		return r.Failure
+	case r.Fail != "" && !r.Reset.IsZero():
+		return &Note{Kind: noteGitHubQuota, Reset: r.Reset}
+	}
+	return legacyNote(r.Fail)
 }
 
 // skillUpdates 是一条安装记录在上游查到的情况。
 type skillUpdates struct {
 	Blocked    UpdateState `json:"blocked,omitempty"`
-	Reason     string      `json:"reason,omitempty"`
+	Reason     string      `json:"reason,omitempty"` // 拦下原因的原话，给旧版本读；这一版看 blockedBy()
+	Why        *Note       `json:"why,omitempty"`    // 拦下的原因
 	Recorded   string      `json:"recorded"`
 	Files      []TreeEntry `json:"files,omitempty"`
 	Name       string      `json:"name"`
@@ -249,8 +263,37 @@ type skillUpdates struct {
 	CommitDate time.Time   `json:"commitDate,omitempty"`
 	Upstream   string      `json:"upstream,omitempty"` // 上游这个目录的 tree 哈希
 	Found      upFound     `json:"found"`
-	Fail       string      `json:"fail,omitempty"`
-	Base       string      `json:"base,omitempty"` // 推导出的安装基线（可能是基线未知时为空）
+	Fail       string      `json:"fail,omitempty"`    // 失败原因的原话，给旧版本读；这一版看 failure()
+	Failure    *Note       `json:"failure,omitempty"` // 失败原因
+	Base       string      `json:"base,omitempty"`    // 推导出的安装基线（可能是基线未知时为空）
+}
+
+// blockedBy 是这条为什么被拦下（Blocked 非空时）。
+func (s skillUpdates) blockedBy() Note {
+	if s.Why != nil {
+		return *s.Why
+	}
+	return Note{Detail: s.Reason}
+}
+
+// block 记下这条被拦成 state 及原因；原话一并写给旧版本。
+func (s *skillUpdates) block(state UpdateState, err error) {
+	n := noteOf(err)
+	s.Blocked, s.Reason, s.Why = state, err.Error(), &n
+}
+
+// failure 是这条没查成的原因，nil 是查成了。
+func (s skillUpdates) failure() *Note {
+	if s.Failure != nil {
+		return s.Failure
+	}
+	return legacyNote(s.Fail)
+}
+
+// fail 记下没查成的原因；原话一并写给旧版本。
+func (s *skillUpdates) fail(err error) {
+	n := noteOf(err)
+	s.Fail, s.Failure = err.Error(), &n
 }
 
 // upFound 是上游有没有这个技能。

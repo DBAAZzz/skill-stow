@@ -159,8 +159,8 @@ func (a *app) updateBody(c *ui.Context, width float32) {
 			if st.err != "" {
 				errorLine(c, st.err)
 			}
-			if st.report.ReadOnly != "" {
-				errorLine(c, st.report.ReadOnly)
+			if !st.report.ReadOnly.IsZero() {
+				errorLine(c, st.report.ReadOnly.String())
 			}
 			ui.Column(c).Grow(1).Padding(24, 24, 72, 24).Center().Gap(10).Children(func() {
 				ui.Column(c).Size(44, 44).Radius(22).Background(colAccentBg).Center().Children(func() {
@@ -182,8 +182,8 @@ func (a *app) updateBody(c *ui.Context, width float32) {
 				if st.err != "" {
 					errorLine(c, st.err)
 				}
-				if st.report.ReadOnly != "" {
-					errorLine(c, st.report.ReadOnly)
+				if !st.report.ReadOnly.IsZero() {
+					errorLine(c, st.report.ReadOnly.String())
 				}
 				if st.group == "" {
 					a.updateSummarySection(c)
@@ -579,28 +579,28 @@ func (a *app) updateReasonInfo(it library.UpdateItem) (string, ui.Color, string)
 		if !it.CommitDate.IsZero() {
 			return formatCommitTime(it.CommitDate), colTextSecondary, it.Commit
 		}
-		return it.Reason, colTextSecondary, it.Commit
+		return it.Reason.String(), colTextSecondary, it.Commit
 	case library.UpdBoth:
 		if !it.CommitDate.IsZero() {
 			return locales.UpdateLocalAndUpstreamChanged(formatCommitTime(it.CommitDate)), colWarnText, it.Commit
 		}
-		return it.Reason, colWarnText, it.Commit
+		return it.Reason.String(), colWarnText, it.Commit
 	case library.UpdUnknownBase:
-		return it.Reason, colWarnText, it.Commit
+		return it.Reason.String(), colWarnText, it.Commit
 	case library.UpdIgnored:
 		if it.Commit != "" {
 			return locales.UpdateKeepingLocal(), colTextSecondary, it.Commit
 		}
-		return it.Reason, colTextSecondary, ""
+		return it.Reason.String(), colTextSecondary, ""
 	case library.UpdCopies:
 		if s := a.lib.Get(it.Name); s != nil && !s.Identical() {
 			return locales.UpdateDifferentCopiesNeedMerge(), colWarnText, ""
 		}
-		return it.Reason, colWarnText, ""
+		return it.Reason.String(), colWarnText, ""
 	case library.UpdFailed:
-		return it.Reason, colDangerText, ""
+		return it.Reason.String(), colDangerText, ""
 	default:
-		return it.Reason, colTextSecondary, ""
+		return it.Reason.String(), colTextSecondary, ""
 	}
 }
 
@@ -618,13 +618,13 @@ func (a *app) updateSourceRow(c *ui.Context, it library.UpdateItem, first bool) 
 			case library.UpdWebsite:
 				if it.RecordIncomplete {
 					title = it.Name
-					sub = []string{it.Source.Repo, it.Reason}
+					sub = []string{it.Source.Repo, it.Reason.String()}
 				} else {
 					title = it.Source.Repo
 					sub = []string{locales.UpdateWellKnownSource()}
 				}
 			default:
-				sub = []string{it.Source.Type, it.Reason}
+				sub = []string{it.Source.Type, it.Reason.String()}
 			}
 			ui.Row(c).Gap(7).AlignItems(ui.Center).MinWidth(0).Children(func() {
 				titleURL := ""

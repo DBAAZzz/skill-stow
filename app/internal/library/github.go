@@ -85,23 +85,26 @@ type RemoteError struct {
 	Err    error
 }
 
-func (e *RemoteError) Error() string {
+func (e *RemoteError) Error() string { return e.note().String() }
+
+// note 是这种失败的说明，存进检查结果后切换语言也跟着换。
+func (e *RemoteError) note() Note {
 	switch e.Kind {
 	case RemoteQuota:
-		return locales.UpdateGitHubQuota(e.Reset.Local().Format("15:04"))
+		return Note{Kind: noteGitHubQuota, Reset: e.Reset}
 	case RemoteThrottled:
-		return locales.UpdateGithubRateLimited()
+		return note(noteGitHubThrottled)
 	case RemoteNotFound:
-		return locales.UpdateGithubRepositoryUnavailable()
+		return note(noteGitHubNotFound)
 	case RemoteNetwork:
-		return locales.UpdateGithubConnectionFailed()
+		return note(noteGitHubNetwork)
 	case RemoteAuth:
-		return locales.UpdateGithubCredentialsExpired()
+		return note(noteGitHubAuth)
 	}
 	if e.Status != 0 {
-		return locales.UpdateGithubStatusError(e.Status)
+		return Note{Kind: noteGitHubStatus, Status: e.Status}
 	}
-	return locales.UpdateGithubInvalidResponse()
+	return note(noteGitHubInvalidReply)
 }
 
 func (e *RemoteError) Unwrap() error { return e.Err }

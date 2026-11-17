@@ -104,7 +104,8 @@ type UpdateItem struct {
 	Source                        SourceID
 	Path, Place                   string
 	State                         UpdateState
-	Reason, Command               string
+	Reason                        Note `json:"-"` // 每次按本机内容和检查结果重新推导，不存
+	Command                       string
 	Local, Base, Upstream, Commit string
 	CommitDate, CheckedAt, Reset  time.Time
 	Stale, ReadOnly               bool
@@ -254,7 +255,7 @@ type UpdateReport struct {
 	Complete bool
 	Eligible int
 	Reset    time.Time
-	ReadOnly string
+	ReadOnly Note // 非空时更新状态只能看：为什么
 }
 
 func (r UpdateReport) Count() int {
@@ -346,10 +347,10 @@ func (l *Library) Updates() UpdateReport {
 	// 没有安装记录文件时没有要按它更新的条目；应用记录的条目不受它影响
 	recordsBad := l.recordsErr != nil || (l.records != nil && l.records.Writable() != nil)
 	if recordsBad {
-		rep.ReadOnly = ErrRecordUnusable.Error()
+		rep.ReadOnly = note(noteRecordUnusable)
 	}
 	if l.updatesErr != nil {
-		rep.ReadOnly = locales.UpdateStateUnreadable(l.updatesErr.Error())
+		rep.ReadOnly = Note{Kind: noteStateUnreadable, Detail: l.updatesErr.Error()}
 	}
 	if st.Check != nil {
 		rep.Checked, rep.Complete = st.Check.At, st.Check.Complete
@@ -357,12 +358,12 @@ func (l *Library) Updates() UpdateReport {
 	for _, tx := range st.Transactions {
 		it := tx.Item
 		it.State = UpdPending
-		it.Reason = locales.UpdatePreviousUnfinished()
+		it.Reason = note(notePreviousUnfinished)
 		if tx.Status == "complete" {
-			it.Reason = locales.UpdateOldVersionCleanupPending()
+			it.Reason = note(noteCleanupPending)
 		}
 		if tx.Status == "retained" {
-			it.Reason = locales.UpdateRecoveryStoppedFilesKept()
+			it.Reason = note(noteRecoveryStopped)
 		}
 		it.Retained = tx.Stage
 		it.Transaction = tx.ID
@@ -412,7 +413,7 @@ func (l *Library) Updates() UpdateReport {
 	return rep
 }
 func (l *Library) localUpdate(e LockEntry) (UpdateItem, bool) {
-	it := UpdateItem{Name: e.Name, Names: []string{e.Name}, Source: sourceOf(e), Path: skillDir(e.SkillPath), Place: l.placeOf(e), Record: e, State: UpdUnchecked, Reason: locales.UpdateNotChecked()}
+	it := UpdateItem{Name: e.Name, Names: []string{e.Name}, Source: sourceOf(e), Path: skillDir(e.SkillPath), Place: l.placeOf(e), Record: e, State: UpdUnchecked, Reason: note(noteNotChecked)}
 	if !filepath.IsLocal(e.Name) || filepath.Base(e.Name) != e.Name {
 		return it, false
 	}
@@ -425,43 +426,43 @@ func (l *Library) localUpdate(e LockEntry) (UpdateItem, bool) {
 		if !l.hasSkill(e.Name) {
 			return it, false
 		}
-		it.State, it.Reason = UpdMovedOut, locales.UpdateMissingFromLibrary()
+		it.State, it.Reason = UpdMovedOut, note(noteMissingFromLibrary)
 		return it, true
 	}
 	if e.SourceType != "github" {
-		it.State, it.Reason = UpdUnsupported, locales.UpdateSourceUnsupported()
+		it.State, it.Reason = UpdUnsupported, note(noteSourceUnsupported)
 		if e.SourceType == "well-known" {
-			it.State, it.Reason = UpdWebsite, locales.UpdateNotAutomatic()
+			it.State, it.Reason = UpdWebsite, note(noteNotAutomatic)
 			if e.Source == "agent.qq.com" && e.SourceBaseURL == "" {
-				it.Reason, it.RecordIncomplete = locales.UpdateIncompleteInstallRecord(), true
+				it.Reason, it.RecordIncomplete = note(noteIncompleteRecord), true
 				it.Command = "npx skills add https://agent.qq.com -g -y"
 			}
 		}
 		return it, true
 	}
 	if l.updateState().stopped(it.Source, it.Place) {
-		it.State, it.Reason = UpdStopped, locales.UpdateChecksStopped()
+		it.State, it.Reason = UpdStopped, note(noteChecksStopped)
 		return it, true
 	}
 	if err != nil {
-		it.State, it.Reason = UpdFailed, err.Error()
+		it.State, it.Reason = UpdFailed, Note{Detail: err.Error()}
 		return it, true
 	}
 	if fi.Mode()&os.ModeSymlink != 0 || !fi.IsDir() || exists(filepath.Join(it.Place, ".git")) {
-		it.State, it.Reason = UpdLocation, locales.UpdateLocationUnsupported()
+		it.State, it.Reason = UpdLocation, note(noteLocationUnsupported)
 		return it, true
 	}
 	if s := l.Get(e.Name); s != nil && s.Copies > 0 && l.untrackedCopies(s, it.Place) > 0 {
-		it.State, it.Reason = UpdCopies, locales.UpdateIndependentCopiesNeedMerge()
+		it.State, it.Reason = UpdCopies, note(noteCopiesNeedMerge)
 		return it, true
 	}
 	if e.SkillPath == "" || len(strings.Split(e.Source, "/")) != 2 {
-		it.State, it.Reason = UpdFailed, locales.UpdateInstallSourcePathMissing()
+		it.State, it.Reason = UpdFailed, note(noteSourcePathMissing)
 		return it, true
 	}
 	it.Local, err = TreeHash(it.Place)
 	if err != nil {
-		it.State, it.Reason = UpdFailed, locales.UpdateLocalUnreadable(err.Error())
+		it.State, it.Reason = UpdFailed, Note{Kind: noteLocalUnreadable, Detail: err.Error()}
 	}
 	return it, true
 }
@@ -479,31 +480,31 @@ func (l *Library) classifyUpdate(it *UpdateItem, r repoResult, s skillUpdates) {
 		it.Base = b
 	}
 	switch {
-	case r.Fail != "":
-		it.State, it.Reason = UpdFailed, r.Fail
+	case r.failure() != nil:
+		it.State, it.Reason = UpdFailed, *r.failure()
 	case s.Blocked != "":
-		it.State, it.Reason = s.Blocked, s.Reason
-	case s.Fail != "":
-		it.State, it.Reason = UpdFailed, s.Fail
+		it.State, it.Reason = s.Blocked, s.blockedBy()
+	case s.failure() != nil:
+		it.State, it.Reason = UpdFailed, *s.failure()
 	case s.Found == foundRemoved:
-		it.State, it.Reason = UpdRemoved, locales.UpdateUpstreamSkillRemoved()
+		it.State, it.Reason = UpdRemoved, note(noteUpstreamRemoved)
 	case s.Found == foundMoved:
-		it.State, it.Reason = UpdRelocated, locales.UpdateUpstreamPathChanged()
+		it.State, it.Reason = UpdRelocated, note(noteUpstreamMoved)
 	case s.Found == foundAmbiguous:
-		it.State, it.Reason = UpdAmbiguous, locales.UpdateUpstreamNameAmbiguous()
+		it.State, it.Reason = UpdAmbiguous, note(noteUpstreamAmbiguous)
 	case it.Local == it.Upstream:
-		it.State, it.Reason = UpdLatest, locales.UpdateAlreadyCurrent()
+		it.State, it.Reason = UpdLatest, note(noteAlreadyCurrent)
 	case it.Base == "":
-		it.State, it.Reason = UpdUnknownBase, locales.UpdateBaselineUnknown()
+		it.State, it.Reason = UpdUnknownBase, note(noteBaselineUnknown)
 	case it.Base == it.Upstream:
-		it.State, it.Reason = UpdLocalOnly, locales.UpdateLocalChangesOnly()
+		it.State, it.Reason = UpdLocalOnly, note(noteLocalChangesOnly)
 	case it.Local == it.Base:
-		it.State, it.Reason = UpdReady, locales.UpdateAvailable()
+		it.State, it.Reason = UpdReady, note(noteAvailable)
 	default:
-		it.State, it.Reason = UpdBoth, locales.UpdateLocalAndUpstreamChanges()
+		it.State, it.Reason = UpdBoth, note(noteBothChanged)
 	}
 	if (it.State == UpdBoth || it.State == UpdUnknownBase) && l.updates.ignored(it.Source, it.Path, it.Place, l.Root, it.Upstream) {
-		it.State, it.Reason = UpdIgnored, locales.UpdateLocalVersionKept()
+		it.State, it.Reason = UpdIgnored, note(noteLocalVersionKept)
 	}
 }
 
@@ -587,7 +588,7 @@ func (l *Library) CheckUpdates(ctx context.Context, remote Remote, progress func
 			check.Skills = slices.DeleteFunc(check.Skills, func(s skillUpdates) bool { return s.Source == res.repo.Source })
 			check.Skills = append(check.Skills, res.skills...)
 		}
-		if res.repo.Fail != "" || !res.repo.Done {
+		if res.repo.failure() != nil || !res.repo.Done {
 			check.Complete = false
 		}
 		if !res.repo.Reset.IsZero() {
@@ -620,7 +621,7 @@ func (l *Library) checkRepo(ctx context.Context, remote Remote, src SourceID, it
 		tree, err = remote.Tree(ctx, src.Repo, c.SHA)
 	}
 	if err == nil && tree.Truncated {
-		err = errors.New(locales.UpdateRepositoryTreeTruncated())
+		err = noteErr(noteTreeTruncated)
 	}
 	if ctx.Err() != nil {
 		return r, nil
@@ -628,7 +629,8 @@ func (l *Library) checkRepo(ctx context.Context, remote Remote, src SourceID, it
 	r.Done = true
 	r.Commit, r.CommitDate = c.SHA, c.Date
 	if err != nil {
-		r.Fail = err.Error()
+		n := noteOf(err)
+		r.Fail, r.Failure = err.Error(), &n
 		var re *RemoteError
 		if errors.As(err, &re) && re.Kind == RemoteQuota {
 			r.Reset = re.Reset
@@ -651,7 +653,7 @@ func (l *Library) checkRepo(ctx context.Context, remote Remote, src SourceID, it
 			s.Found, s.Upstream, s.Files = locateSkill(tree, c.Tree, it.Path, it.Name)
 			if s.Found == foundSame {
 				if e := validTreeFiles(s.Files, it.Path); e != nil {
-					s.Fail = e.Error()
+					s.fail(e)
 				}
 				if b, ok := l.updateState().baseline(src, it.Path, it.Place, it.Record.SkillFolderHash); ok {
 					s.Base = b
@@ -728,7 +730,7 @@ func validTreeFiles(files []TreeEntry, dir string) error {
 	var size int64
 	seen := map[string]bool{}
 	if len(files) > 2000 {
-		return errors.New(locales.UpdateTooManyFiles())
+		return noteErr(noteTooManyFiles)
 	}
 	for _, e := range files {
 		rel := strings.TrimPrefix(e.Path, dir+"/")
@@ -736,22 +738,22 @@ func validTreeFiles(files []TreeEntry, dir string) error {
 			rel = e.Path
 		}
 		if !filepath.IsLocal(rel) || strings.Contains(rel, `\`) || path.Clean(rel) != rel || rel == "." {
-			return errors.New(locales.UpdateInvalidUpstreamPath())
+			return noteErr(noteInvalidUpstreamPath)
 		}
 		key := strings.ToLower(rel)
 		if seen[key] {
-			return errors.New(locales.UpdateUpstreamFilenameConflict())
+			return noteErr(noteFilenameConflict)
 		}
 		seen[key] = true
 		if e.Type != "blob" || e.Mode != "100644" && e.Mode != "100755" {
-			return errors.New(locales.UpdateUnsupportedFiles())
+			return noteErr(noteUnsupportedFiles)
 		}
 		if e.Size < 0 || e.Size > maxFileBytes {
-			return errors.New(locales.UpdateSingleFileTooLarge())
+			return noteErr(noteSingleFileTooLarge)
 		}
 		size += e.Size
 		if size > maxSkillBytes {
-			return errors.New(locales.UpdateSkillTooLarge())
+			return noteErr(noteSkillTooLarge)
 		}
 	}
 	return nil

@@ -161,7 +161,7 @@ func TestASkillMovedOutOfTheLibraryIsExplainedNotUpdated(t *testing.T) {
 	writeRecords(t, h, gh("kami", "tw93/kami", "SKILL.md", strings.Repeat("1", 40)), gh("dbs", "x/dbskill", "dbs/SKILL.md", strings.Repeat("2", 40)))
 	_, rep := checkNow(t, home, r)
 	it := itemNamed(t, rep, "kami")
-	if it.State != UpdMovedOut || !strings.Contains(it.Reason, "技能库中找不到") {
+	if it.State != UpdMovedOut || !strings.Contains(it.Reason.String(), "技能库中找不到") {
 		t.Errorf("kami = %+v", it)
 	}
 	for _, it := range rep.Items {
@@ -178,7 +178,7 @@ func TestASkillRemovedUpstreamIsLeftAlone(t *testing.T) {
 	home, h, r, _ := viteHome(t)
 	r.publish(t, "antfu/skills", map[string]string{"skills/other/SKILL.md": skillMD("other", "")})
 	_, rep := checkNow(t, home, r)
-	if it := itemNamed(t, rep, "vite"); it.State != UpdRemoved || it.Reason != "上游仓库已移除该技能" {
+	if it := itemNamed(t, rep, "vite"); it.State != UpdRemoved || it.Reason.String() != "上游仓库已移除该技能" {
 		t.Errorf("vite = %+v", it)
 	}
 	if _, err := os.Stat(h(".agents/skills/vite/SKILL.md")); err != nil {
@@ -205,7 +205,7 @@ func TestOfflineChecksFailWithoutClaimingRemovals(t *testing.T) {
 	r.fail["antfu/skills"] = &RemoteError{Kind: RemoteNetwork}
 	_, rep := checkNow(t, home, r)
 	it := itemNamed(t, rep, "vite")
-	if it.State != UpdFailed || it.Reason != "连不上 GitHub" {
+	if it.State != UpdFailed || it.Reason.String() != "连不上 GitHub" {
 		t.Errorf("vite = %+v", it)
 	}
 	if rep.Complete {
@@ -219,7 +219,7 @@ func TestATruncatedTreeIsACheckFailure(t *testing.T) {
 	c.tree.Truncated = true
 	c.tree.Entries = nil
 	_, rep := checkNow(t, home, r)
-	if it := itemNamed(t, rep, "vite"); it.State != UpdFailed || it.Reason != "仓库太大，目录树被截断" {
+	if it := itemNamed(t, rep, "vite"); it.State != UpdFailed || it.Reason.String() != "仓库太大，目录树被截断" {
 		t.Errorf("vite = %+v", it)
 	}
 }
@@ -228,7 +228,7 @@ func TestUnsupportedUpstreamFilesBlockTheUpdate(t *testing.T) {
 	home, _, r, _ := viteHome(t)
 	r.publish(t, "antfu/skills", map[string]string{"skills/vite/SKILL.md": skillMD("vite", "v3"), "skills/vite/l": "->SKILL.md"})
 	_, rep := checkNow(t, home, r)
-	if it := itemNamed(t, rep, "vite"); it.State != UpdFailed || it.Reason != "包含暂不支持的文件" {
+	if it := itemNamed(t, rep, "vite"); it.State != UpdFailed || it.Reason.String() != "包含暂不支持的文件" {
 		t.Errorf("vite = %+v", it)
 	}
 }
@@ -248,7 +248,7 @@ func TestQuotaStopsTheCheckButKeepsFinishedRepos(t *testing.T) {
 		t.Errorf("查完的照常：%+v", it)
 	}
 	it := itemNamed(t, rep, "x")
-	if it.State != UpdFailed || !it.Reset.Equal(reset) || !strings.Contains(it.Reason, "额度") {
+	if it.State != UpdFailed || !it.Reset.Equal(reset) || !strings.Contains(it.Reason.String(), "额度") {
 		t.Errorf("额度用完：%+v", it)
 	}
 	if rep.Complete || !rep.Reset.Equal(reset) {
@@ -320,10 +320,10 @@ func TestWebsiteSourcesAreGroupedWithACopyableCommand(t *testing.T) {
 		t.Errorf("飞书 = %+v", f)
 	}
 	q := itemNamed(t, rep, "agent.qq.com")
-	if q.Reason != "安装记录不完整，建议重新安装" || q.Command != "npx skills add https://agent.qq.com -g -y" {
+	if q.Reason.String() != "安装记录不完整，建议重新安装" || q.Command != "npx skills add https://agent.qq.com -g -y" {
 		t.Errorf("腾讯 = %+v", q)
 	}
-	if g := itemNamed(t, rep, "gitlab.com/me/x"); g.State != UpdUnsupported || g.Reason != "暂不支持这种来源" || g.Command != "" {
+	if g := itemNamed(t, rep, "gitlab.com/me/x"); g.State != UpdUnsupported || g.Reason.String() != "暂不支持这种来源" || g.Command != "" {
 		t.Errorf("gitlab = %+v", g)
 	}
 	if rep.Eligible != 0 {
@@ -345,7 +345,7 @@ func TestAnUnknownRecordVersionIsCheckedReadOnly(t *testing.T) {
 			writeRecordsVersion(t, h, 4, gh("vite", "antfu/skills", "skills/vite/SKILL.md", installed))
 			_, rep := checkNow(t, home, r)
 			it := itemNamed(t, rep, "vite")
-			if it.State != want || it.CanUpdate() || rep.ReadOnly != "安装记录无法用于更新，只能查看" {
+			if it.State != want || it.CanUpdate() || rep.ReadOnly.String() != "安装记录无法用于更新，只能查看" {
 				t.Errorf("只读检查：%+v %q", it, rep.ReadOnly)
 			}
 			if rep.Count() != 0 {
