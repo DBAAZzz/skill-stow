@@ -484,7 +484,7 @@ func isUnresolvableImageOnlyParagraph(inls []parser.Inline, skillDir string) boo
 		case parser.SoftBreak, parser.LineBreak:
 			k++
 		case parser.Text:
-			if strings.Trim(in.Text, " \t\r\n|·•/") != "" {
+			if strings.Trim(in.Text, " \t\r\n|·•/") != "" { //separator:ignore 认出 README 里只有徽章和分隔符的行
 				return false
 			}
 			k++
