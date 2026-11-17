@@ -80,9 +80,11 @@ func importPlacementDefault() library.ImportPlacement { return library.ImportPla
 
 // openImport 打开添加技能页。
 func (a *app) openImport() {
-	a.closeMenusIn(menuWinMain)
-	a.scope, a.selected, a.reading, a.coll, a.inColl, a.cmp = scopeImport, nil, nil, nil, nil, nil
-	a.exitBatch()
+	a.navigate(func() {
+		a.closeMenusIn(menuWinMain)
+		a.scope, a.selected, a.reading, a.coll, a.inColl, a.cmp = scopeImport, nil, nil, nil, nil, nil
+		a.exitBatch()
+	})
 	a.checkClipboard()
 }
 
@@ -583,7 +585,9 @@ func (a *app) dropToImport(paths []string) {
 
 // showImported 去「我的技能」选中刚添加的技能。
 func (a *app) showImported(name string) {
-	a.closeMenusIn(menuWinMain)
-	a.scope, a.inColl, a.coll, a.reading, a.cmp = string(library.ScopeMine), nil, nil, nil, nil
-	a.selected = a.lib.Get(name)
+	a.navigate(func() {
+		a.closeMenusIn(menuWinMain)
+		a.scope, a.inColl, a.coll, a.reading, a.cmp = string(library.ScopeMine), nil, nil, nil, nil
+		a.selected = a.lib.Get(name)
+	})
 }

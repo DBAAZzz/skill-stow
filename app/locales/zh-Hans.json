@@ -137,6 +137,14 @@
   "@sidebarShow": {
     "description": "展开侧边栏的按钮"
   },
+  "navBack": "后退",
+  "@navBack": {
+    "description": "收起侧边栏按钮右边的后退按钮：回到上一页"
+  },
+  "navForward": "前进",
+  "@navForward": {
+    "description": "后退按钮右边的前进按钮：回到后退前的那一页"
+  },
   "projectsSampleCantAdd": "示例数据不能添加项目",
   "@projectsSampleCantAdd": {
     "description": "用示例数据运行时点了添加项目"

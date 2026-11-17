@@ -31,7 +31,9 @@ var ()
 // 每个项目各自一页。底栏是添加项目和设置。
 func (a *app) sidebar(c *ui.Context, vibrant bool) {
 	ui.Box(c).Height(toolbarHeight(c)).Shrink(0).DragWindow()
-	bar := ui.Sidebar(c, &a.scope, func() {
+	// 侧边栏改的是 next：在 navigate 里才换范围，历史里前一页还是原来的范围
+	next := a.scope
+	bar := ui.Sidebar(c, &next, func() {
 		a.tidyItem(c)
 		a.sideRow(c, scopeUsage, iconNavUsage, locales.NavUsage(), colTextSecondary).Height(sideRowHeight).Padding(0, 8)
 		a.updateSidebar(c)
@@ -50,10 +52,13 @@ func (a *app) sidebar(c *ui.Context, vibrant bool) {
 		bar.Background(ui.Transparent)
 	}
 	if bar.Changed() {
-		a.closeMenusIn(menuWinMain)
-		a.selected, a.reading, a.coll, a.inColl, a.err, a.errAgent = nil, nil, nil, nil, "", ""
-		a.cmp, a.notice, a.tidy.msg, a.tidy.err = nil, nil, "", ""
-		a.exitBatch()
+		a.navigate(func() {
+			a.scope = next
+			a.closeMenusIn(menuWinMain)
+			a.selected, a.reading, a.coll, a.inColl, a.err, a.errAgent = nil, nil, nil, nil, "", ""
+			a.cmp, a.notice, a.tidy.msg, a.tidy.err = nil, nil, "", ""
+			a.exitBatch()
+		})
 	}
 
 	// 底栏：左边添加项目，右边设置（⌘,）。技能库的位置在设置里。
@@ -90,7 +95,7 @@ func (a *app) sideItem(c *ui.Context, id string, icon *ui.SVG, label string, cou
 func (a *app) tidyItem(c *ui.Context) {
 	it := a.sideRow(c, scopeTidy, iconNavTidy, locales.NavTidy(), colTextSecondary).Height(sideRowHeight).Padding(0, 8)
 	if it.Clicked() && a.scope == scopeTidy && a.cmp != nil {
-		a.cmp = nil // 再点一次，从对比页回来
+		a.closeCompare() // 再点一次，从对比页回来
 	}
 	it.Children(func() {
 		p := a.lib.Problems()
@@ -254,14 +259,16 @@ func (a *app) chooseProjects(show bool) {
 			}
 			a.rescan()
 			if p := a.lib.Project(dirs[0]); show && p != nil {
-				a.scope, a.selected, a.coll, a.inColl, a.projectsOpen = projectScope(p), nil, nil, nil, true
+				a.navigate(func() {
+					a.scope, a.selected, a.coll, a.inColl, a.reading, a.cmp, a.projectsOpen = projectScope(p), nil, nil, nil, nil, nil, true
+				})
 			}
 		})
 	}()
 }
 
 // 收起侧边栏的按钮（像备忘录）：固定在红绿灯右边，侧边栏开着时落在它的
-// 顶栏里，收起后压在内容区工具栏的左端。
+// 顶栏里，收起后压在内容区工具栏的左端。后退、前进紧挨在它右边（history.go）。
 const (
 	sidebarToggleGap  = 14 // 按钮和红绿灯的间距，图标本身离绿灯约 19
 	sidebarToggleEdge = 12 // 左上角没有红绿灯（全屏、Windows/Linux）时离窗口左边
@@ -301,10 +308,10 @@ func sidebarToggleLeft(c *ui.Context) float32 {
 }
 
 // toolbarLeftInset 是内容区工具栏的左边距：侧边栏开着时用设计稿的 base，
-// 收起时让出红绿灯和收起按钮。跟着侧边栏露出的宽度逐帧算，标题一路
-// 平滑地滑，不会跳到红绿灯底下。
+// 收起时让出红绿灯、收起和后退、前进按钮。跟着侧边栏露出的宽度逐帧算，
+// 标题一路平滑地滑，不会跳到红绿灯底下。
 func (a *app) toolbarLeftInset(c *ui.Context, base float32) float32 {
-	return max(base, sidebarToggleLeft(c)+sidebarToggleW+toolbarControlGap-a.sideShown)
+	return max(base, chromeRight(c)+toolbarControlGap-a.sideShown)
 }
 
 // sidebarToggleLabel 是收起按钮的名称和提示。

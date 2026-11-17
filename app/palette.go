@@ -102,9 +102,11 @@ func (a *app) closePalette() { a.pal.open = false }
 
 // goTo 换到侧边栏的一页，像点了那一项。
 func (a *app) goTo(scope string) {
-	a.scope = scope
-	a.selected, a.reading, a.coll, a.inColl, a.cmp = nil, nil, nil, nil, nil
-	a.exitBatch()
+	a.navigate(func() {
+		a.scope = scope
+		a.selected, a.reading, a.coll, a.inColl, a.cmp = nil, nil, nil, nil, nil
+		a.exitBatch()
+	})
 }
 
 // buildSearchIndex 在后台读各技能的正文。扫描换了库之后再调一次，没改过
@@ -231,25 +233,30 @@ func (a *app) choosePalette(it paletteItem, reveal bool) {
 	if s == nil {
 		return
 	}
-	a.showInList(s)
-	if reveal {
-		return
-	}
-	a.open(s)
-	if it.hit.File != "" {
-		a.file = max(0, slices.IndexFunc(s.Files, func(f library.File) bool { return f.Path == it.hit.File }))
-	}
+	// 打开时合成一页：后退回到按 ⌘K 之前的那一页
+	a.navigate(func() {
+		a.showInList(s)
+		if reveal {
+			return
+		}
+		a.open(s)
+		if it.hit.File != "" {
+			a.file = max(0, slices.IndexFunc(s.Files, func(f library.File) bool { return f.Path == it.hit.File }))
+		}
+	})
 }
 
 // showInList 换到技能所在的列表并选中它，详情栏显示它。
 func (a *app) showInList(s *library.Skill) {
-	a.goTo(a.scopeOf(s))
-	// 列表要看得见它：工具栏的搜索词清掉，在集合里的就打开那个集合
-	a.query = ""
-	if s.Collection != nil {
-		a.openSet(s.Collection)
-	}
-	a.selected, a.anchor = s, s.ID
+	a.navigate(func() {
+		a.goTo(a.scopeOf(s))
+		// 列表要看得见它：工具栏的搜索词清掉，在集合里的就打开那个集合
+		a.query = ""
+		if s.Collection != nil {
+			a.openSet(s.Collection)
+		}
+		a.selected, a.anchor = s, s.ID
+	})
 }
 
 // scopeOf 是技能在侧边栏的哪一页。

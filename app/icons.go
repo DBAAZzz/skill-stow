@@ -36,6 +36,9 @@ var (
 	iconLink         = icon(`<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>`)
 	iconGear         = icon(`<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>`)
 	iconBack         = icon(`<path d="m15 5-7 7 7 7"/>`)
+	// 后退、前进：线条和收起侧栏的图标一样粗，箭头短一些，看着圆润
+	iconArrowBack    = icon(`<g stroke-width="2"><path d="M10 7 5 12l5 5"/><path d="M5.5 12H19"/></g>`)
+	iconArrowForward = icon(`<g stroke-width="2"><path d="m14 7 5 5-5 5"/><path d="M18.5 12H5"/></g>`)
 	iconDoc          = icon(`<path d="M7 3.5h7l4.5 4.5v12.5H7z"/><path d="M14 3.5V8h4.5"/>`)
 	iconLock         = icon(`<rect x="5.5" y="10.5" width="13" height="9.5" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>`)
 	iconExternal     = icon(`<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>`)

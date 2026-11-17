@@ -294,7 +294,7 @@ func (a *app) recentImports(c *ui.Context) {
 	importSection(c, locales.ImportRecentlyAdded(), true, func() {
 		if linkButton(c, locales.ImportViewInUpdates()).Clicked() {
 			a.closeMenusIn(menuWinMain)
-			a.scope = scopeUpdates
+			a.goTo(scopeUpdates)
 		}
 	})
 	usageGroup(c).Children(func() {

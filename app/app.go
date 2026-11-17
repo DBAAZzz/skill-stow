@@ -67,6 +67,7 @@ type app struct {
 	wasSelected *library.Skill              // 上一次 view 开始前选中的技能（defer 在本轮结束时写入本轮开始前的值）
 	pinIdx      int                         // 顶部标题栏正显示第几组，-1 为没显示
 	pinDir      float32                     // 顶部标题栏上次换组的方向：1 往下滚，-1 往上滚
+	hist        history                     // 页面栈：后退、前进（history.go）
 
 	readerRaw       bool
 	readerEditor    *editor.State
@@ -184,11 +185,13 @@ func (a *app) view(c *ui.Context) {
 	if vibrant {
 		c.Root().Background(ui.Transparent)
 	}
+	a.syncHistory()
 	c.OnWindowShortcut(0, ui.KeyEscape, a.back)
 	c.OnWindowShortcut(ui.Cmd, ui.KeyComma, a.openSettings)
 	c.OnWindowShortcut(ui.Cmd, ui.KeyK, a.openPalette)
 	if !a.windowMenuOpen(menuWinMain) {
 		a.deleteShortcuts(c)
+		a.historyShortcuts(c)
 		c.OnWindowShortcut(0, ui.KeySpace, func() {
 			switch {
 			case a.reading != nil:
@@ -258,6 +261,7 @@ func (a *app) view(c *ui.Context) {
 		})
 	})
 	a.sidebarToggle(c)
+	a.historyButtons(c)
 	if a.confirmOpen {
 		a.enableDialog(c)
 	}
@@ -296,30 +300,42 @@ func (a *app) page(c *ui.Context) (string, func()) {
 	return "browse", func() { a.browse(c) }
 }
 
-// open 进入阅读视图。
+// open 进入阅读视图，记作最近打开的技能。
 func (a *app) open(s *library.Skill) {
 	if s == nil {
 		return
 	}
+	a.navigate(func() {
+		a.selected = s
+		a.showReader(s)
+	})
+	a.lib.NoteOpened(s, time.Now())
+}
+
+// showReader 显示技能的阅读视图，从第一个文件开始，正文淡入。
+func (a *app) showReader(s *library.Skill) {
 	a.lib.LoadFiles(s)
-	a.selected, a.reading, a.file = s, s, 0
+	a.reading, a.file = s, 0
 	a.readerRaw, a.readerEditor, a.readerEditorKey, a.readerImages = false, nil, "", nil
 	a.readerIn = true
-	a.lib.NoteOpened(s, time.Now())
 }
 
 // closeReader 从阅读视图回到浏览，详情栏显示这个技能，它的卡片从正文收回去。
 func (a *app) closeReader() {
-	a.readerBack, a.selected, a.reading = a.reading, a.reading, nil
+	a.navigateUp(func() {
+		a.readerBack, a.selected, a.reading = a.reading, a.reading, nil
+	})
 }
 
 // manage 是阅读视图的「管理」：回到技能所在的列表，详情栏显示它。从使用
 // 情况页打开的，返回是回使用情况页，这里要换到它所在的列表。
 func (a *app) manage(s *library.Skill) {
-	a.closeReader()
-	if a.scope == scopeUsage {
-		a.showInList(s)
-	}
+	a.navigate(func() {
+		a.closeReader()
+		if a.scope == scopeUsage {
+			a.showInList(s)
+		}
+	})
 }
 
 // enable 启用或停用，失败时记下原因给详情栏显示。
@@ -431,7 +447,7 @@ func (a *app) back() {
 	case a.scope == scopeImport && a.imp.cmp != nil:
 		a.imp.cmp = nil
 	case a.cmp != nil:
-		a.cmp = nil
+		a.closeCompare()
 	case a.reading != nil:
 		a.closeReader()
 	case a.batch.on:

@@ -31,6 +31,8 @@
   "navSettings": "Settings",
   "sidebarHide": "Hide Sidebar",
   "sidebarShow": "Show Sidebar",
+  "navBack": "Back",
+  "navForward": "Forward",
   "projectsSampleCantAdd": "Projects can't be added to the sample data",
   "projectsDialogAdd": "Add",
   "projectsDialogMessage": "Choose project folders. Skills in .claude/skills, .agents/skills and similar folders inside them will be checked.",

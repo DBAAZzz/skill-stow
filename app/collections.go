@@ -72,12 +72,12 @@ func (a *app) pickSet(card ui.Element, coll *library.Collection) {
 
 // openSet 打开集合：浏览页只列它的技能，Esc 或返回按钮回来。
 func (a *app) openSet(coll *library.Collection) {
-	a.inColl, a.coll, a.selected, a.err = coll, nil, nil, ""
+	a.navigate(func() { a.inColl, a.coll, a.selected, a.err = coll, nil, nil, "" })
 }
 
 // closeSet 从集合回到浏览页，集合仍然选中。
 func (a *app) closeSet() {
-	a.coll, a.selected, a.inColl = a.inColl, nil, nil
+	a.navigateUp(func() { a.coll, a.selected, a.inColl = a.inColl, nil, nil })
 }
 
 // ——— 卡片 ———

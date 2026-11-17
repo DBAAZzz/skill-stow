@@ -34,8 +34,18 @@ func (a *app) openCompare(s *library.Skill, fromTidy bool) {
 	if len(s.Versions()) < 2 {
 		return
 	}
+	a.navigate(func() { a.showCompare(s, fromTidy) })
+}
+
+// showCompare 显示对比副本页，右边先对比第二种内容。
+func (a *app) showCompare(s *library.Skill, fromTidy bool) {
 	a.cmp = &compareState{skill: s, tidy: fromTidy}
 	a.compareWith(1)
+}
+
+// closeCompare 从对比副本页回到打开它的那一页。
+func (a *app) closeCompare() {
+	a.navigateUp(func() { a.cmp = nil })
 }
 
 // compareWith 换右边对比的那种内容。
@@ -53,7 +63,7 @@ func (a *app) comparePage(c *ui.Context, st *compareState) {
 	vs := s.Versions()
 	a.toolbarRow(c, func() {
 		if iconButton(c, iconBack, locales.ActionBackShortcut()).Clicked() {
-			a.cmp = nil
+			a.closeCompare()
 		}
 		ui.Row(c).Gap(8).AlignItems(ui.Baseline).Children(func() {
 			ui.Text(c, locales.CompareCopiesOf(s.Name)).FontSize(13).FontWeight(600).SingleLine()
@@ -353,7 +363,7 @@ func (a *app) localVerSide(c *ui.Context, st *compareState, k int) {
 		})
 		if diffActionButton(c, locales.CompareKeepVersion(), false).Clicked() {
 			s, tidy := st.skill, st.tidy
-			a.cmp = nil
+			a.closeCompare()
 			a.merge(s, k, tidy)
 		}
 	})

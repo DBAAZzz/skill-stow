@@ -855,12 +855,14 @@ func rowIcon(c *ui.Context, icon *ui.SVG, label string) ui.Element {
 
 // showSet 从使用情况页打开集合：换到它所在的来源，再打开。
 func (a *app) showSet(coll *library.Collection) {
-	a.scope = string(library.ScopeMine)
-	if len(coll.Skills) > 0 && coll.Skills[0].Source == library.Builtin {
-		a.scope = string(library.ScopeBuiltin)
-	}
-	a.selected = nil
-	a.openSet(coll)
+	a.navigate(func() {
+		a.scope = string(library.ScopeMine)
+		if len(coll.Skills) > 0 && coll.Skills[0].Source == library.Builtin {
+			a.scope = string(library.ScopeBuiltin)
+		}
+		a.selected = nil
+		a.openSet(coll)
+	})
 }
 
 // ——— 详情栏预览 ———

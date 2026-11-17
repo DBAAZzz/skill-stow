@@ -470,6 +470,34 @@ func (msgs Messages) SidebarShow() string {
 	return Catalog.Format(msgs.locale, "sidebarShow", nil)
 }
 
+// NavBack says "后退"
+// in the language the app shows.
+//
+// 收起侧边栏按钮右边的后退按钮：回到上一页
+func NavBack() string { return In(i18n.Locale()).NavBack() }
+
+// NavBack says "后退"
+// in the language of msgs.
+//
+// 收起侧边栏按钮右边的后退按钮：回到上一页
+func (msgs Messages) NavBack() string {
+	return Catalog.Format(msgs.locale, "navBack", nil)
+}
+
+// NavForward says "前进"
+// in the language the app shows.
+//
+// 后退按钮右边的前进按钮：回到后退前的那一页
+func NavForward() string { return In(i18n.Locale()).NavForward() }
+
+// NavForward says "前进"
+// in the language of msgs.
+//
+// 后退按钮右边的前进按钮：回到后退前的那一页
+func (msgs Messages) NavForward() string {
+	return Catalog.Format(msgs.locale, "navForward", nil)
+}
+
 // ProjectsSampleCantAdd says "示例数据不能添加项目"
 // in the language the app shows.
 //

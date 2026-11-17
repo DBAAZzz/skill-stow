@@ -727,7 +727,7 @@ func (a *app) updateActions(c *ui.Context, it library.UpdateItem) {
 		btn(locales.ActionMergeCopies(), false, func() {
 			if s := a.lib.Get(it.Name); s != nil {
 				if s.Identical() {
-					a.scope = scopeTidy
+					a.goTo(scopeTidy)
 					a.tidy.kind = library.SameCopies
 				} else {
 					a.openCompare(s, false)
