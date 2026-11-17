@@ -52,7 +52,9 @@ func (l *Library) NoteOpened(s *Skill, at time.Time) {
 }
 
 // DefaultSettings 是没有 settings.json 时的设置。
-func DefaultSettings() Settings { return Settings{AutoDiscover: true, MergeWorktrees: true} }
+func DefaultSettings() Settings {
+	return Settings{UpdateOldVersion: "trash", AutoDiscover: true, MergeWorktrees: true}
+}
 
 func settingsFile(home string) string { return filepath.Join(appDir(home), "settings.json") }
 
@@ -60,6 +62,9 @@ func loadSettings(home string) Settings {
 	s := DefaultSettings()
 	if b, err := os.ReadFile(settingsFile(home)); err == nil {
 		json.Unmarshal(b, &s)
+	}
+	if s.UpdateOldVersion == "" {
+		s.UpdateOldVersion = "trash"
 	}
 	return s
 }
