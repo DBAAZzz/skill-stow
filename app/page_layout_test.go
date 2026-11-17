@@ -8,43 +8,38 @@ import (
 	"skillmanager/internal/library"
 )
 
-// cardEdges 找内容区第一张白卡：沿内容区中线往下，先过工具栏到灰色页面底，
-// 再遇到的第一个白点是卡片顶边；在卡片顶边往下几行横扫，第一个和最后一个
-// 白点是左右边缘。
+// cardEdges 找内容区第一张卡片：从工具栏下面沿内容区中线往下，第一个卡片底色
+// 的点是卡片顶边；在顶边往下几行横扫，第一个和最后一个卡片底色的点是左右边缘。
+// 不靠页面底色找起点：深色下页面底和工具栏同色。
 func cardEdges(t *testing.T, img *image.RGBA, left int) (x0, x1, y0 int) {
 	t.Helper()
 	b := img.Bounds()
-	page, card := colBgPage, colBgCard
-	is := func(x, y int, want [3]uint8) bool {
+	card := colBgCard
+	isCard := func(x, y int) bool {
 		p := img.RGBAAt(x, y)
 		d := func(a, b uint8) int { return max(int(a)-int(b), int(b)-int(a)) }
-		return d(p.R, want[0]) <= 1 && d(p.G, want[1]) <= 1 && d(p.B, want[2]) <= 1
+		return d(p.R, card.R) <= 1 && d(p.G, card.G) <= 1 && d(p.B, card.B) <= 1
 	}
-	pageRGB := [3]uint8{page.R, page.G, page.B}
-	cardRGB := [3]uint8{card.R, card.G, card.B}
 	mid := (left + b.Max.X) / 2
-	y, seenPage := 0, false
-	for ; y < b.Max.Y; y++ {
-		if !seenPage {
-			seenPage = is(mid, y, pageRGB)
-			continue
-		}
-		if is(mid, y, cardRGB) {
-			break
-		}
+	y := titleBarHeight + 1
+	for y < b.Max.Y && !isCard(mid, y) {
+		y++
 	}
 	if y == b.Max.Y {
-		t.Fatal("内容区里找不到白卡")
+		t.Fatal("内容区里找不到卡片")
 	}
 	row := y + 6
 	x0, x1 = -1, -1
 	for x := left; x < b.Max.X; x++ {
-		if is(x, row, cardRGB) {
+		if isCard(x, row) {
 			if x0 < 0 {
 				x0 = x
 			}
 			x1 = x
 		}
+	}
+	if x0 < 0 || x1-x0 < 100 {
+		t.Fatalf("y=%d 处找到的不像卡片：x=%d…%d", row, x0, x1)
 	}
 	return x0, x1, y
 }
