@@ -272,7 +272,9 @@ func (a *app) openMainWindow() *mygo.Window {
 		a.syncDockProgress(nil)
 		return nil
 	}
-	win := mygo.NewWindow(a.mainWindowOptions())
+	opts := a.mainWindowOptions()
+	win := mygo.NewWindow(opts)
+	installMainWindowZoom(win, opts)
 	a.win = win
 	a.syncDockProgress(win)
 	win.OnFocus(func() {
