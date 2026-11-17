@@ -202,6 +202,17 @@ func setPalette(dark bool) {
 	}
 }
 
+// windowBackground 是原生窗口的底色，写成 light-dark(浅, 深)：内容画出来前
+// 系统先拿它铺底，取自 tones 才和页面底色对得上。c 必须是 tones 里的颜色。
+func windowBackground(c *ui.Color) string {
+	for _, t := range tones {
+		if t.c == c {
+			return "light-dark(" + t.light + ", " + t.dark + ")"
+		}
+	}
+	panic("colors.go: windowBackground needs a palette color")
+}
+
 // ink 是叠在底色上的一层：悬停、按下、细线。浅色界面叠黑，深色叠白。
 func ink(alpha float32) ui.Color {
 	if darkUI {

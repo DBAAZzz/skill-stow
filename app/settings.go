@@ -116,7 +116,7 @@ func (a *app) openSettings() {
 		DisableResize:        true,
 		DisableMaximize:      true,
 		DisableFullScreen:    true,
-		BackgroundColor:      "light-dark(#f5f5f7, #1e1e1e)",
+		BackgroundColor:      windowBackground(&colBgPage),
 		Content:              ui.View(a.settingsView),
 	})
 	a.setWin = win
