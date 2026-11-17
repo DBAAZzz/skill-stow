@@ -15,11 +15,11 @@ func updateFixture(a *app) {
 	a.lib.Skills = append(a.lib.Skills, &library.Skill{ID: "mine:vite", Name: "vite", Source: library.Mine, Dir: "~/.agents/skills/vite"})
 	a.scope = scopeUpdates
 	a.upd.report = library.UpdateReport{Checked: time.Now(), Complete: true, Eligible: 3, Items: []library.UpdateItem{
-		{Name: "vite", Source: library.SourceID{Type: "github", Repo: "antfu/skills"}, State: library.UpdReady, Reason: "可更新", Commit: "3f8a21c", CommitDate: time.Now()},
-		{Name: "vue-best-practices", Source: library.SourceID{Type: "github", Repo: "vuejs-ai/skills"}, State: library.UpdBoth, Reason: "本地改过，且上游有更新"},
-		{Name: "test-first", Source: library.SourceID{Type: "github", Repo: "anthropics/skills"}, State: library.UpdCopies, Reason: "有独立副本，需先收成一份"},
-		{Name: "private-tools", Source: library.SourceID{Type: "github", Repo: "acme/private-skills"}, State: library.UpdFailed, Reason: "仓库访问不了（可能已删除或转为私有）"},
-		{Name: "open.feishu.cn", Names: []string{"lark-doc", "lark-im"}, Source: library.SourceID{Type: "well-known", Repo: "open.feishu.cn"}, State: library.UpdWebsite, Reason: "本应用不自动更新", Command: "npx skills update lark-doc lark-im -g -y"},
+		{Name: "vite", Source: library.SourceID{Type: "github", Repo: "antfu/skills"}, State: library.UpdReady, Reason: library.Note{Detail: "可更新"}, Commit: "3f8a21c", CommitDate: time.Now()},
+		{Name: "vue-best-practices", Source: library.SourceID{Type: "github", Repo: "vuejs-ai/skills"}, State: library.UpdBoth, Reason: library.Note{Detail: "本地改过，且上游有更新"}},
+		{Name: "test-first", Source: library.SourceID{Type: "github", Repo: "anthropics/skills"}, State: library.UpdCopies, Reason: library.Note{Detail: "有独立副本，需先收成一份"}},
+		{Name: "private-tools", Source: library.SourceID{Type: "github", Repo: "acme/private-skills"}, State: library.UpdFailed, Reason: library.Note{Detail: "仓库访问不了（可能已删除或转为私有）"}},
+		{Name: "open.feishu.cn", Names: []string{"lark-doc", "lark-im"}, Source: library.SourceID{Type: "well-known", Repo: "open.feishu.cn"}, State: library.UpdWebsite, Reason: library.Note{Detail: "本应用不自动更新"}, Command: "npx skills update lark-doc lark-im -g -y"},
 	}}
 }
 func TestUpdatePageSeparatesSafeUpdatesFromConfirmations(t *testing.T) {
@@ -135,15 +135,15 @@ func updateFullFixture(a *app) {
 		Eligible: 10,
 		Reset:    now.Add(18 * time.Minute),
 		Items: []library.UpdateItem{
-			{Name: "vite", Source: library.SourceID{Type: "github", Repo: "antfu/skills"}, State: library.UpdReady, Reason: "可更新", Commit: "3f8a21c", CommitDate: now.Add(-2 * 24 * time.Hour)},
-			{Name: "vitest", Source: library.SourceID{Type: "github", Repo: "antfu/skills"}, State: library.UpdReady, Reason: "可更新", Commit: "91d0e4b", CommitDate: now.Add(-5 * 24 * time.Hour)},
-			{Name: "vue-best-practices", Source: library.SourceID{Type: "github", Repo: "vuejs-ai/skills"}, State: library.UpdBoth, Reason: "本地改过，且上游有更新", Commit: "c74b92e", CommitDate: now.Add(-24 * time.Hour)},
-			{Name: "test-first", Source: library.SourceID{Type: "github", Repo: "anthropics/skills"}, State: library.UpdCopies, Reason: "有 2 份独立副本，需先收成一份"},
-			{Name: "kami", Source: library.SourceID{Type: "github", Repo: "obra/superpowers"}, State: library.UpdMovedOut, Reason: "已从当前库移出"},
-			{Name: "turborepo", Source: library.SourceID{Type: "github", Repo: "vercel/turborepo"}, State: library.UpdRemoved, Reason: "上游仓库已删除此技能（404）"},
-			{Name: "private-tools", Source: library.SourceID{Type: "github", Repo: "acme/private-skills"}, State: library.UpdFailed, Reason: "仓库访问不了（可能已删除或转为私有）"},
+			{Name: "vite", Source: library.SourceID{Type: "github", Repo: "antfu/skills"}, State: library.UpdReady, Reason: library.Note{Detail: "可更新"}, Commit: "3f8a21c", CommitDate: now.Add(-2 * 24 * time.Hour)},
+			{Name: "vitest", Source: library.SourceID{Type: "github", Repo: "antfu/skills"}, State: library.UpdReady, Reason: library.Note{Detail: "可更新"}, Commit: "91d0e4b", CommitDate: now.Add(-5 * 24 * time.Hour)},
+			{Name: "vue-best-practices", Source: library.SourceID{Type: "github", Repo: "vuejs-ai/skills"}, State: library.UpdBoth, Reason: library.Note{Detail: "本地改过，且上游有更新"}, Commit: "c74b92e", CommitDate: now.Add(-24 * time.Hour)},
+			{Name: "test-first", Source: library.SourceID{Type: "github", Repo: "anthropics/skills"}, State: library.UpdCopies, Reason: library.Note{Detail: "有 2 份独立副本，需先收成一份"}},
+			{Name: "kami", Source: library.SourceID{Type: "github", Repo: "obra/superpowers"}, State: library.UpdMovedOut, Reason: library.Note{Detail: "已从当前库移出"}},
+			{Name: "turborepo", Source: library.SourceID{Type: "github", Repo: "vercel/turborepo"}, State: library.UpdRemoved, Reason: library.Note{Detail: "上游仓库已删除此技能（404）"}},
+			{Name: "private-tools", Source: library.SourceID{Type: "github", Repo: "acme/private-skills"}, State: library.UpdFailed, Reason: library.Note{Detail: "仓库访问不了（可能已删除或转为私有）"}},
 			{Name: "open.feishu.cn", Names: []string{"lark-doc", "lark-im"}, Source: library.SourceID{Type: "well-known", Repo: "open.feishu.cn"}, State: library.UpdWebsite, Command: "npx skills update lark-doc lark-im -g -y"},
-			{Name: "agently-mail", Names: []string{"agently-mail"}, Source: library.SourceID{Type: "well-known", Repo: "agently-mail.dev"}, State: library.UpdWebsite, Reason: "安装记录不完整，建议重新安装", Command: "npx skills update agently-mail -g -y"},
+			{Name: "agently-mail", Names: []string{"agently-mail"}, Source: library.SourceID{Type: "well-known", Repo: "agently-mail.dev"}, State: library.UpdWebsite, Reason: library.Note{Detail: "安装记录不完整，建议重新安装"}, Command: "npx skills update agently-mail -g -y"},
 		},
 	}
 }
@@ -339,11 +339,11 @@ func TestUpdateStateSnapshots(t *testing.T) {
 	a5.scope = scopeUpdates
 	a5.upd.report = library.UpdateReport{
 		Items: []library.UpdateItem{
-			{Name: "skill-creator", Source: library.SourceID{Type: "github", Repo: "anthropics/skills"}, State: library.UpdCopies, Reason: "有独立副本，需先收成一份"},
-			{Name: "kami", Source: library.SourceID{Type: "github", Repo: "tw93/kami"}, State: library.UpdMovedOut, Reason: "技能库中找不到，其他位置有同名技能；装回技能库后才能更新"},
-			{Name: "code-ablation", Source: library.SourceID{Type: "github", Repo: "DBAAZzz/skills"}, State: library.UpdCopies, Reason: "有独立副本，需先收成一份"},
-			{Name: "better-readme", Source: library.SourceID{Type: "github", Repo: "tommy0103/better-readme-skill"}, State: library.UpdMovedOut, Reason: "技能库中找不到，其他位置有同名技能；装回技能库后才能更新"},
-			{Name: "agently-mail", Names: []string{"agently-mail"}, Source: library.SourceID{Type: "well-known", Repo: "agent.qq.com"}, State: library.UpdWebsite, Reason: "安装记录不完整，建议重新安装", Command: "npx skills add https://agent.qq.com -g -y"},
+			{Name: "skill-creator", Source: library.SourceID{Type: "github", Repo: "anthropics/skills"}, State: library.UpdCopies, Reason: library.Note{Detail: "有独立副本，需先收成一份"}},
+			{Name: "kami", Source: library.SourceID{Type: "github", Repo: "tw93/kami"}, State: library.UpdMovedOut, Reason: library.Note{Detail: "技能库中找不到，其他位置有同名技能；装回技能库后才能更新"}},
+			{Name: "code-ablation", Source: library.SourceID{Type: "github", Repo: "DBAAZzz/skills"}, State: library.UpdCopies, Reason: library.Note{Detail: "有独立副本，需先收成一份"}},
+			{Name: "better-readme", Source: library.SourceID{Type: "github", Repo: "tommy0103/better-readme-skill"}, State: library.UpdMovedOut, Reason: library.Note{Detail: "技能库中找不到，其他位置有同名技能；装回技能库后才能更新"}},
+			{Name: "agently-mail", Names: []string{"agently-mail"}, Source: library.SourceID{Type: "well-known", Repo: "agent.qq.com"}, State: library.UpdWebsite, Reason: library.Note{Detail: "安装记录不完整，建议重新安装"}, Command: "npx skills add https://agent.qq.com -g -y"},
 			{Name: "open.feishu.cn", Names: make([]string, 27), Source: library.SourceID{Type: "well-known", Repo: "open.feishu.cn"}, State: library.UpdWebsite, Command: "npx skills update -g -y"},
 		},
 	}
