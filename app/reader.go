@@ -158,6 +158,7 @@ func (a *app) strip(c *ui.Context, s *library.Skill) {
 		switch {
 		case s.ReadOnly():
 			ui.Text(c, s.Origin()).FontSize(12)
+			readOnlyTag(c)
 		case s.AllDisabled():
 			ui.Text(c, locales.CommonDisabled()).FontSize(12)
 		case len(s.DiscoveredAgents()) == 0:

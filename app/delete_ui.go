@@ -611,7 +611,7 @@ func (a *app) pickSkillRow(c *ui.Context, s *library.Skill, sep bool) {
 		if !can {
 			sub = colTextDisabled
 		}
-		twoLines(c, s.Name, unusedSkillNote(s), sub)
+		twoLines(c, s.Name, unusedSkillTag(s), s.Description, sub)
 		if !can {
 			ui.Text(c, locales.CommonHasCopies()).FontSize(11).TextColor(colWarnText).SingleLine().Shrink(0)
 		}

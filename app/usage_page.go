@@ -37,7 +37,7 @@ func (a *app) usagePage(c *ui.Context) {
 	if a.lib.HasUsage() && len(a.unusedBySource()[library.Mine]) > 0 {
 		pick = func() { ui.Spacer(c); a.pickToggle(c) }
 	}
-	a.toolbar(c, locales.NavUsage(), sub, nil, pick)
+	a.toolbar(c, locales.NavUsage(), toolbarText(c, sub), nil, pick)
 	if !a.lib.HasUsage() {
 		empty(c, locales.UsageReadingLogs())
 		return
@@ -781,19 +781,25 @@ func (a *app) unusedSetCells(c *ui.Context, coll *library.Collection, unused int
 		icon = iconAgentGrid
 	}
 	tile(c, img, icon, false)
-	note := a.setUsageNote(coll)
+	tag := ""
 	if plugin {
-		note = locales.UsagePluginNote(note)
+		tag = locales.SourcePlugin()
 	}
-	twoLines(c, coll.Name, note, colTextMuted)
+	twoLines(c, coll.Name, tag, a.setUsageNote(coll), colTextMuted)
 	ui.Text(c, locales.UsageUnusedCount(unused)).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").
 		Shrink(0).SingleLine()
 }
 
-// twoLines 是行里的名称和下面一行灰色说明。
-func twoLines(c *ui.Context, title, sub string, subColor ui.Color) {
+// twoLines 是行里的名称和下面一行灰色说明；tag 是名称后面的弱色来源
+// （「插件」），和「用过的」列表一样，空为不写。
+func twoLines(c *ui.Context, title, tag, sub string, subColor ui.Color) {
 	ui.Column(c).Grow(1).MinWidth(0).Gap(1).Children(func() {
-		ui.Text(c, title).FontSize(13).FontWeight(500).SingleLine()
+		ui.Row(c).Gap(6).AlignItems(ui.Baseline).MinWidth(0).Children(func() {
+			ui.Text(c, title).FontSize(13).FontWeight(500).SingleLine().MinWidth(0).Shrink(1)
+			if tag != "" {
+				ui.Text(c, tag).FontSize(12).TextColor(subColor).SingleLine().Shrink(0)
+			}
+		})
 		if sub != "" {
 			ui.Text(c, sub).FontSize(12).TextColor(subColor).SingleLine()
 		}
@@ -814,17 +820,17 @@ func (a *app) unusedSkillRow(c *ui.Context, s *library.Skill, sep bool) {
 	}
 	rowBody(c, row, sep && !on, func() {
 		a.skillTile(c, s, on)
-		twoLines(c, s.Name, unusedSkillNote(s), sub)
+		twoLines(c, s.Name, unusedSkillTag(s), s.Description, sub)
 		chevron(c, on)
 	})
 }
 
-// unusedSkillNote 是单个技能下面那行：简介，插件装的标出来。
-func unusedSkillNote(s *library.Skill) string {
+// unusedSkillTag 是单个技能名字后面的来源：插件装的标出来。
+func unusedSkillTag(s *library.Skill) string {
 	if s.Source == library.ViaPlugin {
-		return locales.UsagePluginNote(s.Description)
+		return locales.SourcePlugin()
 	}
-	return s.Description
+	return ""
 }
 
 // setUsageNote 是「27 个里只用过 lark-approval」：集合里用过的技能。
@@ -894,8 +900,7 @@ func (a *app) usagePreviewPane(c *ui.Context, s *library.Skill) {
 	ui.Row(c).Margin(22, 0, 7, 2).AlignItems(ui.Baseline).Children(func() {
 		sectionLabel(c, locales.FilesLabel())
 		ui.Spacer(c)
-		ui.Text(c, locales.FilesCountSize(len(s.Files), sizeLabel(size))).FontSize(11).TextColor(colTextMuted).
-			FontFeatures("tnum").SingleLine()
+		metaLine(c, locales.CommonFileCount(len(s.Files)), sizeLabel(size)).FontSize(11).TextColor(colTextMuted)
 	})
 	a.previewFiles(c, s)
 	a.usagePane(c, s)

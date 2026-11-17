@@ -8,10 +8,14 @@ import (
 )
 
 type enableConfirmation struct {
-	skill           *library.Skill
-	agents, impacts []string
-	on              bool
+	skill   *library.Skill
+	agents  []string
+	impacts []nameImpact
+	on      bool
 }
+
+// nameImpact 是停用时会一起受影响的一处：哪个 Agent 的哪个目录。
+type nameImpact struct{ agent, path string }
 
 func (a *app) controllableAgents(s *library.Skill) []string {
 	var out []string
@@ -23,14 +27,14 @@ func (a *app) controllableAgents(s *library.Skill) []string {
 	return out
 }
 func (a *app) requestEnable(s *library.Skill, ids []string, on bool) {
-	var impacts []string
+	var impacts []nameImpact
 	if !on {
 		for _, id := range ids {
 			if !s.State(id).Controllable() {
 				continue
 			}
 			for _, p := range a.lib.NameImpacts(s, id) {
-				impacts = append(impacts, library.AgentName(id)+" · "+a.lib.Display(p))
+				impacts = append(impacts, nameImpact{library.AgentName(id), a.lib.Display(p)})
 			}
 		}
 	}
@@ -52,8 +56,11 @@ func (a *app) enableDialog(c *ui.Context) {
 	dialog(c, &a.confirmOpen, locales.NativeDisableTitle(p.skill.Name), locales.InspectorDisableCopiesMessage(), func() {
 		ui.Scroll(c).MaxHeight(220).Margin(12, 0, 0, 0).Children(func() {
 			ui.Column(c).Gap(6).Children(func() {
-				for _, path := range p.impacts {
-					ui.Text(c, path).FontSize(12).TextColor(colTextSecondary)
+				for _, im := range p.impacts {
+					ui.Row(c).Gap(8).AlignItems(ui.Baseline).MinWidth(0).Children(func() {
+						ui.Text(c, im.agent).FontSize(12).FontWeight(500).TextColor(colTextSecondary).SingleLine().Shrink(0)
+						ui.Text(c, im.path).Font("monospace").FontSize(11).TextColor(colTextMuted).MinWidth(0).Shrink(1)
+					})
 				}
 			})
 		})
@@ -117,7 +124,7 @@ func tipAction(c *ui.Context, label string) ui.Element {
 }
 func stateBadge(c *ui.Context, s *library.Skill, id string, size float32) {
 	st := s.State(id)
-	wrap := ui.Box(c).Size(size, size).Shrink(0).Tooltip(library.AgentName(id) + " · " + st.Kind.Label())
+	wrap := ui.Box(c).Size(size, size).Shrink(0).Tooltip(locales.AgentStateLine(library.AgentName(id), st.Kind.Label()))
 	if st.Kind == library.StateUnknown {
 		wrap.Border(1, colTextMuted).BorderStyle(ui.BorderDashed).Radius(4).Padding(2).Size(size+4, size+4)
 	}
@@ -172,7 +179,7 @@ func (a *app) nativeBoardCard(c *ui.Context, s *library.Skill, id string) {
 						continue
 					}
 					os := s.State(other)
-					fm.action(library.AgentName(other)+" · "+os.Kind.Label(), withDisabled(true))
+					fm.action(locales.AgentStateLine(library.AgentName(other), os.Kind.Label()), withDisabled(true))
 				}
 			})
 		})

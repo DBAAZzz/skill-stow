@@ -278,15 +278,6 @@
       }
     }
   },
-  "usagePluginNote": "插件 · {note}",
-  "@usagePluginNote": {
-    "description": "插件装的技能或集合，说明前面标出来",
-    "placeholders": {
-      "note": {
-        "type": "String"
-      }
-    }
-  },
   "usageSetNoneUsed": "{n} 个都没用过",
   "@usageSetNoneUsed": {
     "description": "集合里一个都没用过",
@@ -561,18 +552,6 @@
     "description": "usage_page.go:920",
     "placeholders": {}
   },
-  "filesCountSize": "{count} 个 · {p1}",
-  "@filesCountSize": {
-    "description": "usage_page.go:922",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      },
-      "p1": {
-        "type": "String"
-      }
-    }
-  },
   "openInReader": "打开阅读视图",
   "@openInReader": {
     "description": "usage_page.go:950",
@@ -822,7 +801,7 @@
       }
     }
   },
-  "originPlugin": "随 {agent} 插件 {plugin} 安装 · 只读",
+  "originPlugin": "随 {agent} 插件 {plugin} 安装",
   "@originPlugin": {
     "description": "技能来源说明：插件装的",
     "placeholders": {
@@ -834,7 +813,7 @@
       }
     }
   },
-  "originBuiltinPlugin": "由 {agent} 的插件 {plugin} 提供 · 只读",
+  "originBuiltinPlugin": "由 {agent} 的插件 {plugin} 提供",
   "@originBuiltinPlugin": {
     "description": "技能来源说明：Agent 的插件自带的",
     "placeholders": {
@@ -846,7 +825,7 @@
       }
     }
   },
-  "originBuiltin": "由 {agent} 提供 · 只读",
+  "originBuiltin": "由 {agent} 提供",
   "@originBuiltin": {
     "description": "技能来源说明：Agent 自带的",
     "placeholders": {
@@ -855,7 +834,7 @@
       }
     }
   },
-  "originProject": "项目技能 · {project} · 只读",
+  "originProject": "项目 {project} 里的技能",
   "@originProject": {
     "description": "技能来源说明：项目里的",
     "placeholders": {
@@ -1217,25 +1196,10 @@
       }
     }
   },
-  "collectionViaPlugin": "{text} · 随 {agent} 插件安装 · 只读",
+  "collectionViaPlugin": "随 {agent} 插件安装",
   "@collectionViaPlugin": {
     "description": "集合副标题：插件装的",
     "placeholders": {
-      "text": {
-        "type": "String"
-      },
-      "agent": {
-        "type": "String"
-      }
-    }
-  },
-  "collectionBuiltin": "{text} · 由 {agent} 提供 · 只读",
-  "@collectionBuiltin": {
-    "description": "集合副标题：Agent 自带的",
-    "placeholders": {
-      "text": {
-        "type": "String"
-      },
       "agent": {
         "type": "String"
       }
@@ -2778,7 +2742,7 @@
       }
     }
   },
-  "nativeCardActions": "{agent} · {name} 操作",
+  "nativeCardActions": "{agent} 中 {name} 的操作",
   "@nativeCardActions": {
     "description": "看板卡片「…」按钮给辅助功能读的名字",
     "placeholders": {
@@ -2875,7 +2839,7 @@
     "description": "批量删除模式的选择栏和分组选择操作显示的文案。",
     "placeholders": {}
   },
-  "batchSelectionSummary": "含 {sets} 个集合 · 共 {count} 个技能",
+  "batchSelectionSummary": "含 {sets} 个集合，共 {count} 个技能",
   "@batchSelectionSummary": {
     "description": "批量删除模式的选择栏和分组选择操作显示的文案。",
     "placeholders": {
@@ -2911,7 +2875,7 @@
     "description": "对只读技能发起删除时显示的文案。",
     "placeholders": {}
   },
-  "browseSkillsAndAgents": "{count} 个 · {count2} 个 Agent",
+  "browseSkillsAndAgents": "{count} 个技能，分布在 {count2} 个 Agent",
   "@browseSkillsAndAgents": {
     "description": "技能浏览页顶部的技能与 Agent 数量概要显示的文案。",
     "placeholders": {
@@ -3107,16 +3071,7 @@
     "description": "打开集合后顶部的返回按钮和技能数概要显示的文案。",
     "placeholders": {}
   },
-  "collectionSkillCount": "集合 · {count} 个技能",
-  "@collectionSkillCount": {
-    "description": "打开集合后顶部的返回按钮和技能数概要显示的文案。",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "collectionVisibleSkills": "集合 · 显示 {shown} / {count} 个技能",
+  "collectionVisibleSkills": "显示 {shown} / {count} 个技能",
   "@collectionVisibleSkills": {
     "description": "打开集合后顶部的返回按钮和技能数概要显示的文案。",
     "placeholders": {
@@ -3127,11 +3082,6 @@
         "type": "int"
       }
     }
-  },
-  "collectionAllSharedSuffix": " · 都在通用里",
-  "@collectionAllSharedSuffix": {
-    "description": "集合详情中说明读取范围、来源与逐个启停的区域显示的文案。",
-    "placeholders": {}
   },
   "collectionDependents": "{n} 个技能依赖它",
   "@collectionDependents": {
@@ -3203,7 +3153,7 @@
     "description": "集合详情中说明读取范围、来源与逐个启停的区域显示的文案。",
     "placeholders": {}
   },
-  "compareCopiesAndVersions": "{p0} 份 · {count} 种内容",
+  "compareCopiesAndVersions": "{p0} 份副本，{count} 种内容",
   "@compareCopiesAndVersions": {
     "description": "打开同名副本对比页时的标题和版本概要显示的文案。",
     "placeholders": {
@@ -3278,15 +3228,6 @@
   "@compareBinary": {
     "description": "差异文件列表中标示文件状态时显示的文案。",
     "placeholders": {}
-  },
-  "compareLocationsSuffix": " · {count} 处",
-  "@compareLocationsSuffix": {
-    "description": "副本版本卡片显示文件分布位置数时显示的文案。",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "commonLocationCount": "{count} 处",
   "@commonLocationCount": {
@@ -4445,15 +4386,6 @@
     "description": "命令面板的搜索入口和选中技能操作显示的文案。",
     "placeholders": {}
   },
-  "projectReadOnlySkills": "{count} 个技能 · 只读",
-  "@projectReadOnlySkills": {
-    "description": "项目技能页的概要、空状态与读取 Agent 分组显示的文案。",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "projectGlobalLinksHint": "{n} 个技能被全局链接，点击查看",
   "@projectGlobalLinksHint": {
     "description": "项目技能页的概要、空状态与读取 Agent 分组显示的文案。",
@@ -4533,18 +4465,6 @@
   "@readerFilesUnreadable": {
     "description": "打开阅读视图后顶部启用信息和文件读取提示显示的文案。",
     "placeholders": {}
-  },
-  "settingsLibraryPathAndCount": "{p0} · {n} 个技能",
-  "@settingsLibraryPathAndCount": {
-    "description": "设置中显示技能库位置和检查链接操作时显示的文案。",
-    "placeholders": {
-      "p0": {
-        "type": "String"
-      },
-      "n": {
-        "type": "int"
-      }
-    }
   },
   "settingsCheckLinks": "检查链接",
   "@settingsCheckLinks": {
@@ -5258,7 +5178,7 @@
     "description": "更新列表说明本机修改、副本冲突和不支持的来源时显示的文案。",
     "placeholders": {}
   },
-  "updateWellKnownSource": "well-known 来源 · 本应用不自动更新",
+  "updateWellKnownSource": "well-known 来源，本应用不会自动更新",
   "@updateWellKnownSource": {
     "description": "更新列表说明本机修改、副本冲突和不支持的来源时显示的文案。",
     "placeholders": {}
@@ -5624,7 +5544,7 @@
       }
     }
   },
-  "updateNotCheckedThisTime": "本次未检查 · {text}",
+  "updateNotCheckedThisTime": "本次未检查：{text}",
   "@updateNotCheckedThisTime": {
     "description": "更新页行的说明",
     "placeholders": {
@@ -5729,18 +5649,6 @@
     "description": "工具栏副标题：几个技能",
     "placeholders": {
       "n": {
-        "type": "int"
-      }
-    }
-  },
-  "countWithSets": "{count} · {sets} 个集合",
-  "@countWithSets": {
-    "description": "技能数后面接集合数",
-    "placeholders": {
-      "count": {
-        "type": "String"
-      },
-      "sets": {
         "type": "int"
       }
     }
@@ -5901,7 +5809,7 @@
       }
     }
   },
-  "settingsDiscoverMeta": "· {checked}，{took}",
+  "settingsDiscoverMeta": "{checked}，{took}",
   "@settingsDiscoverMeta": {
     "description": "设置 › 项目：什么时候检查的、用了多久",
     "placeholders": {
@@ -6403,6 +6311,32 @@
         "type": "String"
       },
       "to": {
+        "type": "String"
+      }
+    }
+  },
+  "commonSetCount": "{count} 个集合",
+  "@commonSetCount": {
+    "description": "集合数：数量旁叠层图标的悬停和读屏文字",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "collectionAllShared": "都在通用里",
+  "@collectionAllShared": {
+    "description": "打开的集合标题旁：集合里的技能都在通用目录",
+    "placeholders": {}
+  },
+  "agentStateLine": "{agent}：{state}",
+  "@agentStateLine": {
+    "description": "某个 Agent 和它对这个技能的状态，用在悬停提示、菜单项和确认框",
+    "placeholders": {
+      "agent": {
+        "type": "String"
+      },
+      "state": {
         "type": "String"
       }
     }

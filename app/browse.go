@@ -19,9 +19,12 @@ func (a *app) browse(c *ui.Context) {
 	a.pruneFilterSelection()
 
 	sets, _ := a.group(skills)
-	subtitle := countLabel(len(skills), len(sets), true)
+	subtitle := func() {
+		ui.Text(c, locales.CountSkills(len(skills))).FontFeatures("tnum").SingleLine()
+		setsBadge(c, len(sets), 12)
+	}
 	if a.mode == viewBoard {
-		subtitle = locales.BrowseSkillsAndAgents(len(mineOf(skills)), len(a.boardAgents(mineOf(skills))))
+		subtitle = toolbarText(c, locales.BrowseSkillsAndAgents(len(mineOf(skills)), len(a.boardAgents(mineOf(skills)))))
 	}
 	switch {
 	case a.batch.on && a.batchOffered():
@@ -243,13 +246,13 @@ func (sec *section) setCount(coll *library.Collection) int {
 	return len(coll.Skills)
 }
 
-// count 是组里的技能数（含集合里的匹配数），有集合时带上集合数。
+// count 是组里的技能数（含集合里的匹配数），集合数由 sectionHeader 另画。
 func (sec *section) count() string {
 	n := len(sec.skills)
 	for _, coll := range sec.sets {
 		n += sec.setCount(coll)
 	}
-	return countLabel(n, len(sec.sets), false)
+	return fmt.Sprint(n)
 }
 
 // sections 把技能分组：我的分成通用和通用之外（本机没有 Agent 读通用目录时
@@ -359,7 +362,7 @@ func (a *app) cardSection(c *ui.Context, sec section, scope library.Scope, cols 
 // cardSectionHeader 是一组卡片的标题：名称、数量、说明，能折叠时右边是
 // 「显示全部」。
 func (a *app) cardSectionHeader(c *ui.Context, sec section, folds bool) {
-	sectionHeader(c.Key(sec.key), sec.title, sec.count(), func() {
+	sectionHeader(c.Key(sec.key), sec.title, sec.count(), len(sec.sets), func() {
 		if sec.note != nil {
 			sec.note(c)
 		}
@@ -460,12 +463,11 @@ func (a *app) cardFooter(c *ui.Context, s *library.Skill) {
 	switch s.Source {
 	case library.Builtin, library.ViaPlugin:
 		agentBadge(c, s.Provider, 14)
-		label := library.AgentName(s.Provider)
+		ui.Text(c, library.AgentName(s.Provider)).FontSize(12).SingleLine().Shrink(0)
 		if s.Plugin != "" {
 			// 不同插件可能带同名技能，标出插件才分得清
-			label += " · " + s.Plugin
+			ui.Text(c, s.Plugin).FontSize(12).TextColor(colTextMuted).SingleLine().MinWidth(0).Shrink(1).Margin(0, 0, 0, 2)
 		}
-		ui.Text(c, label).FontSize(12).SingleLine()
 	case library.Project:
 		ui.Icon(c, iconFolder).Size(12, 12)
 		ui.Text(c, s.Project).Font("monospace").FontSize(11).SingleLine()

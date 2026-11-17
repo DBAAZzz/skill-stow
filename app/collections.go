@@ -44,19 +44,6 @@ func (a *app) group(skills []*library.Skill) (sets []*library.Collection, rest [
 	return sets, rest
 }
 
-// countLabel 是数量，有集合时带上「· N 个集合」。
-// countLabel 是「36 个 · 4 个集合」；skills 时数字后面带上「个」（英文是 skills）。
-func countLabel(n, sets int, skills bool) string {
-	count := fmt.Sprint(n)
-	if skills {
-		count = locales.CountSkills(n)
-	}
-	if sets == 0 {
-		return count
-	}
-	return locales.CountWithSets(count, sets)
-}
-
 // pickSet 是集合卡片的点击：单击选中，双击打开。
 func (a *app) pickSet(card ui.Element, coll *library.Collection) {
 	if card.Clicked() {
@@ -277,7 +264,9 @@ func (a *app) setPage(c *ui.Context, coll *library.Collection) {
 				ui.Text(c, "›").FontSize(13).TextColor(colTextDisabled)
 				ui.Text(c, coll.Name).FontSize(13).FontWeight(600).SingleLine()
 			})
-			ui.Text(c, setSubtitle(coll, len(skills))).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").SingleLine().MinWidth(0)
+			ui.Row(c).Gap(8).AlignItems(ui.Center).MinWidth(0).Shrink(1).FontSize(12).TextColor(colTextMuted).Children(func() {
+				setSubtitle(c, coll, len(skills))
+			})
 		})
 	}, func() { a.browseControls(c, nil) })
 	a.withPane(c, func(width float32) {
@@ -297,21 +286,24 @@ func (a *app) setPage(c *ui.Context, coll *library.Collection) {
 	})
 }
 
-// setSubtitle 是打开的集合标题旁的说明。
-func setSubtitle(coll *library.Collection, shown int) string {
-	text := locales.CollectionSkillCount(len(coll.Skills))
+// setSubtitle 是打开的集合标题旁的说明：几个技能，再加上从哪来、是否只读
+// 或都在通用里，各自一段。
+func setSubtitle(c *ui.Context, coll *library.Collection, shown int) {
+	count := locales.CommonSkillCount(len(coll.Skills))
 	if shown < len(coll.Skills) {
-		text = locales.CollectionVisibleSkills(shown, len(coll.Skills))
+		count = locales.CollectionVisibleSkills(shown, len(coll.Skills))
 	}
+	ui.Text(c, count).FontFeatures("tnum").SingleLine().Shrink(0)
 	switch {
 	case viaPlugin(coll):
-		text = locales.CollectionViaPlugin(text, library.AgentName(coll.Provider))
+		ui.Text(c, locales.CollectionViaPlugin(library.AgentName(coll.Provider))).SingleLine().MinWidth(0).Shrink(1)
+		readOnlyTag(c)
 	case coll.ReadOnly():
-		text = locales.CollectionBuiltin(text, library.AgentName(coll.Provider))
+		ui.Text(c, locales.OriginBuiltin(library.AgentName(coll.Provider))).SingleLine().MinWidth(0).Shrink(1)
+		readOnlyTag(c)
 	case coll.Shared():
-		text += locales.CollectionAllSharedSuffix()
+		ui.Text(c, locales.CollectionAllShared()).SingleLine().MinWidth(0).Shrink(1)
 	}
-	return text
 }
 
 // dependNote 是打开的集合里，被好几个技能依赖的那个（简介里提到它）。
@@ -332,11 +324,8 @@ func (a *app) setPane(c *ui.Context, coll *library.Collection) {
 		ui.Icon(c, iconStack).Size(18, 18).TextColor(colAccent).Shrink(0)
 		ui.Text(c, coll.Name).FontSize(18).FontWeight(600).LetterSpacing(-0.2).MinWidth(0)
 	})
-	meta := locales.CollectionSkillCount(len(coll.Skills))
-	if !coll.Installed.IsZero() {
-		meta += " · " + installedOn(coll.Installed, time.Now())
-	}
-	ui.Text(c, meta).FontSize(12).TextColor(colTextMuted).Margin(6, 0, 0, 0)
+	// 标题下不再写「集合、几个技能、哪天装的」：图标说明是集合，「包含」写了
+	// 几个，安装日期在「来源」里
 
 	if coll.ReadOnly() {
 		label(c, locales.CommonEnabledFor())
@@ -380,7 +369,13 @@ func (a *app) setPane(c *ui.Context, coll *library.Collection) {
 			case library.SetPlugin:
 				how = locales.CollectionAgentPlugin(library.AgentName(coll.Provider))
 			}
-			ui.Text(c, name).FontSize(13).FontWeight(500).SingleLine().Selectable()
+			ui.Row(c).Gap(8).AlignItems(ui.Baseline).Children(func() {
+				ui.Text(c, name).FontSize(13).FontWeight(500).SingleLine().MinWidth(0).Shrink(1).Selectable()
+				if !coll.Installed.IsZero() {
+					ui.Spacer(c)
+					ui.Text(c, installedOn(coll.Installed, time.Now())).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").SingleLine().Shrink(0)
+				}
+			})
 			ui.Text(c, how).Font("monospace").FontSize(11).TextColor(colTextMuted).SingleLine()
 		})
 	})

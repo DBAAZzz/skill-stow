@@ -714,20 +714,6 @@ func (msgs Messages) UsageOpenCollection(name string) string {
 	return Catalog.Format(msgs.locale, "usageOpenCollection", map[string]any{"name": name})
 }
 
-// UsagePluginNote says "插件 · {note}"
-// in the language the app shows.
-//
-// 插件装的技能或集合，说明前面标出来
-func UsagePluginNote(note string) string { return In(i18n.Locale()).UsagePluginNote(note) }
-
-// UsagePluginNote says "插件 · {note}"
-// in the language of msgs.
-//
-// 插件装的技能或集合，说明前面标出来
-func (msgs Messages) UsagePluginNote(note string) string {
-	return Catalog.Format(msgs.locale, "usagePluginNote", map[string]any{"note": note})
-}
-
 // UsageSetNoneUsed says "{n} 个都没用过"
 // in the language the app shows.
 //
@@ -1310,20 +1296,6 @@ func (msgs Messages) FilesLabel() string {
 	return Catalog.Format(msgs.locale, "filesLabel", nil)
 }
 
-// FilesCountSize says "{count} 个 · {p1}"
-// in the language the app shows.
-//
-// usage_page.go:922
-func FilesCountSize(count int, p1 string) string { return In(i18n.Locale()).FilesCountSize(count, p1) }
-
-// FilesCountSize says "{count} 个 · {p1}"
-// in the language of msgs.
-//
-// usage_page.go:922
-func (msgs Messages) FilesCountSize(count int, p1 string) string {
-	return Catalog.Format(msgs.locale, "filesCountSize", map[string]any{"count": count, "p1": p1})
-}
-
 // OpenInReader says "打开阅读视图"
 // in the language the app shows.
 //
@@ -1852,7 +1824,7 @@ func (msgs Messages) DeleteSharedDirOthers(agent string, dir string, others stri
 	return Catalog.Format(msgs.locale, "deleteSharedDirOthers", map[string]any{"agent": agent, "dir": dir, "others": others})
 }
 
-// OriginPlugin says "随 {agent} 插件 {plugin} 安装 · 只读"
+// OriginPlugin says "随 {agent} 插件 {plugin} 安装"
 // in the language the app shows.
 //
 // 技能来源说明：插件装的
@@ -1860,7 +1832,7 @@ func OriginPlugin(agent string, plugin string) string {
 	return In(i18n.Locale()).OriginPlugin(agent, plugin)
 }
 
-// OriginPlugin says "随 {agent} 插件 {plugin} 安装 · 只读"
+// OriginPlugin says "随 {agent} 插件 {plugin} 安装"
 // in the language of msgs.
 //
 // 技能来源说明：插件装的
@@ -1868,7 +1840,7 @@ func (msgs Messages) OriginPlugin(agent string, plugin string) string {
 	return Catalog.Format(msgs.locale, "originPlugin", map[string]any{"agent": agent, "plugin": plugin})
 }
 
-// OriginBuiltinPlugin says "由 {agent} 的插件 {plugin} 提供 · 只读"
+// OriginBuiltinPlugin says "由 {agent} 的插件 {plugin} 提供"
 // in the language the app shows.
 //
 // 技能来源说明：Agent 的插件自带的
@@ -1876,7 +1848,7 @@ func OriginBuiltinPlugin(agent string, plugin string) string {
 	return In(i18n.Locale()).OriginBuiltinPlugin(agent, plugin)
 }
 
-// OriginBuiltinPlugin says "由 {agent} 的插件 {plugin} 提供 · 只读"
+// OriginBuiltinPlugin says "由 {agent} 的插件 {plugin} 提供"
 // in the language of msgs.
 //
 // 技能来源说明：Agent 的插件自带的
@@ -1884,13 +1856,13 @@ func (msgs Messages) OriginBuiltinPlugin(agent string, plugin string) string {
 	return Catalog.Format(msgs.locale, "originBuiltinPlugin", map[string]any{"agent": agent, "plugin": plugin})
 }
 
-// OriginBuiltin says "由 {agent} 提供 · 只读"
+// OriginBuiltin says "由 {agent} 提供"
 // in the language the app shows.
 //
 // 技能来源说明：Agent 自带的
 func OriginBuiltin(agent string) string { return In(i18n.Locale()).OriginBuiltin(agent) }
 
-// OriginBuiltin says "由 {agent} 提供 · 只读"
+// OriginBuiltin says "由 {agent} 提供"
 // in the language of msgs.
 //
 // 技能来源说明：Agent 自带的
@@ -1898,13 +1870,13 @@ func (msgs Messages) OriginBuiltin(agent string) string {
 	return Catalog.Format(msgs.locale, "originBuiltin", map[string]any{"agent": agent})
 }
 
-// OriginProject says "项目技能 · {project} · 只读"
+// OriginProject says "项目 {project} 里的技能"
 // in the language the app shows.
 //
 // 技能来源说明：项目里的
 func OriginProject(project string) string { return In(i18n.Locale()).OriginProject(project) }
 
-// OriginProject says "项目技能 · {project} · 只读"
+// OriginProject says "项目 {project} 里的技能"
 // in the language of msgs.
 //
 // 技能来源说明：项目里的
@@ -2490,36 +2462,18 @@ func (msgs Messages) SourceAvatar(name string) string {
 	return Catalog.Format(msgs.locale, "sourceAvatar", map[string]any{"name": name})
 }
 
-// CollectionViaPlugin says "{text} · 随 {agent} 插件安装 · 只读"
+// CollectionViaPlugin says "随 {agent} 插件安装"
 // in the language the app shows.
 //
 // 集合副标题：插件装的
-func CollectionViaPlugin(text string, agent string) string {
-	return In(i18n.Locale()).CollectionViaPlugin(text, agent)
-}
+func CollectionViaPlugin(agent string) string { return In(i18n.Locale()).CollectionViaPlugin(agent) }
 
-// CollectionViaPlugin says "{text} · 随 {agent} 插件安装 · 只读"
+// CollectionViaPlugin says "随 {agent} 插件安装"
 // in the language of msgs.
 //
 // 集合副标题：插件装的
-func (msgs Messages) CollectionViaPlugin(text string, agent string) string {
-	return Catalog.Format(msgs.locale, "collectionViaPlugin", map[string]any{"text": text, "agent": agent})
-}
-
-// CollectionBuiltin says "{text} · 由 {agent} 提供 · 只读"
-// in the language the app shows.
-//
-// 集合副标题：Agent 自带的
-func CollectionBuiltin(text string, agent string) string {
-	return In(i18n.Locale()).CollectionBuiltin(text, agent)
-}
-
-// CollectionBuiltin says "{text} · 由 {agent} 提供 · 只读"
-// in the language of msgs.
-//
-// 集合副标题：Agent 自带的
-func (msgs Messages) CollectionBuiltin(text string, agent string) string {
-	return Catalog.Format(msgs.locale, "collectionBuiltin", map[string]any{"text": text, "agent": agent})
+func (msgs Messages) CollectionViaPlugin(agent string) string {
+	return Catalog.Format(msgs.locale, "collectionViaPlugin", map[string]any{"agent": agent})
 }
 
 // CollectionAgentPlugin says "{agent} 的插件"
@@ -5840,7 +5794,7 @@ func (msgs Messages) NativeDisableTitle(name string) string {
 	return Catalog.Format(msgs.locale, "nativeDisableTitle", map[string]any{"name": name})
 }
 
-// NativeCardActions says "{agent} · {name} 操作"
+// NativeCardActions says "{agent} 中 {name} 的操作"
 // in the language the app shows.
 //
 // 看板卡片「…」按钮给辅助功能读的名字
@@ -5848,7 +5802,7 @@ func NativeCardActions(agent string, name string) string {
 	return In(i18n.Locale()).NativeCardActions(agent, name)
 }
 
-// NativeCardActions says "{agent} · {name} 操作"
+// NativeCardActions says "{agent} 中 {name} 的操作"
 // in the language of msgs.
 //
 // 看板卡片「…」按钮给辅助功能读的名字
@@ -6040,7 +5994,7 @@ func (msgs Messages) BatchExitShortcut() string {
 	return Catalog.Format(msgs.locale, "batchExitShortcut", nil)
 }
 
-// BatchSelectionSummary says "含 {sets} 个集合 · 共 {count} 个技能"
+// BatchSelectionSummary says "含 {sets} 个集合，共 {count} 个技能"
 // in the language the app shows.
 //
 // 批量删除模式的选择栏和分组选择操作显示的文案。
@@ -6048,7 +6002,7 @@ func BatchSelectionSummary(sets int, count int) string {
 	return In(i18n.Locale()).BatchSelectionSummary(sets, count)
 }
 
-// BatchSelectionSummary says "含 {sets} 个集合 · 共 {count} 个技能"
+// BatchSelectionSummary says "含 {sets} 个集合，共 {count} 个技能"
 // in the language of msgs.
 //
 // 批量删除模式的选择栏和分组选择操作显示的文案。
@@ -6112,7 +6066,7 @@ func (msgs Messages) BatchReadOnlyCannotDelete() string {
 	return Catalog.Format(msgs.locale, "batchReadOnlyCannotDelete", nil)
 }
 
-// BrowseSkillsAndAgents says "{count} 个 · {count2} 个 Agent"
+// BrowseSkillsAndAgents says "{count} 个技能，分布在 {count2} 个 Agent"
 // in the language the app shows.
 //
 // 技能浏览页顶部的技能与 Agent 数量概要显示的文案。
@@ -6120,7 +6074,7 @@ func BrowseSkillsAndAgents(count int, count2 int) string {
 	return In(i18n.Locale()).BrowseSkillsAndAgents(count, count2)
 }
 
-// BrowseSkillsAndAgents says "{count} 个 · {count2} 个 Agent"
+// BrowseSkillsAndAgents says "{count} 个技能，分布在 {count2} 个 Agent"
 // in the language of msgs.
 //
 // 技能浏览页顶部的技能与 Agent 数量概要显示的文案。
@@ -6614,21 +6568,7 @@ func (msgs Messages) ActionBackShortcut() string {
 	return Catalog.Format(msgs.locale, "actionBackShortcut", nil)
 }
 
-// CollectionSkillCount says "集合 · {count} 个技能"
-// in the language the app shows.
-//
-// 打开集合后顶部的返回按钮和技能数概要显示的文案。
-func CollectionSkillCount(count int) string { return In(i18n.Locale()).CollectionSkillCount(count) }
-
-// CollectionSkillCount says "集合 · {count} 个技能"
-// in the language of msgs.
-//
-// 打开集合后顶部的返回按钮和技能数概要显示的文案。
-func (msgs Messages) CollectionSkillCount(count int) string {
-	return Catalog.Format(msgs.locale, "collectionSkillCount", map[string]any{"count": count})
-}
-
-// CollectionVisibleSkills says "集合 · 显示 {shown} / {count} 个技能"
+// CollectionVisibleSkills says "显示 {shown} / {count} 个技能"
 // in the language the app shows.
 //
 // 打开集合后顶部的返回按钮和技能数概要显示的文案。
@@ -6636,26 +6576,12 @@ func CollectionVisibleSkills(shown int, count int) string {
 	return In(i18n.Locale()).CollectionVisibleSkills(shown, count)
 }
 
-// CollectionVisibleSkills says "集合 · 显示 {shown} / {count} 个技能"
+// CollectionVisibleSkills says "显示 {shown} / {count} 个技能"
 // in the language of msgs.
 //
 // 打开集合后顶部的返回按钮和技能数概要显示的文案。
 func (msgs Messages) CollectionVisibleSkills(shown int, count int) string {
 	return Catalog.Format(msgs.locale, "collectionVisibleSkills", map[string]any{"shown": shown, "count": count})
-}
-
-// CollectionAllSharedSuffix says " · 都在通用里"
-// in the language the app shows.
-//
-// 集合详情中说明读取范围、来源与逐个启停的区域显示的文案。
-func CollectionAllSharedSuffix() string { return In(i18n.Locale()).CollectionAllSharedSuffix() }
-
-// CollectionAllSharedSuffix says " · 都在通用里"
-// in the language of msgs.
-//
-// 集合详情中说明读取范围、来源与逐个启停的区域显示的文案。
-func (msgs Messages) CollectionAllSharedSuffix() string {
-	return Catalog.Format(msgs.locale, "collectionAllSharedSuffix", nil)
 }
 
 // CollectionDependents says "{n} 个技能依赖它"
@@ -6814,7 +6740,7 @@ func (msgs Messages) CollectionToggleEachSkill() string {
 	return Catalog.Format(msgs.locale, "collectionToggleEachSkill", nil)
 }
 
-// CompareCopiesAndVersions says "{p0} 份 · {count} 种内容"
+// CompareCopiesAndVersions says "{p0} 份副本，{count} 种内容"
 // in the language the app shows.
 //
 // 打开同名副本对比页时的标题和版本概要显示的文案。
@@ -6822,7 +6748,7 @@ func CompareCopiesAndVersions(p0 int, count int) string {
 	return In(i18n.Locale()).CompareCopiesAndVersions(p0, count)
 }
 
-// CompareCopiesAndVersions says "{p0} 份 · {count} 种内容"
+// CompareCopiesAndVersions says "{p0} 份副本，{count} 种内容"
 // in the language of msgs.
 //
 // 打开同名副本对比页时的标题和版本概要显示的文案。
@@ -6996,20 +6922,6 @@ func CompareBinary() string { return In(i18n.Locale()).CompareBinary() }
 // 差异文件列表中标示文件状态时显示的文案。
 func (msgs Messages) CompareBinary() string {
 	return Catalog.Format(msgs.locale, "compareBinary", nil)
-}
-
-// CompareLocationsSuffix says " · {count} 处"
-// in the language the app shows.
-//
-// 副本版本卡片显示文件分布位置数时显示的文案。
-func CompareLocationsSuffix(count int) string { return In(i18n.Locale()).CompareLocationsSuffix(count) }
-
-// CompareLocationsSuffix says " · {count} 处"
-// in the language of msgs.
-//
-// 副本版本卡片显示文件分布位置数时显示的文案。
-func (msgs Messages) CompareLocationsSuffix(count int) string {
-	return Catalog.Format(msgs.locale, "compareLocationsSuffix", map[string]any{"count": count})
 }
 
 // CommonLocationCount says "{count} 处"
@@ -9822,22 +9734,6 @@ func (msgs Messages) ActionShowInList() string {
 	return Catalog.Format(msgs.locale, "actionShowInList", nil)
 }
 
-// ProjectReadOnlySkills says "{count} 个技能 · 只读"
-// in the language the app shows.
-//
-// 项目技能页的概要、空状态与读取 Agent
-// 分组显示的文案。
-func ProjectReadOnlySkills(count int) string { return In(i18n.Locale()).ProjectReadOnlySkills(count) }
-
-// ProjectReadOnlySkills says "{count} 个技能 · 只读"
-// in the language of msgs.
-//
-// 项目技能页的概要、空状态与读取 Agent
-// 分组显示的文案。
-func (msgs Messages) ProjectReadOnlySkills(count int) string {
-	return Catalog.Format(msgs.locale, "projectReadOnlySkills", map[string]any{"count": count})
-}
-
 // ProjectGlobalLinksHint says "{n} 个技能被全局链接，点击查看"
 // in the language the app shows.
 //
@@ -10004,22 +9900,6 @@ func ReaderFilesUnreadable() string { return In(i18n.Locale()).ReaderFilesUnread
 // 打开阅读视图后顶部启用信息和文件读取提示显示的文案。
 func (msgs Messages) ReaderFilesUnreadable() string {
 	return Catalog.Format(msgs.locale, "readerFilesUnreadable", nil)
-}
-
-// SettingsLibraryPathAndCount says "{p0} · {n} 个技能"
-// in the language the app shows.
-//
-// 设置中显示技能库位置和检查链接操作时显示的文案。
-func SettingsLibraryPathAndCount(p0 string, n int) string {
-	return In(i18n.Locale()).SettingsLibraryPathAndCount(p0, n)
-}
-
-// SettingsLibraryPathAndCount says "{p0} · {n} 个技能"
-// in the language of msgs.
-//
-// 设置中显示技能库位置和检查链接操作时显示的文案。
-func (msgs Messages) SettingsLibraryPathAndCount(p0 string, n int) string {
-	return Catalog.Format(msgs.locale, "settingsLibraryPathAndCount", map[string]any{"p0": p0, "n": n})
 }
 
 // SettingsCheckLinks says "检查链接"
@@ -11812,13 +11692,13 @@ func (msgs Messages) UpdateDifferentCopiesNeedMerge() string {
 	return Catalog.Format(msgs.locale, "updateDifferentCopiesNeedMerge", nil)
 }
 
-// UpdateWellKnownSource says "well-known 来源 · 本应用不自动更新"
+// UpdateWellKnownSource says "well-known 来源，本应用不会自动更新"
 // in the language the app shows.
 //
 // 更新列表说明本机修改、副本冲突和不支持的来源时显示的文案。
 func UpdateWellKnownSource() string { return In(i18n.Locale()).UpdateWellKnownSource() }
 
-// UpdateWellKnownSource says "well-known 来源 · 本应用不自动更新"
+// UpdateWellKnownSource says "well-known 来源，本应用不会自动更新"
 // in the language of msgs.
 //
 // 更新列表说明本机修改、副本冲突和不支持的来源时显示的文案。
@@ -12682,7 +12562,7 @@ func (msgs Messages) UpdateUpdatedTo(commit string) string {
 	return Catalog.Format(msgs.locale, "updateUpdatedTo", map[string]any{"commit": commit})
 }
 
-// UpdateNotCheckedThisTime says "本次未检查 · {text}"
+// UpdateNotCheckedThisTime says "本次未检查：{text}"
 // in the language the app shows.
 //
 // 更新页行的说明
@@ -12690,7 +12570,7 @@ func UpdateNotCheckedThisTime(text string) string {
 	return In(i18n.Locale()).UpdateNotCheckedThisTime(text)
 }
 
-// UpdateNotCheckedThisTime says "本次未检查 · {text}"
+// UpdateNotCheckedThisTime says "本次未检查：{text}"
 // in the language of msgs.
 //
 // 更新页行的说明
@@ -12882,22 +12762,6 @@ func CountSkills(n int) string { return In(i18n.Locale()).CountSkills(n) }
 // 工具栏副标题：几个技能
 func (msgs Messages) CountSkills(n int) string {
 	return Catalog.Format(msgs.locale, "countSkills", map[string]any{"n": n})
-}
-
-// CountWithSets says "{count} · {sets} 个集合"
-// in the language the app shows.
-//
-// 技能数后面接集合数
-func CountWithSets(count string, sets int) string {
-	return In(i18n.Locale()).CountWithSets(count, sets)
-}
-
-// CountWithSets says "{count} · {sets} 个集合"
-// in the language of msgs.
-//
-// 技能数后面接集合数
-func (msgs Messages) CountWithSets(count string, sets int) string {
-	return Catalog.Format(msgs.locale, "countWithSets", map[string]any{"count": count, "sets": sets})
 }
 
 // InstalledOnDate says "{date}安装"
@@ -13176,7 +13040,7 @@ func (msgs Messages) SettingsWithSkills(n int) string {
 	return Catalog.Format(msgs.locale, "settingsWithSkills", map[string]any{"n": n})
 }
 
-// SettingsDiscoverMeta says "· {checked}，{took}"
+// SettingsDiscoverMeta says "{checked}，{took}"
 // in the language the app shows.
 //
 // 设置 › 项目：什么时候检查的、用了多久
@@ -13184,7 +13048,7 @@ func SettingsDiscoverMeta(checked string, took string) string {
 	return In(i18n.Locale()).SettingsDiscoverMeta(checked, took)
 }
 
-// SettingsDiscoverMeta says "· {checked}，{took}"
+// SettingsDiscoverMeta says "{checked}，{took}"
 // in the language of msgs.
 //
 // 设置 › 项目：什么时候检查的、用了多久
@@ -14330,4 +14194,50 @@ func ImportReplaceLinkNotRestored(path string, to string) string {
 // 替换中途出错撤回时，某个旧链接没能照原样建回去
 func (msgs Messages) ImportReplaceLinkNotRestored(path string, to string) string {
 	return Catalog.Format(msgs.locale, "importReplaceLinkNotRestored", map[string]any{"path": path, "to": to})
+}
+
+// CommonSetCount says "{count} 个集合"
+// in the language the app shows.
+//
+// 集合数：数量旁叠层图标的悬停和读屏文字
+func CommonSetCount(count int) string { return In(i18n.Locale()).CommonSetCount(count) }
+
+// CommonSetCount says "{count} 个集合"
+// in the language of msgs.
+//
+// 集合数：数量旁叠层图标的悬停和读屏文字
+func (msgs Messages) CommonSetCount(count int) string {
+	return Catalog.Format(msgs.locale, "commonSetCount", map[string]any{"count": count})
+}
+
+// CollectionAllShared says "都在通用里"
+// in the language the app shows.
+//
+// 打开的集合标题旁：集合里的技能都在通用目录
+func CollectionAllShared() string { return In(i18n.Locale()).CollectionAllShared() }
+
+// CollectionAllShared says "都在通用里"
+// in the language of msgs.
+//
+// 打开的集合标题旁：集合里的技能都在通用目录
+func (msgs Messages) CollectionAllShared() string {
+	return Catalog.Format(msgs.locale, "collectionAllShared", nil)
+}
+
+// AgentStateLine says "{agent}：{state}"
+// in the language the app shows.
+//
+// 某个 Agent
+// 和它对这个技能的状态，用在悬停提示、菜单项和确认框
+func AgentStateLine(agent string, state string) string {
+	return In(i18n.Locale()).AgentStateLine(agent, state)
+}
+
+// AgentStateLine says "{agent}：{state}"
+// in the language of msgs.
+//
+// 某个 Agent
+// 和它对这个技能的状态，用在悬停提示、菜单项和确认框
+func (msgs Messages) AgentStateLine(agent string, state string) string {
+	return Catalog.Format(msgs.locale, "agentStateLine", map[string]any{"agent": agent, "state": state})
 }

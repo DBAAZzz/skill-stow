@@ -258,7 +258,14 @@ func (a *app) generalTab(c *ui.Context) {
 					n++
 				}
 			}
-			rowText(c, locales.CommonLocation(), locales.SettingsLibraryPathAndCount(a.lib.Display(a.lib.Root), n), true)
+			// 路径用等宽，技能数用正文字体，各自一段
+			ui.Column(c).Grow(1).MinWidth(0).Gap(titleGap).Children(func() {
+				ui.Text(c, locales.CommonLocation()).FontWeight(500).SingleLine()
+				ui.Row(c).Gap(8).AlignItems(ui.Baseline).MinWidth(0).TextColor(colTextMuted).Children(func() {
+					ui.Text(c, a.lib.Display(a.lib.Root)).Font("monospace").FontSize(11).SingleLine().MinWidth(0).Shrink(1)
+					ui.Text(c, locales.CommonSkillCount(n)).FontSize(12).FontFeatures("tnum").SingleLine().Shrink(0)
+				})
+			})
 			if pushButton(c, locales.ActionShowInFinder()).Clicked() {
 				a.reveal(a.lib.Root)
 			}

@@ -4,7 +4,6 @@ import (
 	"context"
 	i18nerrors2 "errors"
 	"fmt"
-	"time"
 
 	"skillmanager/internal/library"
 	"skillmanager/locales"
@@ -141,19 +140,11 @@ func (a *app) prepareUpdate(it library.UpdateItem) {
 }
 
 func newUpdateCompareState(l *library.Library, p *library.Prepared) *compareState {
-	rightSub := p.Item.Source.String()
-	if short := shortCommit(p.Item.Commit); short != "" {
-		rightSub += " · " + short
-	}
-	if !p.Item.CommitDate.IsZero() {
-		rightSub += " · " + dayLabel(p.Item.CommitDate, time.Now())
-	}
 	return &compareState{
 		files:    l.CompareUpdate(p),
 		open:     map[int]bool{},
 		updating: true,
 		leftSub:  l.Display(p.Item.Place),
-		rightSub: rightSub,
 	}
 }
 

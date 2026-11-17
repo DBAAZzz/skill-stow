@@ -88,7 +88,7 @@ func TestBoardMenuOnlyTogglesItsOwnAgent(t *testing.T) {
 	a, tt := newTester(t)
 	a.mode = viewBoard
 	tt.Frame()
-	target := "Claude Code · interface-craft 操作"
+	target := "Claude Code 中 interface-craft 的操作"
 	rect, ok := tt.Find(target)
 	if !ok {
 		t.Fatal("missing card menu")
