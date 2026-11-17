@@ -147,9 +147,9 @@ func TestDockProgressClearsOnLastWindowCloseAndSyncsOnReopen(t *testing.T) {
 			t.Fatalf("再次关闭主窗口时应清除 Dock 进度，实际 applied=%+v", a.tidy.appliedDock)
 		}
 		work(a.post)
-		if a.tidy.merging != nil || a.tidy.wantDock != (mygo.ProgressBar{}) || a.tidy.appliedDock != (mygo.ProgressBar{}) {
+		if a.tidy.work != nil || a.tidy.wantDock != (mygo.ProgressBar{}) || a.tidy.appliedDock != (mygo.ProgressBar{}) {
 			t.Fatalf("无窗口期间任务完成后不应残留进度：merging=%v want=%+v applied=%+v",
-				a.tidy.merging, a.tidy.wantDock, a.tidy.appliedDock)
+				a.tidy.work, a.tidy.wantDock, a.tidy.appliedDock)
 		}
 		a.handleActivate(false)
 		if a.tidy.appliedDock != (mygo.ProgressBar{}) {

@@ -14333,3 +14333,215 @@ func ImportReplaceLinkNotRestored(path string, to string) string {
 func (msgs Messages) ImportReplaceLinkNotRestored(path string, to string) string {
 	return Catalog.Format(msgs.locale, "importReplaceLinkNotRestored", map[string]any{"path": path, "to": to})
 }
+
+// TidyDeletingLink says "正在删除链接"
+// in the language the app shows.
+//
+// 整理操作进度或完成结果。
+func TidyDeletingLink() string { return In(i18n.Locale()).TidyDeletingLink() }
+
+// TidyDeletingLink says "正在删除链接"
+// in the language of msgs.
+//
+// 整理操作进度或完成结果。
+func (msgs Messages) TidyDeletingLink() string {
+	return Catalog.Format(msgs.locale, "tidyDeletingLink", nil)
+}
+
+// TidyLinkDeleted says "已删除链接"
+// in the language the app shows.
+//
+// 整理操作进度或完成结果。
+func TidyLinkDeleted() string { return In(i18n.Locale()).TidyLinkDeleted() }
+
+// TidyLinkDeleted says "已删除链接"
+// in the language of msgs.
+//
+// 整理操作进度或完成结果。
+func (msgs Messages) TidyLinkDeleted() string {
+	return Catalog.Format(msgs.locale, "tidyLinkDeleted", nil)
+}
+
+// TidyReconnecting says "正在重新连接"
+// in the language the app shows.
+//
+// 整理操作进度或完成结果。
+func TidyReconnecting() string { return In(i18n.Locale()).TidyReconnecting() }
+
+// TidyReconnecting says "正在重新连接"
+// in the language of msgs.
+//
+// 整理操作进度或完成结果。
+func (msgs Messages) TidyReconnecting() string {
+	return Catalog.Format(msgs.locale, "tidyReconnecting", nil)
+}
+
+// TidyReconnected says "已重新连上"
+// in the language the app shows.
+//
+// 整理操作进度或完成结果。
+func TidyReconnected() string { return In(i18n.Locale()).TidyReconnected() }
+
+// TidyReconnected says "已重新连上"
+// in the language of msgs.
+//
+// 整理操作进度或完成结果。
+func (msgs Messages) TidyReconnected() string {
+	return Catalog.Format(msgs.locale, "tidyReconnected", nil)
+}
+
+// TidyProcessing says "正在处理"
+// in the language the app shows.
+//
+// 整理操作进度或完成结果。
+func TidyProcessing() string { return In(i18n.Locale()).TidyProcessing() }
+
+// TidyProcessing says "正在处理"
+// in the language of msgs.
+//
+// 整理操作进度或完成结果。
+func (msgs Messages) TidyProcessing() string {
+	return Catalog.Format(msgs.locale, "tidyProcessing", nil)
+}
+
+// TidyProcessed says "已处理"
+// in the language the app shows.
+//
+// 整理操作进度或完成结果。
+func TidyProcessed() string { return In(i18n.Locale()).TidyProcessed() }
+
+// TidyProcessed says "已处理"
+// in the language of msgs.
+//
+// 整理操作进度或完成结果。
+func (msgs Messages) TidyProcessed() string {
+	return Catalog.Format(msgs.locale, "tidyProcessed", nil)
+}
+
+// TidyProcessingName says "正在处理 {name}…"
+// in the language the app shows.
+//
+// 整理操作进度或完成结果。
+func TidyProcessingName(name string) string { return In(i18n.Locale()).TidyProcessingName(name) }
+
+// TidyProcessingName says "正在处理 {name}…"
+// in the language of msgs.
+//
+// 整理操作进度或完成结果。
+func (msgs Messages) TidyProcessingName(name string) string {
+	return Catalog.Format(msgs.locale, "tidyProcessingName", map[string]any{"name": name})
+}
+
+// TidyLinksDeleted says "已删除 {n} 个重复链接。"
+// in the language the app shows.
+//
+// 整理操作进度或完成结果。
+func TidyLinksDeleted(n int) string { return In(i18n.Locale()).TidyLinksDeleted(n) }
+
+// TidyLinksDeleted says "已删除 {n} 个重复链接。"
+// in the language of msgs.
+//
+// 整理操作进度或完成结果。
+func (msgs Messages) TidyLinksDeleted(n int) string {
+	return Catalog.Format(msgs.locale, "tidyLinksDeleted", map[string]any{"n": n})
+}
+
+// TidyBrokenDeleted says "已删除 {name} 的断开链接。"
+// in the language the app shows.
+//
+// 整理操作进度或完成结果。
+func TidyBrokenDeleted(name string) string { return In(i18n.Locale()).TidyBrokenDeleted(name) }
+
+// TidyBrokenDeleted says "已删除 {name} 的断开链接。"
+// in the language of msgs.
+//
+// 整理操作进度或完成结果。
+func (msgs Messages) TidyBrokenDeleted(name string) string {
+	return Catalog.Format(msgs.locale, "tidyBrokenDeleted", map[string]any{"name": name})
+}
+
+// TidyLinkReconnected says "已重新连上 {name}。"
+// in the language the app shows.
+//
+// 整理操作进度或完成结果。
+func TidyLinkReconnected(name string) string { return In(i18n.Locale()).TidyLinkReconnected(name) }
+
+// TidyLinkReconnected says "已重新连上 {name}。"
+// in the language of msgs.
+//
+// 整理操作进度或完成结果。
+func (msgs Messages) TidyLinkReconnected(name string) string {
+	return Catalog.Format(msgs.locale, "tidyLinkReconnected", map[string]any{"name": name})
+}
+
+// TidyLinksKept says "已保留 {name} 的全局链接，不再提醒。"
+// in the language the app shows.
+//
+// 整理操作进度或完成结果。
+func TidyLinksKept(name string) string { return In(i18n.Locale()).TidyLinksKept(name) }
+
+// TidyLinksKept says "已保留 {name} 的全局链接，不再提醒。"
+// in the language of msgs.
+//
+// 整理操作进度或完成结果。
+func (msgs Messages) TidyLinksKept(name string) string {
+	return Catalog.Format(msgs.locale, "tidyLinksKept", map[string]any{"name": name})
+}
+
+// TidyProjectOnly says "{name} 现在只在项目里使用。"
+// in the language the app shows.
+//
+// 整理操作进度或完成结果。
+func TidyProjectOnly(name string) string { return In(i18n.Locale()).TidyProjectOnly(name) }
+
+// TidyProjectOnly says "{name} 现在只在项目里使用。"
+// in the language of msgs.
+//
+// 整理操作进度或完成结果。
+func (msgs Messages) TidyProjectOnly(name string) string {
+	return Catalog.Format(msgs.locale, "tidyProjectOnly", map[string]any{"name": name})
+}
+
+// TidyCollected says "{name} 已收进我的技能。"
+// in the language the app shows.
+//
+// 整理操作进度或完成结果。
+func TidyCollected(name string) string { return In(i18n.Locale()).TidyCollected(name) }
+
+// TidyCollected says "{name} 已收进我的技能。"
+// in the language of msgs.
+//
+// 整理操作进度或完成结果。
+func (msgs Messages) TidyCollected(name string) string {
+	return Catalog.Format(msgs.locale, "tidyCollected", map[string]any{"name": name})
+}
+
+// TidyOperationFailed says "已完成 {completed} 项，{failed} 项失败：{reason}"
+// in the language the app shows.
+//
+// 整理操作进度或完成结果。
+func TidyOperationFailed(completed int, failed int, reason string) string {
+	return In(i18n.Locale()).TidyOperationFailed(completed, failed, reason)
+}
+
+// TidyOperationFailed says "已完成 {completed} 项，{failed} 项失败：{reason}"
+// in the language of msgs.
+//
+// 整理操作进度或完成结果。
+func (msgs Messages) TidyOperationFailed(completed int, failed int, reason string) string {
+	return Catalog.Format(msgs.locale, "tidyOperationFailed", map[string]any{"completed": completed, "failed": failed, "reason": reason})
+}
+
+// TidyProcessingFinished says "处理结束"
+// in the language the app shows.
+//
+// 整理操作完成，可能含失败项；最终结果由提示条说明。
+func TidyProcessingFinished() string { return In(i18n.Locale()).TidyProcessingFinished() }
+
+// TidyProcessingFinished says "处理结束"
+// in the language of msgs.
+//
+// 整理操作完成，可能含失败项；最终结果由提示条说明。
+func (msgs Messages) TidyProcessingFinished() string {
+	return Catalog.Format(msgs.locale, "tidyProcessingFinished", nil)
+}

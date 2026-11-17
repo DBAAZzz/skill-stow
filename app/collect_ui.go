@@ -9,10 +9,10 @@ import (
 
 // globalActions 是被全局链接的项目技能的处理按钮（整理页表格、全局链接弹窗共用）。
 func (a *app) globalActions(c *ui.Context, s *library.Skill, button func(*ui.Context, string) ui.Element) {
-	if button(c, locales.CollectKeepLinks()).Tooltip(locales.CollectKeepLinksHint()).Clicked() {
-		a.tidyRun(func() error { return a.lib.KeepLinks(s) })
+	if button(c, locales.CollectKeepLinks()).Disabled(a.tidy.busy() || a.tidy.scanning).Tooltip(locales.CollectKeepLinksHint()).Clicked() {
+		a.tidyProject(s, keepProjectLinks)
 	}
-	if button(c, locales.CollectIntoMySkills()).Clicked() {
+	if button(c, locales.CollectIntoMySkills()).Disabled(a.tidy.busy() || a.tidy.scanning).Clicked() {
 		a.collect, a.linkedOpen, a.collectOpen = s, false, true
 	}
 }
@@ -45,10 +45,9 @@ func (a *app) collectDialog(c *ui.Context) {
 		if dialogButton(c, locales.ActionCancel(), false).Clicked() {
 			a.collectOpen = false
 		}
-		if dialogButton(c, locales.CollectIntoMySkills(), true).Clicked() {
+		if dialogButton(c, locales.CollectIntoMySkills(), true).Disabled(a.tidy.busy() || a.tidy.scanning).Clicked() {
 			a.collectOpen = false
-			a.tidyRun(func() error { return a.lib.Collect(s) })
-			a.rescan()
+			a.tidyProject(s, collectProjectSkill)
 		}
 	})
 }

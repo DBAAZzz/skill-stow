@@ -990,5 +990,20 @@
   "importChangedSinceConfirmNote": "Compare again, and choose Replace if you still want to.",
   "importReplaceUnreadable": "{path} can't be read in full, so there's no way to tell whether it changed before replacing. It can't be replaced.",
   "importReplaceOldKeptAt": "The old version wasn't deleted. It's kept at {paths}.",
-  "importReplaceLinkNotRestored": "{path} couldn't be restored to its original link (it pointed to {to}). The old link is in the Trash."
+  "importReplaceLinkNotRestored": "{path} couldn't be restored to its original link (it pointed to {to}). The old link is in the Trash.",
+  "tidyDeletingLink": "Deleting link",
+  "tidyLinkDeleted": "Link deleted",
+  "tidyReconnecting": "Reconnecting",
+  "tidyReconnected": "Reconnected",
+  "tidyProcessing": "Processing",
+  "tidyProcessed": "Completed",
+  "tidyProcessingName": "Processing {name}…",
+  "tidyLinksDeleted": "Deleted {n} duplicate links.",
+  "tidyBrokenDeleted": "Deleted the broken link for {name}.",
+  "tidyLinkReconnected": "Reconnected {name}.",
+  "tidyLinksKept": "Kept the global links for {name}; this issue will no longer be reported.",
+  "tidyProjectOnly": "{name} is now used only in its project.",
+  "tidyCollected": "{name} has been added to My Skills.",
+  "tidyOperationFailed": "Completed {completed}; {failed} failed: {reason}",
+  "tidyProcessingFinished": "Processing finished"
 }

@@ -81,3 +81,40 @@ func TestKeptLinksStopBeingReportedAndSurviveRescan(t *testing.T) {
 		t.Error("保持链接不应改链接")
 	}
 }
+
+func TestKeepLinksWriteFailureKeepsTheIssueRetryable(t *testing.T) {
+	home := fakeHome(t)
+	h := func(p string) string { return filepath.Join(home, p) }
+	l := Scan(home)
+	s := stockDocs(t, l, h)
+	must(t, l.SaveSettings())
+	must(t, os.Chmod(settingsFile(home), 0444))
+	t.Cleanup(func() { _ = os.Chmod(settingsFile(home), 0644) })
+	if err := l.KeepLinks(s); err == nil {
+		t.Fatal("read-only settings should reject the operation")
+	}
+	if s.KeptLinks || len(l.Settings.KeptLinks) != 0 || len(l.Problems().Global) == 0 {
+		t.Fatal("failed persistence must not hide the issue or keep an unsaved preference")
+	}
+}
+
+func TestUnglobalFailureKeepsTheIssueRetryable(t *testing.T) {
+	home := fakeHome(t)
+	h := func(p string) string { return filepath.Join(home, p) }
+	l := Scan(home)
+	s := stockDocs(t, l, h)
+	dir := filepath.Dir(s.globalLinks[0])
+	must(t, os.Chmod(dir, 0555))
+	t.Cleanup(func() { _ = os.Chmod(dir, 0755) })
+	if err := l.Unglobal(s); err == nil {
+		t.Fatal("read-only link directory should reject the operation")
+	}
+	if len(l.Problems().Global) == 0 || len(s.GlobalDirs()) == 0 {
+		t.Fatal("failed unlink must stay visible for retry")
+	}
+	must(t, os.Chmod(dir, 0755))
+	must(t, l.Unglobal(s))
+	if len(l.Problems().Global) != 0 {
+		t.Fatal("successful retry should resolve the issue")
+	}
+}

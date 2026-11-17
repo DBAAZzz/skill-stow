@@ -53,13 +53,13 @@ func TestClearingSeveralRecordsChimesOnceForTheBatch(t *testing.T) {
 	early := 0
 	a.sound = func() {
 		*chimes++
-		if a.tidy.clearing != nil {
+		if a.tidy.work != nil {
 			early++
 		}
 	}
 
 	// When 全部清除
-	a.clearRecords(stale, stale...)
+	a.clearRecords(stale...)
 
 	// Then 整批清完才响，只响一声
 	if *chimes != 1 || early != 0 {
@@ -73,7 +73,7 @@ func TestSingleTidyActionChimesWhenItSucceeds(t *testing.T) {
 	e := a.lib.Problems().Extra[0]
 
 	// When 删掉它
-	a.tidyRun(func() error { return a.lib.DropLink(e.Skill, e.Agent) })
+	a.dropExtraLinks([]library.ExtraLink{e})
 
 	// Then 响一声
 	if *chimes != 1 {
@@ -86,7 +86,7 @@ func TestFailedTidyActionStaysSilent(t *testing.T) {
 	a, chimes, _ := chimeTester(t)
 
 	// When 把断掉的链接重新连上
-	a.tidyRun(func() error { return a.lib.Relink("~/.claude/skills/no-such-skill") })
+	a.repairBrokenLink(library.BrokenLink{Path: "~/.claude/skills/no-such-skill", Name: "no-such-skill", Relink: true})
 
 	// Then 显示原因，不响
 	if a.tidy.err == "" {
@@ -104,8 +104,8 @@ func TestBackToBackActionsChimeOnlyOnce(t *testing.T) {
 	e, g := p.Extra[0], p.Global[0]
 
 	// When 一秒内接连处理两件
-	a.tidyRun(func() error { return a.lib.DropLink(e.Skill, e.Agent) })
-	a.tidyRun(func() error { return a.lib.Unglobal(g) })
+	a.dropExtraLinks([]library.ExtraLink{e})
+	a.tidyProject(g, removeProjectLinks)
 
 	// Then 只响一声，不叠在一起
 	if *chimes != 1 {
@@ -120,7 +120,7 @@ func TestChimeCanBeTurnedOff(t *testing.T) {
 	e := a.lib.Problems().Extra[0]
 
 	// When 处理一项
-	a.tidyRun(func() error { return a.lib.DropLink(e.Skill, e.Agent) })
+	a.dropExtraLinks([]library.ExtraLink{e})
 
 	// Then 不响
 	if *chimes != 0 {
@@ -158,7 +158,7 @@ func TestUserTurnsOffTheChimeInSettings(t *testing.T) {
 	}
 	st.ClickAt(sw.Bounds.X+sw.Bounds.W/2, sw.Bounds.Y+sw.Bounds.H/2)
 	e := a.lib.Problems().Extra[0]
-	a.tidyRun(func() error { return a.lib.DropLink(e.Skill, e.Agent) })
+	a.dropExtraLinks([]library.ExtraLink{e})
 
 	// Then 记下关掉了，处理完不响
 	if !a.lib.Settings.QuietTidy || *chimes != 0 {
@@ -191,11 +191,11 @@ func TestChimesAgainOnceASecondHasPassed(t *testing.T) {
 	a, chimes, now := chimeTester(t)
 	p := a.lib.Problems()
 	e, g := p.Extra[0], p.Global[0]
-	a.tidyRun(func() error { return a.lib.DropLink(e.Skill, e.Agent) })
+	a.dropExtraLinks([]library.ExtraLink{e})
 
 	// When 过了一秒多再处理一项
 	*now = now.Add(1100 * time.Millisecond)
-	a.tidyRun(func() error { return a.lib.Unglobal(g) })
+	a.tidyProject(g, removeProjectLinks)
 
 	// Then 又响一声
 	if *chimes != 2 {

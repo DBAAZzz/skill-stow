@@ -23,12 +23,7 @@ type tidyState struct {
 	err   string            // 上一次处理失败的原因（红色）
 	stats map[string]string // 内容不同的副本的差异统计，按技能 ID；重新扫描时清掉
 
-	merging *tidyProgress // 正在后台收成一份，nil 是没在收（merge_ui.go）
-
-	// 正在清除安装记录，nil 是没在清；ID 是来源。clearRows 是开始时整张表：
-	// 清掉的行在内存里马上就没了，表格照这份画，打完勾再收起。
-	clearing  *tidyProgress
-	clearRows []library.StaleRecord
+	work *tidyWork // One shared operation owns progress and retained rows.
 
 	scanning bool // 点了「重新检测」、后台还在扫
 
@@ -39,7 +34,7 @@ type tidyState struct {
 }
 
 // busy 报告整理页正在后台批量处理：这时不能再开始另一件，也不能重新检测。
-func (t *tidyState) busy() bool { return t.merging != nil || t.clearing != nil }
+func (t *tidyState) busy() bool { return t.work != nil }
 
 // 左边一类问题收起、下面的补上来；右边换一类时交叉淡入。
 var (
@@ -51,11 +46,8 @@ var (
 // issueCount 是这一类还剩几个：批量处理的时候，处理好、收起的先减掉，
 // 数字跟着往下滚。
 func (a *app) issueCount(p *library.Problems, k library.Issue) int {
-	switch {
-	case k == library.SameCopies && a.tidy.merging != nil:
-		return p.Count(k) - len(a.tidy.merging.gone)
-	case k == library.StaleRecords && a.tidy.clearing != nil:
-		return len(a.tidy.clearRows) - len(a.tidy.clearing.gone)
+	if w := a.tidy.work; w != nil && w.kind == k {
+		return w.rows.Count(k) - len(w.progress.gone)
 	}
 	return p.Count(k)
 }
@@ -81,7 +73,7 @@ var issueNotes = map[library.Issue]func() string{
 // tidyPage 是整理页（z1–z6）：左边问题类型，右边这一类的表格。没有问题时
 // 是 g2-b。
 func (a *app) tidyPage(c *ui.Context) {
-	p := a.lib.Problems()
+	p := a.tidyProblems()
 	total := a.issueTotal(&p)
 	a.toolbar(c, locales.NavTidy(), "", func() {
 		if total > 0 {
@@ -105,7 +97,7 @@ func (a *app) tidyPage(c *ui.Context) {
 		}
 		label := cond(a.tidy.scanning, locales.TidyRescanning(), locales.ActionDetectAgain())
 		refresh := busyButton(c, iconRefresh, label, a.tidy.scanning)
-		if a.tidy.busy() {
+		if a.tidy.busy() || a.tidy.scanning {
 			refresh.Disabled(true) // 处理完会重新检测
 		}
 		if refresh.Clicked() {
@@ -156,7 +148,7 @@ const minRescanSpin = 600 * time.Millisecond
 // tidyRescan 在后台重新扫描，按钮转圈；扫完换上新结果，用提示条报一句
 // 还剩几个问题。扫的途中别处先扫过一遍（删除、监听）就不拿这份旧的盖回去。
 func (a *app) tidyRescan() {
-	if a.tidy.scanning || a.lib.Home == "" {
+	if a.tidy.scanning || a.tidy.busy() || a.lib.Home == "" {
 		return
 	}
 	a.tidy.msg, a.tidy.err = "", ""
@@ -208,10 +200,8 @@ func (a *app) issueDetail(c *ui.Context, p *library.Problems, k library.Issue) {
 		ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
 			// 标题下面多出一行进度时，标题顺着往上挪
 			ui.Text(c, k.Title()).FontSize(15).FontWeight(600).Transition(ui.ElementTransition{Animation: &swapSpring, Position: true})
-			if m := a.tidy.merging; m != nil && k == library.SameCopies {
-				progressNote(c.Key("merging"), m, locales.TidyMergingName, locales.TidyDetectingAgain())
-			} else if m := a.tidy.clearing; m != nil && k == library.StaleRecords {
-				progressNote(c.Key("clearing"), m, locales.TidyClearingName, locales.TidyCleanupComplete())
+			if w := a.tidy.work; w != nil && w.kind == k {
+				progressNote(c.Key("working"), w.progress, w.doing, locales.TidyProcessingFinished())
 			} else if note := issueNotes[k]; note != nil {
 				ui.Text(c, note()).FontSize(12).TextColor(colTextMuted)
 			}
@@ -222,24 +212,15 @@ func (a *app) issueDetail(c *ui.Context, p *library.Problems, k library.Issue) {
 		case library.StaleRecords:
 			a.clearAllButton(c, p.Stale)
 		case library.ExtraLinks:
-			if dialogButton(c, locales.ActionDeleteAll(), false).Shrink(0).Clicked() {
-				a.tidyRun(func() error {
-					for _, e := range p.Extra {
-						if err := a.lib.DropLink(e.Skill, e.Agent); err != nil {
-							return err
-						}
-					}
-					return nil
-				})
+			if m := a.tidyProgressFor(k); m != nil {
+				progressPill(c, m, locales.TidyLinkDeleted())
+			} else if dialogButton(c, locales.ActionDeleteAll(), false).Shrink(0).
+				Disabled(a.tidy.busy() || a.tidy.scanning).
+				Transition(ui.ElementTransition{Match: batchButtonMatch{}, Animation: &morphSpring}).Clicked() {
+				a.dropExtraLinks(p.Extra)
 			}
 		}
 	})
-	if a.tidy.msg != "" {
-		statusLine(c, iconCheck, colOKText, a.tidy.msg)
-	}
-	if a.tidy.err != "" {
-		statusLine(c, iconWarn, colDanger, a.tidy.err)
-	}
 	ui.Scroll(c).Grow(1).Scrollbars(false).Children(func() {
 		switch k {
 		case library.SameCopies:
@@ -257,17 +238,8 @@ func (a *app) issueDetail(c *ui.Context, p *library.Problems, k library.Issue) {
 		case library.GlobalLinked:
 			a.globalTable(c, p.Global)
 		case library.StaleRecords:
-			a.staleTable(c, a.staleRows(p.Stale))
+			a.staleTable(c, p.Stale)
 		}
-	})
-}
-
-// statusLine 是表格上面一行处理结果。
-func statusLine(c *ui.Context, icon *ui.SVG, color ui.Color, text string) {
-	ui.Row(c).Padding(8, 24).Gap(6).AlignItems(ui.Center).Shrink(0).TextColor(color).
-		BorderWidth(0, 0, 1, 0).BorderColor(colBorderDefault).Children(func() {
-		ui.Icon(c, icon).Size(12, 12)
-		ui.Text(c, text).FontSize(13).Grow(1)
 	})
 }
 
@@ -339,10 +311,6 @@ func agentNamed(c *ui.Context, id string) {
 // ——— 六类问题的表格 ———
 
 func (a *app) sameTable(c *ui.Context, skills []*library.Skill) {
-	if m := a.tidy.merging; m != nil {
-		// 收好的行停够了就收起
-		skills = slices.DeleteFunc(slices.Clone(skills), func(s *library.Skill) bool { return m.gone[s.ID] })
-	}
 	cols := []column{{locales.CommonSkills(), 0, 1.3}, {locales.TidyCopyCountColumn(), 70, 0}, {locales.TidyReadersColumn(), 0, 2}, {locales.CommonLastModified(), 110, 0}}
 	table(c, cols, 90, len(skills), func(i, j int) {
 		s := skills[i]
@@ -385,10 +353,10 @@ func (a *app) diffTable(c *ui.Context, skills []*library.Skill) {
 			cellText(c, dayLabel(a.lib.Modified(s), time.Now())).TextColor(colTextMuted)
 		}
 	}, func(i int) {
-		if pushButton(c, locales.ActionCompare()).Clicked() {
-			a.openCompare(skills[i], true)
-		}
-	}, nil)
+		a.progressRowActions(c, a.tidyProgressFor(library.DiffCopies), skills[i].ID,
+			rowAction{title: locales.ActionCompare(), running: locales.MergeInProgress(), done: locales.MergeCompleted(),
+				run: func() { a.openCompare(a.lib.ByID(skills[i].ID), true) }})
+	}, progressRowStyle(a.tidyProgressFor(library.DiffCopies), func(i int) string { return skills[i].ID }))
 }
 
 // versionChip 是一种内容的小药丸：字母、基准、几处、读到它的 Agent。
@@ -476,10 +444,10 @@ func (a *app) extraTable(c *ui.Context, extra []library.ExtraLink) {
 		}
 	}, func(i int) {
 		e := extra[i]
-		if pushButton(c, locales.TidyDropFrom(library.AgentName(e.Agent))).Clicked() {
-			a.tidyRun(func() error { return a.lib.DropLink(e.Skill, e.Agent) })
-		}
-	}, nil)
+		a.progressRowActions(c, a.tidyProgressFor(library.ExtraLinks), e.Path,
+			rowAction{title: locales.TidyDropFrom(library.AgentName(e.Agent)), running: locales.TidyDeletingLink(), done: locales.TidyLinkDeleted(),
+				run: func() { a.dropExtraLinks([]library.ExtraLink{e}) }})
+	}, progressRowStyle(a.tidyProgressFor(library.ExtraLinks), func(i int) string { return extra[i].Path }))
 }
 
 func (a *app) brokenTable(c *ui.Context, broken []library.BrokenLink) {
@@ -500,16 +468,13 @@ func (a *app) brokenTable(c *ui.Context, broken []library.BrokenLink) {
 		}
 	}, func(i int) {
 		b := broken[i]
+		act := rowAction{title: locales.TidyDeleteLink(), running: locales.TidyDeletingLink(), done: locales.TidyLinkDeleted(),
+			run: func() { a.repairBrokenLink(b) }}
 		if b.Relink {
-			if pushButton(c, locales.TidyReconnect()).Clicked() {
-				a.tidyRun(func() error { return a.lib.Relink(b.Path) })
-			}
-			return
+			act.title, act.running, act.done = locales.TidyReconnect(), locales.TidyReconnecting(), locales.TidyReconnected()
 		}
-		if pushButton(c, locales.TidyDeleteLink()).Clicked() {
-			a.tidyRun(func() error { return a.lib.RemoveBroken(b.Path) })
-		}
-	}, nil)
+		a.progressRowActions(c, a.tidyProgressFor(library.BrokenLinks), b.Path, act)
+	}, progressRowStyle(a.tidyProgressFor(library.BrokenLinks), func(i int) string { return broken[i].Path }))
 }
 
 func (a *app) noDescTable(c *ui.Context, skills []*library.Skill) {
@@ -592,20 +557,14 @@ func (a *app) globalTable(c *ui.Context, skills []*library.Skill) {
 		}
 	}, func(i int) {
 		s := skills[i]
-		a.globalActions(c, s, pushButton)
-		if pushButton(c, locales.TidyUseOnlyInProject()).Clicked() {
-			a.tidyRun(func() error { return a.lib.Unglobal(s) })
+		if a.progressRowStatus(c, a.tidyProgressFor(library.GlobalLinked), s.ID, locales.TidyProcessing(), locales.TidyProcessed()) {
+			return
 		}
-	}, nil)
-}
-
-// staleRows 是表格里的行：清的时候照开始时那份画，清好、收起的去掉。
-func (a *app) staleRows(rows []library.StaleRecord) []library.StaleRecord {
-	m := a.tidy.clearing
-	if m == nil {
-		return rows
-	}
-	return slices.DeleteFunc(slices.Clone(a.tidy.clearRows), func(r library.StaleRecord) bool { return m.gone[r.Source] })
+		a.globalActions(c, s, pushButton)
+		if pushButton(c, locales.TidyUseOnlyInProject()).Disabled(a.tidy.busy() || a.tidy.scanning).Clicked() {
+			a.tidyProject(s, removeProjectLinks)
+		}
+	}, progressRowStyle(a.tidyProgressFor(library.GlobalLinked), func(i int) string { return skills[i].ID }))
 }
 
 func (a *app) staleTable(c *ui.Context, rows []library.StaleRecord) {
@@ -622,15 +581,15 @@ func (a *app) staleTable(c *ui.Context, rows []library.StaleRecord) {
 		}
 	}, func(i int) {
 		r := rows[i]
-		a.progressRowActions(c, a.tidy.clearing, r.Source, rowAction{title: locales.TidyClearRecord(), running: locales.TidyClearingRecord(), done: locales.TidyRecordCleared(),
-			run: func() { a.clearRecords(rows, r) }})
-	}, progressRowStyle(a.tidy.clearing, func(i int) string { return rows[i].Source }))
+		a.progressRowActions(c, a.tidyProgressFor(library.StaleRecords), r.Source, rowAction{title: locales.TidyClearRecord(), running: locales.TidyClearingRecord(), done: locales.TidyRecordCleared(),
+			run: func() { a.clearRecords(r) }})
+	}, progressRowStyle(a.tidyProgressFor(library.StaleRecords), func(i int) string { return rows[i].Source }))
 }
 
 // clearAllButton 是「全部清除」，两行及以上才有；清的时候它变形成进度胶囊。
 func (a *app) clearAllButton(c *ui.Context, rows []library.StaleRecord) {
-	if m := a.tidy.clearing; m != nil {
-		if len(a.tidy.clearRows) >= 2 {
+	if m := a.tidyProgressFor(library.StaleRecords); m != nil {
+		if a.tidy.work.rows.Count(library.StaleRecords) >= 2 {
 			progressPill(c, m, locales.TidyRecordCleared())
 		}
 		return
@@ -640,11 +599,11 @@ func (a *app) clearAllButton(c *ui.Context, rows []library.StaleRecord) {
 	}
 	b := dialogButton(c, locales.ActionClearAll(), false).Shrink(0).
 		Transition(ui.ElementTransition{Match: batchButtonMatch{}, Animation: &morphSpring})
-	if a.tidy.busy() {
+	if a.tidy.busy() || a.tidy.scanning {
 		b.Disabled(true)
 	}
 	if b.Clicked() {
-		a.clearRecords(rows, rows...)
+		a.clearRecords(rows...)
 	}
 }
 
@@ -657,84 +616,30 @@ func namesPreview(names []string, n int) string {
 	return text
 }
 
-// clearRecords 一行一行清掉 todo 的安装记录，界面和「全部收成一份」一样
-// 走进度：正在清的行转圈，清好的打勾、停一下再收起。all 是现在整张表。
-// 清完结果写在表格上面；不提供撤销。
-//
-// 每行只改一次小 JSON 文件，放在界面线程上做（内存里的记录也跟着改，
-// 不能和界面同时读写）；后台只负责一行一行排进去，中间能重画。
-func (a *app) clearRecords(all []library.StaleRecord, todo ...library.StaleRecord) {
-	if a.tidy.busy() || len(todo) == 0 {
-		return
-	}
-	m := newTidyProgress()
+// clearRecords uses the shared progress flow. Record edits run on the UI thread
+// because they also mutate the in-memory manifest.
+func (a *app) clearRecords(todo ...library.StaleRecord) {
+	lib := a.lib
+	var tasks []tidyTask
+	n, skipped := 0, false
 	for _, r := range todo {
-		m.ids, m.names = append(m.ids, r.Source), append(m.names, r.Source)
+		tasks = append(tasks, tidyTask{r.Source, r.Source, func() error {
+			k, err := lib.ClearRecords(r)
+			n += k
+			if k < len(r.Names) {
+				skipped = true
+			}
+			return err
+		}})
 	}
-	a.tidy.msg, a.tidy.err = "", ""
-	a.tidy.clearing, a.tidy.clearRows = m, slices.Clone(all)
-	a.dockProgress(0)
-	var n int
-	var errs []string
-	skipped := false // 有技能期间又装回来了：记录没动，要重新检测才认得
-	a.background(func(post func(func())) {
-		for _, r := range todo {
-			post(func() {
-				k, err := a.lib.ClearRecords(r)
-				n += k
-				m.done++
-				a.dockProgress(float64(m.done) / float64(len(m.ids)))
-				switch {
-				case err != nil:
-					m.failed[r.Source] = err.Error()
-					errs = append(errs, err.Error())
-					return
-				case k < len(r.Names):
-					skipped = true
-				}
-				a.later(mergeRowHold, func() { m.gone[r.Source] = true })
-			})
-		}
-		post(func() {
-			// 等最后一行的勾停够了再收尾
-			a.later(mergeRowHold, func() {
-				if a.tidy.clearing != m {
-					return // 已经不是这一轮了
-				}
-				a.tidy.clearing, a.tidy.clearRows = nil, nil
-				a.dockProgress(-1)
-				if skipped {
-					a.rescan()
-				}
-				if n > 0 {
-					a.tidy.msg = locales.TidyStaleRecordsCleared(n)
-					if len(errs) == 0 {
-						a.chimeDone()
-					}
-				}
-				if len(errs) > 0 {
-					a.tidy.err = errs[0]
-					if len(errs) > 1 {
-						a.tidy.err += locales.TidyUnclearedSources(len(errs) - 1)
-					}
-				}
-				a.changed()
-			})
-		})
-	})
-}
-
-// ——— 处理 ———
-
-// tidyRun 做一件改磁盘的事，失败时把原因写在表格上面。
-func (a *app) tidyRun(fn func() error) {
-	a.tidy.msg, a.tidy.err = "", ""
-	defer a.changed()
-	if err := fn(); err != nil {
-		a.tidy.err = err.Error()
-		return
-	}
-	a.chimeDone()
+	a.runTidy(tidyOperation{kind: library.StaleRecords, tasks: tasks,
+		doing:  locales.TidyClearingName,
+		result: func(int) string { return locales.TidyStaleRecordsCleared(n) },
+		after: func() {
+			if skipped {
+				a.rescan()
+			}
+		}})
 }
 
 // mergeNotice 是刚收成一份的技能：详情栏顶部的绿色提示，和开关变亮的
@@ -749,11 +654,15 @@ type mergeNotice struct {
 // merge 收成一份，留下第 keep 种内容。fromTidy 时留在整理页，否则回到
 // 详情栏，顶部是绿色提示。
 func (a *app) merge(s *library.Skill, keep int, fromTidy bool) {
+	if fromTidy {
+		a.mergeCopies([]*library.Skill{s}, keep, library.DiffCopies)
+		return
+	}
 	a.tidy.msg, a.tidy.err, a.err, a.errAgent = "", "", "", ""
 	defer a.changed()
 	before := slices.Clone(s.Copied())
 	r, err := a.lib.Merge(s, keep)
-	id, name := s.ID, s.Name
+	id := s.ID
 	if a.lib.Home != "" {
 		a.rescan()
 	}
@@ -765,12 +674,6 @@ func (a *app) merge(s *library.Skill, keep int, fromTidy bool) {
 	}
 	if err != nil {
 		a.tidy.err, a.err = err.Error(), err.Error()
-	}
-	if fromTidy {
-		if err == nil {
-			a.tidy.msg = locales.MergeDoneOne(name, r.String())
-		}
-		return
 	}
 	a.selected = s
 	if err == nil {

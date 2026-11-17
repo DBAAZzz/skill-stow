@@ -232,7 +232,7 @@ func TestMergingAllShowsProgressUntilItIsDone(t *testing.T) {
 
 	work(func(fn func()) { fn() })
 	tt.Frame()
-	if a.tidy.merging != nil || !strings.Contains(shownText(a, fromTidy), "brainstorming 已收成一份") || shownKind(a, fromTidy) != toastOK {
+	if a.tidy.work != nil || !strings.Contains(shownText(a, fromTidy), "brainstorming 已收成一份") || shownKind(a, fromTidy) != toastOK {
 		t.Errorf("收完顶部应提示收好了：%q", shownText(a, fromTidy))
 	}
 	if tt.HasText("内容相同的副本") {

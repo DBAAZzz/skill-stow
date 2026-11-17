@@ -69,7 +69,7 @@ func TestClearingAllRecordsShowsProgressUntilItIsDone(t *testing.T) {
 	tt.Frame()
 
 	// Then 结果行写清了几条，这一类从左边消失，问题数少了两行
-	if a.tidy.clearing != nil || !tt.HasText("已清理 34 条失效的安装记录。") {
+	if a.tidy.work != nil || !tt.HasText("已清理 34 条失效的安装记录。") {
 		t.Errorf("清完应显示结果行：%q", tt.Texts())
 	}
 	if tt.HasText("已删除技能的安装记录") {

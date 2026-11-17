@@ -12,11 +12,16 @@ import (
 
 // KeepLinks 记下这些全局链接是有意建的：不再算作需要处理，链接不动。
 func (l *Library) KeepLinks(s *Skill) error {
+	before := slices.Clone(l.Settings.KeptLinks)
 	if !slices.Contains(l.Settings.KeptLinks, s.Real) {
 		l.Settings.KeptLinks = append(l.Settings.KeptLinks, s.Real)
 	}
+	if err := l.SaveSettings(); err != nil {
+		l.Settings.KeptLinks = before
+		return err
+	}
 	s.KeptLinks = true
-	return l.SaveSettings()
+	return nil
 }
 
 // CollectGains 是收进技能库后会多读到这个技能的 Agent（直接读技能库、
