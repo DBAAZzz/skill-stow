@@ -4646,6 +4646,16 @@
     "description": "设置中重新检测 Agent 或手动添加技能目录时显示的文案。",
     "placeholders": {}
   },
+  "settingsDetecting": "正在检测…",
+  "@settingsDetecting": {
+    "description": "设置里点击「重新检测」正在检测 Agent 时按钮显示的文案。",
+    "placeholders": {}
+  },
+  "settingsDetected": "已检测",
+  "@settingsDetected": {
+    "description": "设置里重新检测 Agent 完成后按钮短暂显示的完成文案。",
+    "placeholders": {}
+  },
   "settingsAgentNotFound": "没找到你用的 Agent？",
   "@settingsAgentNotFound": {
     "description": "设置中重新检测 Agent 或手动添加技能目录时显示的文案。",
@@ -4708,6 +4718,16 @@
   "actionCheckAgain": "重新检查",
   "@actionCheckAgain": {
     "description": "设置中管理手动添加的项目文件夹时显示的文案。",
+    "placeholders": {}
+  },
+  "settingsChecking": "正在检查…",
+  "@settingsChecking": {
+    "description": "设置里点击「重新检查」正在检查项目时按钮显示的文案。",
+    "placeholders": {}
+  },
+  "settingsChecked": "已检查",
+  "@settingsChecked": {
+    "description": "设置里重新检查项目完成后按钮短暂显示的完成文案。",
     "placeholders": {}
   },
   "settingsManualFolders": "手动添加的文件夹",

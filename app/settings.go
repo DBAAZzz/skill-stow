@@ -38,21 +38,35 @@ const shownAgents = 9
 // 「在项目里查看的目录」先列几个。
 const shownDirs = 7
 
+type settingsRescanPhase int
+
+const (
+	rescanIdle settingsRescanPhase = iota
+	rescanRunning
+	rescanDone
+)
+
+// settingsRescanHold 是重新检查 / 重新检测完成后，按钮保持绿色确认态再淡回原样的时长。
+const settingsRescanHold = 1200 * time.Millisecond
+
 // settingsState 是设置窗口的状态。
 type settingsState struct {
-	open       bool
-	minimized  bool
-	focused    bool
-	tab        int
-	allAgents  bool      // 「其余 N 个」展开
-	scannedAt  time.Time // 上一次检测 / 检查的时间
-	linkResult string    // 「检查并修复」的结果
-	allDirs    bool      // 「在项目里查看的目录」展开
-	err        string
-	ghProbing  bool
-	ghChecked  bool
-	ghOK       bool
-	ghNote     string
+	open        bool
+	minimized   bool
+	focused     bool
+	tab         int
+	allAgents   bool                // 「其余 N 个」展开
+	scannedAt   time.Time           // 上一次检测 / 检查的时间
+	rescanSeq   int                 // 防旧定时回调误清新一轮检查状态
+	rescanTab   int                 // 这轮检查是 tabAgents 还是 tabProjects 触发的
+	rescanPhase settingsRescanPhase // 重新检测 / 重新检查三态（空闲 / 扫描中 / 已完成）
+	linkResult  string              // 「检查并修复」的结果
+	allDirs     bool                // 「在项目里查看的目录」展开
+	err         string
+	ghProbing   bool
+	ghChecked   bool
+	ghOK        bool
+	ghNote      string
 }
 
 // 设置窗口的固定宽高与左侧导航栏宽度（2A 无界融底左右分栏）。
@@ -162,6 +176,7 @@ func (a *app) settingsView(c *ui.Context) {
 	prevWin := a.menuBuildWin
 	a.menuBuildWin = menuWinSettings
 	defer func() { a.menuBuildWin = prevWin }()
+	a.flushPendingWatch()
 	theme(c)
 	c.Root().Background(colBgPage)
 	c.OnWindowShortcut(ui.Cmd, ui.KeyW, a.closeSettings)
@@ -412,7 +427,7 @@ func (a *app) agentsTab(c *ui.Context) {
 					a.settingsDo(a.lib.RemoveAgentDir(ag.ID), true)
 				}
 				ui.Text(c, locales.CommonSkillTotal(counts[ag.ID])).FontSize(12).TextColor(cond(hidden, colTextDisabled, colTextSecondary)).
-					FontFeatures("tnum").SingleLine().Shrink(0)
+					FontFeatures("tnum").SingleLine().Shrink(0).ContentTransition(ui.ContentTransition{Numeric: true})
 				on := !hidden
 				if toggle(c, &on, locales.SettingsShowAgent(ag.DisplayName())).Margin(0, 0, 0, 4).Changed() {
 					a.settingsDo(a.lib.SetHidden(ag.ID, !on), false)
@@ -432,11 +447,9 @@ func (a *app) agentsTab(c *ui.Context) {
 			}
 		}
 		sumRow(c, func() {
-			ui.Text(c, scannedLabel(a.set.scannedAt, time.Now())).SingleLine()
+			ui.Text(c, scannedLabel(a.set.scannedAt, time.Now())).SingleLine().ContentTransition(labelTransition)
 			ui.Spacer(c)
-			if pushButton(c, locales.ActionDetectAgain()).Clicked() {
-				a.rescan()
-			}
+			a.rescanButton(c, tabAgents, locales.ActionDetectAgain(), locales.SettingsDetecting(), locales.SettingsDetected())
 		})
 	})
 	hint(c, func() {
@@ -509,25 +522,26 @@ func (a *app) projectsTab(c *ui.Context) {
 				if src.Count >= 0 {
 					count = locales.CommonProjectCount(src.Count)
 				}
-				ui.Text(c, count).FontSize(12).TextColor(cond(dim, colTextDisabled, colTextSecondary)).FontFeatures("tnum").SingleLine()
+				ui.Text(c, count).FontSize(12).TextColor(cond(dim, colTextDisabled, colTextSecondary)).FontFeatures("tnum").SingleLine().
+					ContentTransition(ui.ContentTransition{Numeric: true})
 			})
 		}
 		sumRow(c, func() {
 			if set.AutoDiscover {
 				before, after := splitEmph(locales.SettingsDiscoverSummary(d.Total, emphMark))
-				ui.Text(c, before).SingleLine()
-				ui.Text(c, locales.SettingsWithSkills(d.WithSkills)).FontWeight(600).TextColor(colTextPrimary).SingleLine()
+				ui.Text(c, before).SingleLine().ContentTransition(ui.ContentTransition{Numeric: true})
+				ui.Text(c, locales.SettingsWithSkills(d.WithSkills)).FontWeight(600).TextColor(colTextPrimary).FontFeatures("tnum").
+					SingleLine().ContentTransition(ui.ContentTransition{Numeric: true})
 				if after != "" {
-					ui.Text(c, after).SingleLine()
+					ui.Text(c, after).SingleLine().ContentTransition(ui.ContentTransition{Numeric: true})
 				}
-				ui.Text(c, locales.SettingsDiscoverMeta(checkedLabel(a.set.scannedAt), took(d.Took))).TextColor(colTextMuted).SingleLine()
+				ui.Text(c, locales.SettingsDiscoverMeta(checkedLabel(a.set.scannedAt), took(d.Took))).TextColor(colTextMuted).
+					SingleLine().MinWidth(0).Shrink(1).ContentTransition(labelTransition)
 			} else {
-				ui.Text(c, locales.SettingsAutoDiscoverOff()).TextColor(colTextMuted).SingleLine()
+				ui.Text(c, locales.SettingsAutoDiscoverOff()).TextColor(colTextMuted).SingleLine().MinWidth(0).Shrink(1)
 			}
 			ui.Spacer(c)
-			if pushButton(c, locales.ActionCheckAgain()).Clicked() {
-				a.rescan()
-			}
+			a.rescanButton(c, tabProjects, locales.ActionCheckAgain(), locales.SettingsChecking(), locales.SettingsChecked())
 		})
 	})
 
@@ -700,6 +714,130 @@ func pushButton(c *ui.Context, label string) ui.Element {
 		ui.Text(c, label).FontSize(13).TextColor(colTextPrimary).SingleLine().ContentTransition(labelTransition)
 	})
 	return b
+}
+
+// rescanButton 是设置页汇总栏右边的「重新检测 / 重新检查」按钮，按三态平滑过渡：
+// 空闲（刷新图标 + 白底）→ 进行中（蓝色 Spinner + 禁点）→ 刚完成（绿色对勾确认态）。
+func (a *app) rescanButton(c *ui.Context, tab int, idleLabel, runningLabel, doneLabel string) {
+	phase := rescanIdle
+	switch {
+	case a.set.rescanPhase == rescanRunning:
+		phase = rescanRunning
+	case a.set.rescanPhase == rescanDone && a.set.rescanTab == tab:
+		phase = rescanDone
+	}
+
+	label := idleLabel
+	fg := colTextPrimary
+	bgRest, bgHover, bgPress := colBgControl, colInkHover.Over(colBgControl), colInkPress.Over(colBgControl)
+	switch phase {
+	case rescanRunning:
+		label = runningLabel
+		fg = colTextSecondary
+	case rescanDone:
+		label = doneLabel
+		fg = colOKText
+		bgRest, bgHover, bgPress = colOKBg, colOKBg, colInkPress.Over(colOKBg)
+	}
+
+	b := ui.ButtonBase(c).Height(22).Padding(0, 10).Gap(5).Radius(6).Center().Shrink(0).Label(label).
+		Disabled(phase == rescanRunning).
+		Transition(ui.ElementTransition{Animation: &swapSpring, Position: true})
+	tintBg(b, bgRest, bgHover, bgPress)
+	if phase == rescanDone {
+		b.Shadow(0, 0, 0, edgeSpread, colOKEdge)
+	} else {
+		hairline(b, 0.18)
+		lift(b, 1, 1.5, 0.08)
+	}
+	fgAnim := b.AnimateColor("fg", fg, ui.Animation{Duration: hoverOut})
+	b.TextColor(fgAnim)
+	b.Children(func() {
+		ui.Box(c).Size(12, 12).Center().Children(func() {
+			switch phase {
+			case rescanRunning:
+				ui.Box(c.Key("run")).Center().Transition(swapTransition).Children(func() {
+					ui.Spinner(c).Size(12, 12).TextColor(colAccent)
+				})
+			case rescanDone:
+				ui.Box(c.Key("done")).Center().Transition(ui.ElementTransition{
+					Animation: &popSpring,
+					Enter:     &ui.Motion{Opacity: 0, Scale: 0.4},
+					Exit:      &ui.Motion{Opacity: 0, Scale: 0.6},
+				}).Children(func() {
+					ui.Icon(c, iconCheck).Size(12, 12).TextColor(colOKText)
+				})
+			default:
+				ui.Box(c.Key("idle")).Center().Transition(swapTransition).Children(func() {
+					ui.Icon(c, iconRefresh).Size(12, 12).TextColor(colTextSecondary)
+				})
+			}
+		})
+		ui.Text(c, label).FontSize(12).SingleLine().ContentTransition(labelTransition)
+	})
+	if b.Clicked() {
+		a.settingsRescan(tab)
+	}
+}
+
+// settingsRescan 在后台重新扫描技能库并驱动按钮三段反馈；示例模式下保留内存开关，
+// 同样展示完整扫描节奏并刷新最近检查时间。
+func (a *app) settingsRescan(tab int) {
+	if a.set.rescanPhase == rescanRunning {
+		return
+	}
+	a.set.rescanSeq++
+	seq := a.set.rescanSeq
+	a.set.rescanTab = tab
+	a.set.rescanPhase = rescanRunning
+	a.changed()
+
+	home, gen, epoch, live := a.lib.Home, a.watch.scanGen.Load(), a.watch.scanEpoch, a.live
+	a.background(func(post func(func())) {
+		start := time.Now()
+		var lib *library.Library
+		var rep library.UpdateReport
+		if home != "" {
+			lib = library.Scan(home)
+			rep = lib.Updates()
+		}
+		if wait := minRescanSpin - time.Since(start); live && wait > 0 {
+			time.Sleep(wait)
+		}
+		post(func() {
+			if a.set.rescanSeq != seq {
+				return
+			}
+			if lib != nil {
+				switch {
+				case gen != a.watch.scanGen.Load() || epoch != a.watch.scanEpoch:
+					// 期间已有更新的扫描落地或待冲刷：保留较新结果，保留手动重检的 usage 刷新并触发 watch 补扫。
+					if a.watch.pending != nil {
+						a.watch.pending.reloadUsage = true
+					} else {
+						a.refreshUsage()
+					}
+					a.triggerWatchScan()
+				case a.isWatchApplyDeferred():
+					// 推进 scanGen，拒绝更早出发的 watch 扫描覆写这轮暂存结果。
+					newGen := a.watch.scanGen.Add(1)
+					a.watch.pending = &pendingWatchScan{lib: lib, report: rep, gen: newGen, reloadUsage: true}
+				default:
+					a.useScan(lib, rep)
+				}
+			} else {
+				a.set.scannedAt = time.Now()
+				a.changed()
+			}
+			a.set.rescanPhase = rescanDone
+			a.changed()
+			a.later(settingsRescanHold, func() {
+				if a.set.rescanSeq == seq && a.set.rescanPhase == rescanDone {
+					a.set.rescanPhase = rescanIdle
+				}
+			})
+		})
+	})
 }
 
 // saveSettings 写下设置，失败时显示在设置窗口里。

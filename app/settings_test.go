@@ -2,6 +2,7 @@ package main
 
 import (
 	"testing"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 
@@ -137,13 +138,13 @@ func TestSettingsLayoutSumRowStandsOutFromPageAndCard(t *testing.T) {
 			st := ui.NewTesterWith(a.settingsView, 760, 540, ui.TesterOptions{Dark: false})
 			img := st.Image()
 
-			btn, ok := st.Find(tc.button)
+			btn, ok := st.AccessByRole(ui.RoleButton, tc.button)
 			if !ok {
 				t.Fatalf("找不到 %q", tc.button)
 			}
-			midY := int(btn.Y + btn.H/2)
+			midY := int(btn.Bounds.Y + btn.Bounds.H/2)
 			// 汇总栏内部底色应区别于白色卡片底，且卡片左内边框把汇总栏与外部页面底隔开
-			rowBg := img.RGBAAt(int(btn.X-24), midY)
+			rowBg := img.RGBAAt(int(btn.Bounds.X-12), midY)
 			cardEdge := img.RGBAAt(210, midY) // 左侧栏 192 + 右侧内边距 14 = 卡片左缘 206，210 落在卡片内缘留白上
 			cardWant := cssColor(toneOf(t, &colBgCard).light)
 			gotEdge := ui.Color{R: cardEdge.R, G: cardEdge.G, B: cardEdge.B, A: cardEdge.A}
@@ -156,4 +157,321 @@ func TestSettingsLayoutSumRowStandsOutFromPageAndCard(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSettingsRescanShowsSpinnerDoneFeedbackAndRecovers(t *testing.T) {
+	defer usePalette(false)
+
+	t.Run("sample_projects_progress_done_and_guard", func(t *testing.T) {
+		// Given 示例模式下上一次检查显示为 3 分钟前，后台与延时回调由测试接管
+		a := newApp(library.Sample())
+		a.set.open = true
+		a.set.tab = tabProjects
+		a.set.scannedAt = time.Now().Add(-3 * time.Minute)
+		var works []func(post func(func()))
+		a.bg = func(w func(post func(func()))) { works = append(works, w) }
+		var resets []func()
+		a.delay = func(_ time.Duration, fn func()) { resets = append(resets, fn) }
+
+		st := newUITester(a.settingsView, settingsWidth, settingsHeight)
+		if !st.HasText("3 分钟前检查") {
+			t.Fatalf("初始应显示「3 分钟前检查」：%q", st.Texts())
+		}
+
+		// When 点「重新检查」
+		must(t, st.Click("重新检查"))
+		st.Frame()
+
+		// Then 按钮进入进行中状态（禁用、写着正在检查…），再点一次不重复起后台扫描
+		if len(works) != 1 {
+			t.Fatalf("应发起 1 次后台检查，实际 %d 次", len(works))
+		}
+		info, ok := st.Access("正在检查…")
+		if !ok || !info.Disabled {
+			t.Fatalf("检查中按钮应显示「正在检查…」且不可点击：%q", st.Texts())
+		}
+		_ = st.Click("正在检查…")
+		if len(works) != 1 {
+			t.Fatalf("检查中连续点击不应发起第 2 次扫描：%d", len(works))
+		}
+
+		// When 后台检查完成落地
+		works[0](func(fn func()) { fn() })
+		st.Frame()
+
+		// Then 时间刷新为「刚刚检查」，按钮短暂变成绿色「已检查」确认态
+		if !st.HasText("刚刚检查") {
+			t.Fatalf("示例模式重新检查完成后也应刷新时间：%q", st.Texts())
+		}
+		doneBtn, ok := st.Access("已检查")
+		if !ok {
+			t.Fatalf("检查完成后应短暂显示「已检查」确认态：%q", st.Texts())
+		}
+		st.Advance(300 * time.Millisecond)
+		st.Frame()
+		doneBtn, _ = st.Access("已检查")
+		img := st.Image()
+		px := img.RGBAAt(int(doneBtn.Bounds.X+4), int(doneBtn.Bounds.Y+doneBtn.Bounds.H/2))
+		wantOK := cssColor(toneOf(t, &colOKBg).light)
+		if (ui.Color{R: px.R, G: px.G, B: px.B, A: px.A}) != wantOK {
+			t.Fatalf("「已检查」按钮底色应为 %v，实际 %+v", wantOK, px)
+		}
+		if len(resets) != 1 {
+			t.Fatalf("应注册 1 次完成态回收定时，实际 %d", len(resets))
+		}
+
+		// 验证陈旧定时器不会误清后续新一轮扫描；再完成回收到初始按钮
+		must(t, st.Click("已检查"))
+		st.Frame()
+		if !st.HasText("正在检查…") {
+			t.Fatalf("确认态再次点击应进入下一轮检查：%q", st.Texts())
+		}
+		resets[0]() // 旧周期的回收回调不应干扰新一轮
+		st.Frame()
+		if !st.HasText("正在检查…") {
+			t.Fatalf("旧定时回调不应打断新一轮扫描中状态：%q", st.Texts())
+		}
+		works[1](func(fn func()) { fn() })
+		st.Frame()
+		if len(resets) != 2 || !st.HasText("已检查") {
+			t.Fatalf("第二轮结束后应显示「已检查」：%q", st.Texts())
+		}
+		resets[1]()
+		st.Frame()
+		if !st.HasText("重新检查") {
+			t.Fatalf("停留结束后按钮应恢复「重新检查」：%q", st.Texts())
+		}
+	})
+
+	t.Run("real_agents_detects_new_skill_and_cross_tab_isolation", func(t *testing.T) {
+		// Given 真实临时目录里初始 0 个技能
+		a, _, h := importApp(t)
+		a.set.open = true
+		a.set.tab = tabAgents
+		var work func(post func(func()))
+		a.bg = func(w func(post func(func()))) { work = w }
+		var reset func()
+		a.delay = func(_ time.Duration, fn func()) { reset = fn }
+
+		st := newUITester(a.settingsView, settingsWidth, settingsHeight)
+		must(t, st.Click("重新检测"))
+		st.Frame()
+		if info, ok := st.Access("正在检测…"); !ok || !info.Disabled {
+			t.Fatalf("Agent 管理页检测中应显示禁用的「正在检测…」：%q", st.Texts())
+		}
+
+		// When 检测过程中磁盘新增了技能
+		writeTestSkill(t, h(".claude/skills/alpha"), "alpha", "body")
+		work(func(fn func()) { fn() })
+		st.Frame()
+
+		// Then 扫出新技能，当前页显示「已检测」，切到项目页不会误显「已检查」
+		if !st.HasText("1 个技能") || !st.HasText("已检测") {
+			t.Fatalf("完成后应刷新技能计数并显示「已检测」：%q", st.Texts())
+		}
+		must(t, st.Click("项目"))
+		st.Frame()
+		if !st.HasText("重新检查") || st.HasText("已检查") {
+			t.Fatalf("在 Agent 页完成检测，切到项目页应保持「重新检查」：%q", st.Texts())
+		}
+		reset()
+		st.Frame()
+		must(t, st.Click("Agent 管理"))
+		st.Frame()
+		if !st.HasText("重新检测") {
+			t.Fatalf("定时器到期后应恢复「重新检测」：%q", st.Texts())
+		}
+	})
+}
+
+func TestSettingsRescanRespectsNewerWatchAndDefersDuringInteractions(t *testing.T) {
+	t.Run("does_not_overwrite_newer_watch_scan", func(t *testing.T) {
+		// Given 设置扫描在途期间，文件监听已经应用了包含新技能 beta 的结果
+		a, _, h := importApp(t)
+		writeTestSkill(t, h(".claude/skills/alpha"), "alpha", "body")
+		a.rescan()
+		var finish func()
+		a.bg = func(w func(post func(func()))) {
+			w(func(fn func()) { finish = fn })
+		}
+		a.delay = func(_ time.Duration, fn func()) {}
+
+		st := newUITester(a.settingsView, settingsWidth, settingsHeight)
+		a.set.tab = tabAgents
+		st.Frame()
+		must(t, st.Click("重新检测"))
+
+		writeTestSkill(t, h(".claude/skills/beta"), "beta", "body")
+		fresh := library.Scan(a.lib.Home)
+		a.applyWatchScan(fresh, fresh.Updates(), a.watch.scanGen.Load())
+		if a.lib.Get("beta") == nil {
+			t.Fatal("前置条件：watch 扫描应已发现 beta")
+		}
+
+		// When 旧的设置扫描回调后落地
+		finish()
+
+		// Then 不得回退覆盖掉 watch 新发现的 beta，且按钮完成确认态照常展示
+		if a.lib.Get("beta") == nil {
+			t.Fatal("较早发起的设置扫描不应覆盖后落地的 watch 扫描结果")
+		}
+		st.Frame()
+		if !st.HasText("已检测") {
+			t.Fatalf("被 watch 超越后设置按钮仍应进入「已检测」：%q", st.Texts())
+		}
+	})
+
+	t.Run("defers_apply_when_protected_interaction_begins_mid_scan", func(t *testing.T) {
+		// Given 点击重新检测后，用户在扫描结束前打开了副本对比
+		a, tt, h := importApp(t)
+		writeTestSkill(t, h(".claude/skills/alpha"), "alpha", "body")
+		a.rescan()
+		var work func(post func(func()))
+		a.bg = func(w func(post func(func()))) { work = w }
+		a.delay = func(_ time.Duration, fn func()) {}
+
+		st := newUITester(a.settingsView, settingsWidth, settingsHeight)
+		a.set.tab = tabAgents
+		st.Frame()
+		must(t, st.Click("重新检测"))
+
+		writeTestSkill(t, h(".claude/skills/gamma"), "gamma", "body")
+		a.cmp = &compareState{}
+
+		// When 后台扫描完成回到主线程
+		work(func(fn func()) { fn() })
+
+		// Then 正在进行的对比交互不得被打断，结果挂起直到交互结束再应用
+		if a.cmp == nil {
+			t.Fatal("异步设置扫描完成时不应关闭扫描期间新打开的对比视图")
+		}
+		if a.watch.pending == nil {
+			t.Fatal("受保护交互期间完成的扫描应暂存到 pending")
+		}
+
+		// When 用户关掉对比并刷新界面
+		a.cmp = nil
+		tt.Frame()
+
+		// Then 挂起的扫描结果自动应用，新技能 gamma 生效
+		if a.watch.pending != nil {
+			t.Fatal("交互结束后挂起扫描应被冲刷并清空")
+		}
+		if a.lib.Get("gamma") == nil {
+			t.Fatal("延后应用的设置扫描结果应包含扫描期间写入的 gamma")
+		}
+	})
+
+	t.Run("rejects_older_watch_scan_after_deferring_settings_rescan", func(t *testing.T) {
+		// Given 一个老的 watch 扫描早在 baseGen 时就已经出发；期间设置扫描扫到了新技能 gamma 并因打开对比而暂存 pending
+		a, tt, h := importApp(t)
+		writeTestSkill(t, h(".claude/skills/alpha"), "alpha", "body")
+		a.rescan()
+		olderLib, olderRep := library.Scan(a.lib.Home), library.UpdateReport{}
+		olderGen := a.watch.scanGen.Load()
+
+		writeTestSkill(t, h(".claude/skills/gamma"), "gamma", "body")
+		var work func(post func(func()))
+		a.bg = func(w func(post func(func()))) { work = w }
+		a.delay = func(_ time.Duration, fn func()) {}
+
+		st := newUITester(a.settingsView, settingsWidth, settingsHeight)
+		a.set.tab = tabAgents
+		st.Frame()
+		must(t, st.Click("重新检测"))
+		a.cmp = &compareState{}
+		work(func(fn func()) { fn() })
+
+		// When 早先那轮不含 gamma 的 watch 扫描此时才回到主线程
+		a.applyWatchScan(olderLib, olderRep, olderGen)
+
+		// Then 较老的 watch 扫描不得覆写挂起队列里较新的设置扫描结果
+		if a.watch.pending == nil || a.watch.pending.lib.Get("gamma") == nil {
+			t.Fatal("较早出发的 watch 扫描不应覆盖挂起队列里较新的设置扫描结果")
+		}
+		a.cmp = nil
+		tt.Frame()
+		if a.lib.Get("gamma") == nil {
+			t.Fatal("交互结束后应保留并应用包含 gamma 的设置扫描结果")
+		}
+	})
+
+	t.Run("preserves_usage_refresh_when_watch_scan_supersedes_deferred_settings_rescan", func(t *testing.T) {
+		// Given 对比打开期间，设置扫描在途，一轮仅扫技能的 watch 扫描先一步进入 pending（reloadUsage=false）
+		a, tt, h := importApp(t)
+		writeTestSkill(t, h(".claude/skills/alpha"), "alpha", "body")
+		a.rescan()
+		var finish func()
+		a.bg = func(w func(post func(func()))) {
+			w(func(fn func()) { finish = fn })
+		}
+		a.delay = func(_ time.Duration, fn func()) {}
+
+		st := newUITester(a.settingsView, settingsWidth, settingsHeight)
+		a.set.tab = tabAgents
+		st.Frame()
+		must(t, st.Click("重新检测"))
+
+		a.cmp = &compareState{}
+		writeTestSkill(t, h(".claude/skills/beta"), "beta", "body")
+		fresh := library.Scan(a.lib.Home)
+		a.applyWatchScan(fresh, fresh.Updates(), a.watch.scanGen.Load())
+
+		// When 设置扫描后落地但因为已被 watch 超越而让位
+		finish()
+
+		// Then 挂起的替换扫描必须继承手动重检的 reloadUsage 诉求，待交互结束一同刷新调用统计与库
+		if a.watch.pending == nil || !a.watch.pending.reloadUsage {
+			t.Fatalf("被 watch 超越让位后，挂起队列中的替换扫描应保留 reloadUsage=true：%#v", a.watch.pending)
+		}
+		a.cmp = nil
+		tt.Frame()
+		if a.lib.Get("beta") == nil {
+			t.Fatal("冲刷后应应用较新的 beta 扫描结果")
+		}
+	})
+
+	t.Run("preserves_pending_usage_refresh_when_immediate_watch_applies_first", func(t *testing.T) {
+		// Given 设置扫描因打开对比而挂起（reloadUsage=true），随后对比关闭，但在下一帧冲刷前新的一轮 watch 立即落地
+		origLoad := loadUsageAsync
+		refreshes := 0
+		loadUsageAsync = func(*app) { refreshes++ }
+		t.Cleanup(func() { loadUsageAsync = origLoad })
+
+		a, _, h := importApp(t)
+		writeTestSkill(t, h(".claude/skills/alpha"), "alpha", "body")
+		a.rescan()
+		refreshes = 0
+
+		var work func(post func(func()))
+		a.bg = func(w func(post func(func()))) { work = w }
+		a.delay = func(_ time.Duration, fn func()) {}
+
+		st := newUITester(a.settingsView, settingsWidth, settingsHeight)
+		a.set.tab = tabAgents
+		st.Frame()
+		must(t, st.Click("重新检测"))
+
+		a.cmp = &compareState{}
+		work(func(fn func()) { fn() })
+		if a.watch.pending == nil || !a.watch.pending.reloadUsage {
+			t.Fatalf("前置条件：设置扫描应已挂起且带 reloadUsage=true：%#v", a.watch.pending)
+		}
+
+		// 交互结束但未先切回绘图冲刷前，新一轮 watch 扫描带着新技能 delta 直接落地
+		a.cmp = nil
+		writeTestSkill(t, h(".claude/skills/delta"), "delta", "body")
+		fresh := library.Scan(a.lib.Home)
+		a.applyWatchScan(fresh, fresh.Updates(), a.watch.scanGen.Load())
+
+		if a.lib.Get("delta") == nil {
+			t.Fatal("watch 结果 delta 应已立即应用")
+		}
+		if a.watch.pending != nil {
+			t.Fatal("立即应用后不应残留旧 pending")
+		}
+		if refreshes == 0 {
+			t.Fatal("watch 直接取代挂起设置扫描时不应丢失 reloadUsage 调用统计刷新")
+		}
+	})
 }
