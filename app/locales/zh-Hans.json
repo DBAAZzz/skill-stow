@@ -1067,6 +1067,23 @@
       }
     }
   },
+  "importAmbiguousRef": "链接里的 {first} 和 {second} 都是这个仓库的分支或标签，不知道该用哪个。",
+  "@importAmbiguousRef": {
+    "description": "添加技能：/tree/ 链接里带斜杠的分支名能对上多个分支或标签",
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      }
+    }
+  },
+  "importAmbiguousRefHint": "在 GitHub 上打开要用的那个提交，粘贴带提交 ID 的链接",
+  "@importAmbiguousRefHint": {
+    "description": "添加技能：分支名有歧义时的建议",
+    "placeholders": {}
+  },
   "importRepoMissing": "GitHub 上没有 {repo}。",
   "@importRepoMissing": {
     "description": "添加技能",

@@ -61,6 +61,11 @@ type PathCommitter interface {
 	PathCommit(ctx context.Context, repo, ref, subpath string) (Commit, error)
 }
 
+// RefLister 列出仓库里以 prefix 开头的分支名和标签名。
+type RefLister interface {
+	RefNames(ctx context.Context, repo, prefix string) ([]string, error)
+}
+
 // AuthRemote 报告当前上游客户端是否带有登录凭证。
 type AuthRemote interface {
 	Authenticated() bool

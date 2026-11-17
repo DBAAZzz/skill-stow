@@ -25,6 +25,7 @@ type fakeRemote struct {
 	pathCommits map[string]Commit                  // "repo\x00path" → Commit
 	pathFail    error                              // 按目录查提交一律失败（API 额度用完）
 	unsized     bool                               // 目录树不带文件大小（git 协议）
+	branches    map[string]map[string]string       // 仓库 → 分支或标签名 → 提交
 	edit        func(path string, b []byte) []byte // 下载时改内容（篡改用例）
 }
 
@@ -137,9 +138,40 @@ func (f *fakeRemote) commit(repo, ref string) (*fakeCommit, error) {
 	}
 	c := r.commits[ref]
 	if c == nil {
+		c = r.commits[f.branches[repo][ref]]
+	}
+	if c == nil {
 		return nil, &RemoteError{Kind: RemoteNotFound, Status: 404}
 	}
 	return c, nil
+}
+
+// branch 给仓库加一个指向 sha 的分支或标签。
+func (f *fakeRemote) branch(repo, name, sha string) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.branches == nil {
+		f.branches = map[string]map[string]string{}
+	}
+	if f.branches[repo] == nil {
+		f.branches[repo] = map[string]string{}
+	}
+	f.branches[repo][name] = sha
+}
+
+func (f *fakeRemote) RefNames(ctx context.Context, repo, prefix string) ([]string, error) {
+	if err := f.log("refs " + repo + " " + prefix); err != nil {
+		return nil, err
+	}
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	var out []string
+	for name := range f.branches[repo] {
+		if strings.HasPrefix(name, prefix) {
+			out = append(out, name)
+		}
+	}
+	return out, nil
 }
 
 func (f *fakeRemote) Commit(ctx context.Context, repo, ref string) (Commit, error) {

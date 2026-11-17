@@ -190,6 +190,9 @@ func ReadGitHubImport(ctx context.Context, home string, r ImportRemote, src Impo
 			progress(p)
 		}
 	}
+	if src, err = splitRef(ctx, r, src); err != nil {
+		return nil, githubImportError(ctx, src, err)
+	}
 	c, err := r.Commit(ctx, src.Repo, src.Ref)
 	if err != nil {
 		return nil, githubImportError(ctx, src, err)
@@ -282,6 +285,35 @@ func ReadGitHubImport(ctx context.Context, home string, r ImportRemote, src Impo
 	markDuplicateNames(b.Skills)
 	b.audit(ctx)
 	return b, nil
+}
+
+// splitRef 按仓库实际的分支和标签重新切分 /tree/<ref>/<子目录>：分支名可以
+// 带斜杠（feature/x），解析网址时只取了第一段。对上多个时报错，不猜。
+func splitRef(ctx context.Context, r Remote, src ImportSource) (ImportSource, error) {
+	rl, ok := r.(RefLister)
+	if !ok || src.Ref == "" || src.Subpath == "" || isSHA(src.Ref) {
+		return src, nil
+	}
+	names, err := rl.RefNames(ctx, src.Repo, src.Ref)
+	if err != nil {
+		return src, err
+	}
+	segs := strings.Split(src.Subpath, "/")
+	var refs []string
+	at := 0 // 子目录里有几段属于分支名
+	for n := 0; n <= len(segs); n++ {
+		ref := path.Join(append([]string{src.Ref}, segs[:n]...)...)
+		if slices.Contains(names, ref) {
+			refs, at = append(refs, ref), n
+		}
+	}
+	switch {
+	case len(refs) > 1:
+		return src, &ImportError{Msg: locales.ImportAmbiguousRef(refs[0], refs[1]), Hint: locales.ImportAmbiguousRefHint()}
+	case len(refs) == 1:
+		src.Ref, src.Subpath = refs[0], strings.Join(segs[at:], "/")
+	}
+	return src, nil
 }
 
 // dirsNamed 是 dirs 里目录名对得上 src.Skills 的（按 SkillSlug 比较；根目录

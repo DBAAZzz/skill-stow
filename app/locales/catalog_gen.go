@@ -2236,6 +2236,38 @@ func (msgs Messages) ImportRepoOrBranchMissing(repo string, ref string) string {
 	return Catalog.Format(msgs.locale, "importRepoOrBranchMissing", map[string]any{"repo": repo, "ref": ref})
 }
 
+// ImportAmbiguousRef says "链接里的 {first} 和 {second} 都是这个仓库的分支或标签，不知道该用哪个。"
+// in the language the app shows.
+//
+// 添加技能：/tree/
+// 链接里带斜杠的分支名能对上多个分支或标签
+func ImportAmbiguousRef(first string, second string) string {
+	return In(i18n.Locale()).ImportAmbiguousRef(first, second)
+}
+
+// ImportAmbiguousRef says "链接里的 {first} 和 {second} 都是这个仓库的分支或标签，不知道该用哪个。"
+// in the language of msgs.
+//
+// 添加技能：/tree/
+// 链接里带斜杠的分支名能对上多个分支或标签
+func (msgs Messages) ImportAmbiguousRef(first string, second string) string {
+	return Catalog.Format(msgs.locale, "importAmbiguousRef", map[string]any{"first": first, "second": second})
+}
+
+// ImportAmbiguousRefHint says "在 GitHub 上打开要用的那个提交，粘贴带提交 ID 的链接"
+// in the language the app shows.
+//
+// 添加技能：分支名有歧义时的建议
+func ImportAmbiguousRefHint() string { return In(i18n.Locale()).ImportAmbiguousRefHint() }
+
+// ImportAmbiguousRefHint says "在 GitHub 上打开要用的那个提交，粘贴带提交 ID 的链接"
+// in the language of msgs.
+//
+// 添加技能：分支名有歧义时的建议
+func (msgs Messages) ImportAmbiguousRefHint() string {
+	return Catalog.Format(msgs.locale, "importAmbiguousRefHint", nil)
+}
+
 // ImportRepoMissing says "GitHub 上没有 {repo}。"
 // in the language the app shows.
 //

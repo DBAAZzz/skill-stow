@@ -13,6 +13,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"skillmanager/locales"
 )
 
 // fakeImport 是读取用的上游：GitHub 部分沿用 fakeRemote，skills.sh 的快照
@@ -529,6 +531,43 @@ func TestALargeRepoDownloadsSkillsOnlyWhenPicked(t *testing.T) {
 	}
 	if out := l.AddImport(b, []string{"s07"}, ImportPlacement{Library: true}, nil); !out[0].Added || !exists(h(".agents/skills/s07/ref.md")) {
 		t.Errorf("%+v", out)
+	}
+}
+
+func TestABranchNameWithSlashesIsSplitOffTheFolder(t *testing.T) {
+	// Given 仓库有个带斜杠的分支 feature/x
+	home, _ := importHome(t)
+	f := newFakeImport()
+	sha := f.publish(t, "antfu/skills", antfuSkills)
+	f.branch("antfu/skills", "feature/x", sha)
+	f.branch("antfu/skills", "feature-y", sha)
+
+	// When 粘贴这个分支下子目录的链接
+	b := readAntfu(t, home, f, "https://github.com/antfu/skills/tree/feature/x/skills/vite")
+
+	// Then 分支名整段认出，剩下的是子目录
+	if b.Source.Ref != "feature/x" || b.Source.Subpath != "skills/vite" || !slices.Equal(batchNames(b), []string{"vite"}) {
+		t.Errorf("ref=%q sub=%q 技能 %v", b.Source.Ref, b.Source.Subpath, batchNames(b))
+	}
+}
+
+func TestAnAmbiguousBranchNameIsReportedNotGuessed(t *testing.T) {
+	// Given 分支 feature 和标签 feature/x 同时存在
+	home, _ := importHome(t)
+	f := newFakeImport()
+	sha := f.publish(t, "antfu/skills", antfuSkills)
+	f.branch("antfu/skills", "feature", sha)
+	f.branch("antfu/skills", "feature/x", sha)
+	src, err := ParseImportInput("https://github.com/antfu/skills/tree/feature/x/skills/vite")
+	must(t, err)
+
+	// When 读取
+	_, err = ReadGitHubImport(context.Background(), home, f, src, nil)
+
+	// Then 报出两个都对得上，不去猜
+	var ie *ImportError
+	if !errors.As(err, &ie) || ie.Msg != locales.ImportAmbiguousRef("feature", "feature/x") {
+		t.Errorf("err = %v", err)
 	}
 }
 
