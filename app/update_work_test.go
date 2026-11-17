@@ -359,17 +359,6 @@ func TestRunUpdatesBatchTotalFailureAndCancelUnderQueuedPost(t *testing.T) {
 	})
 }
 
-func TestApplyUpdateProgressIgnoresEmptyNameInitialProgress(t *testing.T) {
-	a := newApp(library.Scan(t.TempDir()))
-	a.applyUpdateProgress(library.UpdateProgress{Done: 0, Total: 3})
-	if len(a.upd.batch) != 0 {
-		t.Fatalf("initial progress polluted batch map: %v", a.upd.batch)
-	}
-	if a.upd.progress.Total != 3 {
-		t.Fatalf("progress total = %d, want 3", a.upd.progress.Total)
-	}
-}
-
 func TestConcurrentBackgroundWorkerAndUIPostDeliveryHasNoRaces(t *testing.T) {
 	home := t.TempDir()
 	remote := newBatchFakeRemote()

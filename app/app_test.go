@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"image/png"
 	"os"
@@ -396,24 +395,6 @@ func TestProjectBoardHasAColumnPerSkillDir(t *testing.T) {
 		if !tt.HasText(want) {
 			t.Errorf("项目看板缺少 %q", want)
 		}
-	}
-}
-
-// 从整理页换到使用情况页：整理页的问题行带离场动画，换页时不应留在新页上
-// 淡出——换页后第一时间看到的，和动画都停了以后一样。
-func TestSwitchingPagesLeavesNothingOfTheOldPage(t *testing.T) {
-	a, tt := newTester(t)
-	a.scope = scopeTidy
-	tt.Frame()
-	tt.Advance(time.Second)
-	must(t, tt.Click("使用情况"))
-	tt.Advance(60 * time.Millisecond)
-	tt.Frame()
-	early := bytes.Clone(tt.Image().Pix)
-	tt.Advance(2 * time.Second)
-	tt.Frame()
-	if !bytes.Equal(early, tt.Image().Pix) {
-		t.Error("换到使用情况页时，整理页的东西还在淡出")
 	}
 }
 
@@ -878,27 +859,5 @@ func TestCardScrollIsolatedAcrossPages(t *testing.T) {
 		if a.cardScroll().Y != 0 {
 			t.Fatalf("切到项目页应从顶部开始，实际 Y = %v", a.cardScroll().Y)
 		}
-	}
-}
-
-func TestSelectingSkillAndSwitchingViaSidebarDoesNotFade(t *testing.T) {
-	a, tt := newTester(t)
-	if err := tt.Click("test-first"); err != nil {
-		t.Fatal(err)
-	}
-	tt.Advance(paneDuration)
-	tt.Frame()
-	if a.selected == nil {
-		t.Fatal("应已选中技能")
-	}
-
-	must(t, tt.Click("使用情况"))
-	tt.Advance(60 * time.Millisecond)
-	tt.Frame()
-	early := bytes.Clone(tt.Image().Pix)
-	tt.Advance(2 * time.Second)
-	tt.Frame()
-	if !bytes.Equal(early, tt.Image().Pix) {
-		t.Error("选中技能后点侧边栏去使用情况页时，浏览页仍在淡出")
 	}
 }

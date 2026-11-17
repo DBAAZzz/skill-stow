@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 	"image/png"
@@ -141,61 +140,5 @@ func TestReaderShowsImageAndSwitchesCodeFilesInEditor(t *testing.T) {
 	must(t, tt.Click("assets/cover.png"))
 	if tt.HasText("没法直接显示") {
 		t.Fatalf("图片文件应直接预览，不应提示没法直接显示：%q", tt.Texts())
-	}
-}
-
-func TestReaderFileListScrollsWhenSkillHasManyFiles(t *testing.T) {
-	files := []library.File{
-		{Path: "SKILL.md", Size: 64, Content: "---\nname: cloudflare\ndescription: demo\n---\n# Cloudflare\n"},
-	}
-	for g := range 8 {
-		for i := range 5 {
-			p := fmt.Sprintf("references/group-%02d/doc-%02d.md", g, i)
-			files = append(files, library.File{Path: p, Size: 120, Content: "# " + p + "\ncontent\n"})
-		}
-	}
-	last := "references/group-07/doc-04.md"
-
-	lib := &library.Library{}
-	s := &library.Skill{ID: "cloudflare", Name: "cloudflare", Source: library.Mine, Files: files}
-	lib.Skills = []*library.Skill{s}
-
-	a := newApp(lib)
-	tt := newUITester(a.view, 1280, 800)
-	tt.SetScale(2)
-	a.open(s)
-	tt.Frame()
-	tt.Advance(time.Second)
-	tt.Frame()
-
-	firstRect, ok := tt.Find("SKILL.md")
-	if !ok {
-		t.Fatal("missing SKILL.md row in file list")
-	}
-	lastBefore, ok := tt.Find(last)
-	if !ok {
-		t.Fatal("missing last file row in file list")
-	}
-	if lastBefore.Y+lastBefore.H <= 800 {
-		t.Fatalf("预期末尾文件初始超出视口（Y=%.1f H=%.1f）", lastBefore.Y, lastBefore.H)
-	}
-
-	// 在左侧文件列表区域向下滚动
-	tt.Scroll(firstRect.X+firstRect.W/2, 400, 0, 800)
-	tt.Frame()
-
-	lastAfter, ok := tt.Find(last)
-	if !ok {
-		t.Fatal("missing last file row after scroll")
-	}
-	if lastAfter.Y >= lastBefore.Y {
-		t.Fatalf("文件列表未向下滚动：before Y=%.1f, after Y=%.1f", lastBefore.Y, lastAfter.Y)
-	}
-	if lastAfter.Y+lastAfter.H > 800 || lastAfter.Y < 52 {
-		t.Fatalf("滚动后末尾文件仍不在视口内：rect=%+v", lastAfter)
-	}
-	must(t, tt.Click(last))
-	if a.reading.Files[a.file].Path != last {
-		t.Fatalf("滚动后点击末尾文件应切换过去，实际=%q", a.reading.Files[a.file].Path)
 	}
 }

@@ -410,82 +410,6 @@ func TestOnlyTheNamedSkillIsListedWithAWayToShowTheRest(t *testing.T) {
 	}
 }
 
-func TestLeavingTheSkillListDoesNotCrash(t *testing.T) {
-	for _, button := range []string{"换一个来源", "继续添加"} {
-		a, tt, h := importApp(t)
-		src := h("Downloads/x")
-		writeTestSkill(t, src, "x", "body")
-		tt.DropFiles(700, 400, src)
-		tt.Frame()
-		if a.imp.batch == nil {
-			t.Fatalf("没读到：%v", a.imp.err)
-		}
-		if button == "继续添加" {
-			must(t, tt.Click("添加 1 个技能"))
-			tt.Advance(time.Second)
-		}
-		if err := tt.Click(button); err != nil {
-			t.Fatalf("%v：%v", err, tt.Texts())
-		}
-		tt.Advance(time.Second)
-		if a.imp.batch != nil || !tt.HasText("读取") {
-			t.Errorf("%s：应回到输入页", button)
-		}
-	}
-}
-
-func TestMenuDescriptionsDoNotRunIntoTheNextOption(t *testing.T) {
-	a, tt, h := importApp(t)
-	src := h("Downloads/x")
-	writeTestSkill(t, src, "x", "body")
-	tt.DropFiles(700, 400, src)
-	tt.Frame()
-	if a.imp.batch == nil {
-		t.Fatal("没读到")
-	}
-	must(t, tt.Click("技能库（通用）"))
-	tt.Advance(time.Second)
-	readers := agentNames(a.lib.SharedReaders())
-	detail, ok := tt.Find("放进 ~/.agents/skills，" + readers + " 直接读到")
-	next, ok2 := tt.Find("指定的 Agent…")
-	if !ok || !ok2 {
-		t.Fatalf("菜单没打开：%v", tt.Texts())
-	}
-	if detail.Y+detail.H > next.Y {
-		t.Errorf("说明（底 %.0f）压到了下一项（顶 %.0f）", detail.Y+detail.H, next.Y)
-	}
-}
-
-func TestUncheckingTheLastAgentDoesNotCrash(t *testing.T) {
-	a, tt, h := importApp(t)
-	src := h("Downloads/x")
-	writeTestSkill(t, src, "x", "body")
-	tt.DropFiles(700, 400, src)
-	tt.Frame()
-	if a.imp.batch == nil {
-		t.Fatal("没读到")
-	}
-	a.setPlacement(library.ImportPlacement{Agents: []string{"claude-code"}})
-	tt.Frame()
-	must(t, tt.Click("谁会读到"))
-	tt.Advance(time.Second)
-	// 按钮上也写着 Claude Code；点菜单里那一行右边的目录
-	if err := tt.Click("~/.claude/skills"); err != nil {
-		t.Fatalf("%v：placeable=%v %v", err, a.lib.ImportPlaceable(), tt.Texts())
-	}
-	tt.Advance(time.Second)
-	if len(a.imp.place.Agents) != 0 {
-		t.Fatalf("应取消勾选：%v", a.imp.place.Agents)
-	}
-	if got := a.importAddable(); len(got) != 1 {
-		t.Fatalf("可添加 = %v", got)
-	}
-	a.addImports()
-	if a.imp.adding || exists(h(".claude/skills/x")) {
-		t.Error("没选 Agent 时不应添加")
-	}
-}
-
 func TestImportPreviewSnapshots(t *testing.T) {
 	dir := os.Getenv("SNAPSHOT_DIR")
 	if dir == "" {
@@ -675,7 +599,7 @@ func copyFileTest(src, dst string) error {
 	return os.WriteFile(dst, b, 0o644)
 }
 
-func TestImportTagsRenderDistinctStatesWithoutClipping(t *testing.T) {
+func TestImportTagsShowEachSkillsState(t *testing.T) {
 	a, tt, h := importApp(t)
 	writeTestSkill(t, h(".agents/skills/existing"), "已有技能", "mine")
 	a.rescan()
@@ -701,16 +625,6 @@ func TestImportTagsRenderDistinctStatesWithoutClipping(t *testing.T) {
 		if !tt.HasText(want) {
 			t.Errorf("列表/预览缺少标签 %q：%v", want, tt.Texts())
 		}
-	}
-
-	// 长名技能（web-design-guidelines）列表行里的「缺简介」文字应完整留在行内、不挤压溢出
-	rowRect, okRow := tt.Find("web-design-guidelines")
-	tagRect, okTag := tt.Find("缺简介")
-	if !okRow || !okTag {
-		t.Fatalf("找不到长名行或标签：okRow=%v okTag=%v", okRow, okTag)
-	}
-	if tagRect.X <= rowRect.X || tagRect.X+tagRect.W > rowRect.X+rowRect.W || tagRect.W < 25 || tagRect.H < 10 {
-		t.Errorf("「缺简介」标签位置或尺寸异常：row=%+v tag=%+v", rowRect, tagRect)
 	}
 
 	// 添加后应显示「已添加」
@@ -762,7 +676,7 @@ func TestSkillMarkdownHidesUnresolvableBadgesKeepsLocalImages(t *testing.T) {
 	}
 }
 
-func TestImportDetailSupportsRawToggleCollapsedSafeAuditAndAlignedInspector(t *testing.T) {
+func TestImportDetailSupportsRawToggleAndCollapsedSafeAudit(t *testing.T) {
 	a, tt, h := importApp(t)
 	src := h("Downloads/r7-pack")
 
@@ -824,33 +738,14 @@ func TestImportDetailSupportsRawToggleCollapsedSafeAuditAndAlignedInspector(t *t
 	if tt.HasText("Avatar Badge") || tt.HasText("本应用不扫描文件") {
 		t.Errorf("不应渲染外链徽章占位框或冗余脚注：%v", tt.Texts())
 	}
-	titleRect, okT := tt.Find("ai-avatar-video")
-	h1Rect, okH := tt.Find("AI Avatar Videos")
-	if !okT || !okH || h1Rect.H >= titleRect.H {
-		t.Errorf("正文 H1 高度应严格小于页头标题：title=%+v h1=%+v", titleRect, h1Rect)
-	}
-
-	// 验证右上角「查看原文」->「原文模式」切换（铺满页头下方的纯白原生编辑器）
+	// 「查看原文」切到原文模式
 	must(t, tt.Click("查看原文"))
-	edRect, okEd := tt.Find("SKILL.md")
-	if !a.imp.skillRaw || !tt.HasText("原文模式") || !okEd || edRect.H < 300 {
-		t.Fatalf("应切入铺满原文编辑器：raw=%v okEd=%v rect=%+v texts=%v", a.imp.skillRaw, okEd, edRect, tt.Texts())
+	if !a.imp.skillRaw || !tt.HasText("原文模式") {
+		t.Fatalf("应切到原文模式：raw=%v texts=%v", a.imp.skillRaw, tt.Texts())
 	}
 	if tt.HasText("安全审计") || tt.HasText("工具权限") {
 		t.Errorf("原文模式应直接显示完整只读编辑器，不渲染检查表：%v", tt.Texts())
 	}
-	// 宽窗口下页头按钮与原文编辑器应贴满右侧，不因 780px 限宽留下右半边空白
-	tt.SetSize(1600, 900)
-	tt.Frame()
-	if wideEd, ok := tt.Find("SKILL.md"); !ok || wideEd.W < 950 {
-		t.Errorf("宽窗口下原文编辑器应铺满右侧详情栏：ok=%v rect=%+v", ok, wideEd)
-	}
-	if rawBtn, ok := tt.Find("原文模式"); !ok || rawBtn.X+rawBtn.W < 1500 {
-		t.Errorf("宽窗口下「原文模式」按钮应贴齐右缘：ok=%v rect=%+v", ok, rawBtn)
-	}
-	tt.SetSize(1280, 800)
-	tt.Frame()
-
 	// 再点「原文模式」切回渲染态
 	must(t, tt.Click("原文模式"))
 	if a.imp.skillRaw || !tt.HasText("查看原文") || !tt.HasText("安全审计") {

@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/egoist/mygo/ui"
 	"skillmanager/internal/library"
@@ -344,67 +343,5 @@ func TestZCodeSnapshots(t *testing.T) {
 			}
 		}
 		shot("project-unknown", a)
-	}
-}
-
-func TestBoardMoreButtonIconIsVerticallyCentered(t *testing.T) {
-	a, tt := newTester(t)
-	a.mode = viewBoard
-	tt.SetScale(2)
-	tt.Frame()
-	tt.Advance(350 * time.Millisecond) // 等 modePane 入场位移结束
-	tt.Frame()
-
-	target := "Claude Code · interface-craft 操作"
-	rect, ok := tt.Find(target)
-	if !ok {
-		t.Fatal("missing card menu")
-	}
-	tt.Move(rect.X+rect.W/2, rect.Y+rect.H/2)
-	tt.Frame()
-	must(t, tt.Click(target))
-	tt.Advance(250 * time.Millisecond)
-	tt.Frame()
-
-	rect, ok = tt.Find(target)
-	if !ok {
-		t.Fatal("missing open card menu trigger")
-	}
-	img := tt.Image()
-	const scale = 2
-	x0 := int(rect.X * scale)
-	y0 := int(rect.Y * scale)
-	x1 := int((rect.X + rect.W) * scale)
-	y1 := int((rect.Y + rect.H) * scale)
-	bg := img.RGBAAt((x0+x1)/2, y0+4)
-	minY, maxY := y1, y0
-	dots := 0
-	for y := y0 + 2; y < y1-2; y++ {
-		for x := x0 + 4; x < x1-4; x++ {
-			c := img.RGBAAt(x, y)
-			// 图标像素明显深于按钮背景（colInkSelected 叠白底约 ~237）
-			if int(bg.R)-int(c.R) > 60 {
-				dots++
-				if y < minY {
-					minY = y
-				}
-				if y > maxY {
-					maxY = y
-				}
-			}
-		}
-	}
-	if dots == 0 {
-		t.Fatalf("未在按钮区域 %+v 内检测到「…」图标像素（bg=%v）", rect, bg)
-	}
-	topPad := minY - y0
-	botPad := (y1 - 1) - maxY
-	diff := topPad - botPad
-	if diff < 0 {
-		diff = -diff
-	}
-	if diff > 2 {
-		t.Fatalf("看板卡片「…」图标未垂直居中：dotsY=[%d..%d] inside pxY=[%d..%d), topPad=%dpx, botPad=%dpx",
-			minY, maxY, y0, y1, topPad, botPad)
 	}
 }

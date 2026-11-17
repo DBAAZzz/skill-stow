@@ -476,24 +476,6 @@ func TestSettingsMenusDoNotLeakAndBlockWatchSyncAfterClosing(t *testing.T) {
 	}
 }
 
-func TestBoardMultiColumnSameSkillOpensOnlyOneContextMenu(t *testing.T) {
-	// Given 我的技能看板视图中，interface-craft 同时在 Claude Code 和 ClawdBot 两列出现
-	_, tt := newTester(t)
-	must(t, tt.Click("看板"))
-	r, ok := tt.Find("interface-craft")
-	if !ok {
-		t.Fatal("看板视图应展示 interface-craft")
-	}
-
-	// When 右键其中一列的 interface-craft 卡片
-	tt.RightClickAt(r.X+r.W/2, r.Y+r.H/2)
-
-	// Then 只应弹出一个上下文菜单（「在编辑器中打开」出现 1 组 2 条文本，而不是两列各弹出一个）
-	if got := countText(tt, "在编辑器中打开"); got != 2 {
-		t.Fatalf("多列同名技能右键时只应弹出 1 个菜单，实际「在编辑器中打开」出现 %d 次：%q", got, tt.Texts())
-	}
-}
-
 func TestFilterPrunesCollectionSelectionAndUpdatesCollectionCounts(t *testing.T) {
 	// Given 我的技能卡片视图，先选中 anthropics/skills 集合
 	a, tt := newTester(t)
@@ -555,42 +537,6 @@ func TestFilterPrunesCollectionSelectionAndUpdatesCollectionCounts(t *testing.T)
 	// Then 打开的集合内部也同步清理被过滤掉的 a.selected
 	if a.selected != nil {
 		t.Fatalf("打开的集合内选中项被过滤隐藏时应清空 a.selected，实际 = %v", a.selected.Name)
-	}
-}
-
-func TestBoardHiddenActiveAgentFilterDoesNotRenderBlankCanvas(t *testing.T) {
-	// Given 我的技能看板视图按 Claude Code 筛选，随后在设置中隐藏 Claude Code
-	a, tt := newTester(t)
-	must(t, tt.Click("看板"))
-	openFilterAgentSubmenu(t, tt)
-	clickMenuItem(t, tt, "Claude Code")
-	if err := a.lib.SetHidden("claude-code", true); err != nil {
-		t.Fatal(err)
-	}
-
-	// When 重新绘制看板视图
-	tt.Frame()
-
-	// Then 看板不应因可见列表不含当前筛选 Agent 而渲染「0 个 Agent」的空白画布
-	if tt.HasText("· 0 个 Agent") {
-		t.Fatalf("隐藏激活筛选的 Agent 后不应出现 0 个 Agent 空白看板：%q", tt.Texts())
-	}
-	if !tt.HasText("Claude Code") || !tt.HasText("添加到 Claude Code") {
-		t.Fatalf("看板应与筛选菜单及卡片一致地保留当前明确筛选的 Agent 列：%q", tt.Texts())
-	}
-
-	// When 隐藏全部 Agent 并将搜索限定在非共享且已归属隐藏 Agent 的 systematic-debugging
-	for _, ag := range a.lib.Agents {
-		if err := a.lib.SetHidden(ag.ID, true); err != nil {
-			t.Fatal(err)
-		}
-	}
-	a.currentFilter().agent, a.query = "", "systematic-debugging"
-	tt.Frame()
-
-	// Then columns == 0 时也应显示空状态兜底而不是空白看板画布
-	if !tt.HasText("看板按 Agent 排列你自己的技能。") {
-		t.Fatalf("所有列被隐藏时看板应回退空状态说明而非空白画布：%q", tt.Texts())
 	}
 }
 

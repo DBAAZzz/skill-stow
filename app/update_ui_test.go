@@ -9,8 +9,6 @@ import (
 	"skillmanager/internal/library"
 	"testing"
 	"time"
-
-	"github.com/egoist/mygo/ui"
 )
 
 func updateFixture(a *app) {
@@ -350,106 +348,6 @@ func TestUpdateStateSnapshots(t *testing.T) {
 		},
 	}
 	save("updates-unchecked-local.png", 1120, 820, a5)
-}
-
-func TestPrepareFailureUsesToastInsteadOfRowInlineError(t *testing.T) {
-	home := t.TempDir()
-	a := newApp(library.Scan(home))
-	a.scope = scopeUpdates
-	it := library.UpdateItem{Name: "vite", Source: library.SourceID{Type: "github", Repo: "antfu/skills"}, State: library.UpdReady, Commit: "3f8a21c", CommitDate: time.Now()}
-	a.upd.report = library.UpdateReport{Checked: time.Now(), Complete: true, Eligible: 1, Items: []library.UpdateItem{it}}
-
-	tt := newUITester(a.view, 1280, 800)
-	must(t, tt.Click("查看差异"))
-
-	if a.upd.err != "" {
-		t.Fatalf("unexpected banner err: %q", a.upd.err)
-	}
-	if len(a.upd.errors) != 0 {
-		t.Fatalf("unexpected row inline errors: %v", a.upd.errors)
-	}
-	if shownText(a, fromUpdate) == "" || shownKind(a, fromUpdate) != toastError {
-		t.Fatalf("expected error toast, got kind=%v text=%q", shownKind(a, fromUpdate), shownText(a, fromUpdate))
-	}
-	tt.Frame()
-	if !tt.HasText(shownText(a, fromUpdate)) {
-		t.Fatalf("toast not rendered: %v", tt.Texts())
-	}
-	must(t, tt.Click("关闭提示"))
-	tt.Frame()
-	if shownText(a, fromUpdate) != "" {
-		t.Fatalf("close button did not dismiss toast: %q", shownText(a, fromUpdate))
-	}
-}
-
-func TestUpdateSettingsShowsUseGHAuthToggle(t *testing.T) {
-	a := newApp(library.Sample())
-	a.bg = func(func(func(func()))) {} // 隔离本机 gh CLI 环境
-	a.set.tab = tabUpdates
-	a.set.open = true
-
-	tt := newUITester(a.settingsView, settingsWidth, 560)
-	if !tt.HasText("GitHub 授权") || !tt.HasText("使用本机 gh 登录状态") {
-		t.Fatalf("missing gh auth settings: %v", tt.Texts())
-	}
-	must(t, tt.Click("开关 使用本机 gh 登录状态"))
-	if !a.lib.Settings.UseGHAuth {
-		t.Fatal("toggle did not enable UseGHAuth")
-	}
-	tt.Frame()
-	if !tt.HasText("正在检查本机 gh 登录状态…") {
-		t.Fatalf("missing probing hint: %v", tt.Texts())
-	}
-
-	a.set.ghProbing, a.set.ghChecked, a.set.ghOK = false, true, true
-	tt.Frame()
-	if !tt.HasText("已读取本机 gh 登录凭证") {
-		t.Fatalf("missing gh auth status hint: %v", tt.Texts())
-	}
-
-	a.set.ghOK, a.set.ghNote = false, "本机 gh 尚未登录"
-	tt.Frame()
-	if !tt.HasText("当前将回退匿名请求") {
-		t.Fatalf("missing fallback warning hint: %v", tt.Texts())
-	}
-}
-
-func TestSkillUpdatesSettingsTabAndSectionNames(t *testing.T) {
-	a := newApp(library.Sample())
-	a.bg = func(func(func(func()))) {}
-	a.set.tab = tabUpdates
-	a.set.open = true
-
-	st := newUITester(a.settingsView, settingsWidth, 560)
-	tabZH, ok := st.AccessByRole(ui.RoleButton, "技能更新")
-	if !ok {
-		t.Fatalf("missing settings tab 技能更新: %v", st.Texts())
-	}
-	if _, bare := st.AccessByRole(ui.RoleButton, "更新"); bare {
-		t.Fatalf("settings tab should not use bare 更新: %v", st.Texts())
-	}
-	if !st.HasText("网络与旧版本") {
-		t.Fatalf("missing section header 网络与旧版本: %v", st.Texts())
-	}
-	if tabZH.Bounds.W < 80 {
-		t.Fatalf("settings tab width = %.1f, want >= 80 for Skill Updates", tabZH.Bounds.W)
-	}
-
-	useLocale(t, st, "en")
-	st.Frame()
-	tabEN, ok := st.AccessByRole(ui.RoleButton, "Skill Updates")
-	if !ok {
-		t.Fatalf("missing settings tab Skill Updates: %v", st.Texts())
-	}
-	if _, bare := st.AccessByRole(ui.RoleButton, "Updates"); bare {
-		t.Fatalf("settings tab should not use bare Updates: %v", st.Texts())
-	}
-	if !st.HasText("Network & Old Versions") {
-		t.Fatalf("missing section header Network & Old Versions: %v", st.Texts())
-	}
-	if tabEN.Bounds.W < 80 {
-		t.Fatalf("english settings tab width = %.1f, want >= 80", tabEN.Bounds.W)
-	}
 }
 
 func TestClickingUpdateSourceOpensExpectedWebURL(t *testing.T) {

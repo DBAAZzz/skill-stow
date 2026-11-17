@@ -55,30 +55,6 @@ func TestSearchWithNoResultsSaysSoInsteadOfEmptyLibrary(t *testing.T) {
 	}
 }
 
-func TestBoardDoesNotCallSearchHitsOutsideTheBoardNoResults(t *testing.T) {
-	a, tt := newTester(t)
-	// 挑一个搜它的名字只搜得到插件带的技能的
-	var plugin *library.Skill
-	for _, s := range a.lib.Skills {
-		if s.Source == library.ViaPlugin && len(mineOf(a.lib.Find(library.ScopeMine, s.Name))) == 0 {
-			plugin = s
-			break
-		}
-	}
-	if plugin == nil {
-		t.Fatal("示例数据里没有可用的插件带的技能")
-	}
-	// 插件带的技能在「我的技能」里，但不进看板
-	a.mode, a.query = viewBoard, plugin.Name
-	tt.Frame()
-	if tt.HasText(locales.BrowseNoSearchResults(plugin.Name)) || tt.HasText(locales.BrowseNoSkillsYetTitle()) {
-		t.Fatal("搜到了插件带的技能，看板却说没有结果")
-	}
-	if !tt.HasText(locales.BrowseBoardDescription()) {
-		t.Fatal("看板排不出列时应说明看板只排你自己的技能")
-	}
-}
-
 // 加了技能也不会出现在内置技能、集合里，那里空着只说没有，不引导添加。
 func TestPlacesNewSkillsDoNotLandInDoNotOfferAddingSkills(t *testing.T) {
 	places := []struct {

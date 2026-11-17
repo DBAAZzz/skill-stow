@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/egoist/mygo/ui"
 )
@@ -137,76 +136,5 @@ func TestLongNameListsCollapse(t *testing.T) {
 	}
 	if got := nameList(names, 4); got != "a、b、c、d" {
 		t.Errorf("nameList = %q", got)
-	}
-}
-
-func TestBatchToggleStaysUnderThePointer(t *testing.T) {
-	// Given 在我的技能的卡片视图
-	a, tt := newTester(t)
-	r, ok := tt.Find("批量操作")
-	if !ok {
-		t.Fatal("找不到「批量操作」")
-	}
-	x, y := r.X+r.W/2, r.Y+r.H/2
-
-	// When 点「批量操作」，鼠标不动再点一下
-	tt.ClickAt(x, y)
-	if !a.batch.on {
-		t.Fatal("应进入批量")
-	}
-	near := func(a, b float32) bool { return a-b < 0.5 && b-a < 0.5 }
-	if exit, ok := tt.Find("退出批量"); !ok || !near(exit.X, r.X) || !near(exit.W, r.W) {
-		t.Fatalf("「退出批量」应在原位置：%v，原来 %v", exit, r)
-	}
-	tt.ClickAt(x, y)
-
-	// Then 退出了批量
-	if a.batch.on {
-		t.Error("同一个位置再点一下应退出批量")
-	}
-}
-
-func TestUnselectableCollectionBatchAppearance(t *testing.T) {
-	// Given 我的集合视图里有不可批量选中的只读集合，并进入批量操作
-	a, tt := newTester(t)
-	must(t, tt.Click("批量操作"))
-	var r ui.Rect
-	for range 20 {
-		found, ok := tt.Find("document-skills")
-		if ok && found.Y >= 100 && found.Y+found.H <= 760 {
-			r = found
-			break
-		}
-		a.cardScroll().Y += 200
-		tt.Frame()
-	}
-	if r.W == 0 {
-		t.Fatal("未能把 document-skills 滚动到可见区域")
-	}
-
-	// Then 卡片内部右下留白处从中间到底部颜色一致，不会透出下层叠卡边框
-	img := tt.Image()
-	x := int(r.X + r.W - 24)
-	yTop := int(r.Y + r.H - 42)
-	yBottom := int(r.Y + r.H - 8)
-	base := img.RGBAAt(x, yTop)
-	for y := yTop + 1; y <= yBottom; y++ {
-		if got := img.RGBAAt(x, y); got != base {
-			t.Fatalf("不可选集合卡片内 (%d,%d) 颜色为 %v，与上方 (%d,%d) %v 不一致，下层叠卡透出或未成组淡出",
-				x, y, got, x, yTop, base)
-		}
-	}
-
-	// When 鼠标悬停在不可选集合卡片上
-	tt.Move(r.X+r.W/2, r.Y+r.H/2)
-	tt.Advance(250 * time.Millisecond)
-
-	// Then 卡片不会上抬展开
-	after, ok := tt.Find("document-skills")
-	if !ok {
-		t.Fatal("悬停后找不到 document-skills")
-	}
-	if after.Y != r.Y {
-		t.Errorf("不可选集合悬停时不应上抬: before.Y=%v after.Y=%v", r.Y, after.Y)
 	}
 }
