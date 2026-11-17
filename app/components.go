@@ -304,16 +304,15 @@ const minColumnWidth, boardGap = 228, 10
 // 横向滚动。width 是内容区的宽度。
 func (a *app) boardRow(c *ui.Context, columns int, width float32, fn func(columnWidth float32)) {
 	fits := float32(columns)*(minColumnWidth+boardGap)-boardGap+28 <= width
-	var area ui.Element
 	if fits {
-		area = ui.Row(c).Grow(1).MinHeight(0).AlignItems(ui.Stretch).Padding(14, 14, 0, 14).Gap(boardGap)
+		area := ui.Row(c).Grow(1).MinHeight(0).AlignItems(ui.Stretch).Padding(14, 14, 0, 14).Gap(boardGap)
 		area.Children(func() { fn(0) })
-	} else {
-		area = ui.ScrollHorizontal(c).Grow(1).MinHeight(0).AlignItems(ui.Stretch).Scrollbars(false).
-			Padding(14, 14, 0, 14).Gap(boardGap)
-		area.Children(func() { fn(minColumnWidth) })
+		a.deselectOnBlank(area)
+		return
 	}
-	a.deselectOnBlank(area)
+	area := ui.ScrollHorizontal(c).Grow(1).MinHeight(0).AlignItems(ui.Stretch).Scrollbars(false).
+		Padding(14, 14, 0, 14).Gap(boardGap)
+	a.panBoard(area, func() { fn(minColumnWidth) })
 }
 
 // boardColumn 是看板的一列（r8-a .col）：列头和可以滚动的卡片。width 为 0 时
@@ -341,10 +340,9 @@ const fitColumnWidth = 280
 // fitBoard 是列高随内容的看板（p3-b）：列宽固定，整块上下左右都能滚。
 func (a *app) fitBoard(c *ui.Context, fn func()) {
 	area := ui.ScrollBoth(c).Grow(1).MinHeight(0).Scrollbars(false)
-	area.Children(func() {
+	a.panBoard(area, func() {
 		ui.Row(c).Padding(14).Gap(boardGap).AlignItems(ui.Start).Children(fn)
 	})
-	a.deselectOnBlank(area)
 }
 
 // fitColumn 是 fitBoard 里的一列：圆角的灰底，高度随卡片。
