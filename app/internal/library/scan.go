@@ -825,15 +825,10 @@ func manualFile(home string) string {
 }
 
 func readManual(home string) []manualProject {
-	b, err := os.ReadFile(manualFile(home))
-	if err != nil {
-		return nil
-	}
 	var cfg struct {
 		Projects []manualProject `json:"projects"`
 	}
-	json.Unmarshal(b, &cfg)
-	return cfg.Projects
+	return readJSON(manualFile(home), cfg).Projects
 }
 
 // AddProjects 记下用户手动加的项目目录，重新扫描后列出。
