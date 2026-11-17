@@ -251,7 +251,7 @@ func (a *app) settingsSidebar(c *ui.Context) {
 func (a *app) generalTab(c *ui.Context) {
 	groupLabel(c, locales.NavLibrary(), true)
 	setBox(c, func() {
-		setRow(c, true).Children(func() {
+		setRow(c).Children(func() {
 			n := 0
 			for _, s := range a.lib.Skills {
 				if s.Shared {
@@ -263,7 +263,7 @@ func (a *app) generalTab(c *ui.Context) {
 				a.reveal(a.lib.Root)
 			}
 		})
-		setRow(c, false).Children(func() {
+		setRow(c).Children(func() {
 			rowText(c, locales.SettingsCheckLinks(), locales.SettingsCheckLinksHint(), false)
 			if pushButton(c, locales.SettingsCheckAndRepair()).Clicked() {
 				a.checkLinks()
@@ -276,7 +276,7 @@ func (a *app) generalTab(c *ui.Context) {
 
 	groupLabel(c, locales.SettingsAppearance(), false)
 	setBox(c, func() {
-		setRow(c, true).Padding(12, 18).Children(func() {
+		setRow(c).Padding(12, 18).Children(func() {
 			rowText(c, locales.SettingsTheme(), "", false)
 			ui.Row(c).Gap(14).Role(ui.RoleRadioGroup).Label(locales.SettingsTheme()).Children(func() {
 				a.themeTile(c, themeLight, locales.SettingsThemeLight())
@@ -284,11 +284,11 @@ func (a *app) generalTab(c *ui.Context) {
 				a.themeTile(c, themeAuto, locales.SettingsLanguageSystem())
 			})
 		})
-		setRow(c, false).Children(func() {
+		setRow(c).Children(func() {
 			rowText(c, locales.SettingsLanguage(), "", false)
 			a.languagePicker(c)
 		})
-		setRow(c, false).Children(func() {
+		setRow(c).Children(func() {
 			rowText(c, locales.SettingsTidySound(), locales.SettingsTidySoundHint(), false)
 			on := !a.lib.Settings.QuietTidy
 			if toggle(c, &on, locales.SettingsTidySound()).Changed() {
@@ -589,7 +589,7 @@ func (a *app) projectsTab(c *ui.Context) {
 
 	groupLabel(c, locales.SettingsDisplay(), false)
 	setBox(c, func() {
-		setRow(c, true).Children(func() {
+		setRow(c).Children(func() {
 			rowText(c, locales.SettingsGroupWorktrees(), locales.SettingsGroupWorktreesHint(), false)
 			if toggle(c, &set.MergeWorktrees, locales.SettingsGroupWorktrees()).Changed() {
 				a.saveSettings()
@@ -601,7 +601,7 @@ func (a *app) projectsTab(c *ui.Context) {
 	groupLabel(c, locales.SettingsProjectDirectories(), false)
 	dirs := library.ProjectSkillDirs()
 	setBox(c, func() {
-		setRow(c, true).Children(func() {
+		setRow(c).Children(func() {
 			ui.Text(c, locales.SettingsProjectDirectoriesHint()).
 				FontSize(12).LineHeight(1.45).TextColor(colTextMuted).Grow(1).MinWidth(0)
 		})
@@ -663,7 +663,7 @@ func setBox(c *ui.Context, fn func()) {
 }
 
 // setRow 是通用/更新等短卡片里的一行，内部不画横线，靠留白呼吸。
-func setRow(c *ui.Context, _ bool) ui.Element {
+func setRow(c *ui.Context) ui.Element {
 	return ui.Row(c).MinHeight(36).Padding(11, 18).Gap(10).AlignItems(ui.Center)
 }
 
