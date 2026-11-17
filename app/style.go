@@ -198,7 +198,7 @@ func (a *app) toolbarCompact(c *ui.Context) bool {
 }
 
 func sectionLabel(c *ui.Context, text string) ui.Element {
-	return ui.Text(c, text).FontSize(11).FontWeight(600).TextColor(colTextMuted)
+	return ui.Text(c, text).FontSize(11).FontWeight(500).TextColor(colTextMuted)
 }
 
 var segmentedSpring = ui.Animation{Spring: ui.SpringOptions{Duration: 280 * time.Millisecond, Bounce: 0.14}}

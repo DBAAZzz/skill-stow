@@ -147,7 +147,7 @@ const (
 func sectionTitle(c *ui.Context, row ui.Element, title string, right ...func()) ui.Element {
 	row.Height(sideSectionHeight).Margin(sideSectionGap, 0, 0, 0).Padding(0, 0, 0, 8).AlignItems(ui.Center).Shrink(0).
 		Children(func() {
-			ui.Text(c, title).FontSize(11).FontWeight(600).TextColor(colTextMuted).Grow(1).SingleLine()
+			ui.Text(c, title).FontSize(11).FontWeight(500).TextColor(colTextMuted).Grow(1).SingleLine()
 			for _, fn := range right {
 				fn()
 			}
