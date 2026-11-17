@@ -15,19 +15,21 @@ import (
 
 // ——— 灰底分组页 ———
 
-// pageColumn 是灰底分组页的内容栏，放在页面自己的滚动区里。width 是内容区
-// 的宽度（withPane 给的，详情栏进出时已经是最终值），maxW 取 pageMaxWidth 或
-// formMaxWidth。fn 拿到内容栏的实际宽度，按它排列；返回外面那层，点空白处
-// 取消选中之类的挂在它上面。
+// pageColumn 是灰底分组页的内容栏，放在页面自己的滚动区里，最宽 maxW
+// （pageMaxWidth 或 formMaxWidth）。栏宽跟着滚动区此刻的宽度：详情栏、侧边栏
+// 进出的动画途中区域还没变到位，按终点宽度撑开会在窄区域里居中、把左边裁掉。
+// width 是内容区的终点宽度（withPane 给的），只用来定两侧留白，并按它算出栏的
+// 终点宽度交给 fn，要按宽度换排法的（技能更新的列）按这个定，动画途中不来回跳。
+// 返回外面那层，点空白处取消选中之类的挂在它上面。
 func pageColumn(c *ui.Context, width, maxW float32, fn func(colW float32)) ui.Element {
 	side := float32(pagePadSide)
 	if width < pageNarrow {
 		side = pagePadNarrow
 	}
 	colW := max(0, min(maxW, width-2*side))
-	area := ui.Column(c).FillWidth().Padding(pagePadTop, 0, pagePadBottom, 0).AlignItems(ui.Center)
+	area := ui.Column(c).FillWidth().Padding(pagePadTop, side, pagePadBottom, side).AlignItems(ui.Center)
 	area.Children(func() {
-		ui.Column(c).Width(colW).Children(func() { fn(colW) })
+		ui.Column(c).FillWidth().MaxWidth(maxW).Children(func() { fn(colW) })
 	})
 	return area
 }

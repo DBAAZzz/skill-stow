@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"testing"
+	"time"
 
 	"skillmanager/internal/library"
 )
@@ -75,6 +76,33 @@ func TestGroupedPagesShareOneContentColumn(t *testing.T) {
 			}
 			if d := (ix0 + ix1) - (ux0 + ux1); d < -1 || d > 1 {
 				t.Errorf("添加技能应与其它页居中在同一条轴上：添加 %d…%d，使用情况 %d…%d", ix0, ix1, ux0, ux1)
+			}
+		})
+	}
+}
+
+// 详情栏收起的动画途中，内容区还没放宽：内容栏要跟着当时的宽度，不能先按
+// 终点宽度撑开、在还窄的区域里居中，把左边裁掉。
+func TestGroupedPagesKeepCardsInsideWhileInspectorCloses(t *testing.T) {
+	for name, setup := range map[string]func(a *app){
+		"usage":   func(a *app) { a.scope = scopeUsage },
+		"updates": func(a *app) { updateFixture(a) },
+	} {
+		t.Run(name, func(t *testing.T) {
+			a := newApp(library.Sample())
+			setup(a)
+			a.selected = a.lib.Get("vue-best-practices")
+			tt := newUITester(a.view, 960, 800)
+			tt.Advance(paneDuration)
+
+			a.selected = nil
+			tt.Frame()
+			tt.Advance(100 * time.Millisecond)
+
+			left := int(a.sidebarRoom())
+			x0, _, _ := cardEdges(t, tt.Image(), left)
+			if x0 < left+pagePadNarrow-1 {
+				t.Errorf("收起详情栏途中卡片左边被裁：卡片从 x=%d 起，内容区从 x=%d 起", x0, left)
 			}
 		})
 	}
