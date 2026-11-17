@@ -299,18 +299,21 @@ func statsStrip(c *ui.Context, st usageStats) {
 		}
 		col.Children(func() {
 			ui.Text(c, label).FontSize(12).TextColor(colTextMuted).SingleLine()
-			ui.Row(c).Gap(3).AlignItems(ui.Baseline).Children(func() {
-				ui.Text(c, value).FontSize(17).FontWeight(600).LetterSpacing(-0.2).TextColor(colTextPrimary).
-					FontFeatures("tnum").SingleLine()
-				ui.Text(c, unit).FontSize(12).TextColor(colTextSecondary).SingleLine()
+			// 栏窄了，「最多的一天」后面的日期换到下一行，数和单位不拆开
+			ui.Row(c).Wrap().GapX(8).AlignItems(ui.Baseline).Children(func() {
+				ui.Row(c).Shrink(0).Gap(3).AlignItems(ui.Baseline).Children(func() {
+					ui.Text(c, value).FontSize(17).FontWeight(600).LetterSpacing(-0.2).TextColor(colTextPrimary).
+						FontFeatures("tnum").SingleLine()
+					ui.Text(c, unit).FontSize(12).TextColor(colTextSecondary).SingleLine()
+				})
 				if note != "" {
-					ui.Text(c, note).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").
-						Margin(0, 0, 0, 5).SingleLine()
+					ui.Text(c, note).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").Shrink(0).SingleLine()
 				}
 			})
 		})
 	}
-	ui.Row(c).Shrink(0).BorderWidth(edgeSpread, 0, 0, 0).BorderColor(colBorderSubtle).Children(func() {
+	// 日期换了行的那格会高一些：各格拉到一样高，标签都从顶上排起
+	ui.Row(c).Shrink(0).AlignItems(ui.Stretch).BorderWidth(edgeSpread, 0, 0, 0).BorderColor(colBorderSubtle).Children(func() {
 		cell("avg", locales.UsageDailyAverage(), fmt.Sprintf("%.1f", st.avg), locales.UsageCallsUnit(), "", true)
 		cell("active", locales.UsageActiveDays(), fmt.Sprint(st.active), locales.UsageDaysUnit(), "", false)
 		peak, note := "—", ""
@@ -388,9 +391,9 @@ func (a *app) coverage(c *ui.Context, used []*library.Skill) {
 				}
 			}
 		})
-		ui.Row(c).Gap(20).Margin(9, 0, 0, 0).Children(func() {
+		ui.Row(c).Wrap().GapX(20).GapY(6).Margin(9, 0, 0, 0).Children(func() {
 			for i, b := range buckets {
-				ui.Row(c.Key(i)).Gap(6).AlignItems(ui.Center).Children(func() {
+				ui.Row(c.Key(i)).Shrink(0).Gap(6).AlignItems(ui.Center).Children(func() {
 					ui.Box(c).Size(8, 8).Radius(4).Background(b.col)
 					ui.Text(c, b.label).FontSize(12).TextColor(colTextSecondary).SingleLine()
 					if b.note != "" {
@@ -533,13 +536,14 @@ func (a *app) usedRow(c *ui.Context, now time.Time, s *library.Skill, most int, 
 	}
 	rowBody(c, row, sep, func() {
 		a.skillTile(c, s, on)
-		ui.Row(c).Width(236).Shrink(0).Gap(6).AlignItems(ui.Baseline).Children(func() {
+		// 名字一栏平时 236 宽；栏窄了先缩名字（省略号），用量条至少留一截
+		ui.Row(c).Basis(236).Shrink(1).MinWidth(0).Gap(6).AlignItems(ui.Baseline).Children(func() {
 			ui.Text(c, s.Name).FontSize(13).FontWeight(500).SingleLine().MinWidth(0).Shrink(1)
 			if tag := usageSourceTag(s.Source); tag != "" {
 				ui.Text(c, tag).FontSize(12).TextColor(tertiary).SingleLine().Shrink(0)
 			}
 		})
-		ui.Row(c).Grow(1).MinWidth(0).Height(6).Radius(3).Gap(1.5).Clip().Children(func() {
+		ui.Row(c).Grow(1).MinWidth(48).Height(6).Radius(3).Gap(1.5).Clip().Children(func() {
 			if on {
 				ui.Box(c).Absolute().Fill().Background(white.Alpha(0.25))
 			} else {

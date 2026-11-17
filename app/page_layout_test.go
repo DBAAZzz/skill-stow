@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/egoist/mygo/ui"
+
 	"skillmanager/internal/library"
 )
 
@@ -106,4 +108,59 @@ func TestGroupedPagesKeepCardsInsideWhileInspectorCloses(t *testing.T) {
 			}
 		})
 	}
+}
+
+// 主窗口最窄（960）又开着详情栏时，内容栏只剩三百来宽：每行该有的都要在
+// 卡片里，不能被挤出右边、也不能叠在按钮上。
+func TestGroupedPagesFitNarrowestWindowWithInspector(t *testing.T) {
+	const w = 960
+	paneLeft := float32(w - inspectorWidth - 1)
+	inside := func(t *testing.T, tt *ui.Tester, text string) ui.Rect {
+		t.Helper()
+		r, ok := tt.Find(text)
+		if !ok {
+			t.Fatalf("找不到 %q", text)
+		}
+		if r.X+r.W > paneLeft-pagePadNarrow {
+			t.Errorf("%q 被挤出内容栏：右边到 %.0f，内容栏右边是 %.0f", text, r.X+r.W, paneLeft-pagePadNarrow)
+		}
+		return r
+	}
+
+	t.Run("usage", func(t *testing.T) {
+		render := func(width int, pane bool) *ui.Tester {
+			a := newApp(library.Sample())
+			a.scope = scopeUsage
+			if pane {
+				a.selected = a.lib.Get("vue-best-practices")
+			}
+			tt := newUITester(a.view, width, 1400)
+			tt.Advance(paneDuration)
+			return tt
+		}
+		wide, tt := render(1280, false), render(w, true)
+		// 图例、概览里的字不能被截成省略号：和宽窗口下一样宽
+		for _, text := range []string{"10 次以上", "没用过", "11 月 2 日", "今天"} {
+			full, ok := wide.Find(text)
+			if !ok {
+				t.Fatalf("宽窗口里找不到 %q", text)
+			}
+			if r := inside(t, tt, text); r.W < full.W-0.5 {
+				t.Errorf("%q 被截断：宽 %.1f，完整应为 %.1f", text, r.W, full.W)
+			}
+		}
+		// 「最多的一天」日期换了行，三格的标签仍在同一高度
+		avg, _ := tt.Find("日均")
+		if peak, _ := tt.Find("最多的一天"); peak.Y != avg.Y {
+			t.Errorf("概览三格的标签没对齐：日均 y=%.1f，最多的一天 y=%.1f", avg.Y, peak.Y)
+		}
+		// 用过的那几行，次数左边的用量条还在（末端是没填满的底色）
+		count := inside(t, tt, "13")
+		img := tt.Image()
+		p := img.RGBAAt(int(count.X)-14, int(count.Y+count.H/2))
+		none := colChartNone.Over(colBgCard)
+		if d := max(int(p.R)-int(none.R), int(none.R)-int(p.R)); d > 2 {
+			t.Errorf("次数左边看不到用量条：x=%d 处是 %v", int(count.X)-14, p)
+		}
+	})
 }
