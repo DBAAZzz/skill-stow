@@ -155,6 +155,8 @@
   "importRepoTooBig": "{repo} is too big, so its file list is incomplete.",
   "importNoSkillMdIn": "No SKILL.md found in {where}.",
   "importRepoOrBranchMissing": "{repo} or its branch {ref} isn't on GitHub.",
+  "importAmbiguousRef": "Both {first} and {second} in the link are branches or tags of this repository, so it's unclear which one to use.",
+  "importAmbiguousRefHint": "Open the commit you want on GitHub and paste a link with its commit ID",
   "importRepoMissing": "{repo} isn't on GitHub.",
   "importQuota": "{mins, plural, one {GitHub has paused reading for now. It resumes in about # minute.} other {GitHub has paused reading for now. It resumes in about # minutes.}}",
   "importRemoteError": "{err}.",

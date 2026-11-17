@@ -142,7 +142,9 @@ func (a *app) importHead(c *ui.Context, s *library.ImportSkill, files []library.
 			if s.Count > 1 && (!multi || s.Count != len(files)) {
 				ui.Text(c, locales.CommonFileCount(s.Count)).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").SingleLine()
 			}
-			ui.Text(c, library.HumanSize(s.Size)).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").SingleLine()
+			if s.Size >= 0 { // 大仓库只拿了 SKILL.md 时大小要补齐后才知道
+				ui.Text(c, library.HumanSize(s.Size)).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").SingleLine()
+			}
 			ui.Spacer(c)
 			if multi {
 				previewTabs(c, &st.tab, "SKILL.md", locales.ImportFilesHeadingCount(len(files)))
@@ -178,7 +180,9 @@ func (a *app) importFiles(c *ui.Context, s *library.ImportSkill, files []library
 				ui.Row(c).Padding(2, 8, 6, 8).AlignItems(ui.Center).Children(func() {
 					sectionLabel(c, locales.FilesLabel())
 					ui.Spacer(c)
-					ui.Text(c, library.HumanSize(s.Size)).FontSize(11).TextColor(colTextDisabled).FontFeatures("tnum")
+					if s.Size >= 0 {
+						ui.Text(c, library.HumanSize(s.Size)).FontSize(11).TextColor(colTextDisabled).FontFeatures("tnum")
+					}
 				})
 				dir := ""
 				for i, f := range files {

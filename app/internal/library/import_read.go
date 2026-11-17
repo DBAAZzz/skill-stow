@@ -41,7 +41,7 @@ type ImportSkill struct {
 	RepoPath          string // GitHub：仓库里的目录，根目录为空；本地：原来的路径
 	Dir               string // 暂存的技能目录；Partial 时只有 SKILL.md
 	Tree              string // 目录的 Git tree 哈希；Partial 时是上游的
-	Size              int64
+	Size              int64  // 总字节数；只下了 SKILL.md 而目录树又不带大小时为 -1
 	Count             int
 	Exec              []string      // 可执行文件（有执行位或是脚本），相对技能目录
 	Problem           string        // 不能添加的原因，空为能添加
@@ -190,6 +190,9 @@ func ReadGitHubImport(ctx context.Context, home string, r ImportRemote, src Impo
 			progress(p)
 		}
 	}
+	if src, err = splitRef(ctx, r, src); err != nil {
+		return nil, githubImportError(ctx, src, err)
+	}
 	c, err := r.Commit(ctx, src.Repo, src.Ref)
 	if err != nil {
 		return nil, githubImportError(ctx, src, err)
@@ -284,6 +287,35 @@ func ReadGitHubImport(ctx context.Context, home string, r ImportRemote, src Impo
 	return b, nil
 }
 
+// splitRef 按仓库实际的分支和标签重新切分 /tree/<ref>/<子目录>：分支名可以
+// 带斜杠（feature/x），解析网址时只取了第一段。对上多个时报错，不猜。
+func splitRef(ctx context.Context, r Remote, src ImportSource) (ImportSource, error) {
+	rl, ok := r.(RefLister)
+	if !ok || src.Ref == "" || src.Subpath == "" || isSHA(src.Ref) {
+		return src, nil
+	}
+	names, err := rl.RefNames(ctx, src.Repo, src.Ref)
+	if err != nil {
+		return src, err
+	}
+	segs := strings.Split(src.Subpath, "/")
+	var refs []string
+	at := 0 // 子目录里有几段属于分支名
+	for n := 0; n <= len(segs); n++ {
+		ref := path.Join(append([]string{src.Ref}, segs[:n]...)...)
+		if slices.Contains(names, ref) {
+			refs, at = append(refs, ref), n
+		}
+	}
+	switch {
+	case len(refs) > 1:
+		return src, &ImportError{Msg: locales.ImportAmbiguousRef(refs[0], refs[1]), Hint: locales.ImportAmbiguousRefHint()}
+	case len(refs) == 1:
+		src.Ref, src.Subpath = refs[0], strings.Join(segs[at:], "/")
+	}
+	return src, nil
+}
+
 // dirsNamed 是 dirs 里目录名对得上 src.Skills 的（按 SkillSlug 比较；根目录
 // 的技能按仓库名）。技能名和目录名不一样时这里找不到，调用方退回读全部，
 // 再按技能名预选。
@@ -360,12 +392,18 @@ func skillTree(tree Tree, root, dir string) (string, []TreeEntry) {
 
 // fetch 下载一个技能到 sk.Dir：Partial 时只下 SKILL.md。先用 skills.sh 的
 // 快照，内容按 blob 哈希逐个核对；对不上或缺的文件从 GitHub 按提交下载。
-// 文件本身不合规矩（链接、子模块、太大）时不下载，记进 Problem。
+// 文件本身不合规矩（链接、子模块、太大）时不下载，记进 Problem。目录树不带
+// 文件大小时（git 协议），总大小边下边算，超出上限时同样只留 SKILL.md。
 func (b *ImportBatch) fetch(ctx context.Context, sk *ImportSkill, grew func(int64)) error {
 	files := sk.files
-	sk.Count = len(files)
+	sk.Count, sk.Size = len(files), 0
+	sized := true
 	for _, f := range files {
-		sk.Size += f.Size
+		if f.Size < 0 {
+			sized = false
+		} else {
+			sk.Size += f.Size
+		}
 	}
 	prefix := ""
 	if sk.RepoPath != "" {
@@ -376,13 +414,17 @@ func (b *ImportBatch) fetch(ctx context.Context, sk *ImportSkill, grew func(int6
 	} else if p := sizeProblem(sk.Count, sk.Size); p != "" {
 		sk.Problem = p
 	}
+	mdOnly := func() []TreeEntry {
+		md := slices.DeleteFunc(slices.Clone(files), func(e TreeEntry) bool { return e.Path != prefix+"SKILL.md" })
+		if len(md) == 0 {
+			// SKILL.md 大小写不同（skill.md）
+			md = slices.DeleteFunc(slices.Clone(files), func(e TreeEntry) bool { return !strings.EqualFold(e.Path, prefix+"SKILL.md") })
+		}
+		return md
+	}
 	want := files
 	if sk.Partial || sk.Problem != "" {
-		want = slices.DeleteFunc(slices.Clone(files), func(e TreeEntry) bool { return e.Path != prefix+"SKILL.md" })
-		if len(want) == 0 {
-			// SKILL.md 大小写不同（skill.md）
-			want = slices.DeleteFunc(slices.Clone(files), func(e TreeEntry) bool { return !strings.EqualFold(e.Path, prefix+"SKILL.md") })
-		}
+		want = mdOnly()
 	}
 	if err := os.MkdirAll(sk.Dir, 0o755); err != nil {
 		return err
@@ -424,35 +466,76 @@ func (b *ImportBatch) fetch(ctx context.Context, sk *ImportSkill, grew func(int6
 		}
 	}
 	useArchive := missing > rawFileLimit
+	// counting：目录树不带大小，整份下载时边下边算总大小。下载中途发现的
+	// 问题（如 LFS）不停止计算，否则后面的文件就没有上限了。
+	counting := !sized && !sk.Partial && sk.Problem == ""
+	get := func(e TreeEntry) ([]byte, error) {
+		if data, ok := inSnap(e); ok {
+			return data, nil
+		}
+		if useArchive {
+			if data, ok := b.fromArchive(ctx, e); ok {
+				return data, nil
+			}
+		}
+		got, err := b.remote.File(ctx, b.Source.Repo, b.Commit, e.Path)
+		if err == nil && len(got) > maxFileBytes && counting {
+			return got, nil // 截在单个文件的上限处，必然超过总大小的上限，交给下面处理
+		}
+		if err == nil && blobID(got) != e.SHA {
+			err = &ImportError{Msg: locales.ImportGithubTreeMismatch(), Hint: locales.ImportRetryLater()}
+		}
+		if err != nil {
+			if data, ok := b.fromArchive(ctx, e); ok {
+				return data, nil
+			}
+			return nil, err
+		}
+		return got, nil
+	}
+	var total int64
 	for _, e := range want {
 		if err := ctx.Err(); err != nil {
 			return err
 		}
-		rel := relSkillPath(e.Path, sk.RepoPath)
-		data, ok := inSnap(e)
-		if !ok && useArchive {
-			data, ok = b.fromArchive(ctx, e)
+		data, err := get(e)
+		if err != nil {
+			return err
 		}
-		if !ok {
-			got, err := b.remote.File(ctx, b.Source.Repo, b.Commit, e.Path)
-			if err == nil && blobID(got) != e.SHA {
-				err = &ImportError{Msg: locales.ImportGithubTreeMismatch(), Hint: locales.ImportRetryLater()}
+		total += int64(len(data))
+		grew(int64(len(data)))
+		if counting && total > maxImportBytes {
+			counting = false // 下面只补 SKILL.md，按常规核对
+			sk.Problem = sizeProblem(sk.Count, total)
+			if err := os.RemoveAll(sk.Dir); err != nil {
+				return err
 			}
-			if err != nil {
-				if data, ok = b.fromArchive(ctx, e); !ok {
+			if err := os.MkdirAll(sk.Dir, 0o755); err != nil {
+				return err
+			}
+			for _, e := range mdOnly() {
+				data, err := get(e)
+				if err != nil {
 					return err
 				}
-			} else {
-				data = got
+				if err := writeStageTreeFile(sk.Dir, relSkillPath(e.Path, sk.RepoPath), e.Mode, data); err != nil {
+					return err
+				}
 			}
+			break
 		}
 		if strings.HasPrefix(string(data), "version https://git-lfs.github.com/spec/v1") {
 			sk.Problem = locales.ImportGitLfsUnsupported()
 		}
-		if err := writeStageTreeFile(sk.Dir, rel, e.Mode, data); err != nil {
+		if err := writeStageTreeFile(sk.Dir, relSkillPath(e.Path, sk.RepoPath), e.Mode, data); err != nil {
 			return err
 		}
-		grew(int64(len(data)))
+	}
+	if !sized {
+		sk.Size = total // 超限时是下到停下为止的字节数
+		if len(want) < len(files) && total <= maxImportBytes {
+			sk.Size = -1 // 只下了 SKILL.md，总大小不知道
+		}
 	}
 	b.describe(sk)
 	if !sk.Partial && sk.Problem == "" {

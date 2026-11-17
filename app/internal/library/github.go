@@ -19,9 +19,10 @@ import (
 	"skillmanager/locales"
 )
 
-// GitHub 上游：查提交、目录树，按提交下载单个文件。默认匿名请求；设置里勾选
-// 「使用本机 gh 登录状态」后才读取 gh 登录凭证并按目录区分提交。检查和对比、
-// 更新都固定在查到的提交上，不再用会变的 HEAD。
+// GitHub 上游：查提交、目录树，按提交下载单个文件。提交和目录树走 git 协议
+// （gitproto.go），不占 api.github.com 的请求额度；默认匿名，设置里勾选
+// 「使用本机 gh 登录状态」后才读取 gh 登录凭证，并按目录区分提交（唯一还要
+// 调 API 的地方）。检查和对比、更新都固定在查到的提交上，不再用会变的 HEAD。
 
 // Commit 是查到的一个提交。
 type Commit struct {
@@ -36,7 +37,7 @@ type TreeEntry struct {
 	Mode string // 100644、100755、120000（链接）、160000（子模块）、040000
 	Type string // blob、tree、commit
 	SHA  string
-	Size int64
+	Size int64 // 文件字节数；git 协议不带文件大小，下载前为 -1
 }
 
 // Tree 是一个提交的完整目录树。Truncated 时不完整，不能据此说上游删了什么。
@@ -58,6 +59,11 @@ type Remote interface {
 // PathCommitter 查某个子目录最近一次发生变动的提交。
 type PathCommitter interface {
 	PathCommit(ctx context.Context, repo, ref, subpath string) (Commit, error)
+}
+
+// RefLister 列出仓库里以 prefix 开头的分支名和标签名。
+type RefLister interface {
+	RefNames(ctx context.Context, repo, prefix string) ([]string, error)
 }
 
 // AuthRemote 报告当前上游客户端是否带有登录凭证。
@@ -109,9 +115,11 @@ func (e *RemoteError) note() Note {
 
 func (e *RemoteError) Unwrap() error { return e.Err }
 
-// GitHub 是 api.github.com + raw.githubusercontent.com（+ codeload.github.com）。
+// GitHub 是 github.com 的 git 端点 + raw.githubusercontent.com（+ codeload.github.com，
+// + 有凭证时的 api.github.com）。
 type GitHub struct {
 	API, Raw string
+	Git      string // git 端点，空为 https://github.com
 	Codeload string // 压缩包下载，空为 codeload.github.com
 	Token    string
 	Client   *http.Client
@@ -216,10 +224,8 @@ func (p ghCommitPayload) toCommit() Commit {
 	return Commit{SHA: p.SHA, Tree: p.Commit.Tree.SHA, Date: date}
 }
 
-func (g *GitHub) Commit(ctx context.Context, repo, ref string) (Commit, error) {
-	if ref == "" {
-		ref = "HEAD"
-	}
+// apiCommit 用 API 查 ref 对应的提交。只给 git 协议认不出的简写提交 ID 用。
+func (g *GitHub) apiCommit(ctx context.Context, repo, ref string) (Commit, error) {
 	var body ghCommitPayload
 	if err := g.getJSON(ctx, g.API+"/repos/"+repo+"/commits/"+url.PathEscape(ref), &body); err != nil {
 		return Commit{}, err
@@ -248,27 +254,6 @@ func (g *GitHub) PathCommit(ctx context.Context, repo, ref, subpath string) (Com
 		return Commit{}, &RemoteError{Kind: RemoteOther}
 	}
 	return body[0].toCommit(), nil
-}
-
-func (g *GitHub) Tree(ctx context.Context, repo, commit string) (Tree, error) {
-	var body struct {
-		Truncated bool `json:"truncated"`
-		Tree      []struct {
-			Path string `json:"path"`
-			Mode string `json:"mode"`
-			Type string `json:"type"`
-			SHA  string `json:"sha"`
-			Size int64  `json:"size"`
-		} `json:"tree"`
-	}
-	if err := g.getJSON(ctx, g.API+"/repos/"+repo+"/git/trees/"+url.PathEscape(commit)+"?recursive=1", &body); err != nil {
-		return Tree{}, err
-	}
-	t := Tree{Truncated: body.Truncated}
-	for _, e := range body.Tree {
-		t.Entries = append(t.Entries, TreeEntry{e.Path, e.Mode, e.Type, e.SHA, e.Size})
-	}
-	return t, nil
 }
 
 // maxFileBytes 是单个下载文件的上限（50 MB，低于 GitHub 单文件告警线，避免 4 并发下载时
@@ -310,12 +295,11 @@ func (g *GitHub) getJSON(ctx context.Context, u string, v any) error {
 
 // get 发一个 GET。限流时按 Retry-After 等一次再试；额度用完直接报恢复时间。
 func (g *GitHub) get(ctx context.Context, u, accept string) (*http.Response, error) {
-	for attempt := 0; ; attempt++ {
+	return g.send(ctx, func() (*http.Request, error) {
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 		if err != nil {
 			return nil, err
 		}
-		req.Header.Set("User-Agent", "skill-manager")
 		if tok := strings.TrimSpace(g.Token); tok != "" {
 			req.Header.Set("Authorization", "Bearer "+tok)
 		}
@@ -323,6 +307,19 @@ func (g *GitHub) get(ctx context.Context, u, accept string) (*http.Response, err
 			req.Header.Set("Accept", accept)
 			req.Header.Set("X-GitHub-Api-Version", "2022-11-28")
 		}
+		return req, nil
+	})
+}
+
+// send 发 newReq 建的请求，按状态码归类失败。限流时按 Retry-After 等一次再试
+// （所以每次重试都重新建请求）；额度用完直接报恢复时间。
+func (g *GitHub) send(ctx context.Context, newReq func() (*http.Request, error)) (*http.Response, error) {
+	for attempt := 0; ; attempt++ {
+		req, err := newReq()
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("User-Agent", "skill-manager")
 		resp, err := g.Client.Do(req)
 		if err != nil {
 			return nil, g.wrap(ctx, err)

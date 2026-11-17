@@ -17,39 +17,20 @@ func testGitHub(t *testing.T, h http.HandlerFunc) *GitHub {
 	srv := httptest.NewServer(h)
 	t.Cleanup(srv.Close)
 	g := NewGitHub("")
-	g.API, g.Raw = srv.URL, srv.URL+"/raw"
+	g.API, g.Git, g.Raw = srv.URL, srv.URL, srv.URL+"/raw"
 	g.sleep = func(context.Context, time.Duration) error { return nil }
 	return g
 }
 
-func TestGitHubResolvesACommitAndItsTree(t *testing.T) {
+func TestGitHubDownloadsAFileAtACommit(t *testing.T) {
 	g := testGitHub(t, func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case "/repos/antfu/skills/commits/HEAD":
-			fmt.Fprint(w, `{"sha":"c1","commit":{"tree":{"sha":"t1"},"committer":{"date":"2026-11-10T08:00:00Z"}}}`)
-		case "/repos/antfu/skills/git/trees/c1":
-			if r.URL.Query().Get("recursive") != "1" {
-				t.Error("应递归取目录树")
-			}
-			fmt.Fprint(w, `{"sha":"t1","truncated":false,"tree":[{"path":"skills/vite","mode":"040000","type":"tree","sha":"v1"},{"path":"skills/vite/SKILL.md","mode":"100644","type":"blob","sha":"b1","size":12}]}`)
-		case "/raw/antfu/skills/c1/skills/vite/SKILL.md":
-			fmt.Fprint(w, "hello")
-		default:
+		if r.URL.Path != "/raw/antfu/skills/c1/skills/vite/SKILL.md" {
 			http.NotFound(w, r)
+			return
 		}
+		fmt.Fprint(w, "hello")
 	})
-	ctx := context.Background()
-	c, err := g.Commit(ctx, "antfu/skills", "")
-	must(t, err)
-	if c.SHA != "c1" || c.Tree != "t1" || c.Date.Day() != 10 {
-		t.Errorf("commit = %+v", c)
-	}
-	tr, err := g.Tree(ctx, "antfu/skills", "c1")
-	must(t, err)
-	if tr.Truncated || len(tr.Entries) != 2 || tr.Entries[1].Size != 12 || tr.Entries[0].Type != "tree" {
-		t.Errorf("tree = %+v", tr)
-	}
-	b, err := g.File(ctx, "antfu/skills", "c1", "skills/vite/SKILL.md")
+	b, err := g.File(context.Background(), "antfu/skills", "c1", "skills/vite/SKILL.md")
 	if err != nil || string(b) != "hello" {
 		t.Errorf("file = %q %v", b, err)
 	}
@@ -62,7 +43,7 @@ func TestGitHubQuotaReportsWhenItResets(t *testing.T) {
 		w.Header().Set("X-RateLimit-Reset", fmt.Sprint(reset.Unix()))
 		w.WriteHeader(http.StatusForbidden)
 	})
-	_, err := g.Commit(context.Background(), "a/b", "")
+	_, err := g.PathCommit(context.Background(), "a/b", "", "skills/x")
 	var re *RemoteError
 	if !errors.As(err, &re) || re.Kind != RemoteQuota {
 		t.Fatalf("err = %v", err)
@@ -79,8 +60,8 @@ func TestGitHubWaitsOutAThrottleOnceThenGivesUp(t *testing.T) {
 	var calls atomic.Int32
 	g := testGitHub(t, func(w http.ResponseWriter, r *http.Request) {
 		n := calls.Add(1)
-		if r.URL.Path == "/repos/a/ok/commits/HEAD" && n == 2 {
-			fmt.Fprint(w, `{"sha":"c","commit":{"tree":{"sha":"t"},"committer":{"date":"2026-11-10T08:00:00Z"}}}`)
+		if r.URL.Path == "/repos/a/ok/commits" && n == 2 {
+			fmt.Fprint(w, `[{"sha":"c","commit":{"tree":{"sha":"t"},"committer":{"date":"2026-11-10T08:00:00Z"}}}]`)
 			return
 		}
 		w.Header().Set("X-RateLimit-Remaining", "12")
@@ -89,11 +70,11 @@ func TestGitHubWaitsOutAThrottleOnceThenGivesUp(t *testing.T) {
 	})
 	var waited time.Duration
 	g.sleep = func(_ context.Context, d time.Duration) error { waited += d; return nil }
-	if _, err := g.Commit(context.Background(), "a/ok", ""); err != nil || waited != 3*time.Second {
+	if _, err := g.PathCommit(context.Background(), "a/ok", "", "skills/x"); err != nil || waited != 3*time.Second {
 		t.Errorf("等 Retry-After 后重试一次应成功：%v，等了 %v", err, waited)
 	}
 	calls.Store(10)
-	_, err := g.Commit(context.Background(), "a/bad", "")
+	_, err := g.PathCommit(context.Background(), "a/bad", "", "skills/x")
 	var re *RemoteError
 	if !errors.As(err, &re) || re.Kind != RemoteThrottled {
 		t.Errorf("重试一次仍失败应报限流：%v", err)
@@ -113,7 +94,7 @@ func TestGitHubUnreachableIsANetworkFailure(t *testing.T) {
 	srv := httptest.NewServer(http.NotFoundHandler())
 	srv.Close()
 	g := NewGitHub("")
-	g.API = srv.URL
+	g.API, g.Git = srv.URL, srv.URL
 	_, err := g.Commit(context.Background(), "a/b", "")
 	var re *RemoteError
 	if !errors.As(err, &re) || re.Kind != RemoteNetwork || err.Error() != "连不上 GitHub" {
@@ -202,10 +183,10 @@ func TestGitHubUsesGHTokenOnlyWhenEnabled(t *testing.T) {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		fmt.Fprint(w, `{"sha":"c1","commit":{"tree":{"sha":"t1"},"committer":{"date":"2026-11-10T08:00:00Z"}}}`)
+		fmt.Fprint(w, `[{"sha":"c1","commit":{"tree":{"sha":"t1"},"committer":{"date":"2026-11-10T08:00:00Z"}}}]`)
 	})
 	g.Token = "gho_secret_token"
-	if _, err := g.Commit(context.Background(), "a/b", ""); err != nil {
+	if _, err := g.PathCommit(context.Background(), "a/b", "", "skills/x"); err != nil {
 		t.Fatalf("authed Commit: %v", err)
 	}
 	if gotAuth != "Bearer gho_secret_token" {
@@ -213,7 +194,7 @@ func TestGitHubUsesGHTokenOnlyWhenEnabled(t *testing.T) {
 	}
 
 	g.Token = "expired"
-	_, err := g.Commit(context.Background(), "a/b", "")
+	_, err := g.PathCommit(context.Background(), "a/b", "", "skills/x")
 	var re *RemoteError
 	if !errors.As(err, &re) || re.Kind != RemoteAuth {
 		t.Fatalf("expected RemoteAuth on 401, got %v", err)

@@ -13,6 +13,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"skillmanager/locales"
 )
 
 // fakeImport 是读取用的上游：GitHub 部分沿用 fakeRemote，skills.sh 的快照
@@ -529,6 +531,132 @@ func TestALargeRepoDownloadsSkillsOnlyWhenPicked(t *testing.T) {
 	}
 	if out := l.AddImport(b, []string{"s07"}, ImportPlacement{Library: true}, nil); !out[0].Added || !exists(h(".agents/skills/s07/ref.md")) {
 		t.Errorf("%+v", out)
+	}
+}
+
+func TestABranchNameWithSlashesIsSplitOffTheFolder(t *testing.T) {
+	// Given 仓库有个带斜杠的分支 feature/x
+	home, _ := importHome(t)
+	f := newFakeImport()
+	sha := f.publish(t, "antfu/skills", antfuSkills)
+	f.branch("antfu/skills", "feature/x", sha)
+	f.branch("antfu/skills", "feature-y", sha)
+
+	// When 粘贴这个分支下子目录的链接
+	b := readAntfu(t, home, f, "https://github.com/antfu/skills/tree/feature/x/skills/vite")
+
+	// Then 分支名整段认出，剩下的是子目录
+	if b.Source.Ref != "feature/x" || b.Source.Subpath != "skills/vite" || !slices.Equal(batchNames(b), []string{"vite"}) {
+		t.Errorf("ref=%q sub=%q 技能 %v", b.Source.Ref, b.Source.Subpath, batchNames(b))
+	}
+}
+
+func TestAnAmbiguousBranchNameIsReportedNotGuessed(t *testing.T) {
+	// Given 分支 feature 和标签 feature/x 同时存在
+	home, _ := importHome(t)
+	f := newFakeImport()
+	sha := f.publish(t, "antfu/skills", antfuSkills)
+	f.branch("antfu/skills", "feature", sha)
+	f.branch("antfu/skills", "feature/x", sha)
+	src, err := ParseImportInput("https://github.com/antfu/skills/tree/feature/x/skills/vite")
+	must(t, err)
+
+	// When 读取
+	_, err = ReadGitHubImport(context.Background(), home, f, src, nil)
+
+	// Then 报出两个都对得上，不去猜
+	var ie *ImportError
+	if !errors.As(err, &ie) || ie.Msg != locales.ImportAmbiguousRef("feature", "feature/x") {
+		t.Errorf("err = %v", err)
+	}
+}
+
+func TestWithoutTreeSizesTheSizeIsCountedWhileDownloading(t *testing.T) {
+	// Given 目录树不带文件大小（git 协议）
+	home, _ := importHome(t)
+	f := newFakeImport()
+	f.unsized = true
+	f.publish(t, "antfu/skills", antfuSkills)
+
+	b := readAntfu(t, home, f, "antfu/skills")
+
+	vite := b.Skill("vite")
+	want := int64(len(antfuSkills["skills/vite/SKILL.md"]) + len(antfuSkills["skills/vite/references/build.md"]))
+	if vite.Size != want || vite.Problem != "" || vite.Count != 2 {
+		t.Errorf("vite = %+v，大小 want %d", vite, want)
+	}
+}
+
+func TestWithoutTreeSizesAPickedSkillGetsItsSizeOnceFetched(t *testing.T) {
+	// Given 大仓库，目录树不带文件大小
+	home, _ := importHome(t)
+	files := map[string]string{}
+	for i := range largeRepo + 1 {
+		files[fmt.Sprintf("skills/s%02d/SKILL.md", i)] = fmt.Sprintf("---\nname: s%02d\ndescription: x\n---\n", i)
+		files[fmt.Sprintf("skills/s%02d/ref.md", i)] = "ref"
+	}
+	f := newFakeImport()
+	f.unsized = true
+	f.publish(t, "big/skills", files)
+	b := readAntfu(t, home, f, "big/skills")
+
+	// Then 只拿了 SKILL.md 时大小未知，补齐后才有
+	sk := b.Skill("s07")
+	if !sk.Partial || sk.Size != -1 {
+		t.Fatalf("补齐前 = %+v", sk)
+	}
+	must(t, b.FetchImportSkill(context.Background(), "s07"))
+	if want := int64(len(files["skills/s07/SKILL.md"]) + 3); sk.Partial || sk.Size != want {
+		t.Errorf("补齐后大小 %d，want %d", sk.Size, want)
+	}
+}
+
+func TestWithoutTreeSizesAnOversizedSkillStopsAndKeepsOnlySkillMD(t *testing.T) {
+	// Given 目录树不带文件大小，一个技能的文件超过单个技能的上限
+	home, _ := importHome(t)
+	f := newFakeImport()
+	f.unsized = true
+	f.publish(t, "big/one", map[string]string{
+		"skills/big/SKILL.md": "---\nname: big\ndescription: x\n---\n",
+		"skills/big/data.bin": strings.Repeat("x", maxImportBytes+1),
+	})
+
+	b := readAntfu(t, home, f, "big/one")
+
+	// Then 下载时发现超限：标出原因，暂存里只留 SKILL.md
+	big := b.Skill("big")
+	if big.Problem == "" || big.Problem != sizeProblem(big.Count, big.Size) {
+		t.Errorf("原因 = %q（大小 %d）", big.Problem, big.Size)
+	}
+	if exists(filepath.Join(big.Dir, "data.bin")) || !exists(filepath.Join(big.Dir, "SKILL.md")) {
+		t.Error("超限后应只留 SKILL.md")
+	}
+}
+
+func TestWithoutTreeSizesAnLFSFileDoesNotLiftTheSizeLimit(t *testing.T) {
+	// Given 目录树不带文件大小，先遇到 LFS 指针，后面的文件加起来超限
+	home, _ := importHome(t)
+	f := newFakeImport()
+	f.unsized, f.snapshots, f.noArchive = true, false, true
+	f.publish(t, "big/one", map[string]string{
+		"skills/big/SKILL.md":   "---\nname: big\ndescription: x\n---\n",
+		"skills/big/a-lfs":      "version https://git-lfs.github.com/spec/v1\noid sha256:123\nsize 42\n",
+		"skills/big/b.bin":      strings.Repeat("x", 11<<20),
+		"skills/big/c.bin":      strings.Repeat("y", 11<<20),
+		"skills/big/d-tail.txt": "超限后不该再下载",
+	})
+
+	b := readAntfu(t, home, f, "big/one")
+
+	// Then 照样在超限处停下，只留 SKILL.md
+	big := b.Skill("big")
+	if big.Problem != sizeProblem(big.Count, big.Size) {
+		t.Errorf("原因 = %q（大小 %d）", big.Problem, big.Size)
+	}
+	for _, name := range []string{"b.bin", "c.bin", "d-tail.txt"} {
+		if exists(filepath.Join(big.Dir, name)) {
+			t.Errorf("超限后不该留 %s", name)
+		}
 	}
 }
 
