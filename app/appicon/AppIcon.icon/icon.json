@@ -1,0 +1,102 @@
+{
+  "fill": {
+    "solid": "srgb:1.00000,1.00000,1.00000,1.00000"
+  },
+  "fill-specializations": [
+    {
+      "appearance": "dark",
+      "value": {
+        "solid": "srgb:0.10980,0.10980,0.11765,1.00000"
+      }
+    },
+    {
+      "appearance": "tinted",
+      "value": {
+        "solid": "extended-gray:0.12000,1.00000"
+      }
+    }
+  ],
+  "groups": [
+    {
+      "name": "Sleeve",
+      "layers": [
+        {
+          "name": "Sleeve",
+          "image-name": "sleeve.svg",
+          "image-name-specializations": [
+            {
+              "appearance": "tinted",
+              "value": "sleeve-mono.svg"
+            }
+          ],
+          "fill": "none",
+          "glass": true
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.25
+      },
+      "specular": true,
+      "translucency": {
+        "enabled": false,
+        "value": 0.5
+      }
+    },
+    {
+      "name": "Star",
+      "layers": [
+        {
+          "name": "Star",
+          "image-name": "star.svg",
+          "image-name-specializations": [
+            {
+              "appearance": "tinted",
+              "value": "star-mono.svg"
+            }
+          ],
+          "fill": "none",
+          "glass": false
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.25
+      },
+      "specular": false,
+      "translucency": {
+        "enabled": false,
+        "value": 0.5
+      }
+    },
+    {
+      "name": "Cards",
+      "layers": [
+        {
+          "name": "Cards",
+          "image-name": "cards.svg",
+          "image-name-specializations": [
+            {
+              "appearance": "tinted",
+              "value": "cards-mono.svg"
+            }
+          ],
+          "fill": "none",
+          "glass": true
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.25
+      },
+      "specular": true,
+      "translucency": {
+        "enabled": false,
+        "value": 0.5
+      }
+    }
+  ],
+  "supported-platforms": {
+    "squares": "shared"
+  }
+}
