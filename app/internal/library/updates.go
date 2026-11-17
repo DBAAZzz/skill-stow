@@ -726,6 +726,9 @@ func locateSkill(tree Tree, root, dir, name string) (upFound, string, []TreeEntr
 	}
 	return foundSame, hash, files
 }
+
+// validTreeFiles 检查上游目录树里一个技能的文件能不能装。大小未知（-1）的
+// 文件这里不查大小，下载时按实际字节数拦（apply.go、import_read.go）。
 func validTreeFiles(files []TreeEntry, dir string) error {
 	var size int64
 	seen := map[string]bool{}
@@ -748,10 +751,10 @@ func validTreeFiles(files []TreeEntry, dir string) error {
 		if e.Type != "blob" || e.Mode != "100644" && e.Mode != "100755" {
 			return noteErr(noteUnsupportedFiles)
 		}
-		if e.Size < 0 || e.Size > maxFileBytes {
+		if e.Size > maxFileBytes {
 			return noteErr(noteSingleFileTooLarge)
 		}
-		size += e.Size
+		size += max(e.Size, 0)
 		if size > maxSkillBytes {
 			return noteErr(noteSkillTooLarge)
 		}

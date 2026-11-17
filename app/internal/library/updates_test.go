@@ -256,6 +256,30 @@ func TestQuotaStopsTheCheckButKeepsFinishedRepos(t *testing.T) {
 	}
 }
 
+func TestUnknownUpstreamSizesStillCheckAndUpdate(t *testing.T) {
+	// Given 目录树不带文件大小（git 协议）
+	home, _, r, _ := viteHome(t)
+	r.unsized = true
+
+	// When 检查并更新
+	l, rep := checkNow(t, home, r)
+	it := itemNamed(t, rep, "vite")
+	if it.State != UpdReady {
+		t.Fatalf("大小未知不该挡住检查：%+v", it)
+	}
+	l.Settings.UpdateOldVersion = "trash"
+	p, err := l.PrepareUpdate(context.Background(), r, it)
+	must(t, err)
+	defer l.DiscardPrepared(p)
+	out, err := l.ApplyUpdate(context.Background(), r, p.Item, p, nil)
+	must(t, err)
+
+	// Then 照常更新，大小在下载时核对
+	if !out.Updated {
+		t.Errorf("更新：%+v", out)
+	}
+}
+
 // itemBase 是 viteHome 里 vite 的记录哈希。
 func itemBase(t *testing.T, home string, r *fakeRemote) string {
 	recs, err := ReadInstallRecords(home)

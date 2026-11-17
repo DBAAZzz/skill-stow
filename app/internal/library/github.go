@@ -36,7 +36,7 @@ type TreeEntry struct {
 	Mode string // 100644、100755、120000（链接）、160000（子模块）、040000
 	Type string // blob、tree、commit
 	SHA  string
-	Size int64
+	Size int64 // 文件字节数；目录树不带大小时为 -1，下载后才知道
 }
 
 // Tree 是一个提交的完整目录树。Truncated 时不完整，不能据此说上游删了什么。
