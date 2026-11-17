@@ -8,5 +8,8 @@
   "i18n": {
     "dir": "locales",
     "source": "zh-Hans"
+  },
+  "macos": {
+    "icon": "appicon/AppIcon.icns"
   }
 }
