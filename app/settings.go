@@ -437,7 +437,7 @@ func (a *app) agentsTab(c *ui.Context) {
 		if rest := len(agents) - shownAgents; rest > 0 {
 			text := locales.ShowLess()
 			if !a.set.allAgents {
-				text = locales.SettingsOtherAgents(rest, counts[agents[shownAgents].ID])
+				text = locales.SettingsOtherAgents(rest)
 			}
 			more := ui.ButtonBase(c).Padding(9, 16).Justify(ui.Start).BorderWidth(1, 0, 0, 0).BorderColor(colBorderSubtle).
 				TextColor(colAccent).Label(text)

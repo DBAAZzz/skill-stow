@@ -4566,7 +4566,7 @@
     "description": "设置中显示技能库位置和检查链接操作时显示的文案。",
     "placeholders": {}
   },
-  "settingsCheckLinksHint": "检查各 Agent 目录里指向技能库的链接，断掉的重新连上",
+  "settingsCheckLinksHint": "检查并重新连接各 Agent 中失效的技能软链接",
   "@settingsCheckLinksHint": {
     "description": "设置中显示技能库位置和检查链接操作时显示的文案。",
     "placeholders": {}
@@ -4610,12 +4610,12 @@
     "description": "设置的 Agent 管理列表展示、隐藏或移除 Agent 时显示的文案。",
     "placeholders": {}
   },
-  "settingsHiddenAgentNote": "关掉的 Agent 不出现在看板和详情栏里；它目录里的技能不会被改动。",
+  "settingsHiddenAgentNote": "停用的 Agent 将在看板和详情栏中隐藏，其本地文件保持原样。",
   "@settingsHiddenAgentNote": {
     "description": "设置的 Agent 管理列表展示、隐藏或移除 Agent 时显示的文案。",
     "placeholders": {}
   },
-  "settingsRemoveDirectoryHint": "不再列出这个目录，目录本身不动",
+  "settingsRemoveDirectoryHint": "从列表中移除",
   "@settingsRemoveDirectoryHint": {
     "description": "设置的 Agent 管理列表展示、隐藏或移除 Agent 时显示的文案。",
     "placeholders": {}
@@ -4629,14 +4629,11 @@
       }
     }
   },
-  "settingsOtherAgents": "其余 {rest} 个（都不超过 {p1} 个技能）…",
+  "settingsOtherAgents": "展开其余 {rest} 个 Agent…",
   "@settingsOtherAgents": {
     "description": "设置的 Agent 管理列表展示、隐藏或移除 Agent 时显示的文案。",
     "placeholders": {
       "rest": {
-        "type": "int"
-      },
-      "p1": {
         "type": "int"
       }
     }
@@ -4676,7 +4673,7 @@
     "description": "设置中重新检测 Agent 或手动添加技能目录时显示的文案。",
     "placeholders": {}
   },
-  "settingsChooseSkillDirectory": "选择一个放技能的目录（每个技能一个子目录，里面有 SKILL.md）。它会作为一个 Agent 出现在开关和看板里。",
+  "settingsChooseSkillDirectory": "选择包含技能的目录（每个子目录需含 SKILL.md）。",
   "@settingsChooseSkillDirectory": {
     "description": "设置中重新检测 Agent 或手动添加技能目录时显示的文案。",
     "placeholders": {}
@@ -4691,7 +4688,7 @@
     "description": "设置的项目自动发现选项和日志来源统计区显示的文案。",
     "placeholders": {}
   },
-  "settingsProjectDiscoveryNote": "不扫描整个磁盘。只看 Agent 打开过的项目，并且只查看每个项目里固定的几个技能目录。",
+  "settingsProjectDiscoveryNote": "仅从各 Agent 的历史记录中发现项目，不进行全盘扫描。",
   "@settingsProjectDiscoveryNote": {
     "description": "设置的项目自动发现选项和日志来源统计区显示的文案。",
     "placeholders": {}
@@ -4710,7 +4707,7 @@
       }
     }
   },
-  "settingsAutoDiscoverOff": "已关闭：只列出下面手动添加的文件夹",
+  "settingsAutoDiscoverOff": "已关闭，仅显示手动添加的文件夹",
   "@settingsAutoDiscoverOff": {
     "description": "设置中管理手动添加的项目文件夹时显示的文案。",
     "placeholders": {}
@@ -4755,7 +4752,7 @@
     "description": "设置中管理手动添加的项目文件夹时显示的文案。",
     "placeholders": {}
   },
-  "settingsFolderSelectionHint": "可以一次选多个。移除只是不再检查，文件夹本身不动",
+  "settingsFolderSelectionHint": "支持多选",
   "@settingsFolderSelectionHint": {
     "description": "设置中管理手动添加的项目文件夹时显示的文案。",
     "placeholders": {}
@@ -4770,7 +4767,7 @@
     "description": "设置中配置项目 worktree 显示和固定检查目录时显示的文案。",
     "placeholders": {}
   },
-  "settingsGroupWorktreesHint": "同一个仓库开了多个 worktree 时，只列一次。",
+  "settingsGroupWorktreesHint": "同一仓库的多个 worktree 归并为主项目展示",
   "@settingsGroupWorktreesHint": {
     "description": "设置中配置项目 worktree 显示和固定检查目录时显示的文案。",
     "placeholders": {}
@@ -4780,7 +4777,7 @@
     "description": "设置中配置项目 worktree 显示和固定检查目录时显示的文案。",
     "placeholders": {}
   },
-  "settingsProjectDirectoriesHint": "每个项目只看根目录下的这些文件夹，不往别处找；接入新的 Agent 时自动加上它的目录。",
+  "settingsProjectDirectoriesHint": "仅在项目根目录下匹配以下技能目录：",
   "@settingsProjectDirectoriesHint": {
     "description": "设置中配置项目 worktree 显示和固定检查目录时显示的文案。",
     "placeholders": {}
@@ -4794,7 +4791,7 @@
       }
     }
   },
-  "settingsRemoveFolderHint": "从列表移除，文件夹本身不动",
+  "settingsRemoveFolderHint": "从列表移除",
   "@settingsRemoveFolderHint": {
     "description": "设置中展开更多目录或显示检测耗时、移除提示时显示的文案。",
     "placeholders": {}
@@ -5442,7 +5439,7 @@
     "description": "更新设置对话框的网络代理选择与保存区域显示的文案。",
     "placeholders": {}
   },
-  "updateSystemProxyHint": "系统代理支持 HTTP / HTTPS；PAC 请手动填写",
+  "updateSystemProxyHint": "支持 HTTP / HTTPS 系统代理；PAC 脚本需手动配置",
   "@updateSystemProxyHint": {
     "description": "更新设置对话框的网络代理选择与保存区域显示的文案。",
     "placeholders": {}
@@ -5457,7 +5454,7 @@
     "description": "更新设置对话框的网络代理选择与保存区域显示的文案。",
     "placeholders": {}
   },
-  "updateProxyExample": "例如 http://127.0.0.1:7890",
+  "updateProxyExample": "",
   "@updateProxyExample": {
     "description": "更新设置对话框的网络代理选择与保存区域显示的文案。",
     "placeholders": {}
@@ -5477,7 +5474,7 @@
     "description": "更新设置中选择如何处理被替换的旧版本时显示的文案。",
     "placeholders": {}
   },
-  "updateNoUndo": "不提供应用内撤销",
+  "updateNoUndo": "",
   "@updateNoUndo": {
     "description": "更新设置中选择如何处理被替换的旧版本时显示的文案。",
     "placeholders": {}
@@ -5497,7 +5494,7 @@
     "description": "更新设置中配置和检查本机 gh 登录授权时显示的文案。",
     "placeholders": {}
   },
-  "updateGhLoginHint": "提高请求额度至 5000 次/小时，并按技能目录显示最新提交时间和 Commit SHA；不勾选则沿用匿名请求",
+  "updateGhLoginHint": "使用本机 gh 凭据获取更高的 GitHub API 额度与详细提交信息",
   "@updateGhLoginHint": {
     "description": "更新设置中配置和检查本机 gh 登录授权时显示的文案。",
     "placeholders": {}
@@ -5846,7 +5843,7 @@
       }
     }
   },
-  "settingsLinksAllGood": "，都是好的。",
+  "settingsLinksAllGood": "，全部正常。",
   "@settingsLinksAllGood": {
     "description": "接在「检查了 N 个链接」后面"
   },
@@ -5859,7 +5856,7 @@
       }
     }
   },
-  "settingsLinksBroken": "，{count} 个断掉的在技能库里找不到同名技能，没有动：{names}",
+  "settingsLinksBroken": "，{count} 个在技能库中无同名技能，未作改动：{names}",
   "@settingsLinksBroken": {
     "description": "接在「检查了 N 个链接」后面",
     "placeholders": {
@@ -6133,7 +6130,7 @@
   "@settingsTidySound": {
     "description": "设置 › 通用 › 界面：完成一项整理后放提示音的开关"
   },
-  "settingsTidySoundHint": "收成一份、清除记录等完成后轻响一声",
+  "settingsTidySoundHint": "批量整理、清除记录等操作完成后轻响提示",
   "@settingsTidySoundHint": {
     "description": "设置 › 通用 › 界面：提示音开关下面的说明"
   },

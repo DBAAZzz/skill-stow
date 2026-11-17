@@ -10054,13 +10054,13 @@ func (msgs Messages) SettingsCheckLinks() string {
 	return Catalog.Format(msgs.locale, "settingsCheckLinks", nil)
 }
 
-// SettingsCheckLinksHint says "检查各 Agent 目录里指向技能库的链接，断掉的重新连上"
+// SettingsCheckLinksHint says "检查并重新连接各 Agent 中失效的技能软链接"
 // in the language the app shows.
 //
 // 设置中显示技能库位置和检查链接操作时显示的文案。
 func SettingsCheckLinksHint() string { return In(i18n.Locale()).SettingsCheckLinksHint() }
 
-// SettingsCheckLinksHint says "检查各 Agent 目录里指向技能库的链接，断掉的重新连上"
+// SettingsCheckLinksHint says "检查并重新连接各 Agent 中失效的技能软链接"
 // in the language of msgs.
 //
 // 设置中显示技能库位置和检查链接操作时显示的文案。
@@ -10172,14 +10172,14 @@ func (msgs Messages) SettingsShowInInterface() string {
 	return Catalog.Format(msgs.locale, "settingsShowInInterface", nil)
 }
 
-// SettingsHiddenAgentNote says "关掉的 Agent 不出现在看板和详情栏里；它目录里的技能不会被改动。"
+// SettingsHiddenAgentNote says "停用的 Agent 将在看板和详情栏中隐藏，其本地文件保持原样。"
 // in the language the app shows.
 //
 // 设置的 Agent 管理列表展示、隐藏或移除 Agent
 // 时显示的文案。
 func SettingsHiddenAgentNote() string { return In(i18n.Locale()).SettingsHiddenAgentNote() }
 
-// SettingsHiddenAgentNote says "关掉的 Agent 不出现在看板和详情栏里；它目录里的技能不会被改动。"
+// SettingsHiddenAgentNote says "停用的 Agent 将在看板和详情栏中隐藏，其本地文件保持原样。"
 // in the language of msgs.
 //
 // 设置的 Agent 管理列表展示、隐藏或移除 Agent
@@ -10188,14 +10188,14 @@ func (msgs Messages) SettingsHiddenAgentNote() string {
 	return Catalog.Format(msgs.locale, "settingsHiddenAgentNote", nil)
 }
 
-// SettingsRemoveDirectoryHint says "不再列出这个目录，目录本身不动"
+// SettingsRemoveDirectoryHint says "从列表中移除"
 // in the language the app shows.
 //
 // 设置的 Agent 管理列表展示、隐藏或移除 Agent
 // 时显示的文案。
 func SettingsRemoveDirectoryHint() string { return In(i18n.Locale()).SettingsRemoveDirectoryHint() }
 
-// SettingsRemoveDirectoryHint says "不再列出这个目录，目录本身不动"
+// SettingsRemoveDirectoryHint says "从列表中移除"
 // in the language of msgs.
 //
 // 设置的 Agent 管理列表展示、隐藏或移除 Agent
@@ -10220,22 +10220,20 @@ func (msgs Messages) CommonSkillTotal(p0 int) string {
 	return Catalog.Format(msgs.locale, "commonSkillTotal", map[string]any{"p0": p0})
 }
 
-// SettingsOtherAgents says "其余 {rest} 个（都不超过 {p1} 个技能）…"
+// SettingsOtherAgents says "展开其余 {rest} 个 Agent…"
 // in the language the app shows.
 //
 // 设置的 Agent 管理列表展示、隐藏或移除 Agent
 // 时显示的文案。
-func SettingsOtherAgents(rest int, p1 int) string {
-	return In(i18n.Locale()).SettingsOtherAgents(rest, p1)
-}
+func SettingsOtherAgents(rest int) string { return In(i18n.Locale()).SettingsOtherAgents(rest) }
 
-// SettingsOtherAgents says "其余 {rest} 个（都不超过 {p1} 个技能）…"
+// SettingsOtherAgents says "展开其余 {rest} 个 Agent…"
 // in the language of msgs.
 //
 // 设置的 Agent 管理列表展示、隐藏或移除 Agent
 // 时显示的文案。
-func (msgs Messages) SettingsOtherAgents(rest int, p1 int) string {
-	return Catalog.Format(msgs.locale, "settingsOtherAgents", map[string]any{"rest": rest, "p1": p1})
+func (msgs Messages) SettingsOtherAgents(rest int) string {
+	return Catalog.Format(msgs.locale, "settingsOtherAgents", map[string]any{"rest": rest})
 }
 
 // ActionDetectAgain says "重新检测"
@@ -10352,14 +10350,14 @@ func (msgs Messages) SettingsAddSkillDirectory() string {
 	return Catalog.Format(msgs.locale, "settingsAddSkillDirectory", nil)
 }
 
-// SettingsChooseSkillDirectory says "选择一个放技能的目录（每个技能一个子目录，里面有 SKILL.md）。它会作为一个 Agent …"
+// SettingsChooseSkillDirectory says "选择包含技能的目录（每个子目录需含 SKILL.md）。"
 // in the language the app shows.
 //
 // 设置中重新检测 Agent
 // 或手动添加技能目录时显示的文案。
 func SettingsChooseSkillDirectory() string { return In(i18n.Locale()).SettingsChooseSkillDirectory() }
 
-// SettingsChooseSkillDirectory says "选择一个放技能的目录（每个技能一个子目录，里面有 SKILL.md）。它会作为一个 Agent …"
+// SettingsChooseSkillDirectory says "选择包含技能的目录（每个子目录需含 SKILL.md）。"
 // in the language of msgs.
 //
 // 设置中重新检测 Agent
@@ -10396,13 +10394,13 @@ func (msgs Messages) SettingsFindProjectsFromLogs() string {
 	return Catalog.Format(msgs.locale, "settingsFindProjectsFromLogs", nil)
 }
 
-// SettingsProjectDiscoveryNote says "不扫描整个磁盘。只看 Agent 打开过的项目，并且只查看每个项目里固定的几个技能目录。"
+// SettingsProjectDiscoveryNote says "仅从各 Agent 的历史记录中发现项目，不进行全盘扫描。"
 // in the language the app shows.
 //
 // 设置的项目自动发现选项和日志来源统计区显示的文案。
 func SettingsProjectDiscoveryNote() string { return In(i18n.Locale()).SettingsProjectDiscoveryNote() }
 
-// SettingsProjectDiscoveryNote says "不扫描整个磁盘。只看 Agent 打开过的项目，并且只查看每个项目里固定的几个技能目录。"
+// SettingsProjectDiscoveryNote says "仅从各 Agent 的历史记录中发现项目，不进行全盘扫描。"
 // in the language of msgs.
 //
 // 设置的项目自动发现选项和日志来源统计区显示的文案。
@@ -10438,13 +10436,13 @@ func (msgs Messages) CommonProjectCount(count int) string {
 	return Catalog.Format(msgs.locale, "commonProjectCount", map[string]any{"count": count})
 }
 
-// SettingsAutoDiscoverOff says "已关闭：只列出下面手动添加的文件夹"
+// SettingsAutoDiscoverOff says "已关闭，仅显示手动添加的文件夹"
 // in the language the app shows.
 //
 // 设置中管理手动添加的项目文件夹时显示的文案。
 func SettingsAutoDiscoverOff() string { return In(i18n.Locale()).SettingsAutoDiscoverOff() }
 
-// SettingsAutoDiscoverOff says "已关闭：只列出下面手动添加的文件夹"
+// SettingsAutoDiscoverOff says "已关闭，仅显示手动添加的文件夹"
 // in the language of msgs.
 //
 // 设置中管理手动添加的项目文件夹时显示的文案。
@@ -10564,13 +10562,13 @@ func (msgs Messages) ActionAddFolderEllipsis() string {
 	return Catalog.Format(msgs.locale, "actionAddFolderEllipsis", nil)
 }
 
-// SettingsFolderSelectionHint says "可以一次选多个。移除只是不再检查，文件夹本身不动"
+// SettingsFolderSelectionHint says "支持多选"
 // in the language the app shows.
 //
 // 设置中管理手动添加的项目文件夹时显示的文案。
 func SettingsFolderSelectionHint() string { return In(i18n.Locale()).SettingsFolderSelectionHint() }
 
-// SettingsFolderSelectionHint says "可以一次选多个。移除只是不再检查，文件夹本身不动"
+// SettingsFolderSelectionHint says "支持多选"
 // in the language of msgs.
 //
 // 设置中管理手动添加的项目文件夹时显示的文案。
@@ -10610,14 +10608,14 @@ func (msgs Messages) SettingsGroupWorktrees() string {
 	return Catalog.Format(msgs.locale, "settingsGroupWorktrees", nil)
 }
 
-// SettingsGroupWorktreesHint says "同一个仓库开了多个 worktree 时，只列一次。"
+// SettingsGroupWorktreesHint says "同一仓库的多个 worktree 归并为主项目展示"
 // in the language the app shows.
 //
 // 设置中配置项目 worktree
 // 显示和固定检查目录时显示的文案。
 func SettingsGroupWorktreesHint() string { return In(i18n.Locale()).SettingsGroupWorktreesHint() }
 
-// SettingsGroupWorktreesHint says "同一个仓库开了多个 worktree 时，只列一次。"
+// SettingsGroupWorktreesHint says "同一仓库的多个 worktree 归并为主项目展示"
 // in the language of msgs.
 //
 // 设置中配置项目 worktree
@@ -10642,7 +10640,7 @@ func (msgs Messages) SettingsProjectDirectories() string {
 	return Catalog.Format(msgs.locale, "settingsProjectDirectories", nil)
 }
 
-// SettingsProjectDirectoriesHint says "每个项目只看根目录下的这些文件夹，不往别处找；接入新的 Agent 时自动加上它的目录。"
+// SettingsProjectDirectoriesHint says "仅在项目根目录下匹配以下技能目录："
 // in the language the app shows.
 //
 // 设置中配置项目 worktree
@@ -10651,7 +10649,7 @@ func SettingsProjectDirectoriesHint() string {
 	return In(i18n.Locale()).SettingsProjectDirectoriesHint()
 }
 
-// SettingsProjectDirectoriesHint says "每个项目只看根目录下的这些文件夹，不往别处找；接入新的 Agent 时自动加上它的目录。"
+// SettingsProjectDirectoriesHint says "仅在项目根目录下匹配以下技能目录："
 // in the language of msgs.
 //
 // 设置中配置项目 worktree
@@ -10674,13 +10672,13 @@ func (msgs Messages) CommonMoreItems(p0 int) string {
 	return Catalog.Format(msgs.locale, "commonMoreItems", map[string]any{"p0": p0})
 }
 
-// SettingsRemoveFolderHint says "从列表移除，文件夹本身不动"
+// SettingsRemoveFolderHint says "从列表移除"
 // in the language the app shows.
 //
 // 设置中展开更多目录或显示检测耗时、移除提示时显示的文案。
 func SettingsRemoveFolderHint() string { return In(i18n.Locale()).SettingsRemoveFolderHint() }
 
-// SettingsRemoveFolderHint says "从列表移除，文件夹本身不动"
+// SettingsRemoveFolderHint says "从列表移除"
 // in the language of msgs.
 //
 // 设置中展开更多目录或显示检测耗时、移除提示时显示的文案。
@@ -12256,13 +12254,13 @@ func (msgs Messages) UpdateNetworkProxy() string {
 	return Catalog.Format(msgs.locale, "updateNetworkProxy", nil)
 }
 
-// UpdateSystemProxyHint says "系统代理支持 HTTP / HTTPS；PAC 请手动填写"
+// UpdateSystemProxyHint says "支持 HTTP / HTTPS 系统代理；PAC 脚本需手动配置"
 // in the language the app shows.
 //
 // 更新设置对话框的网络代理选择与保存区域显示的文案。
 func UpdateSystemProxyHint() string { return In(i18n.Locale()).UpdateSystemProxyHint() }
 
-// UpdateSystemProxyHint says "系统代理支持 HTTP / HTTPS；PAC 请手动填写"
+// UpdateSystemProxyHint says "支持 HTTP / HTTPS 系统代理；PAC 脚本需手动配置"
 // in the language of msgs.
 //
 // 更新设置对话框的网络代理选择与保存区域显示的文案。
@@ -12298,13 +12296,13 @@ func (msgs Messages) UpdateManualProxy() string {
 	return Catalog.Format(msgs.locale, "updateManualProxy", nil)
 }
 
-// UpdateProxyExample says "例如 http://127.0.0.1:7890"
+// UpdateProxyExample says ""
 // in the language the app shows.
 //
 // 更新设置对话框的网络代理选择与保存区域显示的文案。
 func UpdateProxyExample() string { return In(i18n.Locale()).UpdateProxyExample() }
 
-// UpdateProxyExample says "例如 http://127.0.0.1:7890"
+// UpdateProxyExample says ""
 // in the language of msgs.
 //
 // 更新设置对话框的网络代理选择与保存区域显示的文案。
@@ -12354,13 +12352,13 @@ func (msgs Messages) UpdateOldVersions() string {
 	return Catalog.Format(msgs.locale, "updateOldVersions", nil)
 }
 
-// UpdateNoUndo says "不提供应用内撤销"
+// UpdateNoUndo says ""
 // in the language the app shows.
 //
 // 更新设置中选择如何处理被替换的旧版本时显示的文案。
 func UpdateNoUndo() string { return In(i18n.Locale()).UpdateNoUndo() }
 
-// UpdateNoUndo says "不提供应用内撤销"
+// UpdateNoUndo says ""
 // in the language of msgs.
 //
 // 更新设置中选择如何处理被替换的旧版本时显示的文案。
@@ -12410,13 +12408,13 @@ func (msgs Messages) UpdateUseGhLogin() string {
 	return Catalog.Format(msgs.locale, "updateUseGhLogin", nil)
 }
 
-// UpdateGhLoginHint says "提高请求额度至 5000 次/小时，并按技能目录显示最新提交时间和 Commit SHA…"
+// UpdateGhLoginHint says "使用本机 gh 凭据获取更高的 GitHub API 额度与详细提交信息"
 // in the language the app shows.
 //
 // 更新设置中配置和检查本机 gh 登录授权时显示的文案。
 func UpdateGhLoginHint() string { return In(i18n.Locale()).UpdateGhLoginHint() }
 
-// UpdateGhLoginHint says "提高请求额度至 5000 次/小时，并按技能目录显示最新提交时间和 Commit SHA…"
+// UpdateGhLoginHint says "使用本机 gh 凭据获取更高的 GitHub API 额度与详细提交信息"
 // in the language of msgs.
 //
 // 更新设置中配置和检查本机 gh 登录授权时显示的文案。
@@ -13078,13 +13076,13 @@ func (msgs Messages) SettingsLinksChecked(checked int) string {
 	return Catalog.Format(msgs.locale, "settingsLinksChecked", map[string]any{"checked": checked})
 }
 
-// SettingsLinksAllGood says "，都是好的。"
+// SettingsLinksAllGood says "，全部正常。"
 // in the language the app shows.
 //
 // 接在「检查了 N 个链接」后面
 func SettingsLinksAllGood() string { return In(i18n.Locale()).SettingsLinksAllGood() }
 
-// SettingsLinksAllGood says "，都是好的。"
+// SettingsLinksAllGood says "，全部正常。"
 // in the language of msgs.
 //
 // 接在「检查了 N 个链接」后面
@@ -13106,7 +13104,7 @@ func (msgs Messages) SettingsLinksFixed(count int) string {
 	return Catalog.Format(msgs.locale, "settingsLinksFixed", map[string]any{"count": count})
 }
 
-// SettingsLinksBroken says "，{count} 个断掉的在技能库里找不到同名技能，没有动：{names}"
+// SettingsLinksBroken says "，{count} 个在技能库中无同名技能，未作改动：{names}"
 // in the language the app shows.
 //
 // 接在「检查了 N 个链接」后面
@@ -13114,7 +13112,7 @@ func SettingsLinksBroken(count int, names string) string {
 	return In(i18n.Locale()).SettingsLinksBroken(count, names)
 }
 
-// SettingsLinksBroken says "，{count} 个断掉的在技能库里找不到同名技能，没有动：{names}"
+// SettingsLinksBroken says "，{count} 个在技能库中无同名技能，未作改动：{names}"
 // in the language of msgs.
 //
 // 接在「检查了 N 个链接」后面
@@ -13626,13 +13624,13 @@ func (msgs Messages) SettingsTidySound() string {
 	return Catalog.Format(msgs.locale, "settingsTidySound", nil)
 }
 
-// SettingsTidySoundHint says "收成一份、清除记录等完成后轻响一声"
+// SettingsTidySoundHint says "批量整理、清除记录等操作完成后轻响提示"
 // in the language the app shows.
 //
 // 设置 › 通用 › 界面：提示音开关下面的说明
 func SettingsTidySoundHint() string { return In(i18n.Locale()).SettingsTidySoundHint() }
 
-// SettingsTidySoundHint says "收成一份、清除记录等完成后轻响一声"
+// SettingsTidySoundHint says "批量整理、清除记录等操作完成后轻响提示"
 // in the language of msgs.
 //
 // 设置 › 通用 › 界面：提示音开关下面的说明

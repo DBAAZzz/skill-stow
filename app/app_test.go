@@ -456,7 +456,7 @@ func TestSettingsWindow(t *testing.T) {
 	if err := st.Click("检查并修复"); err != nil {
 		t.Fatal(err)
 	}
-	if !st.HasText("检查了 0 个链接，都是好的。") {
+	if !st.HasText("检查了 0 个链接，全部正常。") {
 		t.Errorf("应显示检查结果：%q", a.set.linkResult)
 	}
 
