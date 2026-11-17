@@ -5330,7 +5330,7 @@ func (msgs Messages) DeleteLoses(names string) string {
 	return Catalog.Format(msgs.locale, "deleteLoses", map[string]any{"names": names})
 }
 
-// ImportPathsEtc says "{shown} · 等 {count} 个"
+// ImportPathsEtc says "{shown} 等 {count} 个"
 // in the language the app shows.
 //
 // 列了前几个路径，后面写一共几个
@@ -5338,7 +5338,7 @@ func ImportPathsEtc(shown string, count int) string {
 	return In(i18n.Locale()).ImportPathsEtc(shown, count)
 }
 
-// ImportPathsEtc says "{shown} · 等 {count} 个"
+// ImportPathsEtc says "{shown} 等 {count} 个"
 // in the language of msgs.
 //
 // 列了前几个路径，后面写一共几个
@@ -5584,7 +5584,7 @@ func (msgs Messages) ImportSourceWebsite(site string) string {
 	return Catalog.Format(msgs.locale, "importSourceWebsite", map[string]any{"site": site})
 }
 
-// ImportSourceGitHub says "来源记为 {repo} · {commit}，上游有新版本时会出现在「技能更新」里。"
+// ImportSourceGitHub says "来源记为 {repo}（{commit}），上游有新版本时会出现在「技能更新」里。"
 // in the language the app shows.
 //
 // 添加完成后说明来源
@@ -5592,7 +5592,7 @@ func ImportSourceGitHub(repo string, commit string) string {
 	return In(i18n.Locale()).ImportSourceGitHub(repo, commit)
 }
 
-// ImportSourceGitHub says "来源记为 {repo} · {commit}，上游有新版本时会出现在「技能更新」里。"
+// ImportSourceGitHub says "来源记为 {repo}（{commit}），上游有新版本时会出现在「技能更新」里。"
 // in the language of msgs.
 //
 // 添加完成后说明来源
@@ -8566,13 +8566,13 @@ func (msgs Messages) CommonDownloading() string {
 	return Catalog.Format(msgs.locale, "commonDownloading", nil)
 }
 
-// ImportAddedUpToDate says "已添加 · 最新"
+// ImportAddedUpToDate says "已是最新"
 // in the language the app shows.
 //
 // 待添加列表每个技能行显示安装或风险状态时显示的文案。
 func ImportAddedUpToDate() string { return In(i18n.Locale()).ImportAddedUpToDate() }
 
-// ImportAddedUpToDate says "已添加 · 最新"
+// ImportAddedUpToDate says "已是最新"
 // in the language of msgs.
 //
 // 待添加列表每个技能行显示安装或风险状态时显示的文案。
@@ -8648,22 +8648,6 @@ func CommonNew() string { return In(i18n.Locale()).CommonNew() }
 // 待添加列表每个技能行显示安装或风险状态时显示的文案。
 func (msgs Messages) CommonNew() string {
 	return Catalog.Format(msgs.locale, "commonNew", nil)
-}
-
-// ImportSkillSelectionSummary says "{count} 个技能 · 已选 {picked}"
-// in the language the app shows.
-//
-// 待添加技能列表显示数量、选择范围和隐藏项时显示的文案。
-func ImportSkillSelectionSummary(count int, picked int) string {
-	return In(i18n.Locale()).ImportSkillSelectionSummary(count, picked)
-}
-
-// ImportSkillSelectionSummary says "{count} 个技能 · 已选 {picked}"
-// in the language of msgs.
-//
-// 待添加技能列表显示数量、选择范围和隐藏项时显示的文案。
-func (msgs Messages) ImportSkillSelectionSummary(count int, picked int) string {
-	return Catalog.Format(msgs.locale, "importSkillSelectionSummary", map[string]any{"count": count, "picked": picked})
 }
 
 // CommonShowAllTotal says "显示全部 {p0} 个"
@@ -8978,22 +8962,6 @@ func (msgs Messages) ImportRepositoryRoot() string {
 	return Catalog.Format(msgs.locale, "importRepositoryRoot", nil)
 }
 
-// ImportFilesAndSize says "{count} 个文件 · {p1}"
-// in the language the app shows.
-//
-// 添加技能文件树和选中文件的内容预览区显示的文案。
-func ImportFilesAndSize(count int, p1 string) string {
-	return In(i18n.Locale()).ImportFilesAndSize(count, p1)
-}
-
-// ImportFilesAndSize says "{count} 个文件 · {p1}"
-// in the language of msgs.
-//
-// 添加技能文件树和选中文件的内容预览区显示的文案。
-func (msgs Messages) ImportFilesAndSize(count int, p1 string) string {
-	return Catalog.Format(msgs.locale, "importFilesAndSize", map[string]any{"count": count, "p1": p1})
-}
-
 // ImportFilesHeadingCount says "文件 {count}"
 // in the language the app shows.
 //
@@ -9008,6 +8976,20 @@ func ImportFilesHeadingCount(count int) string {
 // 添加技能文件树和选中文件的内容预览区显示的文案。
 func (msgs Messages) ImportFilesHeadingCount(count int) string {
 	return Catalog.Format(msgs.locale, "importFilesHeadingCount", map[string]any{"count": count})
+}
+
+// CommonFileCount says "{count} 个文件"
+// in the language the app shows.
+//
+// 一共几个文件（没有「文件」页签可看时写出来）
+func CommonFileCount(count int) string { return In(i18n.Locale()).CommonFileCount(count) }
+
+// CommonFileCount says "{count} 个文件"
+// in the language of msgs.
+//
+// 一共几个文件（没有「文件」页签可看时写出来）
+func (msgs Messages) CommonFileCount(count int) string {
+	return Catalog.Format(msgs.locale, "commonFileCount", map[string]any{"count": count})
 }
 
 // ImportCannotReadSkillFile says "读不到 SKILL.md。"
@@ -9140,13 +9122,13 @@ func (msgs Messages) ImportAuditProviderCount(count int) string {
 	return Catalog.Format(msgs.locale, "importAuditProviderCount", map[string]any{"count": count})
 }
 
-// ImportAuditAlertCount says " · {alerts} 条告警"
+// ImportAuditAlertCount says "{alerts} 条告警"
 // in the language the app shows.
 //
 // 添加技能的安全审计供应商、告警数和结果时效区显示的文案。
 func ImportAuditAlertCount(alerts int) string { return In(i18n.Locale()).ImportAuditAlertCount(alerts) }
 
-// ImportAuditAlertCount says " · {alerts} 条告警"
+// ImportAuditAlertCount says "{alerts} 条告警"
 // in the language of msgs.
 //
 // 添加技能的安全审计供应商、告警数和结果时效区显示的文案。
@@ -9240,7 +9222,7 @@ func (msgs Messages) ImportLocalSourceCount(count int) string {
 	return Catalog.Format(msgs.locale, "importLocalSourceCount", map[string]any{"count": count})
 }
 
-// ImportAddedNames says "已添加 {added} 个技能 · {p1}"
+// ImportAddedNames says "已添加 {added} 个技能：{p1}"
 // in the language the app shows.
 //
 // 一批技能添加操作结束后的结果提示显示的文案。
@@ -9248,7 +9230,7 @@ func ImportAddedNames(added int, p1 string) string {
 	return In(i18n.Locale()).ImportAddedNames(added, p1)
 }
 
-// ImportAddedNames says "已添加 {added} 个技能 · {p1}"
+// ImportAddedNames says "已添加 {added} 个技能：{p1}"
 // in the language of msgs.
 //
 // 一批技能添加操作结束后的结果提示显示的文案。
@@ -14182,21 +14164,37 @@ func (msgs Messages) ImportReplaceTrashNote() string {
 	return Catalog.Format(msgs.locale, "importReplaceTrashNote", nil)
 }
 
-// ImportReplaceLinkOnly says "链接 · 只移走链接，指向的内容不动"
+// ImportReplaceLinkOnly says "只移走链接，指向的内容不动"
 // in the language the app shows.
 //
-// 同名冲突卡片：要移走的是链接时的说明
+// 同名冲突卡片：要移走的是链接时，「链接」标签的悬停说明
 func ImportReplaceLinkOnly() string { return In(i18n.Locale()).ImportReplaceLinkOnly() }
 
-// ImportReplaceLinkOnly says "链接 · 只移走链接，指向的内容不动"
+// ImportReplaceLinkOnly says "只移走链接，指向的内容不动"
 // in the language of msgs.
 //
-// 同名冲突卡片：要移走的是链接时的说明
+// 同名冲突卡片：要移走的是链接时，「链接」标签的悬停说明
 func (msgs Messages) ImportReplaceLinkOnly() string {
 	return Catalog.Format(msgs.locale, "importReplaceLinkOnly", nil)
 }
 
-// ImportAddAndReplaceCount says "添加 {add} 个 · 替换 {replace} 个"
+// ImportReplaceLinkTag says "链接"
+// in the language the app shows.
+//
+// 要替换的已有技能里，这一条是软链接时，路径右边的小标签；悬停看
+// importReplaceLinkOnly
+func ImportReplaceLinkTag() string { return In(i18n.Locale()).ImportReplaceLinkTag() }
+
+// ImportReplaceLinkTag says "链接"
+// in the language of msgs.
+//
+// 要替换的已有技能里，这一条是软链接时，路径右边的小标签；悬停看
+// importReplaceLinkOnly
+func (msgs Messages) ImportReplaceLinkTag() string {
+	return Catalog.Format(msgs.locale, "importReplaceLinkTag", nil)
+}
+
+// ImportAddAndReplaceCount says "添加 {add} 个，替换 {replace} 个"
 // in the language the app shows.
 //
 // 选择页右上角按钮：既有新添加的又有替换的
@@ -14204,7 +14202,7 @@ func ImportAddAndReplaceCount(add int, replace int) string {
 	return In(i18n.Locale()).ImportAddAndReplaceCount(add, replace)
 }
 
-// ImportAddAndReplaceCount says "添加 {add} 个 · 替换 {replace} 个"
+// ImportAddAndReplaceCount says "添加 {add} 个，替换 {replace} 个"
 // in the language of msgs.
 //
 // 选择页右上角按钮：既有新添加的又有替换的
@@ -14240,7 +14238,7 @@ func (msgs Messages) ImportReplacedAt(place string) string {
 	return Catalog.Format(msgs.locale, "importReplacedAt", map[string]any{"place": place})
 }
 
-// ImportAddedReplacedNames says "已添加 {added} 个技能（替换了 {replaced} 个，旧版在废纸篓）· {p1}"
+// ImportAddedReplacedNames says "已添加 {added} 个技能（替换了 {replaced} 个，旧版在废纸篓）：{p1}"
 // in the language the app shows.
 //
 // 一批技能添加结束后的结果提示：其中有替换的
@@ -14248,7 +14246,7 @@ func ImportAddedReplacedNames(added int, replaced int, p1 string) string {
 	return In(i18n.Locale()).ImportAddedReplacedNames(added, replaced, p1)
 }
 
-// ImportAddedReplacedNames says "已添加 {added} 个技能（替换了 {replaced} 个，旧版在废纸篓）· {p1}"
+// ImportAddedReplacedNames says "已添加 {added} 个技能（替换了 {replaced} 个，旧版在废纸篓）：{p1}"
 // in the language of msgs.
 //
 // 一批技能添加结束后的结果提示：其中有替换的

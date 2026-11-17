@@ -2441,7 +2441,7 @@
       }
     }
   },
-  "importPathsEtc": "{shown} · 等 {count} 个",
+  "importPathsEtc": "{shown} 等 {count} 个",
   "@importPathsEtc": {
     "description": "列了前几个路径，后面写一共几个",
     "placeholders": {
@@ -2615,7 +2615,7 @@
       }
     }
   },
-  "importSourceGitHub": "来源记为 {repo} · {commit}，上游有新版本时会出现在「技能更新」里。",
+  "importSourceGitHub": "来源记为 {repo}（{commit}），上游有新版本时会出现在「技能更新」里。",
   "@importSourceGitHub": {
     "description": "添加完成后说明来源",
     "placeholders": {
@@ -3897,7 +3897,7 @@
     "description": "待添加列表每个技能行显示安装或风险状态时显示的文案。",
     "placeholders": {}
   },
-  "importAddedUpToDate": "已添加 · 最新",
+  "importAddedUpToDate": "已是最新",
   "@importAddedUpToDate": {
     "description": "待添加列表每个技能行显示安装或风险状态时显示的文案。",
     "placeholders": {}
@@ -3926,18 +3926,6 @@
   "@commonNew": {
     "description": "待添加列表每个技能行显示安装或风险状态时显示的文案。",
     "placeholders": {}
-  },
-  "importSkillSelectionSummary": "{count} 个技能 · 已选 {picked}",
-  "@importSkillSelectionSummary": {
-    "description": "待添加技能列表显示数量、选择范围和隐藏项时显示的文案。",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      },
-      "picked": {
-        "type": "int"
-      }
-    }
   },
   "commonShowAllTotal": "显示全部 {p0} 个",
   "@commonShowAllTotal": {
@@ -4069,21 +4057,18 @@
     "description": "添加技能文件树和选中文件的内容预览区显示的文案。",
     "placeholders": {}
   },
-  "importFilesAndSize": "{count} 个文件 · {p1}",
-  "@importFilesAndSize": {
+  "importFilesHeadingCount": "文件 {count}",
+  "@importFilesHeadingCount": {
     "description": "添加技能文件树和选中文件的内容预览区显示的文案。",
     "placeholders": {
       "count": {
         "type": "int"
-      },
-      "p1": {
-        "type": "String"
       }
     }
   },
-  "importFilesHeadingCount": "文件 {count}",
-  "@importFilesHeadingCount": {
-    "description": "添加技能文件树和选中文件的内容预览区显示的文案。",
+  "commonFileCount": "{count} 个文件",
+  "@commonFileCount": {
+    "description": "一共几个文件（没有「文件」页签可看时写出来）",
     "placeholders": {
       "count": {
         "type": "int"
@@ -4146,7 +4131,7 @@
       }
     }
   },
-  "importAuditAlertCount": " · {alerts} 条告警",
+  "importAuditAlertCount": "{alerts} 条告警",
   "@importAuditAlertCount": {
     "description": "添加技能的安全审计供应商、告警数和结果时效区显示的文案。",
     "placeholders": {
@@ -4193,7 +4178,7 @@
       }
     }
   },
-  "importAddedNames": "已添加 {added} 个技能 · {p1}",
+  "importAddedNames": "已添加 {added} 个技能：{p1}",
   "@importAddedNames": {
     "description": "一批技能添加操作结束后的结果提示显示的文案。",
     "placeholders": {
@@ -6321,12 +6306,16 @@
     "description": "同名冲突卡片：确认替换后列出会移到废纸篓的项",
     "placeholders": {}
   },
-  "importReplaceLinkOnly": "链接 · 只移走链接，指向的内容不动",
+  "importReplaceLinkOnly": "只移走链接，指向的内容不动",
   "@importReplaceLinkOnly": {
-    "description": "同名冲突卡片：要移走的是链接时的说明",
+    "description": "同名冲突卡片：要移走的是链接时，「链接」标签的悬停说明",
     "placeholders": {}
   },
-  "importAddAndReplaceCount": "添加 {add} 个 · 替换 {replace} 个",
+  "importReplaceLinkTag": "链接",
+  "@importReplaceLinkTag": {
+    "description": "要替换的已有技能里，这一条是软链接时，路径右边的小标签；悬停看 importReplaceLinkOnly"
+  },
+  "importAddAndReplaceCount": "添加 {add} 个，替换 {replace} 个",
   "@importAddAndReplaceCount": {
     "description": "选择页右上角按钮：既有新添加的又有替换的",
     "placeholders": {
@@ -6356,7 +6345,7 @@
       }
     }
   },
-  "importAddedReplacedNames": "已添加 {added} 个技能（替换了 {replaced} 个，旧版在废纸篓）· {p1}",
+  "importAddedReplacedNames": "已添加 {added} 个技能（替换了 {replaced} 个，旧版在废纸篓）：{p1}",
   "@importAddedReplacedNames": {
     "description": "一批技能添加结束后的结果提示：其中有替换的",
     "placeholders": {

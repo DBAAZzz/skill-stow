@@ -128,9 +128,9 @@ func formatExecSummary(paths []string, limit int) string {
 		return ""
 	}
 	if len(paths) <= limit {
-		return strings.Join(paths, " · ")
+		return strings.Join(paths, locales.ListSeparator())
 	}
-	return locales.ImportPathsEtc(strings.Join(paths[:limit], " · "), len(paths))
+	return locales.ImportPathsEtc(strings.Join(paths[:limit], locales.ListSeparator()), len(paths))
 }
 
 func inspectorGroupTitle(hasTools, hasExec bool) string {

@@ -1025,10 +1025,12 @@ func commitMeta(c *ui.Context, sha string, shaColor, iconColor ui.Color) {
 	})
 }
 
-func pillTag(c *ui.Context, text string) {
-	ui.Row(c).Height(17).Padding(0, 6).Radius(4).Background(colBgFill).AlignItems(ui.Center).Shrink(0).Children(func() {
+func pillTag(c *ui.Context, text string) ui.Element {
+	tag := ui.Row(c).Height(17).Padding(0, 6).Radius(4).Background(colBgFill).AlignItems(ui.Center).Shrink(0)
+	tag.Children(func() {
 		ui.Text(c, text).FontSize(11).FontWeight(500).TextColor(colTextSecondary).FontFeatures("tnum").SingleLine()
 	})
+	return tag
 }
 
 func formatCommitTime(t time.Time) string {

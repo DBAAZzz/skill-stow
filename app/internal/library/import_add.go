@@ -40,7 +40,7 @@ type ImportState int
 
 const (
 	ImportNew      ImportState = iota + 1 // 目标位置没有同名，能添加
-	ImportSame                            // 已经有，内容一样：已添加 · 最新
+	ImportSame                            // 已经有，内容一样：已是最新
 	ImportConflict                        // 已有同名，内容或来源不同：不覆盖，用户确认后可替换
 	ImportInvalid                         // 不合规矩（名称、大小、链接……）
 )

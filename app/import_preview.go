@@ -137,8 +137,12 @@ func (a *app) importHead(c *ui.Context, s *library.ImportSkill, files []library.
 				where = locales.ImportRepositoryRoot()
 			}
 			ui.Text(c, where).FontSize(12).Font("monospace").TextColor(colTextMuted).SingleLine().Shrink(1).MinWidth(0)
-			count := locales.ImportFilesAndSize(s.Count, library.HumanSize(s.Size))
-			ui.Text(c, count).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").SingleLine()
+			// 「文件」页签上的数和实际总数一样时不重复写；没有页签，或页签
+			// 少列了（隐藏文件、node_modules 不预览但照样装上）时写出总数
+			if s.Count > 1 && (!multi || s.Count != len(files)) {
+				ui.Text(c, locales.CommonFileCount(s.Count)).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").SingleLine()
+			}
+			ui.Text(c, library.HumanSize(s.Size)).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").SingleLine()
 			ui.Spacer(c)
 			if multi {
 				previewTabs(c, &st.tab, "SKILL.md", locales.ImportFilesHeadingCount(len(files)))
@@ -367,7 +371,7 @@ func latestAuditAt(rows []library.AuditResult) time.Time {
 }
 
 // importScan 是 skills.sh 收录时的第三方安全审计（画板 au-d / au-e / r7）：
-// 无风险时收成「没发现问题 · N 家」可点开查看明细；有风险时直接列出每家结果（最严重在前）。
+// 无风险时收成「没发现问题，N 家」可点开查看明细；有风险时直接列出每家结果（最严重在前）。
 func (a *app) importScan(c *ui.Context, s *library.ImportSkill) {
 	if len(s.Audit) == 0 {
 		return
@@ -426,7 +430,7 @@ func (a *app) importScan(c *ui.Context, s *library.ImportSkill) {
 					ui.Image(c, riskSymbol(r.Risk)).Size(16, 16).Shrink(0)
 					ui.Text(c, r.ProviderName()).FontSize(13).SingleLine().Shrink(1).MinWidth(0)
 					ui.Spacer(c)
-					ui.Row(c).AlignItems(ui.Center).Shrink(0).Children(func() {
+					ui.Row(c).Gap(6).AlignItems(ui.Center).Shrink(0).Children(func() {
 						level := ui.Text(c, riskLabel(r.Risk)).FontSize(12).TextColor(colTextSecondary).SingleLine()
 						if r.Risk == "critical" {
 							level.TextColor(colDangerText).FontWeight(500)
