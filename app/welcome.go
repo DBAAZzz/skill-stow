@@ -536,11 +536,12 @@ func (a *app) welIcon(c *ui.Context, g welGeom, t, st int, w float32) {
 	ui.Box(c.Key("icon")).Absolute().Left(cx-welIconSize/2).Top(top).Size(welIconSize, welIconSize).ZIndex(3600).
 		AnimatePose(pose, anim).Children(func() {
 		// 投影跟着图标的方块走，不跟着整张图（四周有透明的留白）
-		ui.Box(c).Absolute().Left(9.5).Top(9.5).Size(85, 85).Radius(19).Background(colGroupWebsite).
-			Shadow(0, 14, 26, 0, colGroupWebsite.Alpha(0.28)).ZIndex(-1)
+		// 图标是白底方块（约占 80%，居中），垫底比方块略小一圈，藏在图标后面只出投影，不从边上露出来
+		ui.Box(c).Absolute().Left(12).Top(12).Size(80, 80).Radius(18).Background(colBgCard).
+			Shadow(0, 14, 26, 0, shadow(0.22)).ZIndex(-1)
 		ui.Image(c, welcomeIcon).Size(welIconSize, welIconSize)
-		// 高光只落在图标的方块上：图标四周有 8% 的留白，圆角约为边长的 22%
-		ui.Box(c).Absolute().Left(9.5).Top(9.5).Size(85, 85).Radius(19).Clip().Children(func() {
+		// 高光只落在图标的方块上，裁切框同样比方块略小，免得扫到方块外的透明留白
+		ui.Box(c).Absolute().Left(11).Top(11).Size(82, 82).Radius(20).Clip().Children(func() {
 			ui.Box(c).Absolute().Left(0).Top(-20).Size(40, 125).Rotate(14).
 				LinearGradient(ui.LinearGradient{Angle: 90, Stops: []ui.GradientStop{
 					{Color: white.Alpha(0), At: 0}, {Color: white.Alpha(0.7), At: 0.5}, {Color: white.Alpha(0), At: 1},
