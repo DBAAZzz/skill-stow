@@ -11,6 +11,7 @@ import (
 	"slices"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"skillmanager/locales"
@@ -569,12 +570,14 @@ func (l *Library) CheckUpdates(ctx context.Context, remote Remote, progress func
 	done := make(chan result, 3)
 	next, active, finished := 0, 0, 0
 	quota := false
+	// 按目录查提交时间是唯一还走 API 的请求，额度用完后本轮不再查，其余照常
+	var noPathCommits atomic.Bool
 	for next < len(sources) || active > 0 {
 		for !quota && ctx.Err() == nil && active < 3 && next < len(sources) {
 			src := sources[next]
 			next++
 			active++
-			go func() { r, ss := l.checkRepo(ctx, remote, src, eligible); done <- result{r, ss} }()
+			go func() { r, ss := l.checkRepo(ctx, remote, src, eligible, &noPathCommits); done <- result{r, ss} }()
 		}
 		if active == 0 {
 			break
@@ -612,7 +615,7 @@ func (l *Library) CheckUpdates(ctx context.Context, remote Remote, progress func
 	}
 	return st.save(l.Home)
 }
-func (l *Library) checkRepo(ctx context.Context, remote Remote, src SourceID, items []UpdateItem) (repoResult, []skillUpdates) {
+func (l *Library) checkRepo(ctx context.Context, remote Remote, src SourceID, items []UpdateItem, noPathCommits *atomic.Bool) (repoResult, []skillUpdates) {
 	r := repoResult{Source: src, At: time.Now()}
 	var ss []skillUpdates
 	c, err := remote.Commit(ctx, src.Repo, src.Ref)
@@ -667,7 +670,7 @@ func (l *Library) checkRepo(ctx context.Context, remote Remote, src SourceID, it
 						}
 					}
 				}
-				if usePathCommits && it.Path != "" && r.Reset.IsZero() {
+				if usePathCommits && it.Path != "" && !noPathCommits.Load() {
 					if !pathTried[it.Path] {
 						pathTried[it.Path] = true
 						dc, pe := pc.PathCommit(ctx, src.Repo, c.SHA, it.Path)
@@ -677,9 +680,10 @@ func (l *Library) checkRepo(ctx context.Context, remote Remote, src SourceID, it
 						if pe == nil && dc.SHA != "" {
 							pathCommits[it.Path] = dc
 						} else if pe != nil {
+							// 查不到就显示仓库的提交时间，不算检查失败
 							var re *RemoteError
-							if errors.As(pe, &re) && re.Kind == RemoteQuota {
-								r.Reset = re.Reset
+							if errors.As(pe, &re) && (re.Kind == RemoteQuota || re.Kind == RemoteThrottled) {
+								noPathCommits.Store(true)
 							}
 						}
 					}

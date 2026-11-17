@@ -23,6 +23,7 @@ type fakeRemote struct {
 	calls       []string                           // "commit repo ref"、"tree repo sha"、"file repo sha path"、"pathcommit repo path"
 	fail        map[string]error                   // 按仓库：所有请求都失败
 	pathCommits map[string]Commit                  // "repo\x00path" → Commit
+	pathFail    error                              // 按目录查提交一律失败（API 额度用完）
 	unsized     bool                               // 目录树不带文件大小（git 协议）
 	edit        func(path string, b []byte) []byte // 下载时改内容（篡改用例）
 }
@@ -184,7 +185,11 @@ func (f *fakeRemote) PathCommit(ctx context.Context, repo, ref, subpath string) 
 	}
 	f.mu.Lock()
 	pc, ok := f.pathCommits[repo+"\x00"+subpath]
+	fail := f.pathFail
 	f.mu.Unlock()
+	if fail != nil {
+		return Commit{}, fail
+	}
 	if ok {
 		return pc, nil
 	}
