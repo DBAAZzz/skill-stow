@@ -400,16 +400,25 @@ func groupSubtitle(g library.UpdateGroup) string {
 	}
 }
 
-// updateCols 按内容栏宽度 colW（不是整个内容区）定技能名、来源两列的宽度；
-// 太窄时 compact，三列不再定宽、按比例分。
-func updateCols(colW float32) (skillW, srcW float32, compact bool) {
+// updateLayout 是技能更新表格的排法。
+type updateLayout struct {
+	skillW, srcW float32 // 技能名、来源两列的宽度；不定宽时为 0
+	compact      bool    // 三列不定宽，按比例分
+	stacked      bool    // 名字、来源、说明上下叠成一栏，操作在右边
+}
+
+// updateCols 按内容栏宽度 colW（不是整个内容区）定表格的排法：宽时两列定宽，
+// 窄一些三列按比例分，再窄（主窗口最窄又开着详情栏）就叠成一栏。
+func updateCols(colW float32) updateLayout {
 	switch {
 	case colW >= 760:
-		return 180, 138, false
+		return updateLayout{skillW: 180, srcW: 138}
 	case colW >= 580:
-		return 136, 106, false
+		return updateLayout{skillW: 136, srcW: 106}
+	case colW >= 480:
+		return updateLayout{compact: true}
 	default:
-		return 0, 0, true
+		return updateLayout{stacked: true}
 	}
 }
 
@@ -425,20 +434,21 @@ func (a *app) updateTableHeader(c *ui.Context, g library.UpdateGroup, colW float
 	case library.GroupHandle, library.GroupFailed:
 		infoCol = locales.CommonReason()
 	}
-	skillW, srcW, compact := updateCols(colW)
+	lay := updateCols(colW)
 	ui.Row(c).Height(34).Padding(0, 16).Gap(14).AlignItems(ui.Center).Background(colBgSubtle).
 		BorderWidth(0, 0, 1, 0).BorderColor(colBorderSubtle).FontSize(12).FontWeight(500).TextColor(colTextMuted).Children(func() {
 		col1 := ui.Text(c, locales.CommonSkills()).SingleLine()
-		col2 := ui.Text(c, locales.CommonSource()).SingleLine()
-		col3 := ui.Text(c, infoCol).SingleLine()
-		if compact {
+		switch {
+		case lay.stacked:
+			col1.Grow(1).MinWidth(0)
+		case lay.compact:
 			col1.Grow(1).Basis(0).MinWidth(0)
-			col2.Grow(0.8).Basis(0).MinWidth(0)
-			col3.Grow(1.2).Basis(0).MinWidth(0)
-		} else {
-			col1.Width(skillW).Shrink(0)
-			col2.Width(srcW).Shrink(0)
-			col3.Grow(1).MinWidth(0)
+			ui.Text(c, locales.CommonSource()).SingleLine().Grow(0.8).Basis(0).MinWidth(0)
+			ui.Text(c, infoCol).SingleLine().Grow(1.2).Basis(0).MinWidth(0)
+		default:
+			col1.Width(lay.skillW).Shrink(0)
+			ui.Text(c, locales.CommonSource()).SingleLine().Width(lay.srcW).Shrink(0)
+			ui.Text(c, infoCol).SingleLine().Grow(1).MinWidth(0)
 		}
 		ui.Row(c).MinWidth(52).Shrink(0).Justify(ui.End).Children(func() {
 			ui.Text(c, locales.CommonActions()).SingleLine()
@@ -460,7 +470,7 @@ func (a *app) updateRow(c *ui.Context, it library.UpdateItem, first, single bool
 	if !first {
 		ui.Box(c).Height(1).Margin(0, 16).Background(colBorderSubtle)
 	}
-	skillW, srcW, compact := updateCols(colW)
+	lay := updateCols(colW)
 	selected := a.selected != nil && a.selected.Name == it.Name
 	row := ui.Row(c).MinHeight(42).Padding(8, 16).Gap(14).AlignItems(ui.Center)
 	if single {
@@ -469,52 +479,62 @@ func (a *app) updateRow(c *ui.Context, it library.UpdateItem, first, single bool
 	if selected {
 		row.Background(colAccentBg)
 	}
-	row.Children(func() {
-		cSkill := ui.Row(c).Gap(6).AlignItems(ui.Center).MinWidth(0)
-		if compact {
-			cSkill.Grow(1).Basis(0)
+	skillCell := func() {
+		skill := a.lib.Get(it.Name)
+		if skill != nil {
+			b := ui.ButtonBase(c).Label(it.Name).MinWidth(0).Shrink(1).Cursor(ui.CursorPointer)
+			b.Children(func() {
+				ui.Text(c, it.Name).FontSize(13).FontWeight(500).TextColor(colAccent).SingleLine()
+			})
+			if b.Clicked() {
+				a.selected, a.coll, a.picked = skill, nil, true
+			}
 		} else {
-			cSkill.Width(skillW).Shrink(0)
+			ui.Text(c, it.Name).FontSize(13).FontWeight(500).TextColor(colTextPrimary).SingleLine().MinWidth(0).Shrink(1)
 		}
-		cSkill.Children(func() {
-			skill := a.lib.Get(it.Name)
-			if skill != nil {
-				b := ui.ButtonBase(c).Label(it.Name).MinWidth(0).Shrink(1).Cursor(ui.CursorPointer)
-				b.Children(func() {
-					ui.Text(c, it.Name).FontSize(13).FontWeight(500).TextColor(colAccent).SingleLine()
-				})
-				if b.Clicked() {
-					a.selected, a.coll, a.picked = skill, nil, true
-				}
-			} else {
-				ui.Text(c, it.Name).FontSize(13).FontWeight(500).TextColor(colTextPrimary).SingleLine().MinWidth(0).Shrink(1)
-			}
-			if in := a.lib.InstalledIn(it); in != "" {
-				pillTag(c, locales.UpdateInstalledIn(in))
-			}
-			if it.State == library.UpdIgnored {
-				pillTag(c, locales.UpdateIgnored())
-			}
-		})
-
-		cSrc := a.sourceTextLink(c, it.Source.String(), it.WebURL(), colTextSecondary, func(t ui.Element) {
+		if in := a.lib.InstalledIn(it); in != "" {
+			pillTag(c, locales.UpdateInstalledIn(in))
+		}
+		if it.State == library.UpdIgnored {
+			pillTag(c, locales.UpdateIgnored())
+		}
+	}
+	srcLink := func() ui.Element {
+		return a.sourceTextLink(c, it.Source.String(), it.WebURL(), colTextSecondary, func(t ui.Element) {
 			t.FontSize(12)
 		})
-		if compact {
-			cSrc.Grow(0.8).Basis(0)
+	}
+	row.Children(func() {
+		if lay.stacked {
+			ui.Column(c).Grow(1).MinWidth(0).Gap(3).Children(func() {
+				ui.Row(c).Gap(6).AlignItems(ui.Center).MinWidth(0).Children(skillCell)
+				srcLink().AlignSelf(ui.Start)
+				a.updateInfoCell(c, it)
+			})
 		} else {
-			cSrc.Width(srcW).Shrink(0)
-		}
+			cSkill := ui.Row(c).Gap(6).AlignItems(ui.Center).MinWidth(0)
+			if lay.compact {
+				cSkill.Grow(1).Basis(0)
+			} else {
+				cSkill.Width(lay.skillW).Shrink(0)
+			}
+			cSkill.Children(skillCell)
 
-		cInfo := ui.Column(c).MinWidth(0).Gap(3)
-		if compact {
-			cInfo.Grow(1.2).Basis(0)
-		} else {
-			cInfo.Grow(1)
+			cSrc := srcLink()
+			if lay.compact {
+				cSrc.Grow(0.8).Basis(0)
+			} else {
+				cSrc.Width(lay.srcW).Shrink(0)
+			}
+
+			cInfo := ui.Column(c).MinWidth(0).Gap(3)
+			if lay.compact {
+				cInfo.Grow(1.2).Basis(0)
+			} else {
+				cInfo.Grow(1)
+			}
+			cInfo.Children(func() { a.updateInfoCell(c, it) })
 		}
-		cInfo.Children(func() {
-			a.updateInfoCell(c, it)
-		})
 
 		ui.Row(c).Shrink(0).Justify(ui.End).AlignItems(ui.Center).Gap(6).Children(func() {
 			a.updateActions(c, it)
@@ -539,7 +559,8 @@ func (a *app) updateInfoCell(c *ui.Context, it library.UpdateItem) {
 	}
 
 	if it.State == library.UpdReady && !it.CommitDate.IsZero() && !it.Stale {
-		ui.Row(c).Gap(12).AlignItems(ui.Center).MinWidth(0).Children(func() {
+		// 栏窄了 commit 号换到下一行，不压到右边的按钮上
+		ui.Row(c).Wrap().GapX(12).GapY(3).AlignItems(ui.Center).MinWidth(0).Children(func() {
 			ui.Text(c, formatCommitTime(it.CommitDate)).Font("monospace").FontSize(12).TextColor(colTextSecondary).FontFeatures("tnum").SingleLine()
 			if it.Commit != "" {
 				commitMeta(c, it.Commit, colTextBody, colTextMuted)

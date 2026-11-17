@@ -163,4 +163,19 @@ func TestGroupedPagesFitNarrowestWindowWithInspector(t *testing.T) {
 			t.Errorf("次数左边看不到用量条：x=%d 处是 %v", int(count.X)-14, p)
 		}
 	})
+
+	t.Run("updates", func(t *testing.T) {
+		a := newApp(library.Sample())
+		updateFixture(a)
+		a.selected = a.lib.Get("vue-best-practices")
+		tt := newUITester(a.view, w, 900)
+		tt.Advance(paneDuration)
+		sha := inside(t, tt, "3f8a21c")
+		btn := inside(t, tt, "查看差异")
+		if sha.Y < btn.Y+btn.H && btn.Y < sha.Y+sha.H && sha.X+sha.W > btn.X {
+			t.Errorf("commit 号叠在「查看差异」上：commit %v，按钮 %v", sha, btn)
+		}
+		inside(t, tt, "vite")
+		inside(t, tt, "antfu/skills")
+	})
 }
