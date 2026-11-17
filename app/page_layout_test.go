@@ -186,3 +186,47 @@ func TestGroupedPagesFitNarrowestWindowWithInspector(t *testing.T) {
 		inside(t, tt, "antfu/skills")
 	})
 }
+
+// 技能更新在详情栏开着、内容栏不宽时：英文按钮更宽、名字后面还跟着
+// 「装在哪」的标签，名字和完整的提交时间也都要放得下，commit 号不压按钮。
+func TestNarrowUpdateRowsKeepNameAndTimeWhole(t *testing.T) {
+	setup := func(a *app) {
+		updateFixture(a)
+		a.upd.report.Items[0].Record.Place = "/opt/Claude Code/skills/vite"
+	}
+	wideApp := newApp(library.Sample())
+	setup(wideApp)
+	wide := newUITester(wideApp.view, 1280, 900)
+	useLocale(t, wide, "en")
+	wide.Frame()
+	when := formatCommitTime(wideApp.upd.report.Items[0].CommitDate)
+	fullName, _ := wide.Find("vite")
+	fullTime, _ := wide.Find(when)
+
+	// 窗口 960 / 1114 / 1230 / 1250 开详情栏时，内容栏约 366 / 520 / 620 / 640
+	// （640 起技能名、来源两列定宽）
+	for _, w := range []int{960, 1114, 1230, 1250} {
+		t.Run(fmt.Sprint(w), func(t *testing.T) {
+			a := newApp(library.Sample())
+			setup(a)
+			a.selected = a.lib.Get("vue-best-practices")
+			tt := newUITester(a.view, w, 900)
+			useLocale(t, tt, "en")
+			tt.Advance(paneDuration)
+			if r, _ := tt.Find("vite"); r.W < fullName.W-0.5 {
+				t.Errorf("技能名被挤窄：%.1f，完整 %.1f", r.W, fullName.W)
+			}
+			if r, _ := tt.Find(when); r.W < fullTime.W-0.5 {
+				t.Errorf("提交时间被截断：%.1f，完整 %.1f", r.W, fullTime.W)
+			}
+			sha, _ := tt.Find("3f8a21c")
+			btn, ok := tt.Find("View Differences")
+			if !ok {
+				t.Fatal("找不到 View Differences")
+			}
+			if sha.Y < btn.Y+btn.H && btn.Y < sha.Y+sha.H && sha.X+sha.W > btn.X {
+				t.Errorf("commit 号叠在按钮上：commit %v，按钮 %v", sha, btn)
+			}
+		})
+	}
+}

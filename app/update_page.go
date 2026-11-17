@@ -402,21 +402,19 @@ func groupSubtitle(g library.UpdateGroup) string {
 
 // updateLayout 是技能更新表格的排法。
 type updateLayout struct {
-	skillW, srcW float32 // 技能名、来源两列的宽度；不定宽时为 0
-	compact      bool    // 三列不定宽，按比例分
+	skillW, srcW float32 // 技能名、来源两列的宽度；叠成一栏时为 0
 	stacked      bool    // 名字、来源、说明上下叠成一栏，操作在右边
 }
 
-// updateCols 按内容栏宽度 colW（不是整个内容区）定表格的排法：宽时两列定宽，
-// 窄一些三列按比例分，再窄（主窗口最窄又开着详情栏）就叠成一栏。
+// updateCols 按内容栏宽度 colW（不是整个内容区）定表格的排法：宽时技能名、
+// 来源两列定宽；不到 640（详情栏开着、窗口不宽）三列分不开，英文按钮又更宽，
+// 说明一栏放不下完整的提交时间，就叠成一栏。
 func updateCols(colW float32) updateLayout {
 	switch {
 	case colW >= 760:
 		return updateLayout{skillW: 180, srcW: 138}
-	case colW >= 580:
+	case colW >= 640:
 		return updateLayout{skillW: 136, srcW: 106}
-	case colW >= 480:
-		return updateLayout{compact: true}
 	default:
 		return updateLayout{stacked: true}
 	}
@@ -438,14 +436,9 @@ func (a *app) updateTableHeader(c *ui.Context, g library.UpdateGroup, colW float
 	ui.Row(c).Height(34).Padding(0, 16).Gap(14).AlignItems(ui.Center).Background(colBgSubtle).
 		BorderWidth(0, 0, 1, 0).BorderColor(colBorderSubtle).FontSize(12).FontWeight(500).TextColor(colTextMuted).Children(func() {
 		col1 := ui.Text(c, locales.CommonSkills()).SingleLine()
-		switch {
-		case lay.stacked:
+		if lay.stacked {
 			col1.Grow(1).MinWidth(0)
-		case lay.compact:
-			col1.Grow(1).Basis(0).MinWidth(0)
-			ui.Text(c, locales.CommonSource()).SingleLine().Grow(0.8).Basis(0).MinWidth(0)
-			ui.Text(c, infoCol).SingleLine().Grow(1.2).Basis(0).MinWidth(0)
-		default:
+		} else {
 			col1.Width(lay.skillW).Shrink(0)
 			ui.Text(c, locales.CommonSource()).SingleLine().Width(lay.srcW).Shrink(0)
 			ui.Text(c, infoCol).SingleLine().Grow(1).MinWidth(0)
@@ -499,41 +492,30 @@ func (a *app) updateRow(c *ui.Context, it library.UpdateItem, first, single bool
 			pillTag(c, locales.UpdateIgnored())
 		}
 	}
+	// 名字后面的标签（装在哪、已忽略）放不下就换到下一行，不把名字挤没
+	skillLine := func() ui.Element {
+		return ui.Row(c).Wrap().GapX(6).GapY(3).AlignItems(ui.Center).MinWidth(0)
+	}
 	srcLink := func() ui.Element {
 		return a.sourceTextLink(c, it.Source.String(), it.WebURL(), colTextSecondary, func(t ui.Element) {
 			t.FontSize(12)
 		})
 	}
+	if lay.stacked {
+		// 叠成一栏时文字至少留 160；按钮（英文更宽）挤不下就整组换到下面
+		row.Wrap().GapY(8)
+	}
 	row.Children(func() {
 		if lay.stacked {
-			ui.Column(c).Grow(1).MinWidth(0).Gap(3).Children(func() {
-				ui.Row(c).Gap(6).AlignItems(ui.Center).MinWidth(0).Children(skillCell)
+			ui.Column(c).Basis(160).Grow(1).MinWidth(0).Gap(3).Children(func() {
+				skillLine().Children(skillCell)
 				srcLink().AlignSelf(ui.Start)
 				a.updateInfoCell(c, it)
 			})
 		} else {
-			cSkill := ui.Row(c).Gap(6).AlignItems(ui.Center).MinWidth(0)
-			if lay.compact {
-				cSkill.Grow(1).Basis(0)
-			} else {
-				cSkill.Width(lay.skillW).Shrink(0)
-			}
-			cSkill.Children(skillCell)
-
-			cSrc := srcLink()
-			if lay.compact {
-				cSrc.Grow(0.8).Basis(0)
-			} else {
-				cSrc.Width(lay.srcW).Shrink(0)
-			}
-
-			cInfo := ui.Column(c).MinWidth(0).Gap(3)
-			if lay.compact {
-				cInfo.Grow(1.2).Basis(0)
-			} else {
-				cInfo.Grow(1)
-			}
-			cInfo.Children(func() { a.updateInfoCell(c, it) })
+			skillLine().Width(lay.skillW).Shrink(0).Children(skillCell)
+			srcLink().Width(lay.srcW).Shrink(0)
+			ui.Column(c).Grow(1).MinWidth(0).Gap(3).Children(func() { a.updateInfoCell(c, it) })
 		}
 
 		ui.Row(c).Shrink(0).Justify(ui.End).AlignItems(ui.Center).Gap(6).Children(func() {
