@@ -69,7 +69,7 @@ type settingsState struct {
 	ghNote      string
 }
 
-// 设置窗口的固定宽高与左侧导航栏宽度（2A 无界融底左右分栏）。
+// 设置窗口的固定宽高、左侧导航栏宽度和顶部拖动区高度。
 const (
 	settingsWidth      = 760
 	settingsHeight     = 540
