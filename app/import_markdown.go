@@ -311,13 +311,7 @@ func skillMarkdownTheme() *markdown.Theme {
 var skillMarkdownThemes [2]*markdown.Theme
 
 func newSkillMarkdownTheme() *markdown.Theme {
-	h1 := float32(15.0 / 13.0)
-	h2 := float32(13.5 / 13.0)
-	h3 := float32(1.0)
-	h5 := float32(12.5 / 13.0)
-	return &markdown.Theme{
-		FontSize:            13,
-		LineHeight:          1.54,
+	th := &markdown.Theme{
 		CodeLineHeight:      1.5,
 		Text:                colTextPrimary,
 		Muted:               colTextDisabled,
@@ -326,7 +320,6 @@ func newSkillMarkdownTheme() *markdown.Theme {
 		StrongWeight:        600,
 		Code:                colTextPrimary,
 		CodeBackground:      colBgSubtle,
-		CodeSize:            0.9,
 		BlockSpacing:        0.62,
 		ItemSpacing:         0.25,
 		QuoteBarWidth:       2,
@@ -341,13 +334,28 @@ func newSkillMarkdownTheme() *markdown.Theme {
 		TableHeader:         colBgSubtle,
 		TableCellPadding:    [2]float32{0.85, 0.54},
 		Headings: [6]markdown.HeadingStyle{
-			{Size: h1, Weight: 600, Color: colTextPrimary, Top: 1.38, Bottom: 0.46},
-			{Size: h2, Weight: 600, Color: colTextPrimary, Top: 1.38, Bottom: 0.46},
-			{Size: h3, Weight: 600, Color: colTextPrimary, Top: 1.08, Bottom: 0.31},
-			{Size: h3, Weight: 600, Color: colTextPrimary, Top: 0.92, Bottom: 0.25},
-			{Size: h5, Weight: 600, Color: colTextPrimary, Top: 0.85, Bottom: 0.25},
-			{Size: h5, Weight: 600, Color: colTextSecondary, Top: 0.85, Bottom: 0.25},
+			{Weight: 600, Color: colTextPrimary, Top: 1.38, Bottom: 0.46},
+			{Weight: 600, Color: colTextPrimary, Top: 1.38, Bottom: 0.46},
+			{Weight: 600, Color: colTextPrimary, Top: 1.08, Bottom: 0.31},
+			{Weight: 600, Color: colTextPrimary, Top: 0.92, Bottom: 0.25},
+			{Weight: 600, Color: colTextPrimary, Top: 0.85, Bottom: 0.25},
+			{Weight: 600, Color: colTextSecondary, Top: 0.85, Bottom: 0.25},
 		},
+	}
+	readingSizes(th)
+	return th
+}
+
+// readingSizes 是 SKILL.md 这类长文的整数字号：正文 14，比界面正文的 13 大一档，
+// 和 VS Code 的 Markdown 预览一样；代码 13；标题 18/16/15/14/13/13，都低于页面
+// 上 20 以上的技能名。主题里的字号是相对正文的倍数，这里按 pt 换算。
+func readingSizes(th *markdown.Theme) {
+	const body = 14
+	th.FontSize = body
+	th.LineHeight = 22.0 / body
+	th.CodeSize = 13.0 / body
+	for i, pt := range [6]float32{18, 16, 15, 14, 13, 13} {
+		th.Headings[i].Size = pt / body
 	}
 }
 

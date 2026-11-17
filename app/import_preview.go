@@ -124,7 +124,7 @@ func (a *app) importHead(c *ui.Context, s *library.ImportSkill, files []library.
 			}
 		})
 		if !s.MissingDescription() {
-			ui.Text(c, s.Description).FontSize(13).LineHeight(1.5).TextColor(colTextSecondary).MaxLines(3)
+			ui.Text(c, s.Description).FontSize(14).LineHeight(1.5).TextColor(colTextSecondary).MaxLines(3)
 		}
 		ui.Row(c).Gap(10).AlignItems(ui.Center).Margin(2, 0, 0, 0).Children(func() {
 			where := s.RepoPath

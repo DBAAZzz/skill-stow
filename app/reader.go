@@ -251,6 +251,7 @@ func (a *app) readerBody(c *ui.Context, s *library.Skill, f library.File, fresh 
 
 // document 渲染 Markdown 文件：SKILL.md 的 name / description 做成页头，其余原样渲染。
 func (a *app) document(c *ui.Context, s *library.Skill, f library.File, fresh bool) {
+	a.md.Theme = readerMarkdownTheme(c)
 	if strings.EqualFold(f.Path, "SKILL.md") {
 		md := library.ParseSkillMD(f.Content)
 		name := md.Name
@@ -262,7 +263,7 @@ func (a *app) document(c *ui.Context, s *library.Skill, f library.File, fresh bo
 			ui.Text(c, name).FontSize(22).Bold().AlignSelf(ui.Start).TransformOrigin(0, 0).Transition(titleMorph(s))
 			if md.Description != "" {
 				fadeIn(ui.Column(c), fresh, 220*time.Millisecond).Children(func() {
-					ui.Text(c, md.Description).TextColor(colTextSecondary).LineHeight(1.5)
+					ui.Text(c, md.Description).FontSize(14).TextColor(colTextSecondary).LineHeight(1.5)
 				})
 			}
 		})
@@ -274,3 +275,20 @@ func (a *app) document(c *ui.Context, s *library.Skill, f library.File, fresh bo
 	}
 	fadeIn(ui.Column(c).Gap(16), fresh, 220*time.Millisecond).Children(func() { markdown.View(c, f.Content, &a.md) })
 }
+
+// readerMarkdownTheme 是阅读页的 Markdown 主题：框架默认的配色与代码高亮，
+// 字号换成 readingSizes。浅色、深色各建一份留着，理由同 skillMarkdownThemes。
+func readerMarkdownTheme(c *ui.Context) *markdown.Theme {
+	i := 0
+	if darkUI {
+		i = 1
+	}
+	if readerMarkdownThemes[i] == nil {
+		th := markdown.DefaultTheme(c.Theme())
+		readingSizes(th)
+		readerMarkdownThemes[i] = th
+	}
+	return readerMarkdownThemes[i]
+}
+
+var readerMarkdownThemes [2]*markdown.Theme
