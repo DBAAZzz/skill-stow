@@ -81,8 +81,8 @@ var tones = []tone{
 	{&colBgLogo, "#ffffff", "#ebebed"},                                  // 头像、网站图标垫的底；网站图标多是给白底画的，深色也垫浅底
 	// 文字
 	{&colTextPrimary, "#1d1d1f", "#ececee"},   // 标题、正文
-	{&colTextBody, "#48484d", "#c7c7cc"},      // 简介、路径、计数、工具栏图标
-	{&colTextSecondary, "#6e6e73", "#98989d"}, // 说明、次级文字、侧栏图标
+	{&colTextBody, "#525257", "#c7c7cc"},      // 次级正文、路径、侧栏未选中、工具栏图标
+	{&colTextSecondary, "#6e6e73", "#98989d"}, // 卡片简介、说明、计数、侧栏图标
 	{&colTextMuted, "#8e8e93", "#8e8e93"},     // 数量、元信息、分组标题
 	{&colTextDisabled, "#aeaeb2", "#636366"},  // 禁用、占位、极弱提示
 	// 线

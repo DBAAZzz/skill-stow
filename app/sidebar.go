@@ -119,6 +119,8 @@ func (a *app) sideRow(c *ui.Context, id string, icon *ui.SVG, label string, icon
 		it = ui.SidebarItem(c, id, icon, label).Radius(6)
 		if selected {
 			it.Background(colInkSelected).TextColor(colTextPrimary)
+		} else {
+			it.TextColor(colTextBody)
 		}
 	})
 	return it

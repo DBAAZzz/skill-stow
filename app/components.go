@@ -170,7 +170,7 @@ func descText(c *ui.Context, s *library.Skill) ui.Element {
 	if s.MissingDescription() {
 		return ui.Text(c, locales.CommonNoDescription()).TextColor(colTextDisabled)
 	}
-	return ui.Text(c, s.Description).TextColor(colTextBody)
+	return ui.Text(c, s.Description).TextColor(colTextSecondary)
 }
 
 // sectionHeader 是卡片分节的标题（r8 .sh）：标题、数量、灰色说明（note

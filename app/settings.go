@@ -222,7 +222,7 @@ func (a *app) settingsHeader(c *ui.Context) {
 				selectableRow(b, on, colInkSelected)
 				b.Children(func() {
 					icon := ui.Icon(c, tab.icon).Size(20, 20).TextColor(colTextSecondary)
-					text := ui.Text(c, tab.label()).FontSize(11).TextColor(colTextBody).SingleLine()
+					text := ui.Text(c, tab.label()).FontSize(11).TextColor(colTextSecondary).SingleLine()
 					if on {
 						icon.TextColor(colAccent)
 						text.TextColor(colTextPrimary)
@@ -422,7 +422,7 @@ func (a *app) agentsTab(c *ui.Context) {
 				if library.IsCustom(ag.ID) && linkButton(c, locales.ActionRemove()).Tooltip(locales.SettingsRemoveDirectoryHint()).Clicked() {
 					a.settingsDo(a.lib.RemoveAgentDir(ag.ID), true)
 				}
-				ui.Text(c, locales.CommonSkillTotal(counts[ag.ID])).FontSize(12).TextColor(cond(hidden, colTextDisabled, colTextBody)).
+				ui.Text(c, locales.CommonSkillTotal(counts[ag.ID])).FontSize(12).TextColor(cond(hidden, colTextDisabled, colTextSecondary)).
 					FontFeatures("tnum").SingleLine().Shrink(0)
 				on := !hidden
 				if toggle(c, &on, locales.SettingsShowAgent(ag.DisplayName())).Margin(0, 0, 0, 4).Changed() {
@@ -519,7 +519,7 @@ func (a *app) projectsTab(c *ui.Context) {
 				if src.Count >= 0 {
 					count = locales.CommonProjectCount(src.Count)
 				}
-				ui.Text(c, count).FontSize(12).TextColor(cond(dim, colTextDisabled, colTextBody)).FontFeatures("tnum").SingleLine()
+				ui.Text(c, count).FontSize(12).TextColor(cond(dim, colTextDisabled, colTextSecondary)).FontFeatures("tnum").SingleLine()
 			})
 		}
 		sumRow(c, func() {
@@ -559,7 +559,7 @@ func (a *app) projectsTab(c *ui.Context) {
 				case len(p.Skills) == 0:
 					ui.Text(c, locales.SettingsFolderNoSkills()).FontSize(12).TextColor(colTextDisabled).SingleLine()
 				default:
-					ui.Text(c, locales.CommonSkillCount(len(p.Skills))).FontSize(12).TextColor(colTextBody).FontFeatures("tnum").SingleLine()
+					ui.Text(c, locales.CommonSkillCount(len(p.Skills))).FontSize(12).TextColor(colTextSecondary).FontFeatures("tnum").SingleLine()
 				}
 				if removeButton(c, locales.ActionRemoveTarget(p.Name)).Margin(0, 0, 0, 4).Clicked() {
 					a.settingsDo(a.lib.RemoveProjects([]string{p.Dir}), true)
@@ -680,7 +680,7 @@ func rowText(c *ui.Context, title, sub string, mono bool) {
 // sumRow 是框底部的灰色汇总行（.sum）。
 func sumRow(c *ui.Context, fn func()) {
 	ui.Row(c).Padding(9, 12).Gap(6).AlignItems(ui.Center).Background(colBgSubtle).
-		BorderWidth(1, 0, 0, 0).BorderColor(colBorderSubtle).FontSize(12).TextColor(colTextBody).Children(fn)
+		BorderWidth(1, 0, 0, 0).BorderColor(colBorderSubtle).FontSize(12).TextColor(colTextSecondary).Children(fn)
 }
 
 // hint 是框下面的一行灰色说明（.hint2）。
