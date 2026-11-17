@@ -176,14 +176,9 @@ func (a *app) updateBody(c *ui.Context, width float32) {
 		return
 	}
 
-	padH := float32(32)
-	if width < 640 {
-		padH = 16
-	}
 	ui.Scroll(c).Fill().Background(colBgPage).Scrollbars(false).Children(func() {
-		area := ui.Column(c).FillWidth().Padding(20, padH, 24, padH).AlignItems(ui.Center)
-		area.Children(func() {
-			ui.Column(c).FillWidth().MaxWidth(880).Gap(22).Children(func() {
+		area := pageColumn(c, width, pageMaxWidth, func(float32) {
+			ui.Column(c).FillWidth().Gap(22).Children(func() {
 				if st.err != "" {
 					errorLine(c, st.err)
 				}

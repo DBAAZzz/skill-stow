@@ -45,12 +45,10 @@ func (a *app) usagePage(c *ui.Context) {
 	used := a.lib.Used()
 	a.withPane(c, func(width float32) {
 		ui.Scroll(c.Key("usage-scroll")).Grow(1).MinHeight(0).Background(colBgPage).Children(func() {
-			ui.Column(c).AlignItems(ui.Center).Padding(24, 0, 40, 0).Children(func() {
-				ui.Column(c).Width(min(820, width-48)).Children(func() {
-					a.overview(c, now, used)
-					a.usedSection(c, now, used)
-					a.unusedSection(c)
-				})
+			pageColumn(c, width, pageMaxWidth, func(float32) {
+				a.overview(c, now, used)
+				a.usedSection(c, now, used)
+				a.unusedSection(c)
 			})
 		})
 	})

@@ -13,6 +13,25 @@ import (
 
 // 浏览页和项目页共用的组件：卡片、分节标题、看板的列、详情栏里的框、弹窗。
 
+// ——— 灰底分组页 ———
+
+// pageColumn 是灰底分组页的内容栏，放在页面自己的滚动区里。width 是内容区
+// 的宽度（withPane 给的，详情栏进出时已经是最终值），maxW 取 pageMaxWidth 或
+// formMaxWidth。fn 拿到内容栏的实际宽度，按它排列；返回外面那层，点空白处
+// 取消选中之类的挂在它上面。
+func pageColumn(c *ui.Context, width, maxW float32, fn func(colW float32)) ui.Element {
+	side := float32(pagePadSide)
+	if width < pageNarrow {
+		side = pagePadNarrow
+	}
+	colW := max(0, min(maxW, width-2*side))
+	area := ui.Column(c).FillWidth().Padding(pagePadTop, 0, pagePadBottom, 0).AlignItems(ui.Center)
+	area.Children(func() {
+		ui.Column(c).Width(colW).Children(func() { fn(colW) })
+	})
+	return area
+}
+
 // ——— 卡片 ———
 
 // sectionHeaderHeight 是分组标题行的高度。

@@ -22,6 +22,18 @@ const (
 	minCardWidth     = 210
 )
 
+// 灰底分组页（使用情况、技能更新、添加技能入口）的内容栏：居中，四周留白
+// 统一，只有最大宽度分两档。内容区窄于 pageNarrow 时两侧留白收窄。
+const (
+	pageMaxWidth  = 880 // 列表、统计这类页
+	formMaxWidth  = 640 // 只有几行输入的表单页
+	pagePadTop    = 24
+	pagePadBottom = 40
+	pagePadSide   = 24
+	pagePadNarrow = 16
+	pageNarrow    = 640
+)
+
 // 设计稿用 0.5px 发丝线（Retina 2x 下正好 1 物理像素）和 5% 的淡投影。
 // MyGo 按设备像素取整（ui/paint.go 的 snap），Windows 的 100%/125%/150%
 // 缩放会把 0.5 DIP round 成 0 或只在某一侧留 1px：卡片于是要么没边、要么
