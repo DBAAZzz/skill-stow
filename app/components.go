@@ -196,10 +196,11 @@ func descText(c *ui.Context, s *library.Skill) ui.Element {
 
 // sectionHeader 是卡片分节的标题（r8 .sh）：标题、数量、灰色说明（note
 // 画，可以带图标），right 放右边。
-func sectionHeader(c *ui.Context, title, count string, note, right func()) {
+func sectionHeader(c *ui.Context, title, count string, sets int, note, right func()) {
 	ui.Row(c).Height(sectionHeaderHeight).Gap(8).AlignItems(ui.Center).Children(func() {
 		ui.Text(c, title).FontSize(14).FontWeight(600).SingleLine().Shrink(0)
 		ui.Text(c, count).FontSize(13).TextColor(colTextMuted).FontFeatures("tnum").SingleLine().Shrink(0)
+		setsBadge(c, sets, 13)
 		if note != nil {
 			ui.Row(c).Gap(4).Margin(0, 0, 0, 4).MinWidth(0).Shrink(1).Clip().AlignItems(ui.Center).
 				FontSize(12).TextColor(colTextMuted).Children(note)
@@ -209,6 +210,38 @@ func sectionHeader(c *ui.Context, title, count string, note, right func()) {
 			right()
 		}
 	})
+}
+
+// metaLine 把几段并列的短信息排成一行，段与段之间只留间距，不用分隔符；
+// 空字符串跳过。字号和颜色跟着返回的这一行走，调用方自己设。
+func metaLine(c *ui.Context, parts ...string) ui.Element {
+	row := ui.Row(c).Gap(8).AlignItems(ui.Center).MinWidth(0)
+	row.Children(func() {
+		for _, p := range parts {
+			if p != "" {
+				ui.Text(c, p).FontFeatures("tnum").SingleLine().MinWidth(0).Shrink(1)
+			}
+		}
+	})
+	return row
+}
+
+// setsBadge 是数量旁的集合数：集合卡片上同一个叠层图标加数字，悬停和
+// 读屏是「N 个集合」。n 为 0 时什么都不画。
+func setsBadge(c *ui.Context, n int, size float32) {
+	if n == 0 {
+		return
+	}
+	ui.Row(c).Gap(3).AlignItems(ui.Center).Shrink(0).TextColor(colTextMuted).
+		Label(locales.CommonSetCount(n)).Tooltip(locales.CommonSetCount(n)).Children(func() {
+		ui.Icon(c, iconStack).Size(size-1, size-1)
+		ui.Text(c, fmt.Sprint(n)).FontSize(size).FontFeatures("tnum").SingleLine()
+	})
+}
+
+// readOnlyTag 是来源说明旁的「只读」小标签。
+func readOnlyTag(c *ui.Context) ui.Element {
+	return pillTag(c, locales.CommonReadOnly())
 }
 
 func empty(c *ui.Context, text string) {
@@ -304,16 +337,15 @@ const minColumnWidth, boardGap = 228, 10
 // 横向滚动。width 是内容区的宽度。
 func (a *app) boardRow(c *ui.Context, columns int, width float32, fn func(columnWidth float32)) {
 	fits := float32(columns)*(minColumnWidth+boardGap)-boardGap+28 <= width
-	var area ui.Element
 	if fits {
-		area = ui.Row(c).Grow(1).MinHeight(0).AlignItems(ui.Stretch).Padding(14, 14, 0, 14).Gap(boardGap)
+		area := ui.Row(c).Grow(1).MinHeight(0).AlignItems(ui.Stretch).Padding(14, 14, 0, 14).Gap(boardGap)
 		area.Children(func() { fn(0) })
-	} else {
-		area = ui.ScrollHorizontal(c).Grow(1).MinHeight(0).AlignItems(ui.Stretch).Scrollbars(false).
-			Padding(14, 14, 0, 14).Gap(boardGap)
-		area.Children(func() { fn(minColumnWidth) })
+		a.deselectOnBlank(area)
+		return
 	}
-	a.deselectOnBlank(area)
+	area := ui.ScrollHorizontal(c).Grow(1).MinHeight(0).AlignItems(ui.Stretch).Scrollbars(false).
+		Padding(14, 14, 0, 14).Gap(boardGap)
+	a.panBoard(area, func() { fn(minColumnWidth) })
 }
 
 // boardColumn 是看板的一列（r8-a .col）：列头和可以滚动的卡片。width 为 0 时
@@ -341,10 +373,9 @@ const fitColumnWidth = 280
 // fitBoard 是列高随内容的看板（p3-b）：列宽固定，整块上下左右都能滚。
 func (a *app) fitBoard(c *ui.Context, fn func()) {
 	area := ui.ScrollBoth(c).Grow(1).MinHeight(0).Scrollbars(false)
-	area.Children(func() {
+	a.panBoard(area, func() {
 		ui.Row(c).Padding(14).Gap(boardGap).AlignItems(ui.Start).Children(fn)
 	})
-	a.deselectOnBlank(area)
 }
 
 // fitColumn 是 fitBoard 里的一列：圆角的灰底，高度随卡片。
@@ -445,7 +476,10 @@ func (a *app) paneHeader(c *ui.Context, s *library.Skill, originIcon *ui.SVG, me
 		} else if originIcon != nil {
 			ui.Icon(c, originIcon).Size(12, 12)
 		}
-		ui.Text(c, a.originText(s)).FontSize(12)
+		ui.Text(c, a.originText(s)).FontSize(12).MinWidth(0).Shrink(1)
+		if s.ReadOnly() {
+			readOnlyTag(c).Margin(0, 0, 0, 3)
+		}
 	})
 }
 

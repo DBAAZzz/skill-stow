@@ -233,7 +233,7 @@ func TestUpdateFullGroupsAndSecondaryStates(t *testing.T) {
 		updating: true,
 		skill:    s,
 		leftSub:  "~/.agents/skills/vite",
-		rightSub: "antfu/skills · 3f8a21c",
+		rightSub: "antfu/skills",
 		files: []library.FileDiff{
 			{
 				Path:  "SKILL.md",
@@ -317,7 +317,7 @@ func TestUpdateStateSnapshots(t *testing.T) {
 		updating: true,
 		skill:    s,
 		leftSub:  "~/.agents/skills/vite",
-		rightSub: "antfu/skills · 3f8a21c",
+		rightSub: "antfu/skills",
 		files: []library.FileDiff{
 			{
 				Path:  "SKILL.md",

@@ -139,7 +139,10 @@ func (a *app) infoPane(c *ui.Context, s *library.Skill, note string, noteColor u
 							ui.Text(c, rec.Source).FontSize(13).MinWidth(0).SingleLine()
 							return
 						}
-						ui.Text(c, rec.Source+" · "+rec.SourceType).FontSize(13).MinWidth(0).SingleLine()
+						ui.Text(c, rec.Source).FontSize(13).MinWidth(0).Shrink(1).SingleLine()
+						if rec.SourceType != "" {
+							pillTag(c, rec.SourceType)
+						}
 					})
 				})
 				if url := recordWebURL(rec); url != "" {

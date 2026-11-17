@@ -128,9 +128,9 @@ func formatExecSummary(paths []string, limit int) string {
 		return ""
 	}
 	if len(paths) <= limit {
-		return strings.Join(paths, " · ")
+		return strings.Join(paths, locales.ListSeparator())
 	}
-	return locales.ImportPathsEtc(strings.Join(paths[:limit], " · "), len(paths))
+	return locales.ImportPathsEtc(strings.Join(paths[:limit], locales.ListSeparator()), len(paths))
 }
 
 func inspectorGroupTitle(hasTools, hasExec bool) string {
@@ -484,7 +484,7 @@ func isUnresolvableImageOnlyParagraph(inls []parser.Inline, skillDir string) boo
 		case parser.SoftBreak, parser.LineBreak:
 			k++
 		case parser.Text:
-			if strings.Trim(in.Text, " \t\r\n|·•/") != "" {
+			if strings.Trim(in.Text, " \t\r\n|·•/") != "" { //separator:ignore 认出 README 里只有徽章和分隔符的行
 				return false
 			}
 			k++

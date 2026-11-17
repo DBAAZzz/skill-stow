@@ -125,7 +125,7 @@ func TestBoardShowsSharedSkillsOnlyInSharedColumn(t *testing.T) {
 	if n := countText(tt, "stock-analysis"); n != 4 {
 		t.Errorf("通用之外的技能应保留两张 Agent 卡片，实际有 %d 个名称标签", n)
 	}
-	if _, ok := tt.Find("Claude Code · code-review 操作"); ok {
+	if _, ok := tt.Find("Claude Code 中 code-review 的操作"); ok {
 		t.Error("通用技能不应出现在 Agent 列中")
 	}
 }
@@ -356,7 +356,7 @@ func TestProjectPageAndInspector(t *testing.T) {
 	if p := a.project(); p == nil || p.Name != "stock-plan" {
 		t.Fatalf("scope = %q", a.scope)
 	}
-	for _, want := range []string{"项目技能", "2 个技能 · 只读", "release-checklist", "全局链接"} {
+	for _, want := range []string{"项目技能", "2 个技能", "只读", "release-checklist", "全局链接"} {
 		if !tt.HasText(want) {
 			t.Errorf("项目页缺少 %q：%q", want, tt.Texts())
 		}
@@ -442,7 +442,7 @@ func TestSettingsWindow(t *testing.T) {
 	}
 	// 设置是单独的窗口，用自己的 Tester
 	st := newUITester(a.settingsView, settingsWidth, settingsHeight)
-	for _, want := range []string{"技能库", "~/.agents/skills · 20 个技能", "在 Finder 中显示", "检查并修复", "主题", "浅色", "跟随系统", "语言"} {
+	for _, want := range []string{"技能库", "~/.agents/skills", "20 个技能", "在 Finder 中显示", "检查并修复", "主题", "浅色", "跟随系统", "语言"} {
 		if !st.HasText(want) {
 			t.Errorf("通用缺少 %q：%q", want, st.Texts())
 		}
@@ -540,7 +540,7 @@ func TestCollections(t *testing.T) {
 	a.scope = string(library.ScopeMine)
 	tt.Frame()
 	// 插件装的（document-skills）也在「我的」里，单独一组、只读
-	for _, want := range []string{"36 个 · 4 个集合", "20 · 3 个集合", "插件安装", "document-skills", "open.feishu.cn", "lark-calendar、lark-doc、lark-im、lark-meeting、lark-minutes、lark-vc", "anthropics/skills", "2/3", "1/3"} {
+	for _, want := range []string{"36 个", "4 个集合", "20", "3 个集合", "插件安装", "document-skills", "open.feishu.cn", "lark-calendar、lark-doc、lark-im、lark-meeting、lark-minutes、lark-vc", "anthropics/skills", "2/3", "1/3"} {
 		if !tt.HasText(want) {
 			t.Errorf("卡片缺少 %q：%q", want, tt.Texts())
 		}
@@ -554,7 +554,7 @@ func TestCollections(t *testing.T) {
 		t.Fatal(err)
 	}
 	tt.Advance(paneDuration)
-	for _, want := range []string{"集合 · 3 个技能 · 1 月 25 日安装", "3/3 已启用", "2/3 已启用", "包含", "打开集合，查看全部 3 个 ›", "用 npx skills 安装"} {
+	for _, want := range []string{"1 月 25 日安装", "3/3 已启用", "2/3 已启用", "包含", "打开集合，查看全部 3 个 ›", "用 npx skills 安装"} {
 		if !tt.HasText(want) {
 			t.Errorf("详情栏缺少 %q：%q", want, tt.Texts())
 		}
@@ -572,7 +572,7 @@ func TestCollections(t *testing.T) {
 
 	// 打开：只列集合里的技能，依赖多的标出来；Esc 回来，集合仍选中
 	doubleClick(t, tt, "open.feishu.cn")
-	if a.inColl == nil || countText(tt, "lark-doc") == 0 || !tt.HasText("集合 · 6 个技能 · 都在通用里") || !tt.HasText("2 个技能依赖它") {
+	if a.inColl == nil || countText(tt, "lark-doc") == 0 || !tt.HasText("6 个技能") || !tt.HasText("都在通用里") || !tt.HasText("2 个技能依赖它") {
 		t.Fatalf("双击应打开集合：%q", tt.Texts())
 	}
 	if tt.HasText("test-first") {

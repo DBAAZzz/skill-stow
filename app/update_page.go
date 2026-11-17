@@ -613,18 +613,18 @@ func (a *app) updateSourceRow(c *ui.Context, it library.UpdateItem, first bool) 
 
 		ui.Column(c).Grow(1).MinWidth(0).Gap(1).Children(func() {
 			title := it.Source.String()
-			sub := ""
+			var sub []string
 			switch it.State {
 			case library.UpdWebsite:
 				if it.RecordIncomplete {
 					title = it.Name
-					sub = fmt.Sprintf("%s · %s", it.Source.Repo, it.Reason)
+					sub = []string{it.Source.Repo, it.Reason.String()}
 				} else {
 					title = it.Source.Repo
-					sub = locales.UpdateWellKnownSource()
+					sub = []string{locales.UpdateWellKnownSource()}
 				}
 			default:
-				sub = fmt.Sprintf("%s · %s", it.Source.Type, it.Reason)
+				sub = []string{it.Source.Type, it.Reason.String()}
 			}
 			ui.Row(c).Gap(7).AlignItems(ui.Center).MinWidth(0).Children(func() {
 				titleURL := ""
@@ -636,7 +636,7 @@ func (a *app) updateSourceRow(c *ui.Context, it library.UpdateItem, first bool) 
 				}).Shrink(1)
 				pillTag(c, locales.CommonItemTotal(max(1, len(it.Names))))
 			})
-			ui.Text(c, sub).FontSize(12).TextColor(colTextSecondary).SingleLine()
+			metaLine(c, sub...).FontSize(12).TextColor(colTextSecondary)
 		})
 
 		if it.State == library.UpdWebsite {
@@ -1025,10 +1025,12 @@ func commitMeta(c *ui.Context, sha string, shaColor, iconColor ui.Color) {
 	})
 }
 
-func pillTag(c *ui.Context, text string) {
-	ui.Row(c).Height(17).Padding(0, 6).Radius(4).Background(colBgFill).AlignItems(ui.Center).Shrink(0).Children(func() {
+func pillTag(c *ui.Context, text string) ui.Element {
+	tag := ui.Row(c).Height(17).Padding(0, 6).Radius(4).Background(colBgFill).AlignItems(ui.Center).Shrink(0)
+	tag.Children(func() {
 		ui.Text(c, text).FontSize(11).FontWeight(500).TextColor(colTextSecondary).FontFeatures("tnum").SingleLine()
 	})
+	return tag
 }
 
 func formatCommitTime(t time.Time) string {

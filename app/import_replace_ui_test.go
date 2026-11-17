@@ -112,8 +112,8 @@ func TestSelectAllNeverPicksAReplacementButTheCheckboxCan(t *testing.T) {
 		t.Fatalf("全选只勾能直接添加的：%v", got)
 	}
 	must(t, tt.Click("勾选 vue"))
-	wantTexts(t, tt, "添加 1 个 · 替换 1 个", "将替换")
-	must(t, tt.Click("添加 1 个 · 替换 1 个"))
+	wantTexts(t, tt, "添加 1 个，替换 1 个", "将替换")
+	must(t, tt.Click("添加 1 个，替换 1 个"))
 	if !strings.Contains(readBody(t, h(".agents/skills/vue")), "theirs") || !exists(h(".agents/skills/deploy")) {
 		t.Error("两个都应装好")
 	}
@@ -144,5 +144,29 @@ func TestAReplacementIsRedecidedWhenTheExistingSkillChangedAfterConfirming(t *te
 	}
 	if !strings.Contains(readBody(t, h(".Trash/vue")), "edited") {
 		t.Error("废纸篓里应是改过的那份")
+	}
+}
+
+func TestReplacingALinkTellsScreenReadersOnlyTheLinkMoves(t *testing.T) {
+	// Given 技能库里的 vue 是一个链接，指向别处的目录；要添加的是别人的 vue
+	a, tt, h := importApp(t)
+	writeTestSkill(t, h("elsewhere/vue"), "我的 vue", "mine")
+	must(t, os.MkdirAll(h(".agents/skills"), 0o755))
+	must(t, os.Symlink(h("elsewhere/vue"), h(".agents/skills/vue")))
+	writeTestSkill(t, h("Downloads/vue"), "别人的 vue", "theirs")
+	a.rescan()
+	a.importPaths([]string{h("Downloads/vue")})
+	tt.Frame()
+
+	// When 在冲突卡片上点「替换」
+	must(t, tt.Click("替换"))
+
+	// Then 要移走的那项标成「链接」，读屏也能听到只移走链接、指向的内容不动
+	info, ok := tt.Access("链接")
+	if !ok {
+		t.Fatalf("替换清单里的链接应标出来：%q", tt.Texts())
+	}
+	if info.Description != "只移走链接，指向的内容不动" {
+		t.Errorf("「链接」标签的说明应进无障碍树，实际 Description=%q", info.Description)
 	}
 }

@@ -326,16 +326,12 @@ func (a *app) localVerSide(c *ui.Context, st *compareState, k int) {
 	if len(v.Places) > 0 {
 		placePath = a.lib.Display(v.Places[0].Path)
 	}
-	meta := ""
+	var modified, places string
 	if !v.Modified.IsZero() {
-		meta = locales.CompareModified(dayLabel(v.Modified, time.Now()))
+		modified = locales.CompareModified(dayLabel(v.Modified, time.Now()))
 	}
 	if len(v.Places) > 1 {
-		if meta != "" {
-			meta += locales.CompareLocationsSuffix(len(v.Places))
-		} else {
-			meta = locales.CommonLocationCount(len(v.Places))
-		}
+		places = locales.CommonLocationCount(len(v.Places))
 	}
 	ui.Row(c.Key(k)).Padding(9, 14).Gap(10).AlignItems(ui.Center).Children(func() {
 		versionBadge(c, v, k, 22)
@@ -345,9 +341,7 @@ func (a *app) localVerSide(c *ui.Context, st *compareState, k int) {
 				if k == 0 {
 					baseTag(c)
 				}
-				if meta != "" {
-					ui.Text(c, meta).FontSize(11).TextColor(colTextMuted).FontFeatures("tnum").SingleLine().MinWidth(0)
-				}
+				metaLine(c, modified, places).FontSize(11).TextColor(colTextMuted)
 			})
 			if placePath != "" {
 				tip := placePath
@@ -552,7 +546,7 @@ func binarySide(c *ui.Context, f library.File, missing bool) {
 			return
 		}
 		ui.Text(c, path.Base(f.Path)).FontWeight(500).SingleLine().MinWidth(0)
-		ui.Text(c, unreadKind(f)+" · "+sizeLabel(f.Size)).FontSize(12).TextColor(colTextMuted).SingleLine().MinWidth(0)
+		metaLine(c, unreadKind(f), sizeLabel(f.Size)).FontSize(12).TextColor(colTextMuted)
 	})
 }
 

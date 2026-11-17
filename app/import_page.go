@@ -388,28 +388,30 @@ func (a *app) importSourceBar(c *ui.Context) {
 		a.importSourceIcon(c, b)
 		ui.Column(c).Gap(3).MinWidth(0).Shrink(1).Children(func() {
 			ui.Text(c, b.Source.Label()).FontSize(14).FontWeight(600).SingleLine()
-			ui.Row(c).Gap(4).AlignItems(ui.Center).TextColor(colTextMuted).Children(func() {
-				dot := func() { ui.Text(c, "·").FontSize(12).TextColor(colTextDisabled) }
-				if b.Source.Kind == library.ImportGitHub {
-					ui.Icon(c, iconBranch).Size(11, 11)
+			// 技能数不在这里写：下面列表头已经有了
+			ui.Row(c).Gap(10).AlignItems(ui.Center).TextColor(colTextMuted).Children(func() {
+				iconLabel := func(ic *ui.SVG, text string) {
+					ui.Row(c).Gap(4).AlignItems(ui.Center).Shrink(0).Children(func() {
+						ui.Icon(c, ic).Size(11, 11)
+						ui.Text(c, text).FontSize(12).SingleLine()
+					})
+				}
+				switch b.Source.Kind {
+				case library.ImportGitHub:
 					ref := b.Source.Ref
 					if ref == "" {
 						ref = locales.ImportDefaultBranch()
 					}
-					ui.Text(c, ref).FontSize(12).SingleLine()
-					dot()
-					ui.Text(c, shortCommit(b.Commit)).FontSize(12).Font("monospace").SingleLine()
-				} else if b.Source.Kind == library.ImportWebsite {
-					ui.Icon(c, iconGlobe).Size(11, 11)
-					ui.Text(c, "well-known "+b.Protocol).FontSize(12).SingleLine()
-					dot()
+					iconLabel(iconBranch, ref)
+					if b.Commit != "" {
+						commitMeta(c, b.Commit, colTextSecondary, colTextMuted)
+					}
+				case library.ImportWebsite:
+					iconLabel(iconGlobe, "well-known "+b.Protocol)
 					ui.Text(c, locales.ImportWebsiteMutable()).FontSize(12).SingleLine().Shrink(1).MinWidth(0)
-				} else {
-					ui.Icon(c, iconFolder).Size(11, 11)
-					ui.Text(c, locales.CommonLocal()).FontSize(12).SingleLine()
+				default:
+					iconLabel(iconFolder, locales.CommonLocal())
 				}
-				dot()
-				ui.Text(c, locales.CommonSkillCount(len(b.Skills))).FontSize(12).FontFeatures("tnum").SingleLine()
 			})
 		})
 		ui.Spacer(c)
@@ -734,7 +736,6 @@ func (a *app) importList(c *ui.Context) {
 			picked++
 		}
 	}
-	chosen := len(a.importAddable())
 	ui.Column(c).Grow(1).MinWidth(0).Background(colBgSurface).Children(func() {
 		ui.Row(c).Height(36).Shrink(0).Padding(0, 14).Gap(9).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(colBorderDefault).Children(func() {
 			all := picked > 0 && picked == len(selectable)
@@ -744,7 +745,8 @@ func (a *app) importList(c *ui.Context) {
 					a.setImportPicked(n, !all)
 				}
 			}
-			ui.Text(c, locales.ImportSkillSelectionSummary(len(b.Skills), chosen)).FontSize(12).TextColor(colTextSecondary).FontFeatures("tnum").Grow(1).SingleLine()
+			// 选了几个看复选框和主按钮上的数字，这里只写一共几个
+			ui.Text(c, locales.CommonSkillCount(len(b.Skills))).FontSize(12).TextColor(colTextSecondary).FontFeatures("tnum").Grow(1).SingleLine()
 			if b.Hidden > 0 {
 				// 指定了技能时只读了那几个；要看仓库里其他的再整个读一遍
 				if linkButton(c, locales.CommonShowAllTotal(len(b.Skills)+b.Hidden)).Tooltip(locales.ImportRepositoryHasMore(b.Hidden)).Clicked() {
@@ -1025,7 +1027,8 @@ func (a *app) conflictCard(c *ui.Context, s *library.ImportSkill, existing, titl
 					ui.Row(c.Key("trash-" + e.Path)).Gap(10).AlignItems(ui.Center).Children(func() {
 						ui.Text(c, a.lib.Display(e.Path)).FontSize(12).Font("monospace").TextColor(colTextBody).Grow(1).MinWidth(0).SingleLine()
 						if e.Link {
-							ui.Text(c, locales.ImportReplaceLinkOnly()).FontSize(11).TextColor(colTextMuted).Shrink(0).SingleLine()
+							// 有了 Label 标签才进无障碍树，读屏才念得到悬停说明
+							pillTag(c, locales.ImportReplaceLinkTag()).Label(locales.ImportReplaceLinkTag()).Tooltip(locales.ImportReplaceLinkOnly())
 						}
 					})
 				}
