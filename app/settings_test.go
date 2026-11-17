@@ -474,4 +474,38 @@ func TestSettingsRescanRespectsNewerWatchAndDefersDuringInteractions(t *testing.
 			t.Fatal("watch 直接取代挂起设置扫描时不应丢失 reloadUsage 调用统计刷新")
 		}
 	})
+
+	t.Run("next_serial_watch_scan_still_applies_after_one_that_reloads_usage", func(t *testing.T) {
+		// Given 设置扫描因打开对比而挂起（reloadUsage=true），对比随后关闭
+		a, _, h := importApp(t)
+		writeTestSkill(t, h(".claude/skills/alpha"), "alpha", "body")
+		a.rescan()
+		var work func(post func(func()))
+		a.bg = func(w func(post func(func()))) { work = w }
+		a.delay = func(_ time.Duration, fn func()) {}
+
+		st := newUITester(a.settingsView, settingsWidth, settingsHeight)
+		a.set.tab = tabAgents
+		st.Frame()
+		must(t, st.Click("重新检测"))
+		a.cmp = &compareState{}
+		work(func(fn func()) { fn() })
+		a.cmp = nil
+
+		// 监听是一轮接一轮扫的：下一轮在上一轮结果落地前就记下了 baseGen
+		baseGen := a.watch.scanGen.Load()
+		writeTestSkill(t, h(".claude/skills/delta"), "delta", "body")
+		first := library.Scan(a.lib.Home)
+		writeTestSkill(t, h(".claude/skills/epsilon"), "epsilon", "body")
+		second := library.Scan(a.lib.Home)
+
+		// When 两轮监听结果依次落地，第一轮接手了挂起的 reloadUsage
+		a.applyWatchScan(first, first.Updates(), baseGen)
+		a.applyWatchScan(second, second.Updates(), baseGen)
+
+		// Then 第二轮不应被当成过期丢掉
+		if a.lib.Get("epsilon") == nil {
+			t.Fatal("带 reloadUsage 的监听结果落地后，同批次的下一轮监听结果应照常应用")
+		}
+	})
 }

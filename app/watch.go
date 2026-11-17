@@ -207,11 +207,7 @@ func (a *app) applyWatchScan(lib *library.Library, rep library.UpdateReport, bas
 		return
 	}
 	a.watch.pending = nil
-	if reload {
-		a.useScan(lib, rep)
-	} else {
-		a.applyScan(lib, rep, false)
-	}
+	a.applyScan(lib, rep, reload)
 	a.ensureSourceIcons()
 }
 
@@ -224,11 +220,7 @@ func (a *app) flushPendingWatch() {
 	if p.gen != a.watch.scanGen.Load() {
 		return
 	}
-	if p.reloadUsage {
-		a.useScan(p.lib, p.report)
-	} else {
-		a.applyScan(p.lib, p.report, false)
-	}
+	a.applyScan(p.lib, p.report, p.reloadUsage)
 	a.ensureSourceIcons()
 }
 
