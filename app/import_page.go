@@ -54,10 +54,9 @@ func (a *app) importPage(c *ui.Context) {
 			a.openExternalURL("https://skills.sh")
 		}
 	})
+	w, _ := c.Size()
 	ui.Scroll(c).Grow(1).MinHeight(0).Background(colBgPage).Scrollbars(false).Children(func() {
-		ui.Column(c).FillWidth().Padding(30, 28, 32, 28).AlignItems(ui.Center).Children(func() {
-			ui.Column(c).FillWidth().MaxWidth(640).Children(func() { a.importHome(c) })
-		})
+		pageColumn(c, w-a.sidebarRoom(), formMaxWidth, func(float32) { a.importHome(c) })
 	})
 }
 
