@@ -9,6 +9,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"skillmanager/internal/library"
+	"skillmanager/locales"
 )
 
 // cardEdges 找内容区第一张卡片：从工具栏下面沿内容区中线往下，第一个卡片底色
@@ -128,7 +129,7 @@ func TestGroupedPagesFitNarrowestWindowWithInspector(t *testing.T) {
 	}
 
 	t.Run("usage", func(t *testing.T) {
-		render := func(width int, pane bool) *ui.Tester {
+		render := func(width int, pane bool) (*app, *ui.Tester) {
 			a := newApp(library.Sample())
 			a.scope = scopeUsage
 			if pane {
@@ -136,11 +137,17 @@ func TestGroupedPagesFitNarrowestWindowWithInspector(t *testing.T) {
 			}
 			tt := newUITester(a.view, width, 1400)
 			tt.Advance(paneDuration)
-			return tt
+			return a, tt
 		}
-		wide, tt := render(1280, false), render(w, true)
-		// 图例、概览里的字不能被截成省略号：和宽窗口下一样宽
-		for _, text := range []string{"10 次以上", "没用过", "11 月 2 日", "今天"} {
+		_, wide := render(1280, false)
+		a, tt := render(w, true)
+		// 样例的调用记录按今天往前排，日期类的字从数据算，不写死
+		now := time.Now()
+		st := dailyStats(a.lib.Daily(now, usageWeeks))
+		peakDate := monthDay(st.peakDay, st.peakDay)
+		lastUsed := locales.DaysAgoShort(daysAgo(a.lib.Usage(a.lib.Used()[0]).Last, now))
+		// 图例、概览、行尾的字不能被截成省略号：和宽窗口下一样宽
+		for _, text := range []string{"10 次以上", "没用过", peakDate, lastUsed} {
 			full, ok := wide.Find(text)
 			if !ok {
 				t.Fatalf("宽窗口里找不到 %q", text)
