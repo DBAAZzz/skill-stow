@@ -230,7 +230,7 @@ func TestAppDefersWatchScanDuringActiveInteractionAndFlushesLater(t *testing.T) 
 		leave func()
 	}{
 		{"删除确认框", func() { a.del.confirmOpen = true }, func() { a.del.confirmOpen = false }},
-		{"合并清理进行中", func() { a.tidy.merging = &tidyProgress{} }, func() { a.tidy.merging = nil }},
+		{"合并清理进行中", func() { a.tidy.work = &tidyWork{} }, func() { a.tidy.work = nil }},
 		{"更新差异确认页", func() { a.upd.prepared = &library.Prepared{} }, func() { a.upd.prepared = nil }},
 	}
 

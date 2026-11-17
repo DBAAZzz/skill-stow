@@ -984,5 +984,20 @@
   "importReplaceLinkNotRestored": "{path} couldn't be restored to its original link (it pointed to {to}). The old link is in the Trash.",
   "commonSetCount": "{count, plural, one {# collection} other {# collections}}",
   "collectionAllShared": "All in Shared",
-  "agentStateLine": "{agent}: {state}"
+  "agentStateLine": "{agent}: {state}",
+  "tidyDeletingLink": "Deleting link",
+  "tidyLinkDeleted": "Link deleted",
+  "tidyProcessed": "Completed",
+  "tidyReconnected": "Reconnected",
+  "tidyLinksDeleted": "Deleted {n} duplicate links.",
+  "tidyProjectOnly": "{name} is now used only in its project.",
+  "tidyProcessing": "Processing",
+  "tidyLinkReconnected": "Reconnected {name}.",
+  "tidyReconnecting": "Reconnecting",
+  "tidyCollected": "{name} has been added to My Skills.",
+  "tidyOperationFailed": "Completed {completed}; {failed} failed: {reason}",
+  "tidyBrokenDeleted": "Deleted the broken link for {name}.",
+  "tidyLinksKept": "Kept the global links for {name}; this issue will no longer be reported.",
+  "tidyProcessingFinished": "Processing finished",
+  "tidyProcessingName": "Processing {name}…"
 }

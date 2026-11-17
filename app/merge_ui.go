@@ -87,98 +87,32 @@ var swapTransition = ui.ElementTransition{
 // mergeAll 在后台把能收的都收成一份，收完重新检测一次。上百处副本要一处
 // 一处移到废纸篓，要好几秒：放在界面线程上窗口会卡住，也看不到进度。
 func (a *app) mergeAll(skills []*library.Skill) {
-	if a.tidy.busy() {
-		return
-	}
-	var todo []*library.Skill
-	m := newTidyProgress()
-	for _, s := range skills {
-		if a.lib.CanMerge(s) {
-			todo = append(todo, s)
-			m.ids, m.names = append(m.ids, s.ID), append(m.names, s.Name)
-		}
-	}
-	if len(todo) == 0 {
-		return
-	}
-	a.tidy.msg, a.tidy.err, a.tidy.merging = "", "", m
-	a.dockProgress(0)
-	lib := a.lib
-	a.background(func(post func(func())) {
-		var total library.MergeResult
-		var errs []string
-		for _, s := range todo {
-			var failed string
-			step := func() {
-				r, err := lib.Merge(s, 0)
-				total.Add(r)
-				if err != nil {
-					failed = err.Error()
-					errs = append(errs, locales.NameColonError(s.Name, failed))
-				}
-			}
-			finish := func() {
-				m.done++
-				a.dockProgress(float64(m.done) / float64(len(m.ids)))
-				if failed != "" {
-					m.failed[s.ID] = failed
-					return
-				}
-				a.later(mergeRowHold, func() { m.gone[s.ID] = true })
-			}
-			if lib.Home == "" {
-				// 示例数据收成一份改的是内存里的库，界面正读着，要在界面线程上改
-				post(func() { step(); finish() })
-				continue
-			}
-			step()
-			post(finish)
-		}
-		var next *library.Library
-		var report library.UpdateReport
-		if lib.Home != "" {
-			next = library.Scan(lib.Home)
-			report = next.Updates()
-		}
-		post(func() {
-			// 等最后一行的勾停够了再换上新的库
-			a.later(mergeRowHold, func() {
-				if a.tidy.merging != m {
-					return // 已经不是这一轮了
-				}
-				a.tidy.merging = nil
-				a.dockProgress(-1)
-				if next != nil {
-					a.useScan(next, report)
-				}
-				msg, errMsg := mergedMessage(todo, total, errs)
-				a.tidy.err = errMsg
-				if msg != "" {
-					a.notify(fromTidy, toastOK, msg)
-				}
-				if msg != "" && errMsg == "" {
-					a.chimeDone()
-				}
-			})
-		})
-	})
+	a.mergeCopies(skills, 0, library.SameCopies)
 }
 
-// mergedMessage 是收完的结果：成功的一句，失败的第一个原因。
-func mergedMessage(todo []*library.Skill, total library.MergeResult, errs []string) (msg, errMsg string) {
-	switch n := len(todo) - len(errs); {
-	case n == 1 && len(todo) == 1:
-		msg = locales.MergeDoneOne(todo[0].Name, total.String())
-	case n > 0:
-		msg = locales.MergeSkillResult(n, total.String())
-	}
-	if len(errs) > 0 {
-		errMsg = errs[0]
-		if len(errs) > 1 {
-			errMsg += locales.MergeRemainingFailures(len(errs) - 1)
+func (a *app) mergeCopies(skills []*library.Skill, keep int, kind library.Issue) {
+	lib := a.lib
+	var tasks []tidyTask
+	var total library.MergeResult
+	for _, row := range skills {
+		s := lib.ByID(row.ID)
+		if s == nil || !lib.CanMerge(s) {
+			continue
 		}
+		tasks = append(tasks, tidyTask{s.ID, s.Name, func() error {
+			r, err := lib.Merge(s, keep)
+			total.Add(r)
+			return err
+		}})
 	}
-	return msg, errMsg
+	a.runTidy(tidyOperation{kind: kind, tasks: tasks, diskOnly: true,
+		doing: locales.TidyMergingName,
+		result: func(n int) string {
+			if len(tasks) == 1 {
+				return locales.MergeDoneOne(tasks[0].name, total.String())
+			}
+			return locales.MergeSkillResult(n, total.String())
+		}})
 }
 
 // later 过 d 在界面线程上执行 fn 并重画。测试里没有窗口，马上执行（除非接管 delay）。
@@ -243,13 +177,13 @@ func (a *app) clearDockProgressOnLastWindowClose(w *mygo.Window, otherOpen bool)
 
 // mergeAllButton 是「全部收成一份」；收的时候它变形成进度胶囊。
 func (a *app) mergeAllButton(c *ui.Context, skills []*library.Skill) {
-	if m := a.tidy.merging; m != nil {
+	if m := a.tidyProgressFor(library.SameCopies); m != nil {
 		progressPill(c, m, locales.MergeCompleted())
 		return
 	}
 	b := dialogButton(c, locales.MergeAll(), false).Shrink(0).
 		Transition(ui.ElementTransition{Match: batchButtonMatch{}, Animation: &morphSpring})
-	if a.tidy.busy() {
+	if a.tidy.busy() || a.tidy.scanning {
 		b.Disabled(true)
 	}
 	if b.Clicked() {
@@ -320,7 +254,7 @@ func progressRowStyle(m *tidyProgress, id func(i int) string) *rowStyle {
 }
 
 func (a *app) sameRowStyle(skills []*library.Skill) *rowStyle {
-	return progressRowStyle(a.tidy.merging, func(i int) string { return skills[i].ID })
+	return progressRowStyle(a.tidyProgressFor(library.SameCopies), func(i int) string { return skills[i].ID })
 }
 
 // rowAction 是一行最右边那个按钮；批量处理时由 progressRowActions 换成转圈、对勾。
@@ -334,6 +268,33 @@ type rowAction struct {
 // progressRowActions 是一行最右边：平时是按钮；处理的时候是转圈、对勾，
 // 没成功是红色的叹号，悬停看原因。m 是这一类的进度，nil 是没在处理。
 func (a *app) progressRowActions(c *ui.Context, m *tidyProgress, id string, act rowAction) {
+	if a.progressRowStatus(c, m, id, act.running, act.done) {
+		return
+	}
+	state := rowIdle
+	if m != nil {
+		state = m.state(id)
+	}
+	ui.Row(c.Key("button")).AlignItems(ui.Center).Transition(swapTransition).Children(func() {
+		b := pushButton(c, act.title)
+		dim := float32(1)
+		switch {
+		case state == rowWaiting:
+			b.Disabled(true)
+			dim = 0.45
+		case a.tidy.busy() || a.tidy.scanning:
+			b.Disabled(true)
+		case act.disabled != "":
+			b.Disabled(true).Tooltip(act.disabled)
+		}
+		b.Opacity(b.AnimateTo("dim", dim, ui.Animation{Duration: 200 * time.Millisecond, NonMotion: true}))
+		if b.Clicked() {
+			act.run()
+		}
+	})
+}
+
+func (a *app) progressRowStatus(c *ui.Context, m *tidyProgress, id, running, done string) bool {
 	state := rowIdle
 	if m != nil {
 		state = m.state(id)
@@ -343,37 +304,22 @@ func (a *app) progressRowActions(c *ui.Context, m *tidyProgress, id string, act 
 	}
 	switch state {
 	case rowRunning:
-		slot("running", func() { ui.Spinner(c).Label(act.running) })
+		slot("running", func() { ui.Spinner(c).Label(running) })
 	case rowDone:
 		slot("done", func() {
-			ui.Box(c).Size(18, 18).Radius(9).Background(colOK).Center().TextColor(white).Label(act.done).
+			ui.Box(c).Size(18, 18).Radius(9).Background(colOK).Center().TextColor(white).Label(done).
 				Transition(ui.ElementTransition{Animation: &popSpring, Enter: &ui.Motion{Opacity: 0, Scale: 0.3}}).Children(func() {
 				ui.Icon(c, iconCheck).Size(11, 11)
 			})
 		})
 	case rowFailed:
 		slot("failed", func() {
-			ui.Icon(c, iconWarn).Size(15, 15).TextColor(colDanger).Tooltip(m.failed[id])
+			ui.Icon(c, iconWarn).Size(15, 15).TextColor(colDanger).Label(m.failed[id]).Tooltip(m.failed[id])
 		})
 	default:
-		slot("button", func() {
-			b := pushButton(c, act.title)
-			dim := float32(1)
-			switch {
-			case state == rowWaiting:
-				b.Disabled(true)
-				dim = 0.45
-			case a.tidy.busy():
-				b.Disabled(true)
-			case act.disabled != "":
-				b.Disabled(true).Tooltip(act.disabled)
-			}
-			b.Opacity(b.AnimateTo("dim", dim, ui.Animation{Duration: 200 * time.Millisecond, NonMotion: true}))
-			if b.Clicked() {
-				act.run()
-			}
-		})
+		return false
 	}
+	return true
 }
 
 // mergeRowActions 是收成一份表格一行最右边。
@@ -383,5 +329,5 @@ func (a *app) mergeRowActions(c *ui.Context, s *library.Skill) {
 	if !a.lib.CanMerge(s) {
 		act.disabled = locales.MergeLegacyLocationsUntouched()
 	}
-	a.progressRowActions(c, a.tidy.merging, s.ID, act)
+	a.progressRowActions(c, a.tidyProgressFor(library.SameCopies), s.ID, act)
 }

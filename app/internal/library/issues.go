@@ -231,9 +231,12 @@ func (l *Library) Unglobal(s *Skill) error {
 			}
 		}
 	}
+	if err := errors.Join(errs...); err != nil {
+		return err
+	}
 	s.globalLinks, s.Enabled = nil, nil
 	s.Reads = slices.DeleteFunc(s.Reads, func(r Read) bool { return r.Global })
-	return errors.Join(errs...)
+	return nil
 }
 
 // GlobalDirs 是全局目录里指向项目技能的链接所在的目录（显示用）。

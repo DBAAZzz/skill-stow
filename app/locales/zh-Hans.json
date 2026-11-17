@@ -6340,5 +6340,117 @@
         "type": "String"
       }
     }
+  },
+  "@tidyBrokenDeleted": {
+    "description": "整理操作进度或完成结果。",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@tidyProcessingFinished": {
+    "description": "整理操作完成，可能含失败项；最终结果由提示条说明。"
+  },
+  "tidyReconnected": "已重新连上",
+  "tidyProjectOnly": "{name} 现在只在项目里使用。",
+  "@tidyProcessed": {
+    "description": "整理操作进度或完成结果。",
+    "placeholders": {}
+  },
+  "@tidyOperationFailed": {
+    "description": "整理操作进度或完成结果。",
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "@tidyProcessingName": {
+    "description": "整理操作进度或完成结果。",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@tidyProjectOnly": {
+    "description": "整理操作进度或完成结果。",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tidyCollected": "{name} 已收进我的技能。",
+  "@tidyProcessing": {
+    "description": "整理操作进度或完成结果。",
+    "placeholders": {}
+  },
+  "tidyProcessingFinished": "处理结束",
+  "tidyProcessingName": "正在处理 {name}…",
+  "@tidyReconnected": {
+    "description": "整理操作进度或完成结果。",
+    "placeholders": {}
+  },
+  "tidyDeletingLink": "正在删除链接",
+  "tidyLinkDeleted": "已删除链接",
+  "tidyProcessed": "已处理",
+  "@tidyReconnecting": {
+    "description": "整理操作进度或完成结果。",
+    "placeholders": {}
+  },
+  "@tidyLinksDeleted": {
+    "description": "整理操作进度或完成结果。",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@tidyCollected": {
+    "description": "整理操作进度或完成结果。",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@tidyLinkDeleted": {
+    "description": "整理操作进度或完成结果。",
+    "placeholders": {}
+  },
+  "tidyLinksDeleted": "已删除 {n} 个重复链接。",
+  "@tidyDeletingLink": {
+    "description": "整理操作进度或完成结果。",
+    "placeholders": {}
+  },
+  "tidyProcessing": "正在处理",
+  "tidyLinkReconnected": "已重新连上 {name}。",
+  "tidyReconnecting": "正在重新连接",
+  "@tidyLinksKept": {
+    "description": "整理操作进度或完成结果。",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tidyOperationFailed": "已完成 {completed} 项，{failed} 项失败：{reason}",
+  "tidyBrokenDeleted": "已删除 {name} 的断开链接。",
+  "tidyLinksKept": "已保留 {name} 的全局链接，不再提醒。",
+  "@tidyLinkReconnected": {
+    "description": "整理操作进度或完成结果。",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }
