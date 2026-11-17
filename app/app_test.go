@@ -733,6 +733,9 @@ func TestSnapshots(t *testing.T) {
 			tt.Advance(paletteTransition.Duration * 2)
 			tt.Frame()
 		}
+		if a.reading != nil { // 等阅读页的简介和正文淡入完
+			tt.Advance(time.Second)
+		}
 		writePNG(t, filepath.Join(dir, s.name+".png"), tt)
 	}
 	// 设置窗口四个标签，窗口高度按内容
