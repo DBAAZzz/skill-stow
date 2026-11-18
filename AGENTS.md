@@ -69,6 +69,13 @@ mkdir -p /tmp/shots && SNAPSHOT_DIR=/tmp/shots go test -run Snapshots .
 - 新增内容放进已有位置前，先看那里已经显示什么（例如添加技能页已有 skills.sh 的“安全审计”），避免重复或名字相近。
 - 交付前和 `SNAPSHOT_DIR` 截出的现有页面并排对照一遍。
 
+## 发版
+
+1. 改 `app/mygo.json` 的 `version`，提交 `build(release): …`。
+2. 在 `app/` 下执行 `go tool mygo build -platform darwin/universal`，产物是 `build/darwin-universal/skill-stow-<版本>.dmg`。
+3. 打标签 `v<版本>` 并推送，用 `gh release create` 建 Release，附上 dmg。
+4. Release 说明先写完整的 `## 中文`，再写完整的 `## English`，两节内容对应，不逐段交替。末尾附 dmg 的 SHA-256。还没有签名时，两节都要写第一次打开的放行步骤（参考 v0.1.0）。
+
 ## 提交规范
 
 提交信息遵循 [Conventional Commits](https://www.conventionalcommits.org/zh-hans/)：`<type>(<scope>): <subject>`。一个提交只做一件事，按功能拆分。
