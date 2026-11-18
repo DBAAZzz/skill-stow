@@ -1,0 +1,65 @@
+name: Release
+
+# 推送 v<版本> 标签后构建 macOS 通用版，连同签名的更新包传到草稿 Release。
+# 草稿不自动发布：写好中英文说明、核对附件后手动发布（见 AGENTS.md「发版」），
+# 发布后已安装的应用才会检查到它。
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write # 建草稿 Release 并上传附件
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check the tag, version and changelog agree
+        run: |
+          version="$(jq -r .version mygo.json)"
+          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::标签 $GITHUB_REF_NAME 和 app/mygo.json 的版本 $version 不一致"
+            exit 1
+          fi
+          if ! grep -Eq "^## \[?${version//./\\.}\]?( |$)" CHANGELOG.md; then
+            echo "::error::app/CHANGELOG.md 里没有 ## $version 一节，更新窗口会没有更新说明"
+            exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: app/go.mod
+          cache-dependency-path: app/go.sum
+
+      - run: go test ./...
+
+      - name: Build and upload to the draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MYGO_UPDATER_PRIVATE_KEY: ${{ secrets.MYGO_UPDATER_PRIVATE_KEY }}
+        run: go tool mygo build -platform darwin/universal -upload
+
+      - name: Summarize
+        run: |
+          dmg="build/darwin-universal/skill-stow-$VERSION.dmg"
+          {
+            echo "## v$VERSION 草稿已上传"
+            echo
+            echo "dmg 的 SHA-256（贴进 Release 说明末尾）："
+            echo
+            echo '```'
+            shasum -a 256 "$dmg" | cut -d' ' -f1
+            echo '```'
+            echo
+            echo "写好说明后发布：\`gh release edit v$VERSION --draft=false\`"
+          } >> "$GITHUB_STEP_SUMMARY"
