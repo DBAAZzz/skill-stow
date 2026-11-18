@@ -1152,5 +1152,10 @@
   "secUnfinishedMany": "{count} files weren’t checked, including {path} ({reason})",
   "secRescanClean": "{name} checked. No known risks found.",
   "secRescanRisky": "{name} checked. {count} items need a look.",
-  "secRescanUnfinished": "{name} still couldn’t be fully checked: {reason}"
+  "secRescanUnfinished": "{name} still couldn’t be fully checked: {reason}",
+  "secIgnore": "Ignore",
+  "secUnignore": "Stop Ignoring",
+  "secShowIgnored": "Show {count} Ignored",
+  "secHideIgnored": "Hide Ignored",
+  "secIgnoreSaveFailed": "Couldn’t save that. Try again."
 }

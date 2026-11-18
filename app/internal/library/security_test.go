@@ -494,3 +494,39 @@ func TestFilesThatOnlyLookLikeImagesAreStillChecked(t *testing.T) {
 		t.Fatalf("内容是文本的文件应照常分析：%+v", v.Report.Findings)
 	}
 }
+
+// 忽略“没检查完”：整理页不再列；重启后还在；目录里有文件变了就失效。
+func TestIgnoringAnUnfinishedCheckLastsUntilTheSkillChanges(t *testing.T) {
+	dir := t.TempDir()
+	r := secSkill(t, map[string]string{"SKILL.md": "# a", "x.pyc": "\x00\x01binary"})
+	s := newTestSecurity(t, dir)
+	s.Scan([]string{r}, true)
+	waitFor(t, "扫描", scanned(s, r))
+	if v := s.View(r); !v.Unfinished() || v.Ignored {
+		t.Fatalf("pyc 应让检查不完整：%+v", v.Report)
+	}
+	must(t, s.IgnoreUnfinished(r))
+	if !s.View(r).Ignored {
+		t.Fatal("忽略后应生效")
+	}
+	s.Close()
+
+	s2 := newTestSecurity(t, dir)
+	s2.Sync([]string{r})
+	waitFor(t, "重启核对", func() bool { return s2.View(r).Fresh == FreshCurrent })
+	if !s2.View(r).Ignored {
+		t.Fatal("忽略应落盘，重启后仍有效")
+	}
+
+	must(t, os.WriteFile(filepath.Join(r, "SKILL.md"), []byte("# a changed"), 0o644))
+	s2.Scan([]string{r}, true)
+	waitFor(t, "重扫", func() bool { v := s2.View(r); return scanned(s2, r)() && v.Fresh == FreshCurrent })
+	if s2.View(r).Ignored {
+		t.Fatal("文件变了，忽略应失效，重新列出来")
+	}
+	must(t, s2.IgnoreUnfinished(r))
+	must(t, s2.UnignoreUnfinished(r))
+	if s2.View(r).Ignored {
+		t.Fatal("取消忽略后应恢复")
+	}
+}

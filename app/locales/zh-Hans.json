@@ -7191,5 +7191,30 @@
         "type": "String"
       }
     }
+  },
+  "secIgnore": "忽略",
+  "@secIgnore": {
+    "description": "本地安全检查：整理页忽略一条没检查完的"
+  },
+  "secUnignore": "取消忽略",
+  "@secUnignore": {
+    "description": "本地安全检查：撤销忽略"
+  },
+  "secShowIgnored": "显示已忽略的 {count} 项",
+  "@secShowIgnored": {
+    "description": "本地安全检查：展开已忽略的",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "secHideIgnored": "收起已忽略的",
+  "@secHideIgnored": {
+    "description": "本地安全检查：收起已忽略的"
+  },
+  "secIgnoreSaveFailed": "没能记下忽略，请再试一次。",
+  "@secIgnoreSaveFailed": {
+    "description": "本地安全检查：忽略写入失败"
   }
 }

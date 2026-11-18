@@ -2,7 +2,10 @@ package library
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
+	"fmt"
 	"io/fs"
 	"maps"
 	"path/filepath"
@@ -44,6 +47,7 @@ type SkillSecurity struct {
 	Scanning  bool
 	Queued    bool
 	Acked     map[string]bool // 仍然有效的“已看过”
+	Ignored   bool            // 用户忽略了这次没检查完（没检查到的内容和目录都没变时有效）
 }
 
 // Pending 是还没看过的警告和高风险的条数。
@@ -99,6 +103,7 @@ type secRoot struct {
 	rec      *securityRecord
 	prev     *securityRecord
 	acks     []SecurityAck
+	ignored  string // 用户忽略“没检查完”时的签名（没检查到的内容 + 元信息清单）
 	fresh    Freshness
 	loaded   bool
 	queued   bool
@@ -202,6 +207,7 @@ func (s *SecurityService) load(r string, st *secRoot) {
 	st.rec, bad = loadRecord(filepath.Join(d, "current.json"), r)
 	st.prev, _ = loadRecord(filepath.Join(d, "previous.json"), r)
 	st.acks = loadAcks(filepath.Join(d, "acks.json"))
+	st.ignored = loadIgnored(filepath.Join(d, "ignored.json"))
 	if bad {
 		st.fresh = FreshUnknown
 	}
@@ -502,7 +508,58 @@ func (s *SecurityService) View(r string) SkillSecurity {
 		v.Previous = &p
 	}
 	v.Acked = s.validAcks(st)
+	v.Ignored = st.ignored != "" && st.rec != nil && st.ignored == unfinishedSig(st.rec)
 	return v
+}
+
+// unfinishedSig 是“没检查完”的签名：没检查到哪些、为什么，加上当时的元信息
+// 清单。目录里任何文件变了，或没检查到的内容变了，签名就不同，忽略自动失效。
+func unfinishedSig(rec *securityRecord) string {
+	h := sha256.New()
+	for _, x := range rec.Report.Holes {
+		fmt.Fprintf(h, "%d:%s|%s\n", len(x.Path), x.Path, x.Reason)
+	}
+	fmt.Fprintf(h, "%s|%s|%s", rec.Report.Execution, rec.Report.Error, rec.Meta)
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+// IgnoreUnfinished 忽略这个目录这次没检查完：整理页不再列它，直到内容变了。
+// 先落盘，成功了才生效。
+func (s *SecurityService) IgnoreUnfinished(r string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	st := s.roots[r]
+	if st == nil || st.rec == nil {
+		return errNoFinding
+	}
+	sig := unfinishedSig(st.rec)
+	if err := s.saveIgnored(r, sig); err != nil {
+		return err
+	}
+	st.ignored = sig
+	return nil
+}
+
+// UnignoreUnfinished 撤销忽略。
+func (s *SecurityService) UnignoreUnfinished(r string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	st := s.roots[r]
+	if st == nil {
+		return nil
+	}
+	if err := s.saveIgnored(r, ""); err != nil {
+		return err
+	}
+	st.ignored = ""
+	return nil
+}
+
+func (s *SecurityService) saveIgnored(r, sig string) error {
+	if s.dir == "" {
+		return nil
+	}
+	return writePrivate(filepath.Join(reportDir(s.dir, r), "ignored.json"), ignoredFile{Sig: sig})
 }
 
 var errNoFinding = errors.New("security: finding not in current report")

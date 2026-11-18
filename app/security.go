@@ -929,6 +929,7 @@ func (a *app) tidyKinds() []library.Issue {
 
 type secRow struct {
 	skill *library.Skill
+	key   string // 显示的是哪一份（它自己或某个同名副本）的结果
 	view  library.SkillSecurity
 }
 
@@ -959,10 +960,11 @@ func (a *app) secRows(k library.Issue, acked bool) []secRow {
 				match = v.TopPending() == want
 			}
 		case library.SecurityUnfinished:
-			match = !acked && (v.Unfinished() || v.Fresh == library.FreshUnknown)
+			// acked 在这一类是“已忽略的”
+			match = (v.Unfinished() || v.Fresh == library.FreshUnknown) && v.Ignored == acked
 		}
 		if match {
-			out = append(out, secRow{s, v})
+			out = append(out, secRow{s, key, v})
 		}
 	}
 	return out
@@ -972,34 +974,88 @@ func (a *app) secRows(k library.Issue, acked bool) []secRow {
 func (a *app) securityTable(c *ui.Context, k library.Issue) {
 	rows := a.secRows(k, false)
 	if k == library.SecurityUnfinished {
-		cols := []column{{locales.CommonSkills(), 0, 1}, {locales.CommonSource(), 0, 0.8}, {locales.TidyCondition(), 0, 2.4}}
-		table(c, cols, 180, len(rows), func(i, j int) {
-			r := rows[i]
-			switch j {
-			case 0:
-				cellText(c, r.skill.Name)
-			case 1:
-				cellText(c, secSourceLabel(r.skill))
-			case 2:
-				cellText(c, secUnfinishedText(r.view)).Shrink(1).Tooltip(secUnfinishedText(r.view))
-			}
-		}, func(i int) {
-			a.secRescanButton(c, rows[i].skill, rows[i].view)
-			if pushButton(c, locales.ActionView()).Clicked() {
-				a.openSecurityReport(rows[i].skill)
-			}
-		}, nil)
+		a.secUnfinishedTable(c, rows, false)
+	} else {
+		a.secFindingTable(c, k, rows)
+	}
+	hidden := a.secRows(k, true)
+	if len(hidden) == 0 {
 		return
 	}
-	a.secFindingTable(c, k, rows)
-	if hidden := a.secRows(k, true); len(hidden) > 0 {
-		label := cond(a.sec.showAcked, locales.SecHideAcked(), locales.SecShowAcked(len(hidden)))
-		if linkButton(c, label).Margin(10, 24).AlignSelf(ui.Start).Clicked() {
-			a.sec.showAcked = !a.sec.showAcked
+	show, hide := locales.SecShowAcked(len(hidden)), locales.SecHideAcked()
+	if k == library.SecurityUnfinished {
+		show, hide = locales.SecShowIgnored(len(hidden)), locales.SecHideIgnored()
+	}
+	if linkButton(c, cond(a.sec.showAcked, hide, show)).Margin(10, 24).AlignSelf(ui.Start).Clicked() {
+		a.sec.showAcked = !a.sec.showAcked
+	}
+	if a.sec.showAcked {
+		ui.Column(c).Opacity(0.6).Children(func() {
+			if k == library.SecurityUnfinished {
+				a.secUnfinishedTable(c, hidden, true)
+			} else {
+				a.secFindingTable(c, k, hidden)
+			}
+		})
+	}
+}
+
+// secRowStyle 让行按技能认：忽略、处理掉的那行像整理页其他表格一样收起，
+// 下面的补上来。
+func secRowStyle(rows []secRow, apply func(row ui.Element)) *rowStyle {
+	return &rowStyle{
+		key: func(i int) any { return rows[i].key },
+		apply: func(_ int, row ui.Element) {
+			row.Transition(mergeRowTransition)
+			if apply != nil {
+				apply(row)
+			}
+		},
+	}
+}
+
+// secUnfinishedTable 是“安全检查未完成”的表格。ignored 为真时列的是已忽略的，
+// 按钮换成“取消忽略”。
+func (a *app) secUnfinishedTable(c *ui.Context, rows []secRow, ignored bool) {
+	cols := []column{{locales.CommonSkills(), 0, 1}, {locales.CommonSource(), 0, 0.8}, {locales.TidyCondition(), 0, 2.4}}
+	table(c, cols, 250, len(rows), func(i, j int) {
+		r := rows[i]
+		switch j {
+		case 0:
+			cellText(c, r.skill.Name)
+		case 1:
+			cellText(c, secSourceLabel(r.skill))
+		case 2:
+			cellText(c, secUnfinishedText(r.view)).Shrink(1).Tooltip(secUnfinishedText(r.view))
 		}
-		if a.sec.showAcked {
-			ui.Column(c).Opacity(0.6).Children(func() { a.secFindingTable(c, k, hidden) })
+	}, func(i int) {
+		r := rows[i]
+		if ignored {
+			if pushButton(c, locales.SecUnignore()).Clicked() {
+				a.secIgnore(r.key, false)
+			}
+			return
 		}
+		a.secRescanButton(c, r.skill, r.view)
+		if pushButton(c, locales.ActionView()).Clicked() {
+			a.openSecurityReport(r.skill)
+		}
+		if pushButton(c, locales.SecIgnore()).Disabled(r.view.Scanning || r.view.Queued).Clicked() {
+			a.secIgnore(r.key, true)
+		}
+	}, secRowStyle(rows, nil))
+}
+
+// secIgnore 忽略或取消忽略一份没检查完的结果；写不进磁盘时提示。
+func (a *app) secIgnore(key string, on bool) {
+	var err error
+	if on {
+		err = a.sec.svc.IgnoreUnfinished(key)
+	} else {
+		err = a.sec.svc.UnignoreUnfinished(key)
+	}
+	if err != nil {
+		a.notify(fromTidy, toastError, locales.SecIgnoreSaveFailed())
 	}
 }
 
@@ -1042,12 +1098,10 @@ func (a *app) secFindingTable(c *ui.Context, k library.Issue, rows []secRow) {
 		if pushButton(c, locales.ActionView()).Clicked() {
 			a.openSecurityReport(rows[i].skill)
 		}
-	}, twoLineRows)
+	}, secRowStyle(rows, func(row ui.Element) {
+		row.MinHeight(58).Padding(10, 24) // 问题一栏两行（摘要、位置），上下多留些
+	}))
 }
-
-// twoLineRows 让问题一栏的两行（摘要、位置）上下留出和单行表格一样的
-// 余量：默认行高按一行字定，两行会顶着行的上下边。
-var twoLineRows = &rowStyle{apply: func(_ int, row ui.Element) { row.MinHeight(58).Padding(10, 24) }}
 
 func secSourceLabel(s *library.Skill) string {
 	if s.Source == library.Project {

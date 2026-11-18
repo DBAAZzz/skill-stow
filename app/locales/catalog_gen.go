@@ -16635,3 +16635,73 @@ func SecRescanUnfinished(reason string, name string) string {
 func (msgs Messages) SecRescanUnfinished(reason string, name string) string {
 	return Catalog.Format(msgs.locale, "secRescanUnfinished", map[string]any{"reason": reason, "name": name})
 }
+
+// SecIgnore says "忽略"
+// in the language the app shows.
+//
+// 本地安全检查：整理页忽略一条没检查完的
+func SecIgnore() string { return In(i18n.Locale()).SecIgnore() }
+
+// SecIgnore says "忽略"
+// in the language of msgs.
+//
+// 本地安全检查：整理页忽略一条没检查完的
+func (msgs Messages) SecIgnore() string {
+	return Catalog.Format(msgs.locale, "secIgnore", nil)
+}
+
+// SecUnignore says "取消忽略"
+// in the language the app shows.
+//
+// 本地安全检查：撤销忽略
+func SecUnignore() string { return In(i18n.Locale()).SecUnignore() }
+
+// SecUnignore says "取消忽略"
+// in the language of msgs.
+//
+// 本地安全检查：撤销忽略
+func (msgs Messages) SecUnignore() string {
+	return Catalog.Format(msgs.locale, "secUnignore", nil)
+}
+
+// SecShowIgnored says "显示已忽略的 {count} 项"
+// in the language the app shows.
+//
+// 本地安全检查：展开已忽略的
+func SecShowIgnored(count int) string { return In(i18n.Locale()).SecShowIgnored(count) }
+
+// SecShowIgnored says "显示已忽略的 {count} 项"
+// in the language of msgs.
+//
+// 本地安全检查：展开已忽略的
+func (msgs Messages) SecShowIgnored(count int) string {
+	return Catalog.Format(msgs.locale, "secShowIgnored", map[string]any{"count": count})
+}
+
+// SecHideIgnored says "收起已忽略的"
+// in the language the app shows.
+//
+// 本地安全检查：收起已忽略的
+func SecHideIgnored() string { return In(i18n.Locale()).SecHideIgnored() }
+
+// SecHideIgnored says "收起已忽略的"
+// in the language of msgs.
+//
+// 本地安全检查：收起已忽略的
+func (msgs Messages) SecHideIgnored() string {
+	return Catalog.Format(msgs.locale, "secHideIgnored", nil)
+}
+
+// SecIgnoreSaveFailed says "没能记下忽略，请再试一次。"
+// in the language the app shows.
+//
+// 本地安全检查：忽略写入失败
+func SecIgnoreSaveFailed() string { return In(i18n.Locale()).SecIgnoreSaveFailed() }
+
+// SecIgnoreSaveFailed says "没能记下忽略，请再试一次。"
+// in the language of msgs.
+//
+// 本地安全检查：忽略写入失败
+func (msgs Messages) SecIgnoreSaveFailed() string {
+	return Catalog.Format(msgs.locale, "secIgnoreSaveFailed", nil)
+}

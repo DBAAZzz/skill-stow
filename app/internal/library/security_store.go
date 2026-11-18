@@ -19,6 +19,7 @@ import (
 //	reports/<id>/current.json  最近一次结束的报告与当时的元信息清单摘要
 //	reports/<id>/previous.json 上一份完整报告（重扫失败后还能看历史）
 //	reports/<id>/acks.json     “已看过”标记
+//	reports/<id>/ignored.json  忽略“没检查完”的签名
 //
 // 目录 0700，文件 0600，先写临时文件再原子替换。不存源码、原始证据或密钥。
 
@@ -88,6 +89,23 @@ func loadRecord(file, root string) (*securityRecord, bool) {
 		return nil, true
 	}
 	return &r, false
+}
+
+// ignoredFile 是“忽略没检查完”的落盘格式。
+type ignoredFile struct {
+	Sig string `json:"sig,omitempty"`
+}
+
+func loadIgnored(file string) string {
+	b, err := os.ReadFile(file)
+	if err != nil {
+		return ""
+	}
+	var f ignoredFile
+	if json.Unmarshal(b, &f) != nil {
+		return ""
+	}
+	return f.Sig
 }
 
 func loadAcks(file string) []SecurityAck {
