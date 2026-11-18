@@ -2,26 +2,81 @@
 
 [English](README.md) · 中文
 
-Skill Stow 是一个 macOS 桌面应用，在一个窗口里管理本机所有 AI Agent 的技能（skill）：看谁读得到哪个技能、按 Agent 开关、添加、更新、清理。
+**一个 Mac 应用，管好你用的所有 AI Agent 的技能（skill）。** 哪个 Agent 读得到哪个技能一目了然；可以按 Agent 单独开关，添加和更新前先过一遍安全检查；散落在 `~/.claude`、`~/.codex`、`~/.cursor` 等目录里的重复副本和断掉的链接，也能一次清理干净。
+
+免费开源（MIT）。支持 macOS 12 及以上，Apple Silicon 和 Intel 都能用。不用注册账号，没有遥测。[下载最新版](https://github.com/DBAAZzz/skill-stow/releases/latest)，第一次打开的步骤见[安装](#安装)。
 
 ![Skill Stow：「我的技能」与右侧详情栏](docs/screenshots/zh/main.png)
 
-- **技能库**：自己装的技能和 Agent 自带的技能分开列，技能库在 `~/.agents/skills`。
-- **技能范围 / 项目**：按全局和项目查看，每个 Agent 实际会读到哪些技能。
-- **按 Agent 启用、停用**：直接改 Agent 自己的配置文件，Agent 侧看到的状态和这里一致（支持范围见下表）。
-- **添加技能**：可以粘贴 GitHub 链接、`owner/repo`、`npx skills add …` 命令或网站地址，也可以从本地目录导入。
-- **技能更新**：从 GitHub 添加的技能会记下 commit，上游有新版本时列出来。
-- **使用情况**：从 Claude Code、Codex 的会话记录里统计每个技能的调用。
-- **整理**：找出重复副本、多余链接和断掉的链接，并直接处理。
+## 能做什么
+
+### 所有技能，一处看全
+
+扫描 32 个 Agent 的技能目录和你的项目，标出每个技能到底被哪些 Agent 读到：来自通用技能库（`~/.agents/skills`）、某个 Agent 自己的目录，还是项目里。可以用卡片浏览，也可以切到看板，一个 Agent 一列。用 `npx skills` 或 Agent 插件一起装的技能会归成一个集合。
+
+项目会从 Claude Code、Codex 和 VS Code 系编辑器的使用记录里自动找出来，也可以手动添加任意文件夹。
+
+### 按 Agent 开关单个技能
+
+在 Claude Code、Codex、Gemini CLI、OpenCode 或 ZCode 上拨一下开关，应用会直接改这个 Agent 自己的配置文件，Agent 那边看到的状态和这里完全一致。「添加到其他 Agent…」会把技能链接进其他 Agent 的目录；「移除」只删本应用建的链接。
+
+### 从哪都能加，加之前先检查
+
+粘贴 GitHub 链接、`owner/repo`、`npx skills add …` 命令或网站地址，或者直接把文件夹、`.zip` 拖进窗口。选好要加哪些技能、放到哪里：通用技能库、指定的 Agent，或者某个项目。
+
+每个技能加进来之前都会先做本地安全检查；GitHub 来源还会同时列出 skills.sh 的安全审计。高风险或没能检查完的技能，要你点「仍然添加」才会加进来。
+
+### 本地安全检查
+
+离线分析器会读每个技能的所有文件，包括 SKILL.md、脚本和参考资料，标出这类问题：
+
+- 脚本下载远程代码直接运行、反弹 shell、解码后执行
+- 读取 SSH 私钥或凭据文件，或把密钥发到外部地址
+- 让 Agent 忽略之前的指令、瞒着你做事、跳过确认，或把对话内容发出去
+- 看不见的字符、会改变显示顺序的字符，以及藏在注释里的指令
+- 文件里像是真的密钥、大范围删除文件、改登录项或 shell 配置
+
+每条结果都能直接跳到对应的那一行。看过之后勾上「已看过」；技能内容一变，它会重新出现。首次打开会在后台检查全部技能，之后哪个技能的文件变了，就标成「已过期」并重新检查。这是基于规则的检查，不能保证绝对安全。
+
+### 更新不踩坑
+
+从 GitHub 添加的技能会记下来源 commit。「技能更新」列出上游有新 commit 的技能，「查看差异」会在改动之前逐个文件展示差异。
+
+- 你在本地改过的技能不会被直接覆盖，会等你对比确认。
+- 新版本有高风险或没能检查完时，要你点「仍然更新」才会更新。
+- 旧版本默认移到废纸篓，随时能放回原处。
+- 只在你点「检查技能更新」时才联网检查。网络受限时可以设代理，也可以用本机的 `gh` 登录提高 API 限额。
+
+装在项目里的技能暂时不参与更新。
+
+### 整理
+
+需要处理的问题都列在一处，大多点一下就能解决：
+
+- 内容相同的副本，收成一份
+- 内容已经不一样的副本，左右对比后留下想要的那份
+- 重复的链接和断掉的链接
+- SKILL.md 里引用了不存在的文件
+- 技能删了、安装记录还留着
+- 全局链接指向项目里的技能，项目一挪就断
+
+### 使用情况
+
+根据本机 Claude Code 和 Codex 的会话记录，统计每个技能被调用了多少次：哪些常用、哪些从没用过，一眼就能看出来，方便清理。其他 Agent 没有留下调用记录。
 
 <p>
   <img src="docs/screenshots/zh/tidy.png" width="49%" alt="整理：找出重复副本和断掉的链接，一键处理">
   <img src="docs/screenshots/zh/usage.png" width="49%" alt="使用情况：每个技能被调用的次数">
 </p>
 
-## 安装
+### 用起来像原生 Mac 应用
 
-需要 macOS 12 或更新版本，Apple Silicon 和 Intel Mac 都能用。
+- 在任何页面按 ⌘K，都能搜技能的名称、简介和正文，也能直接跳到整理、技能更新或设置。中文界面下打拼音也能搜到。
+- 界面跟着磁盘走：在终端里装了技能，不用刷新就会出现。
+- 删除的技能进废纸篓，提示条上就有「撤销」（⌘Z）。
+- 支持前进后退（⌘[ 和 ⌘]）、拖放、浅色和深色外观，界面有简体中文和英文。
+
+## 安装
 
 1. 从 [Releases](https://github.com/DBAAZzz/skill-stow/releases/latest) 下载 `skill-stow-<版本>.dmg`，打开后把 Skill Stow 拖进「应用程序」。
 2. 第一次打开时，macOS 会提示无法验证开发者。应用还没有用 Apple 开发者证书签名，这个提示是预期的：
@@ -36,13 +91,13 @@ Skill Stow 是一个 macOS 桌面应用，在一个窗口里管理本机所有 A
    xattr -dr com.apple.quarantine "/Applications/Skill Stow.app"
    ```
 
-不想运行下载的程序，可以按下面「从源码运行」自己构建。
+不想运行下载的程序，可以按下面「[从源码运行](#从源码运行)」自己构建。
 
 ## 支持的 Agent
 
-能扫描 32 个 Agent 的技能目录，包括 Claude Code、Codex、Cursor、Gemini CLI、GitHub Copilot、OpenCode、Windsurf、Cline、Kiro、Trae、Qwen Code、Qoder、CodeBuddy、ZCode 等，完整列表见 [`app/internal/library/agents.go`](app/internal/library/agents.go)。
+能扫描 32 个 Agent 的技能目录，包括 Claude Code、Codex、Cursor、Gemini CLI、GitHub Copilot、OpenCode、Windsurf、Cline、Kiro、Trae、Qwen Code、Qoder、CodeBuddy、ZCode 等，完整列表见 [`app/internal/library/agents.go`](app/internal/library/agents.go)。没认出你用的 Agent，可以在「设置 › Agent 管理」里手动添加它的技能目录。
 
-单个技能的启用、停用要靠 Agent 自己的配置支持，目前接了 5 个：
+单个技能的启用、停用要靠 Agent 自己的配置支持，目前有 5 个：
 
 | Agent | 写入的配置 |
 |---|---|
@@ -52,30 +107,17 @@ Skill Stow 是一个 macOS 桌面应用，在一个窗口里管理本机所有 A
 | OpenCode | `~/.config/opencode/opencode.jsonc` 或 `opencode.json` |
 | ZCode | `~/.zcode/cli/config.json` |
 
-其他 Agent 显示为“始终启用”。配置格式认不出来时状态显示为“未知”，不会写入。
-
-## 从源码运行
-
-需要 Go 1.27+（版本以 [`app/go.mod`](app/go.mod) 为准），MyGo 作为 Go tool 随模块安装。
-
-```sh
-cd app
-SKILLS_SAMPLE=1 go tool mygo dev  # 用示例数据启动，不读写本机目录
-go tool mygo dev                  # 读本机真实数据，改代码自动重载
-go tool mygo build -platform darwin/arm64  # Apple Silicon；产物在 app/build/darwin-arm64/
-```
-
-需要同时支持 Intel 和 Apple Silicon Mac 时，执行 `go tool mygo build -platform darwin/universal`，产物在 `app/build/darwin-universal/`。
+其他 Agent 里的技能显示为「始终启用」。配置格式认不出来时状态显示为「未知」，不会写入。
 
 ## 会改动本机哪些文件
 
 用真实数据运行时，应用会写本机文件：
 
 - 启用、停用会修改上表中的 Agent 配置，只改技能相关的部分，其余内容保持原样。
-- 「添加到 Agent」会在 Agent 的技能目录里建链接；「移除」只删本应用建的链接。
-- 「整理」里的删除、修复链接会改动技能目录。
+- 「添加到其他 Agent…」会在 Agent 的技能目录里建链接；「移除」只删本应用建的链接。
+- 添加、更新、删除技能，以及「整理」里的处理，都会改动技能目录。删掉的技能和收成一份时多出来的副本会进废纸篓；更新后的旧版本也一样，除非你设成了直接删除。
 
-应用自己的设置、记录和事件日志（`logs/`，上限约 1 MB）放在 `~/Library/Application Support/Skill Stow/`。日志只记应用改了什么、哪里失败了，不含技能内容、配置原文和 token。遇到问题时用「帮助 › 反馈问题…」，诊断信息会先给你预览再复制。不想动本机，就用 `SKILLS_SAMPLE=1`。
+应用自己的设置、记录和事件日志（`logs/`，上限约 1 MB）放在 `~/Library/Application Support/Skill Stow/`。日志只记应用改了什么、哪里失败了，不含技能内容、配置原文和 token。遇到问题时用「帮助 › 反馈问题…」，诊断信息会先给你预览再复制。
 
 ## 隐私与联网
 
@@ -88,6 +130,17 @@ go tool mygo build -platform darwin/arm64  # Apple Silicon；产物在 app/build
 - **来源图标**：在从 GitHub 或网站装的技能旁边显示所有者头像或网站图标。每个图标只抓一次，缓存在应用数据目录里。
 
 在技能更新设置里打开「使用本机 gh 登录状态」后，`gh` 的 token 只发给 GitHub，用来提高 API 限额。诊断信息只在你用「帮助 › 反馈问题…」并预览过之后才会复制。
+
+## 从源码运行
+
+需要 Go 1.27+（版本以 [`app/go.mod`](app/go.mod) 为准），MyGo 作为 Go tool 随模块安装。
+
+```sh
+cd app
+SKILLS_SAMPLE=1 go tool mygo dev  # 用示例数据启动，不读写本机目录
+go tool mygo dev                  # 读本机真实数据，改代码自动重载
+go tool mygo build -platform darwin/universal  # 同时支持 Intel 和 Apple Silicon；产物在 app/build/darwin-universal/
+```
 
 ## 参与开发
 
