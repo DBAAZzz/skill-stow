@@ -948,7 +948,7 @@ func (a *app) secFindingTable(c *ui.Context, k library.Issue, rows []secRow) {
 		case 1:
 			cellText(c, secSourceLabel(r.skill))
 		case 2:
-			ui.Column(c).Gap(1).MinWidth(0).Shrink(1).Children(func() {
+			ui.Column(c).Gap(titleGap).MinWidth(0).Shrink(1).Children(func() {
 				ui.Row(c).Gap(6).AlignItems(ui.Center).MinWidth(0).Children(func() {
 					cellText(c, secSummary(first.Message)).Shrink(1)
 					if more > 0 {
@@ -964,8 +964,12 @@ func (a *app) secFindingTable(c *ui.Context, k library.Issue, rows []secRow) {
 		if pushButton(c, locales.ActionView()).Clicked() {
 			a.openSecurityReport(rows[i].skill)
 		}
-	}, nil)
+	}, twoLineRows)
 }
+
+// twoLineRows 让问题一栏的两行（摘要、位置）上下留出和单行表格一样的
+// 余量：默认行高按一行字定，两行会顶着行的上下边。
+var twoLineRows = &rowStyle{apply: func(_ int, row ui.Element) { row.MinHeight(52).Padding(8, 24) }}
 
 func secSourceLabel(s *library.Skill) string {
 	if s.Source == library.Project {
