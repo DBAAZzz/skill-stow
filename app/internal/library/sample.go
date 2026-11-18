@@ -150,7 +150,7 @@ func Sample() *Library {
 	for _, s := range l.Skills {
 		s.Defects = sampleDefects(l, s)
 	}
-	if strings.HasPrefix(i18n.Locale(), "en") {
+	if sampleIsEnglish() {
 		// 英文界面（截图、README）里卡片和详情栏显示英文简介；正文仍是中文
 		for _, s := range l.Skills {
 			if d, ok := sampleEnglish[s.Name]; ok {
@@ -198,6 +198,10 @@ func Sample() *Library {
 	sampleUsage(l)
 	return l
 }
+
+// sampleIsEnglish 报告界面是不是英文：示例数据换成英文简介和 sample/en 下的英文正文，
+// 截图和英文 README 里不出现中文。
+func sampleIsEnglish() bool { return strings.HasPrefix(i18n.Locale(), "en") }
 
 // sampleEnglish 是示例技能的英文简介，界面是英文时替换中文简介。
 // doc-coauthoring 故意没有简介（整理页「没有简介」的示例），不在这里。
@@ -258,8 +262,13 @@ func sampleProblems(l *Library) {
 	tf := l.Get("test-first")
 	older := slices.Clone(tf.Files)
 	md := older[0].Content
-	md = strings.Replace(md, "，先见红再见绿。", "，先见红再见绿，规则能 lint 的都 lint。", 1)
-	md = strings.Replace(md, "- 按改动范围运行对应级别的测试，不每次都跑全量，见 `references/test-levels.md`。\n", "- 每次都跑全量测试。\n- 能 lint 的规则都交给 lint。\n", 1)
+	if sampleIsEnglish() {
+		md = strings.Replace(md, "; see red before green.", "; see red before green, and lint every rule that can be linted.", 1)
+		md = strings.Replace(md, "- Run the test level that matches the change instead of the full suite every time; see `references/test-levels.md`.\n", "- Run the full suite every time.\n- Hand every rule that can be linted to the linter.\n", 1)
+	} else {
+		md = strings.Replace(md, "，先见红再见绿。", "，先见红再见绿，规则能 lint 的都 lint。", 1)
+		md = strings.Replace(md, "- 按改动范围运行对应级别的测试，不每次都跑全量，见 `references/test-levels.md`。\n", "- 每次都跑全量测试。\n- 能 lint 的规则都交给 lint。\n", 1)
+	}
 	older[0].Content, older[0].Size = md, len(md)
 	older = slices.DeleteFunc(older, func(f File) bool { return f.Path == "references/test-levels.md" })
 	tf.versions = []Version{
@@ -312,6 +321,11 @@ func sampleProblems(l *Library) {
 func sampleFiles(s *Skill) []File {
 	var files []File
 	root := "sample/" + s.Name
+	if en := "sample/en/" + s.Name; sampleIsEnglish() {
+		if _, err := fs.Stat(sampleFS, en); err == nil {
+			root = en
+		}
+	}
 	fs.WalkDir(sampleFS, root, func(p string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
 			return nil
