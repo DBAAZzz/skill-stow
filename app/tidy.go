@@ -46,6 +46,9 @@ var (
 // issueCount 是这一类还剩几个：批量处理的时候，处理好、收起的先减掉，
 // 数字跟着往下滚。
 func (a *app) issueCount(p *library.Problems, k library.Issue) int {
+	if secIssue(k) {
+		return a.secIssueCount(k)
+	}
 	if w := a.tidy.work; w != nil && w.kind == k {
 		return w.rows.Count(k) - len(w.progress.gone)
 	}
@@ -55,7 +58,7 @@ func (a *app) issueCount(p *library.Problems, k library.Issue) int {
 // issueTotal 是全部问题还剩几个：顶栏和侧边栏「整理」的数字。
 func (a *app) issueTotal(p *library.Problems) int {
 	n := 0
-	for _, k := range library.Issues {
+	for _, k := range a.tidyKinds() {
 		n += a.issueCount(p, k)
 	}
 	return n
@@ -68,6 +71,10 @@ var issueNotes = map[library.Issue]func() string{
 	library.GlobalLinked:  locales.TidyNoteGlobalLinked,
 	library.StaleRecords:  locales.TidyNoteStaleRecords,
 	library.Incomplete:    locales.TidyNoteIncomplete,
+
+	library.SecurityHighRisk:   locales.TidyNoteSecurityHighRisk,
+	library.SecurityWarning:    locales.TidyNoteSecurityWarning,
+	library.SecurityUnfinished: locales.TidyNoteSecurityUnfinished,
 }
 
 // tidyPage 是整理页（z1–z6）：左边问题类型，右边这一类的表格。没有问题时
@@ -92,6 +99,7 @@ func (a *app) tidyPage(c *ui.Context) {
 		}
 	}, func() {
 		ui.Spacer(c)
+		a.securityProgress(c)
 		if !a.tidy.scanning {
 			ui.Text(c, scannedLabel(a.set.scannedAt, time.Now())).FontSize(12).TextColor(colTextMuted).SingleLine()
 		}
@@ -118,7 +126,7 @@ func (a *app) tidyPage(c *ui.Context) {
 	}
 	if a.issueCount(&p, a.tidy.kind) == 0 {
 		// 这一类处理完了，左边那一项消失，换到下一类
-		for _, k := range library.Issues {
+		for _, k := range a.tidyKinds() {
 			if a.issueCount(&p, k) > 0 {
 				a.tidy.kind = k
 				break
@@ -128,7 +136,7 @@ func (a *app) tidyPage(c *ui.Context) {
 	ui.Row(c).Grow(1).MinHeight(0).AlignItems(ui.Stretch).Children(func() {
 		ui.Column(c).Width(250).Shrink(0).Padding(10, 8).Gap(2).Background(colBgPane).
 			BorderWidth(0, 1, 0, 0).BorderColor(colBorderDefault).Children(func() {
-			for _, k := range library.Issues {
+			for _, k := range a.tidyKinds() {
 				if n := a.issueCount(&p, k); n > 0 {
 					a.issueRow(c.Key(int(k)), k, n)
 				}
@@ -239,6 +247,8 @@ func (a *app) issueDetail(c *ui.Context, p *library.Problems, k library.Issue) {
 			a.globalTable(c, p.Global)
 		case library.StaleRecords:
 			a.staleTable(c, p.Stale)
+		case library.SecurityHighRisk, library.SecurityWarning, library.SecurityUnfinished:
+			a.securityTable(c, k)
 		}
 	})
 }

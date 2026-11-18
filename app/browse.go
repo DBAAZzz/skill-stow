@@ -547,7 +547,7 @@ func (a *app) board(c *ui.Context, scope library.Scope, skills []*library.Skill,
 		if len(unassigned) > 0 {
 			boardColumn(c.Key("unassigned"), colW, func() { columnTitle(c, locales.CommonNotEnabled(), len(unassigned)) }, func() {
 				for _, s := range unassigned {
-					a.boardCard(c.Key(s.ID), s, "unassigned", 1, true, func() { flags(c, s) })
+					a.boardCard(c.Key(s.ID), s, "unassigned", 1, true, func() { a.securityFlag(c, s); flags(c, s) })
 				}
 			})
 		}

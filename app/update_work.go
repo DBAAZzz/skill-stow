@@ -132,9 +132,11 @@ func (a *app) prepareUpdate(it library.UpdateItem) {
 			}
 		}
 		diff := newUpdateCompareState(l, p)
+		rep := a.scanPrepared(ctx, p)
 		return updateWorkResult{apply: func() {
 			a.upd.prepared = p
 			a.upd.diff = diff
+			a.sec.updFor, a.sec.updReport = p, rep
 		}}
 	})
 }

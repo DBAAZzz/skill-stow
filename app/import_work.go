@@ -356,6 +356,7 @@ func (a *app) refreshImportChecks() {
 	for _, s := range st.batch.Skills {
 		st.checks[a.importKey(s)] = a.lib.CheckImport(s, st.place)
 	}
+	defer a.scanImports()
 	// 勾上的冲突项只在已有的那一项还是确认时的样子时保留：换了装到哪里、
 	// 或已有的变了，都要用户重新确认
 	for n := range st.picked {

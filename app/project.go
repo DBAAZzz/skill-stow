@@ -67,7 +67,7 @@ func (a *app) projectBoard(c *ui.Context, p *library.ProjectInfo) {
 				ui.Text(c, d.Rel).Font("monospace").FontSize(11).TextColor(colTextMuted).SingleLine()
 			}, func() {
 				for _, s := range skills {
-					a.boardCard(c.Key(s.ID), s, "project:"+d.Rel, 2, false, func() { flags(c, s) })
+					a.boardCard(c.Key(s.ID), s, "project:"+d.Rel, 2, false, func() { a.securityFlag(c, s); flags(c, s) })
 				}
 			})
 		}

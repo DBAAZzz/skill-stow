@@ -396,6 +396,9 @@ func (a *app) handleActivate(hasVisibleWindows bool) {
 
 func (a *app) handleDidBecomeActive() {
 	a.triggerWatchIfStale(activateWatchCooldown)
+	if a.sec.svc != nil {
+		a.sec.svc.CheckMeta(false)
+	}
 	if a.main.open && a.scope == scopeImport {
 		a.post(a.checkClipboard)
 	}
@@ -410,6 +413,7 @@ func (a *app) shutdown() {
 	a.lib.LogAppQuit()
 	a.discardDeletion()
 	a.stopWatch()
+	a.stopSecurity()
 }
 
 func (a *app) bindLifecycle() {
@@ -451,6 +455,7 @@ func (a *app) startLive(forceWelcome bool) {
 		a.background(func(func(func())) { startSnap.Log(env) })
 		library.CleanImportStaging(a.lib.Home) // 上次中途退出留下的读取暂存
 		a.recoverUpdates()
+		a.startSecurity() // 先于监听：监听回调会读它
 		a.startWatch()
 	}
 }

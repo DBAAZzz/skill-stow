@@ -17,11 +17,12 @@ import (
 
 // reader 是阅读视图：双击卡片或选中后按空格进入，‹ 或 Esc 返回。只读。
 func (a *app) reader(c *ui.Context, s *library.Skill) {
-	if a.file >= len(s.Files) {
+	report := a.file == secFile && a.secOn()
+	if a.file >= len(s.Files) || a.file < 0 && !report {
 		a.file = 0
 	}
 	var f library.File
-	if len(s.Files) > 0 {
+	if !report && len(s.Files) > 0 {
 		f = s.Files[a.file]
 	}
 
@@ -39,13 +40,13 @@ func (a *app) reader(c *ui.Context, s *library.Skill) {
 			ui.Text(c, s.Origin()).FontSize(11).FixedLineHeight(14).TextColor(colTextMuted).SingleLine()
 		})
 		ui.Spacer(c)
-		if !f.Binary && strings.EqualFold(path.Ext(f.Path), ".md") {
+		if !report && !f.Binary && strings.EqualFold(path.Ext(f.Path), ".md") {
 			importRawToggle(c, &a.readerRaw)
 		}
 		if iconButton(c, iconFolder, locales.ActionShowInFinder()).Clicked() {
 			a.reveal(s.Dir)
 		}
-		if button(c, iconExternal, locales.ActionOpenInEditor()).Clicked() {
+		if !report && button(c, iconExternal, locales.ActionOpenInEditor()).Clicked() {
 			a.openInEditor(filepath.Join(s.Dir, f.Path))
 		}
 	})
@@ -55,7 +56,11 @@ func (a *app) reader(c *ui.Context, s *library.Skill) {
 		ui.Box(c).Width(1).Background(colBorderDefault)
 		ui.Column(c).Grow(1).MinWidth(0).MinHeight(0).Children(func() {
 			fadeIn(ui.Column(c), fresh, 200*time.Millisecond).Children(func() { a.strip(c, s) })
-			a.readerBody(c, s, f, fresh)
+			if report {
+				a.securityReport(c, s, fresh)
+			} else {
+				a.readerBody(c, s, f, fresh)
+			}
 		})
 	})
 }
@@ -111,10 +116,14 @@ func fadeIn(e ui.Element, fresh bool, delay time.Duration) ui.Element {
 
 // fileList 是技能目录下的文件，SKILL.md 在最前，子目录里的文件缩进。
 func (a *app) fileList(c *ui.Context, s *library.Skill, fresh bool) {
-	ui.Scroll(c.Key("reader-files:"+s.ID)).Width(232).MinHeight(0).Shrink(0).
+	ui.Scroll(c.Key("reader-files:" + s.ID)).Width(232).MinHeight(0).Shrink(0).
 		Background(colBgPane).Scrollbars(false).Children(func() {
 		list := ui.Column(c).Padding(12, 8).Gap(1)
 		fadeIn(list, fresh, 90*time.Millisecond).Children(func() {
+			if a.secOn() {
+				a.securityFileRow(c, s)
+				ui.Box(c).Height(10)
+			}
 			sectionLabel(c, locales.FilesLabel()).Padding(2, 8, 6, 8)
 			dir := ""
 			for i, f := range s.Files {
@@ -137,6 +146,9 @@ func (a *app) fileList(c *ui.Context, s *library.Skill, fresh bool) {
 				row.Children(func() {
 					ui.Icon(c, iconDoc).Size(14, 14).TextColor(colTextMuted).Shrink(0)
 					ui.Text(c, name).FontSize(13).SingleLine().Grow(1).MinWidth(0)
+					if col, ok := a.secFileMark(s, f.Path); ok {
+						ui.Box(c).Size(6, 6).Radius(3).Background(col).Shrink(0)
+					}
 					ui.Text(c, sizeLabel(f.Size)).FontSize(11).TextColor(colTextDisabled).FontFeatures("tnum").Shrink(0)
 				})
 			}
@@ -174,6 +186,7 @@ func (a *app) strip(c *ui.Context, s *library.Skill) {
 				ui.Text(c, locales.InspectorOtherCopies(s.Copies)).FontSize(12).FontWeight(500)
 			})
 		}
+		a.securityStrip(c, s)
 		ui.Spacer(c)
 		if linkButton(c, locales.ReaderManage()).Clicked() {
 			a.manage(s)
@@ -188,6 +201,7 @@ func (a *app) readerEditorState(s *library.Skill, f library.File, softWrap bool)
 	}
 	a.readerEditor = newReadOnlyEditor(f.Content, f.Path, softWrap)
 	a.readerEditorKey = key
+	a.applySecurityJump(key, a.readerEditor)
 	return a.readerEditor
 }
 

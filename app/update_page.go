@@ -206,7 +206,7 @@ func (a *app) updateBody(c *ui.Context, width float32) {
 				for _, g := range groups {
 					var items []library.UpdateItem
 					for _, it := range st.report.Items {
-						if it.State.Group() == g {
+						if updateGroupOf(it) == g {
 							items = append(items, it)
 						}
 					}
@@ -232,12 +232,12 @@ func (a *app) updateSummarySection(c *ui.Context) {
 	// 有可更新的技能时这张卡一直在，更新进行中也不撤掉：撤掉会让下面整页
 	// 往上跳，更新完又跳回来。单个更新时只是按钮不能点；一起更新时这张卡
 	// 原地显示进度。
-	if ready := st.report.Ready(); len(ready) > 0 {
+	if ready := updateReadyNotHeld(st.report.Ready()); len(ready) > 0 {
 		n := len(ready)
 		batch := st.cancel != nil && st.task == taskUpdate && st.progress.Total > 1
 		confirmCount := 0
 		for _, it := range st.report.Items {
-			if it.State.Group() == library.GroupConfirm {
+			if updateGroupOf(it) == library.GroupConfirm {
 				confirmCount++
 			}
 		}
@@ -451,7 +451,7 @@ func (a *app) updateTableHeader(c *ui.Context, g library.UpdateGroup, colW float
 
 func hasUpdateAttention(r library.UpdateReport) bool {
 	for _, it := range r.Items {
-		switch it.State.Group() {
+		switch updateGroupOf(it) {
 		case library.GroupReady, library.GroupConfirm, library.GroupHandle, library.GroupFailed:
 			return true
 		}
@@ -540,6 +540,10 @@ func (a *app) updateInfoCell(c *ui.Context, it library.UpdateItem) {
 		}
 	}
 
+	if rep, held := library.SecurityHold(it); held && !it.Stale {
+		ui.Text(c, secHoldText(rep)).FontSize(12).TextColor(secNoticeColor(rep.Top())).SingleLine()
+		return
+	}
 	if it.State == library.UpdReady && !it.CommitDate.IsZero() && !it.Stale {
 		// 栏窄了 commit 号换到下一行，不压到右边的按钮上
 		ui.Row(c).Wrap().GapX(12).GapY(3).AlignItems(ui.Center).MinWidth(0).Children(func() {
@@ -696,6 +700,10 @@ func (a *app) updateActions(c *ui.Context, it library.UpdateItem) {
 		btn(locales.ActionCheckAgain(), false, func() { a.checkUpdates(false) })
 		return
 	}
+	if _, held := library.SecurityHold(it); held {
+		btn(locales.ActionView(), false, func() { a.prepareUpdate(it) })
+		return
+	}
 	switch it.State {
 	case library.UpdReady:
 		if it.CanCompare() {
@@ -816,6 +824,7 @@ func (a *app) updateComparePage(c *ui.Context) {
 			ui.Column(c).Grow(1).MinWidth(0).Children(func() {
 				a.updateCompareHeader(c, p, st)
 				a.updateCompareNotice(c, p, st)
+				a.updateSecurityNotice(c, p)
 				a.diffFileContent(c, st, &p.Item)
 			})
 		})
@@ -893,11 +902,13 @@ func (a *app) updateCompareHeader(c *ui.Context, p *library.Prepared, st *compar
 					t.Font("monospace").FontSize(11)
 				})
 			})
-			btn := diffActionButton(c, locales.ActionUpdate(), true).Disabled(a.upd.cancel != nil || it.ReadOnly)
+			approve := a.updateNeedsApproval(p)
+			btn := diffActionButton(c, cond(approve, locales.SecUpdateAnyway(), locales.ActionUpdate()), true).Disabled(a.upd.cancel != nil || it.ReadOnly)
 			if it.ReadOnly {
 				btn.Tooltip(locales.UpdateReadOnlyCannotReplace())
 			}
 			if btn.Clicked() {
+				p.SecurityApproved = approve // 看过检查结果后点的：库层不再拦
 				a.runUpdates([]library.UpdateItem{it}, p)
 			}
 		})

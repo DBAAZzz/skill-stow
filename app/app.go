@@ -25,6 +25,7 @@ const (
 type app struct {
 	upd               updatePageState
 	imp               importPageState // 添加技能页（import_page.go）
+	sec               securityUI      // 本地安全检查（security.go）
 	lib               *library.Library
 	win               *mygo.Window // 测试里为 nil
 	setWin            *mygo.Window // 设置窗口，开着时非 nil
@@ -173,6 +174,9 @@ func newApp(lib *library.Library) *app {
 		a.upd.report = lib.Updates()
 	}
 	a.noticeRecovered(lib)
+	if lib.Home == "" && library.SecuritySupported() {
+		a.sec.svc = library.SampleSecurity(lib) // 示例数据：在内存里检查一遍，不落盘
+	}
 	return a
 }
 
@@ -417,6 +421,7 @@ func (a *app) applyScan(lib *library.Library, report library.UpdateReport, reloa
 	if hub := a.watch.hub.Load(); hub != nil && lib != nil {
 		hub.sync(lib.WatchPlan())
 	}
+	a.syncSecurity()
 }
 
 // changed 让两个窗口都按新的状态重画：设置里关掉的 Agent 要从看板消失，

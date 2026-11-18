@@ -93,6 +93,7 @@ func (a *app) importPreview(c *ui.Context) {
 			ui.Column(c).Padding(24, 32, 28, 32).Gap(0).Children(func() {
 				a.importHead(c, s, files, multi, hasSkillMD)
 				a.importStatusNotes(c, s)
+				a.importSecuritySection(c, s)
 				a.importScan(c, s)
 				a.importInspectorGroup(c, s, files, len(s.Audit) > 0)
 				ui.Box(c).Height(1).AlignSelf(ui.Stretch).Background(colBorderDefault).Margin(20, 0, 18, 0)

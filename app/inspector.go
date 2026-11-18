@@ -31,6 +31,7 @@ func (a *app) inspector(c *ui.Context, s *library.Skill, coll *library.Collectio
 				defectsCallout(c, s)
 				label(c, locales.CommonEnabledFor())
 				readOnlyNote(c, pluginNote(s.Source, s.Provider, s.Plugin))
+				a.securityPane(c, s)
 				a.usagePane(c, s)
 				a.infoPane(c, s, "", colTextMuted)
 			default:
@@ -113,6 +114,7 @@ func (a *app) mineSkillPane(c *ui.Context, s *library.Skill) {
 	if a.err != "" && a.errAgent == "" {
 		errorLine(c, a.err)
 	}
+	a.securityPane(c, s)
 	a.usagePane(c, s)
 }
 
@@ -355,6 +357,7 @@ func (a *app) projectSkillPane(c *ui.Context, s *library.Skill) {
 	}
 	a.projectTips(c, s)
 	caption(c, locales.InspectorProjectNoToggle())
+	a.securityPane(c, s)
 	a.usagePane(c, s)
 	a.infoPane(c, s, "", colTextMuted)
 }

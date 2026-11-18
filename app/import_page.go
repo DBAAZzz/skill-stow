@@ -466,8 +466,9 @@ func (a *app) importSourceBar(c *ui.Context) {
 			btn.Tooltip(locales.ImportSelectedStillDownloading())
 		}
 		if btn.Clicked() {
-			a.addImports()
+			a.requestAddImports()
 		}
+		a.importConfirmDialog(c)
 	})
 }
 
@@ -687,6 +688,10 @@ func (a *app) importTag(s *library.ImportSkill) importTagSpec {
 		return importTagSpec{text: locales.ImportNameExists(), tone: tagToneWarn, icon: symTagWarn}
 	case library.ImportInvalid:
 		return importTagSpec{text: locales.ImportCannotAdd(), tone: tagToneCrit, icon: symCritical}
+	}
+	// 本地检查排在缺描述、审计前面：高风险、没检查完的要先看到
+	if spec, ok := a.importSecTag(s); ok {
+		return spec
 	}
 	if s.MissingDescription() {
 		return importTagSpec{text: locales.ImportMissingDescription(), tone: tagToneMuted, icon: symTagMinus}

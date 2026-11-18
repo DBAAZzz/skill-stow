@@ -109,7 +109,10 @@ func (a *app) keepVisit() {
 	if a.coll != nil {
 		v.coll = a.coll.ID
 	}
-	if a.reading != nil && a.file < len(a.reading.Files) {
+	switch {
+	case a.reading != nil && a.file == secFile:
+		v.file = secHistoryFile
+	case a.reading != nil && a.file >= 0 && a.file < len(a.reading.Files):
 		v.file = a.reading.Files[a.file].Path
 	}
 }
@@ -187,6 +190,9 @@ func (a *app) restore(v visit) {
 			if f.Path == v.file {
 				a.file = i
 			}
+		}
+		if v.file == secHistoryFile {
+			a.file = secFile
 		}
 	}
 	if s := a.lib.ByID(v.compare); v.compare != "" && s != nil {

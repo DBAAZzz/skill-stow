@@ -181,8 +181,9 @@ func TestTidy(t *testing.T) {
 	if err := tt.Click("整理"); err != nil {
 		t.Fatal(err)
 	}
-	total := a.lib.Problems().Total()
-	for _, want := range []string{fmt.Sprintf("%d 个问题", total), "内容相同的副本", "内容不同的副本", "重复的链接", "断掉的链接", "没写简介", "项目技能被全局链接", "全部收成一份", "brainstorming"} {
+	p := a.lib.Problems()
+	total := a.issueTotal(&p)
+	for _, want := range []string{fmt.Sprintf("%d 个问题", total), "高风险", "安全警告", "内容相同的副本", "内容不同的副本", "重复的链接", "断掉的链接", "没写简介", "项目技能被全局链接", "全部收成一份", "brainstorming"} {
 		if _, ok := tt.Access(want); !ok && !tt.HasText(want) {
 			t.Errorf("整理页缺少 %q：%q", want, tt.Texts())
 		}
@@ -193,7 +194,8 @@ func TestTidy(t *testing.T) {
 	if tt.HasText("全部收成一份") || !strings.Contains(shownText(a, fromTidy), "已收成一份") {
 		t.Errorf("收成一份后这一类应消失，顶部提示收好了：%q", shownText(a, fromTidy))
 	}
-	if got := a.lib.Problems().Total(); got != total-1 {
+	p = a.lib.Problems()
+	if got := a.issueTotal(&p); got != total-1 {
 		t.Errorf("还剩 %d 个问题，应为 %d", got, total-1)
 	}
 	if err := tt.Click("断掉的链接"); err != nil {
@@ -265,6 +267,14 @@ func TestTidyDone(t *testing.T) {
 	}
 	if _, err := a.lib.ClearRecords(p.Stale...); err != nil {
 		t.Fatal(err)
+	}
+	for _, s := range a.lib.Skills { // 安全检查的发现都看过了
+		v := a.secView(s)
+		for _, f := range v.Report.Findings {
+			if f.Notice.Risky() {
+				must(t, a.sec.svc.Ack(library.SecurityKey(s), f.Key))
+			}
+		}
 	}
 	tt.Frame()
 	if !tt.HasText("没有发现问题") {
@@ -663,6 +673,28 @@ func TestSnapshots(t *testing.T) {
 		{"t6-tidy-global", func(a *app) { a.scope, a.tidy.kind = scopeTidy, library.GlobalLinked }},
 		{"t8-tidy-records", func(a *app) { a.scope, a.tidy.kind = scopeTidy, library.StaleRecords }},
 		{"t9-tidy-incomplete", func(a *app) { a.scope, a.tidy.kind = scopeTidy, library.Incomplete }},
+		{"s1-sec-tidy-high", func(a *app) { a.scope, a.tidy.kind = scopeTidy, library.SecurityHighRisk }},
+		{"s2-sec-tidy-warning", func(a *app) { a.scope, a.tidy.kind = scopeTidy, library.SecurityWarning }},
+		{"s3-sec-inspector", func(a *app) { a.selected = a.lib.Get("stock-docs") }},
+		{"s4-sec-inspector-warn", func(a *app) { a.selected = a.lib.Get("wechat-pay") }},
+		{"s5-sec-report", func(a *app) {
+			if s := a.lib.Get("stock-docs"); s != nil {
+				a.openSecurityReport(s)
+			}
+		}},
+		{"s6-sec-report-warn", func(a *app) {
+			if s := a.lib.Get("wechat-pay"); s != nil {
+				a.openSecurityReport(s)
+			}
+		}},
+		{"s7-sec-jump", func(a *app) {
+			if s := a.lib.Get("stock-docs"); s != nil {
+				a.openSecurityReport(s)
+				if v := a.secView(s); v.Report != nil && len(v.Report.Findings) > 0 && len(v.Report.Findings[0].Evidence) > 0 {
+					a.jumpToEvidence(s, v.Report.Findings[0].Evidence[0])
+				}
+			}
+		}},
 		{"t7-collect-confirm", func(a *app) {
 			a.scope, a.tidy.kind = scopeTidy, library.GlobalLinked
 			if g := a.lib.Problems().Global; len(g) > 0 {

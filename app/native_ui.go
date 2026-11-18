@@ -184,7 +184,7 @@ func (a *app) nativeBoardCard(c *ui.Context, s *library.Skill, id string) {
 			})
 		})
 		descText(c, s).FontSize(12).SingleLine()
-		ui.Row(c).Height(16).Margin(7, 0, 0, 0).Gap(4).AlignItems(ui.Center).Children(func() { a.enabledBadges(c, s, id, 13, 6); ui.Spacer(c); flags(c, s) })
+		ui.Row(c).Height(16).Margin(7, 0, 0, 0).Gap(4).AlignItems(ui.Center).Children(func() { a.enabledBadges(c, s, id, 13, 6); ui.Spacer(c); a.securityFlag(c, s); flags(c, s) })
 		if len(st.Projects) > 0 {
 			ui.Text(c, locales.NativeStillDisabledIn(strings.Join(st.Projects, locales.ListSeparator()))).FontSize(11).TextColor(colTextMuted)
 		} else if st.Kind == library.StateRestart {

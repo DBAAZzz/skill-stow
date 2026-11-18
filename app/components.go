@@ -175,6 +175,7 @@ func (a *app) skillCard(c *ui.Context, s *library.Skill, footer func()) {
 				ui.Row(c).Gap(5).AlignItems(ui.Center).MinWidth(0).Shrink(1).Clip().TextColor(colTextMuted).
 					Padding(dotRoom).Margin(-dotRoom).Children(footer)
 				ui.Spacer(c)
+				a.securityFlag(c, s)
 				flags(c, s)
 				a.dependNote(c, s)
 			})

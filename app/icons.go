@@ -29,13 +29,13 @@ var (
 )
 
 var (
-	iconAll          = icon(`<rect x="7" y="7" width="13" height="13" rx="2.5"/><path d="M4 15V6.5A2.5 2.5 0 0 1 6.5 4H15"/>`)
-	iconWarn         = icon(`<path d="M12 4 21 19.5H3z"/><path d="M12 10v4.5M12 17.2v.01"/>`)
-	iconFolder       = icon(`<path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>`)
-	iconFolderAdd    = icon(`<path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/><path d="M12 10.5v6M9 13.5h6"/>`)
-	iconLink         = icon(`<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>`)
-	iconGear         = icon(`<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>`)
-	iconBack         = icon(`<path d="m15 5-7 7 7 7"/>`)
+	iconAll       = icon(`<rect x="7" y="7" width="13" height="13" rx="2.5"/><path d="M4 15V6.5A2.5 2.5 0 0 1 6.5 4H15"/>`)
+	iconWarn      = icon(`<path d="M12 4 21 19.5H3z"/><path d="M12 10v4.5M12 17.2v.01"/>`)
+	iconFolder    = icon(`<path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>`)
+	iconFolderAdd = icon(`<path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/><path d="M12 10.5v6M9 13.5h6"/>`)
+	iconLink      = icon(`<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>`)
+	iconGear      = icon(`<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>`)
+	iconBack      = icon(`<path d="m15 5-7 7 7 7"/>`)
 	// 后退、前进：线条和收起侧栏的图标一样粗，箭头短一些，看着圆润
 	iconArrowBack    = icon(`<g stroke-width="2"><path d="M10 7 5 12l5 5"/><path d="M5.5 12H19"/></g>`)
 	iconArrowForward = icon(`<g stroke-width="2"><path d="m14 7 5 5-5 5"/><path d="M18.5 12H5"/></g>`)
@@ -98,6 +98,10 @@ var issueIcons = map[library.Issue]issueStyle{
 	library.GlobalLinked:  {issueOrange, issueSVG("global-linked")},
 	library.StaleRecords:  {issueBlue, issueSVG("stale-records")},
 	library.Incomplete:    {issueRed, issueSVG("incomplete")},
+
+	library.SecurityHighRisk:   {issueRed, issueSVG("security-risk")},
+	library.SecurityWarning:    {issueOrange, issueSVG("security-risk")},
+	library.SecurityUnfinished: {issueGray, issueSVG("security-unfinished")},
 }
 
 type issueStyle struct {

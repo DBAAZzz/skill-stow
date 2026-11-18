@@ -50,6 +50,7 @@ type watchedEntry struct {
 	ctx     context.Context
 	cancel  context.CancelFunc
 	names   []string // 等待创建的监听只认这些直接子项，其余变化不重扫
+	base    string   // 监听目录解开链接后的实际路径，变化路径相对它
 }
 
 // watchKind 是一项监听的种类：目录树只给提示，单文件看它自己，等待创建的
@@ -74,6 +75,7 @@ type diskWatcher struct {
 	scan           func(home string) (*library.Library, library.UpdateReport)
 	post           func(func())
 	onReady        func(*library.Library, library.UpdateReport, uint64)
+	onChange       func(paths []string) // 变化的实际路径，给安全检查标过期；可为 nil
 	curGen         func() uint64
 
 	ctx     context.Context
@@ -138,6 +140,7 @@ func (a *app) startWatch() {
 		scan:           cfg.scan,
 		post:           cfg.post,
 		onReady:        a.applyWatchScan,
+		onChange:       a.securityHint,
 		curGen:         a.watch.scanGen.Load,
 		ctx:            ctx,
 		cancel:         cancel,
@@ -343,8 +346,12 @@ func (h *diskWatcher) syncLoop() {
 				results = append(results, opened{target: target, err: err})
 				continue
 			}
+			base, err := filepath.EvalSymlinks(target.path)
+			if err != nil {
+				base = target.path
+			}
 			results = append(results, opened{target: target,
-				entry: &watchedEntry{watcher: w, ctx: entryCtx, cancel: entryCancel, names: target.names}})
+				entry: &watchedEntry{watcher: w, ctx: entryCtx, cancel: entryCancel, names: target.names, base: base}})
 		}
 
 		var extraClose []*watchedEntry
@@ -428,6 +435,9 @@ func (h *diskWatcher) watchEntry(entry *watchedEntry, key string, kind watchKind
 			}
 			return
 		}
+		if h.onChange != nil {
+			h.onChange(entry.paths(events))
+		}
 		if slices.ContainsFunc(events, entry.wants) {
 			h.markDirty()
 		}
@@ -443,6 +453,18 @@ func (e *watchedEntry) wants(ev mygo.FileEvent) bool {
 	first, _, _ := strings.Cut(ev.Path, "/")
 	old, _, _ := strings.Cut(ev.OldPath, "/")
 	return first == "." || slices.Contains(e.names, first) || ev.OldPath != "" && slices.Contains(e.names, old)
+}
+
+// paths 是这批变化的实际路径（含改名前的）。
+func (e *watchedEntry) paths(events []mygo.FileEvent) []string {
+	var out []string
+	for _, ev := range events {
+		out = append(out, filepath.Join(e.base, ev.Path))
+		if ev.OldPath != "" {
+			out = append(out, filepath.Join(e.base, ev.OldPath))
+		}
+	}
+	return out
 }
 
 func (h *diskWatcher) removeEntry(key string, kind watchKind, entry *watchedEntry) {
