@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -117,8 +119,18 @@ func TestAppUpdatesStayOfflineUntilTurnedOn(t *testing.T) {
 }
 
 func TestAppUpdatePluginRegisters(t *testing.T) {
-	// 插件注册时校验 Strings，出错会在启动时 panic
-	if upd := useAppUpdates(func() {}); upd.Enabled() {
-		t.Error("测试里的构建没有签名公钥，不应能自行更新")
+	// 插件注册时校验 Strings，出错会在启动时 panic。插件表是进程全局的、
+	// 注册了撤不掉，所以在子进程里注册，不影响本进程的其他测试和 -count=N
+	if os.Getenv("APP_UPDATE_REGISTER") == "1" {
+		if upd := useAppUpdates(func() {}); upd.Enabled() {
+			t.Error("测试里的构建没有签名公钥，不应能自行更新")
+		}
+		return
+	}
+	cmd := exec.Command(os.Args[0], "-test.run=^TestAppUpdatePluginRegisters$", "-test.count=1", "-test.v")
+	cmd.Env = append(os.Environ(), "APP_UPDATE_REGISTER=1")
+	out, err := cmd.CombinedOutput()
+	if err != nil || !strings.Contains(string(out), "--- PASS: TestAppUpdatePluginRegisters") {
+		t.Fatalf("注册更新插件失败：%v\n%s", err, out)
 	}
 }
