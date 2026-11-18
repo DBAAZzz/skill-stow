@@ -19,6 +19,8 @@ go tool mygo build                # 打包 .app / .dmg 到 build/
 mkdir -p /tmp/shots && SNAPSHOT_DIR=/tmp/shots go test -run Snapshots .
 ```
 
+README 的截图在 `docs/screenshots/zh/`、`docs/screenshots/en/`，取自上面截图命令的 `2-cards-selected`（main）、`t1-tidy`（tidy）、`u1-usage` 上面 1600 像素（usage），缩到 1760 像素宽。界面有明显变化时重新生成。
+
 ## 代码分层
 
 - 界面代码（`app/*.go`）只通过 `app/internal/library` 读写磁盘，不直接操作文件。

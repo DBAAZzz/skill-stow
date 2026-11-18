@@ -4,6 +4,8 @@ English · [中文](README.zh-CN.md)
 
 A macOS desktop app for managing the skills of every AI agent on your machine from one window. It shows which agent reads which skill and lets you turn skills on or off per agent, add new skills, update them, and clean up duplicates and leftover links.
 
+![Skill Stow: the My Skills library with the inspector open](docs/screenshots/en/main.png)
+
 - **Library**: your own skills and the skills that ship with agents, listed separately. Your library lives in `~/.agents/skills`.
 - **Skill Scopes / Projects**: shows which skills each agent actually reads, globally and in each project.
 - **Per-agent enable / disable**: edits the agent's own config file, so the agent sees the same state the app shows (see the table below for supported agents).
@@ -11,6 +13,11 @@ A macOS desktop app for managing the skills of every AI agent on your machine fr
 - **Skill Updates**: skills added from GitHub record their commit and are listed here when upstream has a newer version.
 - **Usage**: counts how often each skill is invoked, based on Claude Code and Codex session logs.
 - **Tidy Up**: finds duplicate copies, redundant links, and broken links, and fixes them for you.
+
+<p>
+  <img src="docs/screenshots/en/tidy.png" width="49%" alt="Tidy Up: duplicate copies and broken links, fixed in one click">
+  <img src="docs/screenshots/en/usage.png" width="49%" alt="Usage: how often each skill is called">
+</p>
 
 ## Install
 

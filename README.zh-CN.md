@@ -4,6 +4,8 @@
 
 Skill Stow 是一个 macOS 桌面应用，在一个窗口里管理本机所有 AI Agent 的技能（skill）：看谁读得到哪个技能、按 Agent 开关、添加、更新、清理。
 
+![Skill Stow：「我的技能」与右侧详情栏](docs/screenshots/zh/main.png)
+
 - **技能库**：自己装的技能和 Agent 自带的技能分开列，技能库在 `~/.agents/skills`。
 - **技能范围 / 项目**：按全局和项目查看，每个 Agent 实际会读到哪些技能。
 - **按 Agent 启用、停用**：直接改 Agent 自己的配置文件，Agent 侧看到的状态和这里一致（支持范围见下表）。
@@ -11,6 +13,11 @@ Skill Stow 是一个 macOS 桌面应用，在一个窗口里管理本机所有 A
 - **技能更新**：从 GitHub 添加的技能会记下 commit，上游有新版本时列出来。
 - **使用情况**：从 Claude Code、Codex 的会话记录里统计每个技能的调用。
 - **整理**：找出重复副本、多余链接和断掉的链接，并直接处理。
+
+<p>
+  <img src="docs/screenshots/zh/tidy.png" width="49%" alt="整理：找出重复副本和断掉的链接，一键处理">
+  <img src="docs/screenshots/zh/usage.png" width="49%" alt="使用情况：每个技能被调用的次数">
+</p>
 
 ## 安装
 
