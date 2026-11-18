@@ -27,17 +27,18 @@ func projectScope(p *library.ProjectInfo) string { return projectPrefix + p.Dir 
 var ()
 
 // sidebar 是左边的侧边栏（画板「侧边栏」方案 A，像邮件的分组）：没有标题的
-// 一组放整理、使用情况；「技能库」放我的、内置；「项目」是能折叠的分组，
+// 一组按「加、更新、清理、回顾」排：添加技能、技能更新、整理、使用情况，
+// 带数字的两项待办挨着；「技能库」放我的、内置；「项目」是能折叠的分组，
 // 每个项目各自一页。底栏是添加项目和设置。
 func (a *app) sidebar(c *ui.Context, vibrant bool) {
 	ui.Box(c).Height(toolbarHeight(c)).Shrink(0).DragWindow()
 	// 侧边栏改的是 next：在 navigate 里才换范围，历史里前一页还是原来的范围
 	next := a.scope
 	bar := ui.Sidebar(c, &next, func() {
+		a.importSidebar(c)
+		a.updateSidebar(c)
 		a.tidyItem(c)
 		a.sideRow(c, scopeUsage, iconNavUsage, locales.NavUsage(), colTextSecondary).Height(sideRowHeight).Padding(0, 8)
-		a.updateSidebar(c)
-		a.importSidebar(c)
 		sectionTitle(c, ui.Row(c), locales.NavLibrary())
 		a.sideItem(c, string(library.ScopeMine), iconNavMine, locales.NavMine(), a.lib.Count(library.ScopeMine))
 		a.sideItem(c, string(library.ScopeBuiltin), iconNavBuiltin, locales.NavBuiltin(), a.lib.Count(library.ScopeBuiltin))
