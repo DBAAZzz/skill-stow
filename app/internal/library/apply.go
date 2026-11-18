@@ -24,6 +24,9 @@ type Prepared struct {
 	Item   UpdateItem
 	Dir    string
 	Target directoryID
+	// SecurityApproved 是用户看过这份新版本的安全检查结果后仍要更新：只对
+	// 这一份暂存内容有效（安装前仍核对它的 tree 哈希）。
+	SecurityApproved bool
 }
 type UpdateOutcome struct {
 	Updated  bool
@@ -84,7 +87,7 @@ func (l *Library) prepareUpdate(ctx context.Context, remote Remote, it UpdateIte
 	if err != nil {
 		return nil, err
 	}
-	p = &Prepared{it, dir, id}
+	p = &Prepared{Item: it, Dir: dir, Target: id}
 	defer func() {
 		if err != nil {
 			os.RemoveAll(dir)
@@ -540,6 +543,9 @@ func (l *Library) applyUpdate(ctx context.Context, remote Remote, it UpdateItem,
 	hash, err := TreeHash(p.Dir)
 	if err != nil || hash != it.Upstream {
 		return out, errors.New(locales.UpdateIncompleteDownload())
+	}
+	if err = holdForSecurity(ctx, it, p); err != nil {
+		return out, err
 	}
 	recorded := it.Upstream
 	if it.Path == "" {

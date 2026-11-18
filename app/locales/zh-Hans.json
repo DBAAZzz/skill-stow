@@ -6557,5 +6557,575 @@
   "menuReportIssue": "反馈问题…",
   "@menuReportIssue": {
     "description": "macOS「帮助」菜单：预览诊断信息后前往 GitHub 新建问题"
+  },
+  "secFindingRemotePipe": "会下载远程脚本并直接执行",
+  "@secFindingRemotePipe": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingRemotePipeDetail": "内容从网上取来后直接交给 shell 或解释器运行，本机检查不到它实际会做什么。确认来源可信，最好先下载、看过再运行。",
+  "@secFindingRemotePipeDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingRemoteDownloadRun": "会下载文件后再执行",
+  "@secFindingRemoteDownloadRun": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingRemoteDownloadRunDetail": "先把远程文件存到本地，随后运行它，下载的内容没有经过检查。确认来源可信，并先看过下载的文件。",
+  "@secFindingRemoteDownloadRunDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingReverseShell": "会把本机终端连到远程地址",
+  "@secFindingReverseShell": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingReverseShellDetail": "这是反向连接的写法，远程的人可以借此在本机执行命令。除非你非常清楚用途，否则不要运行。",
+  "@secFindingReverseShellDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingEncodedExec": "会解码一段内容后直接执行",
+  "@secFindingEncodedExec": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingEncodedExecDetail": "执行的内容经过编码，直接看不出它会做什么。先解码看过内容再决定。",
+  "@secFindingEncodedExecDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingBidiChars": "文本里有改变显示顺序的控制字符",
+  "@secFindingBidiChars": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingBidiCharsDetail": "双向控制字符会让文字显示的顺序和实际内容不同，可能用来隐藏指令。检查这一行的实际内容。",
+  "@secFindingBidiCharsDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingInvisibleChars": "文本里有看不见的字符",
+  "@secFindingInvisibleChars": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingInvisibleCharsDetail": "零宽字符或标签字符在界面上看不见，但 Agent 能读到，可能用来藏指令。检查这一行。",
+  "@secFindingInvisibleCharsDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingHiddenComment": "隐藏的注释里写着指令",
+  "@secFindingHiddenComment": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingHiddenCommentDetail": "HTML 注释渲染后看不见，Agent 却会读到。确认注释里的内容是你希望 Agent 照做的。",
+  "@secFindingHiddenCommentDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingIgnoreInstructions": "要求 Agent 忽略之前的指令",
+  "@secFindingIgnoreInstructions": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingIgnoreInstructionsDetail": "这类说法会让 Agent 不再遵守你或系统设定的规则。确认它只是在讲解，而不是要求照做。",
+  "@secFindingIgnoreInstructionsDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingConcealFromUser": "要求 Agent 对你隐瞒操作",
+  "@secFindingConcealFromUser": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingConcealFromUserDetail": "Skill 不应要求 Agent 瞒着你做事。确认这段文字的用意。",
+  "@secFindingConcealFromUserDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingBypassConfirmation": "要求跳过确认或权限检查",
+  "@secFindingBypassConfirmation": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingBypassConfirmationDetail": "跳过确认会让 Agent 在你不知情时执行操作。确认是否真的需要。",
+  "@secFindingBypassConfirmationDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingLeakContext": "要求把对话或上下文发出去",
+  "@secFindingLeakContext": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingLeakContextDetail": "对话和系统提示里可能有你的私密信息。确认要发往哪里、为什么发。",
+  "@secFindingLeakContextDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingSecretInChat": "让你把密钥粘贴到聊天里",
+  "@secFindingSecretInChat": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingSecretInChatDetail": "粘贴到对话里的密钥会留在会话记录中。改用环境变量或钥匙串。",
+  "@secFindingSecretInChatDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingReadCredentials": "会读取私钥或凭据文件",
+  "@secFindingReadCredentials": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingReadCredentialsDetail": "会读取 SSH 私钥、云服务凭据或钥匙串里的内容。确认它为什么需要这些，以及读到后用在哪里。",
+  "@secFindingReadCredentialsDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingCredentialUpload": "会读取凭据并发往外部地址",
+  "@secFindingCredentialUpload": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingCredentialUploadDetail": "私钥或凭据被当作请求内容发到网上。除非你确认这是预期行为，否则不要运行。",
+  "@secFindingCredentialUploadDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingSecretEnvUpload": "会把密钥变量发往外部地址",
+  "@secFindingSecretEnvUpload": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingSecretEnvUploadDetail": "环境变量里的密钥出现在请求内容里。确认收件地址可信，并且确实需要发送。",
+  "@secFindingSecretEnvUploadDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingWipeHome": "会大范围删除文件",
+  "@secFindingWipeHome": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingWipeHomeDetail": "删除的是主目录或系统目录，运行后可能无法恢复。除非完全清楚后果，否则不要运行。",
+  "@secFindingWipeHomeDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingPersistence": "会修改启动项或 shell 配置",
+  "@secFindingPersistence": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingPersistenceDetail": "改动会在每次登录或打开终端时生效。确认改了什么，以及怎么撤销。",
+  "@secFindingPersistenceDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingEmbeddedSecret": "文件里有疑似真实的密钥",
+  "@secFindingEmbeddedSecret": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingEmbeddedSecretDetail": "密钥写在文件里，分享或同步这个 Skill 时会一起泄露。考虑撤销这个密钥。",
+  "@secFindingEmbeddedSecretDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingLinkOutside": "有链接指向 Skill 目录外",
+  "@secFindingLinkOutside": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingLinkOutsideDetail": "Agent 可能经这个链接读到 Skill 以外的文件。检查链接指向哪里。",
+  "@secFindingLinkOutsideDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingSpecialFile": "包含管道或设备等特殊文件",
+  "@secFindingSpecialFile": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingSpecialFileDetail": "Skill 里通常不需要这类文件。检查它的用途。",
+  "@secFindingSpecialFileDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingUsesNetwork": "会访问外部服务",
+  "@secFindingUsesNetwork": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingUsesNetworkDetail": "脚本或步骤里有联网操作。",
+  "@secFindingUsesNetworkDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingHasScripts": "包含可执行脚本",
+  "@secFindingHasScripts": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingHasScriptsDetail": "Agent 可能会运行这些脚本。",
+  "@secFindingHasScriptsDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingHasBinary": "包含无法检查的程序",
+  "@secFindingHasBinary": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingHasBinaryDetail": "编译好的程序无法检查内容。确认来源可信。",
+  "@secFindingHasBinaryDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingNeedsAdmin": "需要管理员权限",
+  "@secFindingNeedsAdmin": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingNeedsAdminDetail": "部分命令用 sudo 运行，会以管理员身份修改系统。",
+  "@secFindingNeedsAdminDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secFindingUnknown": "未识别的检查结果",
+  "@secFindingUnknown": {
+    "description": "本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）"
+  },
+  "secFindingUnknownDetail": "这条结果来自更新的检查规则，重新检查即可。",
+  "@secFindingUnknownDetail": {
+    "description": "本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）"
+  },
+  "secNoticeHighRisk": "高风险",
+  "@secNoticeHighRisk": {
+    "description": "本地安全检查：提示类型「高风险」的标签"
+  },
+  "secNoticeWarning": "警告",
+  "@secNoticeWarning": {
+    "description": "本地安全检查：提示类型「警告」的标签"
+  },
+  "secNoticeInfo": "提示",
+  "@secNoticeInfo": {
+    "description": "本地安全检查：提示类型「提示」的标签"
+  },
+  "secFlagHighRisk": "高风险",
+  "@secFlagHighRisk": {
+    "description": "本地安全检查：卡片底栏的标记：有没看过的高风险"
+  },
+  "secFlagWarning": "安全警告",
+  "@secFlagWarning": {
+    "description": "本地安全检查：卡片底栏的标记：有没看过的警告"
+  },
+  "secLocalCheck": "本地检查",
+  "@secLocalCheck": {
+    "description": "本地安全检查：详情栏、添加技能预览里这一节的名字，和 skills.sh 的「安全审计」区分"
+  },
+  "secCheck": "安全检查",
+  "@secCheck": {
+    "description": "本地安全检查：阅读视图文件列表最上面的入口，也是报告页的标题"
+  },
+  "secCountHigh": "高风险 {count}",
+  "@secCountHigh": {
+    "description": "本地安全检查：详情栏：高风险条数",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "secCountWarning": "警告 {count}",
+  "@secCountWarning": {
+    "description": "本地安全检查：详情栏：警告条数",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "secClean": "未发现已知风险",
+  "@secClean": {
+    "description": "本地安全检查：检查完整、当前有效、没有警告或高风险"
+  },
+  "secNotScanned": "尚未检查",
+  "@secNotScanned": {
+    "description": "本地安全检查：还没有检查结果"
+  },
+  "secScanning": "正在检查",
+  "@secScanning": {
+    "description": "本地安全检查：正在检查这个技能"
+  },
+  "secQueued": "等待检查",
+  "@secQueued": {
+    "description": "本地安全检查：排在队列里"
+  },
+  "secStale": "已过期",
+  "@secStale": {
+    "description": "本地安全检查：文件或规则变了，结果不再对应当前内容（状态标签）"
+  },
+  "secUnknown": "无法核实",
+  "@secUnknown": {
+    "description": "本地安全检查：读不了目录或读的时候在变，结果没法核实（状态标签）"
+  },
+  "secIncomplete": "检查不完整",
+  "@secIncomplete": {
+    "description": "本地安全检查：有内容没检查到（状态标签）"
+  },
+  "secAckedCount": "已看过 {count} 项",
+  "@secAckedCount": {
+    "description": "本地安全检查：已标为看过的风险条数",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "secRescan": "重新检查",
+  "@secRescan": {
+    "description": "本地安全检查：重新检查这个技能的按钮"
+  },
+  "secScanNow": "检查",
+  "@secScanNow": {
+    "description": "本地安全检查：还没检查过时的按钮"
+  },
+  "secStaleNote": "文件改过，下面是上次的结果。",
+  "@secStaleNote": {
+    "description": "本地安全检查：结果已过期时的说明"
+  },
+  "secUnknownNote": "读不了这个目录，或读的时候它在变化，结果没法核实。",
+  "@secUnknownNote": {
+    "description": "本地安全检查：无法核实时的说明"
+  },
+  "secStripHigh": "高风险 {count} 项",
+  "@secStripHigh": {
+    "description": "本地安全检查：阅读视图顶部状态栏：没看过的高风险",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "secStripWarning": "安全警告 {count} 项",
+  "@secStripWarning": {
+    "description": "本地安全检查：阅读视图顶部状态栏：没看过的警告",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "secCheckedFiles": "检查了 {done} / {total} 个文件",
+  "@secCheckedFiles": {
+    "description": "本地安全检查：报告页顶部：检查了几个文件",
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "secCheckedAt": "{date} 检查",
+  "@secCheckedAt": {
+    "description": "本地安全检查：报告页顶部：检查日期",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "secDisclaimer": "本机离线检查，不代表安全保证",
+  "@secDisclaimer": {
+    "description": "本地安全检查：报告页顶部的说明"
+  },
+  "secAcked": "已看过",
+  "@secAcked": {
+    "description": "本地安全检查：一条风险旁的勾选框：标为已看过"
+  },
+  "secLine": "第 {line} 行",
+  "@secLine": {
+    "description": "本地安全检查：证据所在的行",
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "secReferencedFrom": "引用这个脚本的位置",
+  "@secReferencedFrom": {
+    "description": "本地安全检查：证据：文档里提到这个脚本的地方"
+  },
+  "secHolesTitle": "没有检查到的内容",
+  "@secHolesTitle": {
+    "description": "本地安全检查：报告页：覆盖缺口的标题"
+  },
+  "secExternalTitle": "要从网上取来执行的内容，没有检查",
+  "@secExternalTitle": {
+    "description": "本地安全检查：报告页：远程载荷的标题"
+  },
+  "secMaybeExample": "可能是示例或说明里的引用，请核查。",
+  "@secMaybeExample": {
+    "description": "本地安全检查：低置信度且在示例语境里时的说明"
+  },
+  "secWeakEvidence": "证据不充分，请核查。",
+  "@secWeakEvidence": {
+    "description": "本地安全检查：低置信度的说明"
+  },
+  "secNoFindings": "没有发现需要注意的内容",
+  "@secNoFindings": {
+    "description": "本地安全检查：报告里没有任何发现"
+  },
+  "secLastResult": "上次结果",
+  "@secLastResult": {
+    "description": "本地安全检查：重新检查期间，旧结果的标注"
+  },
+  "secWholeSkill": "整个技能",
+  "@secWholeSkill": {
+    "description": "本地安全检查：覆盖缺口不针对某个文件时的位置"
+  },
+  "secOpenFile": "在文件里查看",
+  "@secOpenFile": {
+    "description": "本地安全检查：证据旁的按钮：跳到文件对应的行"
+  },
+  "secGapSourcePartial": "来源还没下载完整",
+  "@secGapSourcePartial": {
+    "description": "本地安全检查：没检查到的原因"
+  },
+  "secGapUnreadable": "读不了",
+  "@secGapUnreadable": {
+    "description": "本地安全检查：没检查到的原因"
+  },
+  "secGapBinary": "二进制文件",
+  "@secGapBinary": {
+    "description": "本地安全检查：没检查到的原因"
+  },
+  "secGapEncoding": "不支持的文字编码",
+  "@secGapEncoding": {
+    "description": "本地安全检查：没检查到的原因"
+  },
+  "secGapFileLimit": "文件太多，超出上限",
+  "@secGapFileLimit": {
+    "description": "本地安全检查：没检查到的原因"
+  },
+  "secGapByteLimit": "文件太大，超出上限",
+  "@secGapByteLimit": {
+    "description": "本地安全检查：没检查到的原因"
+  },
+  "secGapDepthLimit": "目录层级太深",
+  "@secGapDepthLimit": {
+    "description": "本地安全检查：没检查到的原因"
+  },
+  "secGapDeadline": "检查超时",
+  "@secGapDeadline": {
+    "description": "本地安全检查：没检查到的原因"
+  },
+  "secGapChanged": "检查时文件在变化",
+  "@secGapChanged": {
+    "description": "本地安全检查：没检查到的原因"
+  },
+  "secGapLinkNotFollowed": "链接没有跟进去",
+  "@secGapLinkNotFollowed": {
+    "description": "本地安全检查：没检查到的原因"
+  },
+  "secGapSpecialFile": "特殊文件",
+  "@secGapSpecialFile": {
+    "description": "本地安全检查：没检查到的原因"
+  },
+  "secGapAnalysisError": "分析出错",
+  "@secGapAnalysisError": {
+    "description": "本地安全检查：没检查到的原因"
+  },
+  "secGapFindingLimit": "发现太多，超出上限",
+  "@secGapFindingLimit": {
+    "description": "本地安全检查：没检查到的原因"
+  },
+  "secGapCancelled": "检查被取消",
+  "@secGapCancelled": {
+    "description": "本地安全检查：没检查到的原因"
+  },
+  "secFailNotFound": "目录不存在",
+  "@secFailNotFound": {
+    "description": "本地安全检查：检查失败的原因"
+  },
+  "secFailPermission": "没有读取权限",
+  "@secFailPermission": {
+    "description": "本地安全检查：检查失败的原因"
+  },
+  "secFailUnreadable": "读不了这个目录",
+  "@secFailUnreadable": {
+    "description": "本地安全检查：检查失败的原因"
+  },
+  "secFailChanged": "检查之后内容变了",
+  "@secFailChanged": {
+    "description": "本地安全检查：检查失败的原因"
+  },
+  "issueSecurityHighRisk": "高风险",
+  "@issueSecurityHighRisk": {
+    "description": "整理页：问题类型「高风险」"
+  },
+  "issueSecurityWarning": "安全警告",
+  "@issueSecurityWarning": {
+    "description": "整理页：问题类型「安全警告」"
+  },
+  "issueSecurityUnfinished": "安全检查未完成",
+  "@issueSecurityUnfinished": {
+    "description": "整理页：问题类型「安全检查未完成」"
+  },
+  "tidyNoteSecurityHighRisk": "本机检查发现的严重风险。看过并确认没问题的，可以标为已看过。",
+  "@tidyNoteSecurityHighRisk": {
+    "description": "整理页「高风险」的说明"
+  },
+  "tidyNoteSecurityWarning": "本机检查发现的需要注意的地方。看过并确认没问题的，可以标为已看过。",
+  "@tidyNoteSecurityWarning": {
+    "description": "整理页「安全警告」的说明"
+  },
+  "tidyNoteSecurityUnfinished": "这些技能没能完整检查，结果不能当作没有风险。",
+  "@tidyNoteSecurityUnfinished": {
+    "description": "整理页「安全检查未完成」的说明"
+  },
+  "secColumnIssue": "问题",
+  "@secColumnIssue": {
+    "description": "本地安全检查：整理页表格的列名"
+  },
+  "secMoreFindings": "另有 {count} 项",
+  "@secMoreFindings": {
+    "description": "本地安全检查：整理页一行里还有几条",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "secShowAcked": "显示已看过的 {count} 项",
+  "@secShowAcked": {
+    "description": "本地安全检查：整理页表格下面：展开已看过的",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "secHideAcked": "收起已看过的",
+  "@secHideAcked": {
+    "description": "本地安全检查：整理页表格下面：收起已看过的"
+  },
+  "secProgress": "安全检查 {done} / {total}",
+  "@secProgress": {
+    "description": "本地安全检查：整理页顶栏：后台检查进度",
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "secStop": "停止",
+  "@secStop": {
+    "description": "本地安全检查：整理页顶栏：停止后台检查"
+  },
+  "secTagChecking": "检查中",
+  "@secTagChecking": {
+    "description": "本地安全检查：添加技能列表：正在检查"
+  },
+  "secTagUnchecked": "未检查完",
+  "@secTagUnchecked": {
+    "description": "本地安全检查：添加技能列表：检查失败或不完整"
+  },
+  "secAddConfirmTitle": "{count} 个技能有高风险或没检查完",
+  "@secAddConfirmTitle": {
+    "description": "本地安全检查：添加前的确认弹窗标题",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "secAddConfirmBody": "确认看过它们的检查结果后再添加。",
+  "@secAddConfirmBody": {
+    "description": "本地安全检查：添加前的确认弹窗说明"
+  },
+  "secAddAnyway": "仍然添加",
+  "@secAddAnyway": {
+    "description": "本地安全检查：添加前的确认弹窗：确认按钮"
+  },
+  "secUpdateHeldHigh": "新版本发现高风险",
+  "@secUpdateHeldHigh": {
+    "description": "本地安全检查：更新页：新版本检查出高风险"
+  },
+  "secUpdateUnchecked": "新版本没能完整检查",
+  "@secUpdateUnchecked": {
+    "description": "本地安全检查：更新页：新版本检查失败或不完整"
+  },
+  "secUpdateAnyway": "仍然更新",
+  "@secUpdateAnyway": {
+    "description": "本地安全检查：更新对比页：确认看过风险后仍要更新"
+  },
+  "libraryUpdateSecurityHold": "新版本的安全检查结果需要先确认",
+  "@libraryUpdateSecurityHold": {
+    "description": "本地安全检查：库层：更新被安全检查拦下"
   }
 }

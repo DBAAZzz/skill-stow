@@ -27,13 +27,19 @@ const (
 	GlobalLinked               // 项目技能被全局链接
 	StaleRecords               // 已删除技能的安装记录
 	Incomplete                 // 技能里说有、磁盘上没有的文件
+
+	// 本地安全检查的三类。计数来自安全检查服务（界面汇总），不在 Problems 里，
+	// 也不在 Issues 的默认顺序里。
+	SecurityHighRisk
+	SecurityWarning
+	SecurityUnfinished
 )
 
 // Issues 是界面上问题的顺序。
 var Issues = []Issue{SameCopies, DiffCopies, ExtraLinks, BrokenLinks, Incomplete, StaleRecords, NoDescription, GlobalLinked}
 
 func (k Issue) Title() string {
-	return [...]string{locales.IssueIdenticalCopies(), locales.IssueDifferentCopies(), locales.IssueDuplicateLinks(), locales.IssueBrokenLinks(), locales.IssueMissingDescription(), locales.IssueGloballyLinkedProjectSkills(), locales.IssueDeletedSkillInstallRecords(), locales.IssueIncompleteSkills()}[k]
+	return [...]string{locales.IssueIdenticalCopies(), locales.IssueDifferentCopies(), locales.IssueDuplicateLinks(), locales.IssueBrokenLinks(), locales.IssueMissingDescription(), locales.IssueGloballyLinkedProjectSkills(), locales.IssueDeletedSkillInstallRecords(), locales.IssueIncompleteSkills(), locales.IssueSecurityHighRisk(), locales.IssueSecurityWarning(), locales.IssueSecurityUnfinished()}[k]
 }
 
 // ExtraLink 是读技能库的 Agent 自己目录里，又指向技能库那份的链接：

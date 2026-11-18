@@ -14757,3 +14757,1789 @@ func MenuReportIssue() string { return In(i18n.Locale()).MenuReportIssue() }
 func (msgs Messages) MenuReportIssue() string {
 	return Catalog.Format(msgs.locale, "menuReportIssue", nil)
 }
+
+// SecFindingRemotePipe says "会下载远程脚本并直接执行"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingRemotePipe() string { return In(i18n.Locale()).SecFindingRemotePipe() }
+
+// SecFindingRemotePipe says "会下载远程脚本并直接执行"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingRemotePipe() string {
+	return Catalog.Format(msgs.locale, "secFindingRemotePipe", nil)
+}
+
+// SecFindingRemotePipeDetail says "内容从网上取来后直接交给 shell …"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingRemotePipeDetail() string { return In(i18n.Locale()).SecFindingRemotePipeDetail() }
+
+// SecFindingRemotePipeDetail says "内容从网上取来后直接交给 shell …"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingRemotePipeDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingRemotePipeDetail", nil)
+}
+
+// SecFindingRemoteDownloadRun says "会下载文件后再执行"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingRemoteDownloadRun() string { return In(i18n.Locale()).SecFindingRemoteDownloadRun() }
+
+// SecFindingRemoteDownloadRun says "会下载文件后再执行"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingRemoteDownloadRun() string {
+	return Catalog.Format(msgs.locale, "secFindingRemoteDownloadRun", nil)
+}
+
+// SecFindingRemoteDownloadRunDetail says "…"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingRemoteDownloadRunDetail() string {
+	return In(i18n.Locale()).SecFindingRemoteDownloadRunDetail()
+}
+
+// SecFindingRemoteDownloadRunDetail says "…"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingRemoteDownloadRunDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingRemoteDownloadRunDetail", nil)
+}
+
+// SecFindingReverseShell says "会把本机终端连到远程地址"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingReverseShell() string { return In(i18n.Locale()).SecFindingReverseShell() }
+
+// SecFindingReverseShell says "会把本机终端连到远程地址"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingReverseShell() string {
+	return Catalog.Format(msgs.locale, "secFindingReverseShell", nil)
+}
+
+// SecFindingReverseShellDetail says "…"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingReverseShellDetail() string { return In(i18n.Locale()).SecFindingReverseShellDetail() }
+
+// SecFindingReverseShellDetail says "…"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingReverseShellDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingReverseShellDetail", nil)
+}
+
+// SecFindingEncodedExec says "会解码一段内容后直接执行"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingEncodedExec() string { return In(i18n.Locale()).SecFindingEncodedExec() }
+
+// SecFindingEncodedExec says "会解码一段内容后直接执行"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingEncodedExec() string {
+	return Catalog.Format(msgs.locale, "secFindingEncodedExec", nil)
+}
+
+// SecFindingEncodedExecDetail says "执行的内容经过编码，直接看不出它会做什么。先解码看过内容再决定。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingEncodedExecDetail() string { return In(i18n.Locale()).SecFindingEncodedExecDetail() }
+
+// SecFindingEncodedExecDetail says "执行的内容经过编码，直接看不出它会做什么。先解码看过内容再决定。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingEncodedExecDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingEncodedExecDetail", nil)
+}
+
+// SecFindingBidiChars says "文本里有改变显示顺序的控制字符"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingBidiChars() string { return In(i18n.Locale()).SecFindingBidiChars() }
+
+// SecFindingBidiChars says "文本里有改变显示顺序的控制字符"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingBidiChars() string {
+	return Catalog.Format(msgs.locale, "secFindingBidiChars", nil)
+}
+
+// SecFindingBidiCharsDetail says "…"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingBidiCharsDetail() string { return In(i18n.Locale()).SecFindingBidiCharsDetail() }
+
+// SecFindingBidiCharsDetail says "…"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingBidiCharsDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingBidiCharsDetail", nil)
+}
+
+// SecFindingInvisibleChars says "文本里有看不见的字符"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingInvisibleChars() string { return In(i18n.Locale()).SecFindingInvisibleChars() }
+
+// SecFindingInvisibleChars says "文本里有看不见的字符"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingInvisibleChars() string {
+	return Catalog.Format(msgs.locale, "secFindingInvisibleChars", nil)
+}
+
+// SecFindingInvisibleCharsDetail says "零宽字符或标签字符在界面上看不见，但 Agent 能读到，可能用来藏指令。检查这一行。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingInvisibleCharsDetail() string {
+	return In(i18n.Locale()).SecFindingInvisibleCharsDetail()
+}
+
+// SecFindingInvisibleCharsDetail says "零宽字符或标签字符在界面上看不见，但 Agent 能读到，可能用来藏指令。检查这一行。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingInvisibleCharsDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingInvisibleCharsDetail", nil)
+}
+
+// SecFindingHiddenComment says "隐藏的注释里写着指令"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingHiddenComment() string { return In(i18n.Locale()).SecFindingHiddenComment() }
+
+// SecFindingHiddenComment says "隐藏的注释里写着指令"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingHiddenComment() string {
+	return Catalog.Format(msgs.locale, "secFindingHiddenComment", nil)
+}
+
+// SecFindingHiddenCommentDetail says "HTML 注释渲染后看不见，Agent 却会读到。确认注释里的内容是你希望 Agent 照做的。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingHiddenCommentDetail() string { return In(i18n.Locale()).SecFindingHiddenCommentDetail() }
+
+// SecFindingHiddenCommentDetail says "HTML 注释渲染后看不见，Agent 却会读到。确认注释里的内容是你希望 Agent 照做的。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingHiddenCommentDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingHiddenCommentDetail", nil)
+}
+
+// SecFindingIgnoreInstructions says "要求 Agent 忽略之前的指令"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingIgnoreInstructions() string { return In(i18n.Locale()).SecFindingIgnoreInstructions() }
+
+// SecFindingIgnoreInstructions says "要求 Agent 忽略之前的指令"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingIgnoreInstructions() string {
+	return Catalog.Format(msgs.locale, "secFindingIgnoreInstructions", nil)
+}
+
+// SecFindingIgnoreInstructionsDetail says "这类说法会让 Agent 不再遵守你或系统设定的规则。确认它只是在讲解，而不是要求照做。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingIgnoreInstructionsDetail() string {
+	return In(i18n.Locale()).SecFindingIgnoreInstructionsDetail()
+}
+
+// SecFindingIgnoreInstructionsDetail says "这类说法会让 Agent 不再遵守你或系统设定的规则。确认它只是在讲解，而不是要求照做。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingIgnoreInstructionsDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingIgnoreInstructionsDetail", nil)
+}
+
+// SecFindingConcealFromUser says "要求 Agent 对你隐瞒操作"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingConcealFromUser() string { return In(i18n.Locale()).SecFindingConcealFromUser() }
+
+// SecFindingConcealFromUser says "要求 Agent 对你隐瞒操作"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingConcealFromUser() string {
+	return Catalog.Format(msgs.locale, "secFindingConcealFromUser", nil)
+}
+
+// SecFindingConcealFromUserDetail says "Skill 不应要求 Agent 瞒着你做事。确认这段文字的用意。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingConcealFromUserDetail() string {
+	return In(i18n.Locale()).SecFindingConcealFromUserDetail()
+}
+
+// SecFindingConcealFromUserDetail says "Skill 不应要求 Agent 瞒着你做事。确认这段文字的用意。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingConcealFromUserDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingConcealFromUserDetail", nil)
+}
+
+// SecFindingBypassConfirmation says "要求跳过确认或权限检查"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingBypassConfirmation() string { return In(i18n.Locale()).SecFindingBypassConfirmation() }
+
+// SecFindingBypassConfirmation says "要求跳过确认或权限检查"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingBypassConfirmation() string {
+	return Catalog.Format(msgs.locale, "secFindingBypassConfirmation", nil)
+}
+
+// SecFindingBypassConfirmationDetail says "跳过确认会让 Agent 在你不知情时执行操作。确认是否真的需要。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingBypassConfirmationDetail() string {
+	return In(i18n.Locale()).SecFindingBypassConfirmationDetail()
+}
+
+// SecFindingBypassConfirmationDetail says "跳过确认会让 Agent 在你不知情时执行操作。确认是否真的需要。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingBypassConfirmationDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingBypassConfirmationDetail", nil)
+}
+
+// SecFindingLeakContext says "要求把对话或上下文发出去"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingLeakContext() string { return In(i18n.Locale()).SecFindingLeakContext() }
+
+// SecFindingLeakContext says "要求把对话或上下文发出去"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingLeakContext() string {
+	return Catalog.Format(msgs.locale, "secFindingLeakContext", nil)
+}
+
+// SecFindingLeakContextDetail says "对话和系统提示里可能有你的私密信息。确认要发往哪里、为什么发。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingLeakContextDetail() string { return In(i18n.Locale()).SecFindingLeakContextDetail() }
+
+// SecFindingLeakContextDetail says "对话和系统提示里可能有你的私密信息。确认要发往哪里、为什么发。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingLeakContextDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingLeakContextDetail", nil)
+}
+
+// SecFindingSecretInChat says "让你把密钥粘贴到聊天里"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingSecretInChat() string { return In(i18n.Locale()).SecFindingSecretInChat() }
+
+// SecFindingSecretInChat says "让你把密钥粘贴到聊天里"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingSecretInChat() string {
+	return Catalog.Format(msgs.locale, "secFindingSecretInChat", nil)
+}
+
+// SecFindingSecretInChatDetail says "粘贴到对话里的密钥会留在会话记录中。改用环境变量或钥匙串。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingSecretInChatDetail() string { return In(i18n.Locale()).SecFindingSecretInChatDetail() }
+
+// SecFindingSecretInChatDetail says "粘贴到对话里的密钥会留在会话记录中。改用环境变量或钥匙串。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingSecretInChatDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingSecretInChatDetail", nil)
+}
+
+// SecFindingReadCredentials says "会读取私钥或凭据文件"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingReadCredentials() string { return In(i18n.Locale()).SecFindingReadCredentials() }
+
+// SecFindingReadCredentials says "会读取私钥或凭据文件"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingReadCredentials() string {
+	return Catalog.Format(msgs.locale, "secFindingReadCredentials", nil)
+}
+
+// SecFindingReadCredentialsDetail says "会读取 SSH …"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingReadCredentialsDetail() string {
+	return In(i18n.Locale()).SecFindingReadCredentialsDetail()
+}
+
+// SecFindingReadCredentialsDetail says "会读取 SSH …"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingReadCredentialsDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingReadCredentialsDetail", nil)
+}
+
+// SecFindingCredentialUpload says "会读取凭据并发往外部地址"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingCredentialUpload() string { return In(i18n.Locale()).SecFindingCredentialUpload() }
+
+// SecFindingCredentialUpload says "会读取凭据并发往外部地址"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingCredentialUpload() string {
+	return Catalog.Format(msgs.locale, "secFindingCredentialUpload", nil)
+}
+
+// SecFindingCredentialUploadDetail says "私钥或凭据被当作请求内容发到网上。除非你确认这是预期行为，否则不要运行。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingCredentialUploadDetail() string {
+	return In(i18n.Locale()).SecFindingCredentialUploadDetail()
+}
+
+// SecFindingCredentialUploadDetail says "私钥或凭据被当作请求内容发到网上。除非你确认这是预期行为，否则不要运行。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingCredentialUploadDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingCredentialUploadDetail", nil)
+}
+
+// SecFindingSecretEnvUpload says "会把密钥变量发往外部地址"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingSecretEnvUpload() string { return In(i18n.Locale()).SecFindingSecretEnvUpload() }
+
+// SecFindingSecretEnvUpload says "会把密钥变量发往外部地址"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingSecretEnvUpload() string {
+	return Catalog.Format(msgs.locale, "secFindingSecretEnvUpload", nil)
+}
+
+// SecFindingSecretEnvUploadDetail says "环境变量里的密钥出现在请求内容里。确认收件地址可信，并且确实需要发送。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingSecretEnvUploadDetail() string {
+	return In(i18n.Locale()).SecFindingSecretEnvUploadDetail()
+}
+
+// SecFindingSecretEnvUploadDetail says "环境变量里的密钥出现在请求内容里。确认收件地址可信，并且确实需要发送。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingSecretEnvUploadDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingSecretEnvUploadDetail", nil)
+}
+
+// SecFindingWipeHome says "会大范围删除文件"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingWipeHome() string { return In(i18n.Locale()).SecFindingWipeHome() }
+
+// SecFindingWipeHome says "会大范围删除文件"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingWipeHome() string {
+	return Catalog.Format(msgs.locale, "secFindingWipeHome", nil)
+}
+
+// SecFindingWipeHomeDetail says "删除的是主目录或系统目录，运行后可能无法恢复。除非完全清楚后果，否则不要运行。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingWipeHomeDetail() string { return In(i18n.Locale()).SecFindingWipeHomeDetail() }
+
+// SecFindingWipeHomeDetail says "删除的是主目录或系统目录，运行后可能无法恢复。除非完全清楚后果，否则不要运行。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingWipeHomeDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingWipeHomeDetail", nil)
+}
+
+// SecFindingPersistence says "会修改启动项或 shell 配置"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingPersistence() string { return In(i18n.Locale()).SecFindingPersistence() }
+
+// SecFindingPersistence says "会修改启动项或 shell 配置"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingPersistence() string {
+	return Catalog.Format(msgs.locale, "secFindingPersistence", nil)
+}
+
+// SecFindingPersistenceDetail says "改动会在每次登录或打开终端时生效。确认改了什么，以及怎么撤销。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingPersistenceDetail() string { return In(i18n.Locale()).SecFindingPersistenceDetail() }
+
+// SecFindingPersistenceDetail says "改动会在每次登录或打开终端时生效。确认改了什么，以及怎么撤销。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingPersistenceDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingPersistenceDetail", nil)
+}
+
+// SecFindingEmbeddedSecret says "文件里有疑似真实的密钥"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingEmbeddedSecret() string { return In(i18n.Locale()).SecFindingEmbeddedSecret() }
+
+// SecFindingEmbeddedSecret says "文件里有疑似真实的密钥"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingEmbeddedSecret() string {
+	return Catalog.Format(msgs.locale, "secFindingEmbeddedSecret", nil)
+}
+
+// SecFindingEmbeddedSecretDetail says "密钥写在文件里，分享或同步这个 Skill 时会一起泄露。考虑撤销这个密钥。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingEmbeddedSecretDetail() string {
+	return In(i18n.Locale()).SecFindingEmbeddedSecretDetail()
+}
+
+// SecFindingEmbeddedSecretDetail says "密钥写在文件里，分享或同步这个 Skill 时会一起泄露。考虑撤销这个密钥。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingEmbeddedSecretDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingEmbeddedSecretDetail", nil)
+}
+
+// SecFindingLinkOutside says "有链接指向 Skill 目录外"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingLinkOutside() string { return In(i18n.Locale()).SecFindingLinkOutside() }
+
+// SecFindingLinkOutside says "有链接指向 Skill 目录外"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingLinkOutside() string {
+	return Catalog.Format(msgs.locale, "secFindingLinkOutside", nil)
+}
+
+// SecFindingLinkOutsideDetail says "Agent 可能经这个链接读到 Skill 以外的文件。检查链接指向哪里。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingLinkOutsideDetail() string { return In(i18n.Locale()).SecFindingLinkOutsideDetail() }
+
+// SecFindingLinkOutsideDetail says "Agent 可能经这个链接读到 Skill 以外的文件。检查链接指向哪里。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingLinkOutsideDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingLinkOutsideDetail", nil)
+}
+
+// SecFindingSpecialFile says "包含管道或设备等特殊文件"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingSpecialFile() string { return In(i18n.Locale()).SecFindingSpecialFile() }
+
+// SecFindingSpecialFile says "包含管道或设备等特殊文件"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingSpecialFile() string {
+	return Catalog.Format(msgs.locale, "secFindingSpecialFile", nil)
+}
+
+// SecFindingSpecialFileDetail says "Skill 里通常不需要这类文件。检查它的用途。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingSpecialFileDetail() string { return In(i18n.Locale()).SecFindingSpecialFileDetail() }
+
+// SecFindingSpecialFileDetail says "Skill 里通常不需要这类文件。检查它的用途。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingSpecialFileDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingSpecialFileDetail", nil)
+}
+
+// SecFindingUsesNetwork says "会访问外部服务"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingUsesNetwork() string { return In(i18n.Locale()).SecFindingUsesNetwork() }
+
+// SecFindingUsesNetwork says "会访问外部服务"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingUsesNetwork() string {
+	return Catalog.Format(msgs.locale, "secFindingUsesNetwork", nil)
+}
+
+// SecFindingUsesNetworkDetail says "脚本或步骤里有联网操作。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingUsesNetworkDetail() string { return In(i18n.Locale()).SecFindingUsesNetworkDetail() }
+
+// SecFindingUsesNetworkDetail says "脚本或步骤里有联网操作。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingUsesNetworkDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingUsesNetworkDetail", nil)
+}
+
+// SecFindingHasScripts says "包含可执行脚本"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingHasScripts() string { return In(i18n.Locale()).SecFindingHasScripts() }
+
+// SecFindingHasScripts says "包含可执行脚本"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingHasScripts() string {
+	return Catalog.Format(msgs.locale, "secFindingHasScripts", nil)
+}
+
+// SecFindingHasScriptsDetail says "Agent 可能会运行这些脚本。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingHasScriptsDetail() string { return In(i18n.Locale()).SecFindingHasScriptsDetail() }
+
+// SecFindingHasScriptsDetail says "Agent 可能会运行这些脚本。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingHasScriptsDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingHasScriptsDetail", nil)
+}
+
+// SecFindingHasBinary says "包含无法检查的程序"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingHasBinary() string { return In(i18n.Locale()).SecFindingHasBinary() }
+
+// SecFindingHasBinary says "包含无法检查的程序"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingHasBinary() string {
+	return Catalog.Format(msgs.locale, "secFindingHasBinary", nil)
+}
+
+// SecFindingHasBinaryDetail says "编译好的程序无法检查内容。确认来源可信。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingHasBinaryDetail() string { return In(i18n.Locale()).SecFindingHasBinaryDetail() }
+
+// SecFindingHasBinaryDetail says "编译好的程序无法检查内容。确认来源可信。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingHasBinaryDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingHasBinaryDetail", nil)
+}
+
+// SecFindingNeedsAdmin says "需要管理员权限"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingNeedsAdmin() string { return In(i18n.Locale()).SecFindingNeedsAdmin() }
+
+// SecFindingNeedsAdmin says "需要管理员权限"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingNeedsAdmin() string {
+	return Catalog.Format(msgs.locale, "secFindingNeedsAdmin", nil)
+}
+
+// SecFindingNeedsAdminDetail says "部分命令用 sudo 运行，会以管理员身份修改系统。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingNeedsAdminDetail() string { return In(i18n.Locale()).SecFindingNeedsAdminDetail() }
+
+// SecFindingNeedsAdminDetail says "部分命令用 sudo 运行，会以管理员身份修改系统。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingNeedsAdminDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingNeedsAdminDetail", nil)
+}
+
+// SecFindingUnknown says "未识别的检查结果"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func SecFindingUnknown() string { return In(i18n.Locale()).SecFindingUnknown() }
+
+// SecFindingUnknown says "未识别的检查结果"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的摘要（卡片、整理页、详情的标题）
+func (msgs Messages) SecFindingUnknown() string {
+	return Catalog.Format(msgs.locale, "secFindingUnknown", nil)
+}
+
+// SecFindingUnknownDetail says "这条结果来自更新的检查规则，重新检查即可。"
+// in the language the app shows.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func SecFindingUnknownDetail() string { return In(i18n.Locale()).SecFindingUnknownDetail() }
+
+// SecFindingUnknownDetail says "这条结果来自更新的检查规则，重新检查即可。"
+// in the language of msgs.
+//
+// 本地安全检查：发现的一条问题的原因与建议（详情里摘要下面）
+func (msgs Messages) SecFindingUnknownDetail() string {
+	return Catalog.Format(msgs.locale, "secFindingUnknownDetail", nil)
+}
+
+// SecNoticeHighRisk says "高风险"
+// in the language the app shows.
+//
+// 本地安全检查：提示类型「高风险」的标签
+func SecNoticeHighRisk() string { return In(i18n.Locale()).SecNoticeHighRisk() }
+
+// SecNoticeHighRisk says "高风险"
+// in the language of msgs.
+//
+// 本地安全检查：提示类型「高风险」的标签
+func (msgs Messages) SecNoticeHighRisk() string {
+	return Catalog.Format(msgs.locale, "secNoticeHighRisk", nil)
+}
+
+// SecNoticeWarning says "警告"
+// in the language the app shows.
+//
+// 本地安全检查：提示类型「警告」的标签
+func SecNoticeWarning() string { return In(i18n.Locale()).SecNoticeWarning() }
+
+// SecNoticeWarning says "警告"
+// in the language of msgs.
+//
+// 本地安全检查：提示类型「警告」的标签
+func (msgs Messages) SecNoticeWarning() string {
+	return Catalog.Format(msgs.locale, "secNoticeWarning", nil)
+}
+
+// SecNoticeInfo says "提示"
+// in the language the app shows.
+//
+// 本地安全检查：提示类型「提示」的标签
+func SecNoticeInfo() string { return In(i18n.Locale()).SecNoticeInfo() }
+
+// SecNoticeInfo says "提示"
+// in the language of msgs.
+//
+// 本地安全检查：提示类型「提示」的标签
+func (msgs Messages) SecNoticeInfo() string {
+	return Catalog.Format(msgs.locale, "secNoticeInfo", nil)
+}
+
+// SecFlagHighRisk says "高风险"
+// in the language the app shows.
+//
+// 本地安全检查：卡片底栏的标记：有没看过的高风险
+func SecFlagHighRisk() string { return In(i18n.Locale()).SecFlagHighRisk() }
+
+// SecFlagHighRisk says "高风险"
+// in the language of msgs.
+//
+// 本地安全检查：卡片底栏的标记：有没看过的高风险
+func (msgs Messages) SecFlagHighRisk() string {
+	return Catalog.Format(msgs.locale, "secFlagHighRisk", nil)
+}
+
+// SecFlagWarning says "安全警告"
+// in the language the app shows.
+//
+// 本地安全检查：卡片底栏的标记：有没看过的警告
+func SecFlagWarning() string { return In(i18n.Locale()).SecFlagWarning() }
+
+// SecFlagWarning says "安全警告"
+// in the language of msgs.
+//
+// 本地安全检查：卡片底栏的标记：有没看过的警告
+func (msgs Messages) SecFlagWarning() string {
+	return Catalog.Format(msgs.locale, "secFlagWarning", nil)
+}
+
+// SecLocalCheck says "本地检查"
+// in the language the app shows.
+//
+// 本地安全检查：详情栏、添加技能预览里这一节的名字，和
+// skills.sh 的「安全审计」区分
+func SecLocalCheck() string { return In(i18n.Locale()).SecLocalCheck() }
+
+// SecLocalCheck says "本地检查"
+// in the language of msgs.
+//
+// 本地安全检查：详情栏、添加技能预览里这一节的名字，和
+// skills.sh 的「安全审计」区分
+func (msgs Messages) SecLocalCheck() string {
+	return Catalog.Format(msgs.locale, "secLocalCheck", nil)
+}
+
+// SecCheck says "安全检查"
+// in the language the app shows.
+//
+// 本地安全检查：阅读视图文件列表最上面的入口，也是报告页的标题
+func SecCheck() string { return In(i18n.Locale()).SecCheck() }
+
+// SecCheck says "安全检查"
+// in the language of msgs.
+//
+// 本地安全检查：阅读视图文件列表最上面的入口，也是报告页的标题
+func (msgs Messages) SecCheck() string {
+	return Catalog.Format(msgs.locale, "secCheck", nil)
+}
+
+// SecCountHigh says "高风险 {count}"
+// in the language the app shows.
+//
+// 本地安全检查：详情栏：高风险条数
+func SecCountHigh(count int) string { return In(i18n.Locale()).SecCountHigh(count) }
+
+// SecCountHigh says "高风险 {count}"
+// in the language of msgs.
+//
+// 本地安全检查：详情栏：高风险条数
+func (msgs Messages) SecCountHigh(count int) string {
+	return Catalog.Format(msgs.locale, "secCountHigh", map[string]any{"count": count})
+}
+
+// SecCountWarning says "警告 {count}"
+// in the language the app shows.
+//
+// 本地安全检查：详情栏：警告条数
+func SecCountWarning(count int) string { return In(i18n.Locale()).SecCountWarning(count) }
+
+// SecCountWarning says "警告 {count}"
+// in the language of msgs.
+//
+// 本地安全检查：详情栏：警告条数
+func (msgs Messages) SecCountWarning(count int) string {
+	return Catalog.Format(msgs.locale, "secCountWarning", map[string]any{"count": count})
+}
+
+// SecClean says "未发现已知风险"
+// in the language the app shows.
+//
+// 本地安全检查：检查完整、当前有效、没有警告或高风险
+func SecClean() string { return In(i18n.Locale()).SecClean() }
+
+// SecClean says "未发现已知风险"
+// in the language of msgs.
+//
+// 本地安全检查：检查完整、当前有效、没有警告或高风险
+func (msgs Messages) SecClean() string {
+	return Catalog.Format(msgs.locale, "secClean", nil)
+}
+
+// SecNotScanned says "尚未检查"
+// in the language the app shows.
+//
+// 本地安全检查：还没有检查结果
+func SecNotScanned() string { return In(i18n.Locale()).SecNotScanned() }
+
+// SecNotScanned says "尚未检查"
+// in the language of msgs.
+//
+// 本地安全检查：还没有检查结果
+func (msgs Messages) SecNotScanned() string {
+	return Catalog.Format(msgs.locale, "secNotScanned", nil)
+}
+
+// SecScanning says "正在检查"
+// in the language the app shows.
+//
+// 本地安全检查：正在检查这个技能
+func SecScanning() string { return In(i18n.Locale()).SecScanning() }
+
+// SecScanning says "正在检查"
+// in the language of msgs.
+//
+// 本地安全检查：正在检查这个技能
+func (msgs Messages) SecScanning() string {
+	return Catalog.Format(msgs.locale, "secScanning", nil)
+}
+
+// SecQueued says "等待检查"
+// in the language the app shows.
+//
+// 本地安全检查：排在队列里
+func SecQueued() string { return In(i18n.Locale()).SecQueued() }
+
+// SecQueued says "等待检查"
+// in the language of msgs.
+//
+// 本地安全检查：排在队列里
+func (msgs Messages) SecQueued() string {
+	return Catalog.Format(msgs.locale, "secQueued", nil)
+}
+
+// SecStale says "已过期"
+// in the language the app shows.
+//
+// 本地安全检查：文件或规则变了，结果不再对应当前内容（状态标签）
+func SecStale() string { return In(i18n.Locale()).SecStale() }
+
+// SecStale says "已过期"
+// in the language of msgs.
+//
+// 本地安全检查：文件或规则变了，结果不再对应当前内容（状态标签）
+func (msgs Messages) SecStale() string {
+	return Catalog.Format(msgs.locale, "secStale", nil)
+}
+
+// SecUnknown says "无法核实"
+// in the language the app shows.
+//
+// 本地安全检查：读不了目录或读的时候在变，结果没法核实（状态标签）
+func SecUnknown() string { return In(i18n.Locale()).SecUnknown() }
+
+// SecUnknown says "无法核实"
+// in the language of msgs.
+//
+// 本地安全检查：读不了目录或读的时候在变，结果没法核实（状态标签）
+func (msgs Messages) SecUnknown() string {
+	return Catalog.Format(msgs.locale, "secUnknown", nil)
+}
+
+// SecIncomplete says "检查不完整"
+// in the language the app shows.
+//
+// 本地安全检查：有内容没检查到（状态标签）
+func SecIncomplete() string { return In(i18n.Locale()).SecIncomplete() }
+
+// SecIncomplete says "检查不完整"
+// in the language of msgs.
+//
+// 本地安全检查：有内容没检查到（状态标签）
+func (msgs Messages) SecIncomplete() string {
+	return Catalog.Format(msgs.locale, "secIncomplete", nil)
+}
+
+// SecAckedCount says "已看过 {count} 项"
+// in the language the app shows.
+//
+// 本地安全检查：已标为看过的风险条数
+func SecAckedCount(count int) string { return In(i18n.Locale()).SecAckedCount(count) }
+
+// SecAckedCount says "已看过 {count} 项"
+// in the language of msgs.
+//
+// 本地安全检查：已标为看过的风险条数
+func (msgs Messages) SecAckedCount(count int) string {
+	return Catalog.Format(msgs.locale, "secAckedCount", map[string]any{"count": count})
+}
+
+// SecRescan says "重新检查"
+// in the language the app shows.
+//
+// 本地安全检查：重新检查这个技能的按钮
+func SecRescan() string { return In(i18n.Locale()).SecRescan() }
+
+// SecRescan says "重新检查"
+// in the language of msgs.
+//
+// 本地安全检查：重新检查这个技能的按钮
+func (msgs Messages) SecRescan() string {
+	return Catalog.Format(msgs.locale, "secRescan", nil)
+}
+
+// SecScanNow says "检查"
+// in the language the app shows.
+//
+// 本地安全检查：还没检查过时的按钮
+func SecScanNow() string { return In(i18n.Locale()).SecScanNow() }
+
+// SecScanNow says "检查"
+// in the language of msgs.
+//
+// 本地安全检查：还没检查过时的按钮
+func (msgs Messages) SecScanNow() string {
+	return Catalog.Format(msgs.locale, "secScanNow", nil)
+}
+
+// SecStaleNote says "文件改过，下面是上次的结果。"
+// in the language the app shows.
+//
+// 本地安全检查：结果已过期时的说明
+func SecStaleNote() string { return In(i18n.Locale()).SecStaleNote() }
+
+// SecStaleNote says "文件改过，下面是上次的结果。"
+// in the language of msgs.
+//
+// 本地安全检查：结果已过期时的说明
+func (msgs Messages) SecStaleNote() string {
+	return Catalog.Format(msgs.locale, "secStaleNote", nil)
+}
+
+// SecUnknownNote says "读不了这个目录，或读的时候它在变化，结果没法核实。"
+// in the language the app shows.
+//
+// 本地安全检查：无法核实时的说明
+func SecUnknownNote() string { return In(i18n.Locale()).SecUnknownNote() }
+
+// SecUnknownNote says "读不了这个目录，或读的时候它在变化，结果没法核实。"
+// in the language of msgs.
+//
+// 本地安全检查：无法核实时的说明
+func (msgs Messages) SecUnknownNote() string {
+	return Catalog.Format(msgs.locale, "secUnknownNote", nil)
+}
+
+// SecStripHigh says "高风险 {count} 项"
+// in the language the app shows.
+//
+// 本地安全检查：阅读视图顶部状态栏：没看过的高风险
+func SecStripHigh(count int) string { return In(i18n.Locale()).SecStripHigh(count) }
+
+// SecStripHigh says "高风险 {count} 项"
+// in the language of msgs.
+//
+// 本地安全检查：阅读视图顶部状态栏：没看过的高风险
+func (msgs Messages) SecStripHigh(count int) string {
+	return Catalog.Format(msgs.locale, "secStripHigh", map[string]any{"count": count})
+}
+
+// SecStripWarning says "安全警告 {count} 项"
+// in the language the app shows.
+//
+// 本地安全检查：阅读视图顶部状态栏：没看过的警告
+func SecStripWarning(count int) string { return In(i18n.Locale()).SecStripWarning(count) }
+
+// SecStripWarning says "安全警告 {count} 项"
+// in the language of msgs.
+//
+// 本地安全检查：阅读视图顶部状态栏：没看过的警告
+func (msgs Messages) SecStripWarning(count int) string {
+	return Catalog.Format(msgs.locale, "secStripWarning", map[string]any{"count": count})
+}
+
+// SecCheckedFiles says "检查了 {done} / {total} 个文件"
+// in the language the app shows.
+//
+// 本地安全检查：报告页顶部：检查了几个文件
+func SecCheckedFiles(done int, total int) string {
+	return In(i18n.Locale()).SecCheckedFiles(done, total)
+}
+
+// SecCheckedFiles says "检查了 {done} / {total} 个文件"
+// in the language of msgs.
+//
+// 本地安全检查：报告页顶部：检查了几个文件
+func (msgs Messages) SecCheckedFiles(done int, total int) string {
+	return Catalog.Format(msgs.locale, "secCheckedFiles", map[string]any{"done": done, "total": total})
+}
+
+// SecCheckedAt says "{date} 检查"
+// in the language the app shows.
+//
+// 本地安全检查：报告页顶部：检查日期
+func SecCheckedAt(date string) string { return In(i18n.Locale()).SecCheckedAt(date) }
+
+// SecCheckedAt says "{date} 检查"
+// in the language of msgs.
+//
+// 本地安全检查：报告页顶部：检查日期
+func (msgs Messages) SecCheckedAt(date string) string {
+	return Catalog.Format(msgs.locale, "secCheckedAt", map[string]any{"date": date})
+}
+
+// SecDisclaimer says "本机离线检查，不代表安全保证"
+// in the language the app shows.
+//
+// 本地安全检查：报告页顶部的说明
+func SecDisclaimer() string { return In(i18n.Locale()).SecDisclaimer() }
+
+// SecDisclaimer says "本机离线检查，不代表安全保证"
+// in the language of msgs.
+//
+// 本地安全检查：报告页顶部的说明
+func (msgs Messages) SecDisclaimer() string {
+	return Catalog.Format(msgs.locale, "secDisclaimer", nil)
+}
+
+// SecAcked says "已看过"
+// in the language the app shows.
+//
+// 本地安全检查：一条风险旁的勾选框：标为已看过
+func SecAcked() string { return In(i18n.Locale()).SecAcked() }
+
+// SecAcked says "已看过"
+// in the language of msgs.
+//
+// 本地安全检查：一条风险旁的勾选框：标为已看过
+func (msgs Messages) SecAcked() string {
+	return Catalog.Format(msgs.locale, "secAcked", nil)
+}
+
+// SecLine says "第 {line} 行"
+// in the language the app shows.
+//
+// 本地安全检查：证据所在的行
+func SecLine(line int) string { return In(i18n.Locale()).SecLine(line) }
+
+// SecLine says "第 {line} 行"
+// in the language of msgs.
+//
+// 本地安全检查：证据所在的行
+func (msgs Messages) SecLine(line int) string {
+	return Catalog.Format(msgs.locale, "secLine", map[string]any{"line": line})
+}
+
+// SecReferencedFrom says "引用这个脚本的位置"
+// in the language the app shows.
+//
+// 本地安全检查：证据：文档里提到这个脚本的地方
+func SecReferencedFrom() string { return In(i18n.Locale()).SecReferencedFrom() }
+
+// SecReferencedFrom says "引用这个脚本的位置"
+// in the language of msgs.
+//
+// 本地安全检查：证据：文档里提到这个脚本的地方
+func (msgs Messages) SecReferencedFrom() string {
+	return Catalog.Format(msgs.locale, "secReferencedFrom", nil)
+}
+
+// SecHolesTitle says "没有检查到的内容"
+// in the language the app shows.
+//
+// 本地安全检查：报告页：覆盖缺口的标题
+func SecHolesTitle() string { return In(i18n.Locale()).SecHolesTitle() }
+
+// SecHolesTitle says "没有检查到的内容"
+// in the language of msgs.
+//
+// 本地安全检查：报告页：覆盖缺口的标题
+func (msgs Messages) SecHolesTitle() string {
+	return Catalog.Format(msgs.locale, "secHolesTitle", nil)
+}
+
+// SecExternalTitle says "要从网上取来执行的内容，没有检查"
+// in the language the app shows.
+//
+// 本地安全检查：报告页：远程载荷的标题
+func SecExternalTitle() string { return In(i18n.Locale()).SecExternalTitle() }
+
+// SecExternalTitle says "要从网上取来执行的内容，没有检查"
+// in the language of msgs.
+//
+// 本地安全检查：报告页：远程载荷的标题
+func (msgs Messages) SecExternalTitle() string {
+	return Catalog.Format(msgs.locale, "secExternalTitle", nil)
+}
+
+// SecMaybeExample says "可能是示例或说明里的引用，请核查。"
+// in the language the app shows.
+//
+// 本地安全检查：低置信度且在示例语境里时的说明
+func SecMaybeExample() string { return In(i18n.Locale()).SecMaybeExample() }
+
+// SecMaybeExample says "可能是示例或说明里的引用，请核查。"
+// in the language of msgs.
+//
+// 本地安全检查：低置信度且在示例语境里时的说明
+func (msgs Messages) SecMaybeExample() string {
+	return Catalog.Format(msgs.locale, "secMaybeExample", nil)
+}
+
+// SecWeakEvidence says "证据不充分，请核查。"
+// in the language the app shows.
+//
+// 本地安全检查：低置信度的说明
+func SecWeakEvidence() string { return In(i18n.Locale()).SecWeakEvidence() }
+
+// SecWeakEvidence says "证据不充分，请核查。"
+// in the language of msgs.
+//
+// 本地安全检查：低置信度的说明
+func (msgs Messages) SecWeakEvidence() string {
+	return Catalog.Format(msgs.locale, "secWeakEvidence", nil)
+}
+
+// SecNoFindings says "没有发现需要注意的内容"
+// in the language the app shows.
+//
+// 本地安全检查：报告里没有任何发现
+func SecNoFindings() string { return In(i18n.Locale()).SecNoFindings() }
+
+// SecNoFindings says "没有发现需要注意的内容"
+// in the language of msgs.
+//
+// 本地安全检查：报告里没有任何发现
+func (msgs Messages) SecNoFindings() string {
+	return Catalog.Format(msgs.locale, "secNoFindings", nil)
+}
+
+// SecLastResult says "上次结果"
+// in the language the app shows.
+//
+// 本地安全检查：重新检查期间，旧结果的标注
+func SecLastResult() string { return In(i18n.Locale()).SecLastResult() }
+
+// SecLastResult says "上次结果"
+// in the language of msgs.
+//
+// 本地安全检查：重新检查期间，旧结果的标注
+func (msgs Messages) SecLastResult() string {
+	return Catalog.Format(msgs.locale, "secLastResult", nil)
+}
+
+// SecWholeSkill says "整个技能"
+// in the language the app shows.
+//
+// 本地安全检查：覆盖缺口不针对某个文件时的位置
+func SecWholeSkill() string { return In(i18n.Locale()).SecWholeSkill() }
+
+// SecWholeSkill says "整个技能"
+// in the language of msgs.
+//
+// 本地安全检查：覆盖缺口不针对某个文件时的位置
+func (msgs Messages) SecWholeSkill() string {
+	return Catalog.Format(msgs.locale, "secWholeSkill", nil)
+}
+
+// SecOpenFile says "在文件里查看"
+// in the language the app shows.
+//
+// 本地安全检查：证据旁的按钮：跳到文件对应的行
+func SecOpenFile() string { return In(i18n.Locale()).SecOpenFile() }
+
+// SecOpenFile says "在文件里查看"
+// in the language of msgs.
+//
+// 本地安全检查：证据旁的按钮：跳到文件对应的行
+func (msgs Messages) SecOpenFile() string {
+	return Catalog.Format(msgs.locale, "secOpenFile", nil)
+}
+
+// SecGapSourcePartial says "来源还没下载完整"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的原因
+func SecGapSourcePartial() string { return In(i18n.Locale()).SecGapSourcePartial() }
+
+// SecGapSourcePartial says "来源还没下载完整"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的原因
+func (msgs Messages) SecGapSourcePartial() string {
+	return Catalog.Format(msgs.locale, "secGapSourcePartial", nil)
+}
+
+// SecGapUnreadable says "读不了"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的原因
+func SecGapUnreadable() string { return In(i18n.Locale()).SecGapUnreadable() }
+
+// SecGapUnreadable says "读不了"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的原因
+func (msgs Messages) SecGapUnreadable() string {
+	return Catalog.Format(msgs.locale, "secGapUnreadable", nil)
+}
+
+// SecGapBinary says "二进制文件"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的原因
+func SecGapBinary() string { return In(i18n.Locale()).SecGapBinary() }
+
+// SecGapBinary says "二进制文件"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的原因
+func (msgs Messages) SecGapBinary() string {
+	return Catalog.Format(msgs.locale, "secGapBinary", nil)
+}
+
+// SecGapEncoding says "不支持的文字编码"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的原因
+func SecGapEncoding() string { return In(i18n.Locale()).SecGapEncoding() }
+
+// SecGapEncoding says "不支持的文字编码"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的原因
+func (msgs Messages) SecGapEncoding() string {
+	return Catalog.Format(msgs.locale, "secGapEncoding", nil)
+}
+
+// SecGapFileLimit says "文件太多，超出上限"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的原因
+func SecGapFileLimit() string { return In(i18n.Locale()).SecGapFileLimit() }
+
+// SecGapFileLimit says "文件太多，超出上限"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的原因
+func (msgs Messages) SecGapFileLimit() string {
+	return Catalog.Format(msgs.locale, "secGapFileLimit", nil)
+}
+
+// SecGapByteLimit says "文件太大，超出上限"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的原因
+func SecGapByteLimit() string { return In(i18n.Locale()).SecGapByteLimit() }
+
+// SecGapByteLimit says "文件太大，超出上限"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的原因
+func (msgs Messages) SecGapByteLimit() string {
+	return Catalog.Format(msgs.locale, "secGapByteLimit", nil)
+}
+
+// SecGapDepthLimit says "目录层级太深"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的原因
+func SecGapDepthLimit() string { return In(i18n.Locale()).SecGapDepthLimit() }
+
+// SecGapDepthLimit says "目录层级太深"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的原因
+func (msgs Messages) SecGapDepthLimit() string {
+	return Catalog.Format(msgs.locale, "secGapDepthLimit", nil)
+}
+
+// SecGapDeadline says "检查超时"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的原因
+func SecGapDeadline() string { return In(i18n.Locale()).SecGapDeadline() }
+
+// SecGapDeadline says "检查超时"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的原因
+func (msgs Messages) SecGapDeadline() string {
+	return Catalog.Format(msgs.locale, "secGapDeadline", nil)
+}
+
+// SecGapChanged says "检查时文件在变化"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的原因
+func SecGapChanged() string { return In(i18n.Locale()).SecGapChanged() }
+
+// SecGapChanged says "检查时文件在变化"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的原因
+func (msgs Messages) SecGapChanged() string {
+	return Catalog.Format(msgs.locale, "secGapChanged", nil)
+}
+
+// SecGapLinkNotFollowed says "链接没有跟进去"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的原因
+func SecGapLinkNotFollowed() string { return In(i18n.Locale()).SecGapLinkNotFollowed() }
+
+// SecGapLinkNotFollowed says "链接没有跟进去"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的原因
+func (msgs Messages) SecGapLinkNotFollowed() string {
+	return Catalog.Format(msgs.locale, "secGapLinkNotFollowed", nil)
+}
+
+// SecGapSpecialFile says "特殊文件"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的原因
+func SecGapSpecialFile() string { return In(i18n.Locale()).SecGapSpecialFile() }
+
+// SecGapSpecialFile says "特殊文件"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的原因
+func (msgs Messages) SecGapSpecialFile() string {
+	return Catalog.Format(msgs.locale, "secGapSpecialFile", nil)
+}
+
+// SecGapAnalysisError says "分析出错"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的原因
+func SecGapAnalysisError() string { return In(i18n.Locale()).SecGapAnalysisError() }
+
+// SecGapAnalysisError says "分析出错"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的原因
+func (msgs Messages) SecGapAnalysisError() string {
+	return Catalog.Format(msgs.locale, "secGapAnalysisError", nil)
+}
+
+// SecGapFindingLimit says "发现太多，超出上限"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的原因
+func SecGapFindingLimit() string { return In(i18n.Locale()).SecGapFindingLimit() }
+
+// SecGapFindingLimit says "发现太多，超出上限"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的原因
+func (msgs Messages) SecGapFindingLimit() string {
+	return Catalog.Format(msgs.locale, "secGapFindingLimit", nil)
+}
+
+// SecGapCancelled says "检查被取消"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的原因
+func SecGapCancelled() string { return In(i18n.Locale()).SecGapCancelled() }
+
+// SecGapCancelled says "检查被取消"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的原因
+func (msgs Messages) SecGapCancelled() string {
+	return Catalog.Format(msgs.locale, "secGapCancelled", nil)
+}
+
+// SecFailNotFound says "目录不存在"
+// in the language the app shows.
+//
+// 本地安全检查：检查失败的原因
+func SecFailNotFound() string { return In(i18n.Locale()).SecFailNotFound() }
+
+// SecFailNotFound says "目录不存在"
+// in the language of msgs.
+//
+// 本地安全检查：检查失败的原因
+func (msgs Messages) SecFailNotFound() string {
+	return Catalog.Format(msgs.locale, "secFailNotFound", nil)
+}
+
+// SecFailPermission says "没有读取权限"
+// in the language the app shows.
+//
+// 本地安全检查：检查失败的原因
+func SecFailPermission() string { return In(i18n.Locale()).SecFailPermission() }
+
+// SecFailPermission says "没有读取权限"
+// in the language of msgs.
+//
+// 本地安全检查：检查失败的原因
+func (msgs Messages) SecFailPermission() string {
+	return Catalog.Format(msgs.locale, "secFailPermission", nil)
+}
+
+// SecFailUnreadable says "读不了这个目录"
+// in the language the app shows.
+//
+// 本地安全检查：检查失败的原因
+func SecFailUnreadable() string { return In(i18n.Locale()).SecFailUnreadable() }
+
+// SecFailUnreadable says "读不了这个目录"
+// in the language of msgs.
+//
+// 本地安全检查：检查失败的原因
+func (msgs Messages) SecFailUnreadable() string {
+	return Catalog.Format(msgs.locale, "secFailUnreadable", nil)
+}
+
+// SecFailChanged says "检查之后内容变了"
+// in the language the app shows.
+//
+// 本地安全检查：检查失败的原因
+func SecFailChanged() string { return In(i18n.Locale()).SecFailChanged() }
+
+// SecFailChanged says "检查之后内容变了"
+// in the language of msgs.
+//
+// 本地安全检查：检查失败的原因
+func (msgs Messages) SecFailChanged() string {
+	return Catalog.Format(msgs.locale, "secFailChanged", nil)
+}
+
+// IssueSecurityHighRisk says "高风险"
+// in the language the app shows.
+//
+// 整理页：问题类型「高风险」
+func IssueSecurityHighRisk() string { return In(i18n.Locale()).IssueSecurityHighRisk() }
+
+// IssueSecurityHighRisk says "高风险"
+// in the language of msgs.
+//
+// 整理页：问题类型「高风险」
+func (msgs Messages) IssueSecurityHighRisk() string {
+	return Catalog.Format(msgs.locale, "issueSecurityHighRisk", nil)
+}
+
+// IssueSecurityWarning says "安全警告"
+// in the language the app shows.
+//
+// 整理页：问题类型「安全警告」
+func IssueSecurityWarning() string { return In(i18n.Locale()).IssueSecurityWarning() }
+
+// IssueSecurityWarning says "安全警告"
+// in the language of msgs.
+//
+// 整理页：问题类型「安全警告」
+func (msgs Messages) IssueSecurityWarning() string {
+	return Catalog.Format(msgs.locale, "issueSecurityWarning", nil)
+}
+
+// IssueSecurityUnfinished says "安全检查未完成"
+// in the language the app shows.
+//
+// 整理页：问题类型「安全检查未完成」
+func IssueSecurityUnfinished() string { return In(i18n.Locale()).IssueSecurityUnfinished() }
+
+// IssueSecurityUnfinished says "安全检查未完成"
+// in the language of msgs.
+//
+// 整理页：问题类型「安全检查未完成」
+func (msgs Messages) IssueSecurityUnfinished() string {
+	return Catalog.Format(msgs.locale, "issueSecurityUnfinished", nil)
+}
+
+// TidyNoteSecurityHighRisk says "本机检查发现的严重风险。看过并确认没问题的，可以标为已看过。"
+// in the language the app shows.
+//
+// 整理页「高风险」的说明
+func TidyNoteSecurityHighRisk() string { return In(i18n.Locale()).TidyNoteSecurityHighRisk() }
+
+// TidyNoteSecurityHighRisk says "本机检查发现的严重风险。看过并确认没问题的，可以标为已看过。"
+// in the language of msgs.
+//
+// 整理页「高风险」的说明
+func (msgs Messages) TidyNoteSecurityHighRisk() string {
+	return Catalog.Format(msgs.locale, "tidyNoteSecurityHighRisk", nil)
+}
+
+// TidyNoteSecurityWarning says "本机检查发现的需要注意的地方。看过并确认没问题的，可以标为已看过。"
+// in the language the app shows.
+//
+// 整理页「安全警告」的说明
+func TidyNoteSecurityWarning() string { return In(i18n.Locale()).TidyNoteSecurityWarning() }
+
+// TidyNoteSecurityWarning says "本机检查发现的需要注意的地方。看过并确认没问题的，可以标为已看过。"
+// in the language of msgs.
+//
+// 整理页「安全警告」的说明
+func (msgs Messages) TidyNoteSecurityWarning() string {
+	return Catalog.Format(msgs.locale, "tidyNoteSecurityWarning", nil)
+}
+
+// TidyNoteSecurityUnfinished says "这些技能没能完整检查，结果不能当作没有风险。"
+// in the language the app shows.
+//
+// 整理页「安全检查未完成」的说明
+func TidyNoteSecurityUnfinished() string { return In(i18n.Locale()).TidyNoteSecurityUnfinished() }
+
+// TidyNoteSecurityUnfinished says "这些技能没能完整检查，结果不能当作没有风险。"
+// in the language of msgs.
+//
+// 整理页「安全检查未完成」的说明
+func (msgs Messages) TidyNoteSecurityUnfinished() string {
+	return Catalog.Format(msgs.locale, "tidyNoteSecurityUnfinished", nil)
+}
+
+// SecColumnIssue says "问题"
+// in the language the app shows.
+//
+// 本地安全检查：整理页表格的列名
+func SecColumnIssue() string { return In(i18n.Locale()).SecColumnIssue() }
+
+// SecColumnIssue says "问题"
+// in the language of msgs.
+//
+// 本地安全检查：整理页表格的列名
+func (msgs Messages) SecColumnIssue() string {
+	return Catalog.Format(msgs.locale, "secColumnIssue", nil)
+}
+
+// SecMoreFindings says "另有 {count} 项"
+// in the language the app shows.
+//
+// 本地安全检查：整理页一行里还有几条
+func SecMoreFindings(count int) string { return In(i18n.Locale()).SecMoreFindings(count) }
+
+// SecMoreFindings says "另有 {count} 项"
+// in the language of msgs.
+//
+// 本地安全检查：整理页一行里还有几条
+func (msgs Messages) SecMoreFindings(count int) string {
+	return Catalog.Format(msgs.locale, "secMoreFindings", map[string]any{"count": count})
+}
+
+// SecShowAcked says "显示已看过的 {count} 项"
+// in the language the app shows.
+//
+// 本地安全检查：整理页表格下面：展开已看过的
+func SecShowAcked(count int) string { return In(i18n.Locale()).SecShowAcked(count) }
+
+// SecShowAcked says "显示已看过的 {count} 项"
+// in the language of msgs.
+//
+// 本地安全检查：整理页表格下面：展开已看过的
+func (msgs Messages) SecShowAcked(count int) string {
+	return Catalog.Format(msgs.locale, "secShowAcked", map[string]any{"count": count})
+}
+
+// SecHideAcked says "收起已看过的"
+// in the language the app shows.
+//
+// 本地安全检查：整理页表格下面：收起已看过的
+func SecHideAcked() string { return In(i18n.Locale()).SecHideAcked() }
+
+// SecHideAcked says "收起已看过的"
+// in the language of msgs.
+//
+// 本地安全检查：整理页表格下面：收起已看过的
+func (msgs Messages) SecHideAcked() string {
+	return Catalog.Format(msgs.locale, "secHideAcked", nil)
+}
+
+// SecProgress says "安全检查 {done} / {total}"
+// in the language the app shows.
+//
+// 本地安全检查：整理页顶栏：后台检查进度
+func SecProgress(done int, total int) string { return In(i18n.Locale()).SecProgress(done, total) }
+
+// SecProgress says "安全检查 {done} / {total}"
+// in the language of msgs.
+//
+// 本地安全检查：整理页顶栏：后台检查进度
+func (msgs Messages) SecProgress(done int, total int) string {
+	return Catalog.Format(msgs.locale, "secProgress", map[string]any{"done": done, "total": total})
+}
+
+// SecStop says "停止"
+// in the language the app shows.
+//
+// 本地安全检查：整理页顶栏：停止后台检查
+func SecStop() string { return In(i18n.Locale()).SecStop() }
+
+// SecStop says "停止"
+// in the language of msgs.
+//
+// 本地安全检查：整理页顶栏：停止后台检查
+func (msgs Messages) SecStop() string {
+	return Catalog.Format(msgs.locale, "secStop", nil)
+}
+
+// SecTagChecking says "检查中"
+// in the language the app shows.
+//
+// 本地安全检查：添加技能列表：正在检查
+func SecTagChecking() string { return In(i18n.Locale()).SecTagChecking() }
+
+// SecTagChecking says "检查中"
+// in the language of msgs.
+//
+// 本地安全检查：添加技能列表：正在检查
+func (msgs Messages) SecTagChecking() string {
+	return Catalog.Format(msgs.locale, "secTagChecking", nil)
+}
+
+// SecTagUnchecked says "未检查完"
+// in the language the app shows.
+//
+// 本地安全检查：添加技能列表：检查失败或不完整
+func SecTagUnchecked() string { return In(i18n.Locale()).SecTagUnchecked() }
+
+// SecTagUnchecked says "未检查完"
+// in the language of msgs.
+//
+// 本地安全检查：添加技能列表：检查失败或不完整
+func (msgs Messages) SecTagUnchecked() string {
+	return Catalog.Format(msgs.locale, "secTagUnchecked", nil)
+}
+
+// SecAddConfirmTitle says "{count} 个技能有高风险或没检查完"
+// in the language the app shows.
+//
+// 本地安全检查：添加前的确认弹窗标题
+func SecAddConfirmTitle(count int) string { return In(i18n.Locale()).SecAddConfirmTitle(count) }
+
+// SecAddConfirmTitle says "{count} 个技能有高风险或没检查完"
+// in the language of msgs.
+//
+// 本地安全检查：添加前的确认弹窗标题
+func (msgs Messages) SecAddConfirmTitle(count int) string {
+	return Catalog.Format(msgs.locale, "secAddConfirmTitle", map[string]any{"count": count})
+}
+
+// SecAddConfirmBody says "确认看过它们的检查结果后再添加。"
+// in the language the app shows.
+//
+// 本地安全检查：添加前的确认弹窗说明
+func SecAddConfirmBody() string { return In(i18n.Locale()).SecAddConfirmBody() }
+
+// SecAddConfirmBody says "确认看过它们的检查结果后再添加。"
+// in the language of msgs.
+//
+// 本地安全检查：添加前的确认弹窗说明
+func (msgs Messages) SecAddConfirmBody() string {
+	return Catalog.Format(msgs.locale, "secAddConfirmBody", nil)
+}
+
+// SecAddAnyway says "仍然添加"
+// in the language the app shows.
+//
+// 本地安全检查：添加前的确认弹窗：确认按钮
+func SecAddAnyway() string { return In(i18n.Locale()).SecAddAnyway() }
+
+// SecAddAnyway says "仍然添加"
+// in the language of msgs.
+//
+// 本地安全检查：添加前的确认弹窗：确认按钮
+func (msgs Messages) SecAddAnyway() string {
+	return Catalog.Format(msgs.locale, "secAddAnyway", nil)
+}
+
+// SecUpdateHeldHigh says "新版本发现高风险"
+// in the language the app shows.
+//
+// 本地安全检查：更新页：新版本检查出高风险
+func SecUpdateHeldHigh() string { return In(i18n.Locale()).SecUpdateHeldHigh() }
+
+// SecUpdateHeldHigh says "新版本发现高风险"
+// in the language of msgs.
+//
+// 本地安全检查：更新页：新版本检查出高风险
+func (msgs Messages) SecUpdateHeldHigh() string {
+	return Catalog.Format(msgs.locale, "secUpdateHeldHigh", nil)
+}
+
+// SecUpdateUnchecked says "新版本没能完整检查"
+// in the language the app shows.
+//
+// 本地安全检查：更新页：新版本检查失败或不完整
+func SecUpdateUnchecked() string { return In(i18n.Locale()).SecUpdateUnchecked() }
+
+// SecUpdateUnchecked says "新版本没能完整检查"
+// in the language of msgs.
+//
+// 本地安全检查：更新页：新版本检查失败或不完整
+func (msgs Messages) SecUpdateUnchecked() string {
+	return Catalog.Format(msgs.locale, "secUpdateUnchecked", nil)
+}
+
+// SecUpdateAnyway says "仍然更新"
+// in the language the app shows.
+//
+// 本地安全检查：更新对比页：确认看过风险后仍要更新
+func SecUpdateAnyway() string { return In(i18n.Locale()).SecUpdateAnyway() }
+
+// SecUpdateAnyway says "仍然更新"
+// in the language of msgs.
+//
+// 本地安全检查：更新对比页：确认看过风险后仍要更新
+func (msgs Messages) SecUpdateAnyway() string {
+	return Catalog.Format(msgs.locale, "secUpdateAnyway", nil)
+}
+
+// LibraryUpdateSecurityHold says "新版本的安全检查结果需要先确认"
+// in the language the app shows.
+//
+// 本地安全检查：库层：更新被安全检查拦下
+func LibraryUpdateSecurityHold() string { return In(i18n.Locale()).LibraryUpdateSecurityHold() }
+
+// LibraryUpdateSecurityHold says "新版本的安全检查结果需要先确认"
+// in the language of msgs.
+//
+// 本地安全检查：库层：更新被安全检查拦下
+func (msgs Messages) LibraryUpdateSecurityHold() string {
+	return Catalog.Format(msgs.locale, "libraryUpdateSecurityHold", nil)
+}

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"skillmanager/internal/security"
+	"skillmanager/locales"
 )
 
 // 本地安全检查服务：由应用持有，不随页面关闭，也不随 Library 重建。
@@ -663,4 +664,82 @@ func (s *SecurityService) ScanStaged(ctx context.Context, dir string, incomplete
 	defer cancel()
 	rec := s.analyze(ctx, dir, incomplete)
 	return StagedSecurity{Report: rec.Report}
+}
+
+// ScanImport 检查一个导入暂存的技能。完整下载的还核对暂存目录的 tree 哈希
+// 等于读取时记下的：添加时会再核对复制出来的内容，三者一致，装进去的就是
+// 检查过的内容。
+func (s *SecurityService) ScanImport(ctx context.Context, sk *ImportSkill) StagedSecurity {
+	st := s.ScanStaged(ctx, sk.Dir, sk.Partial)
+	if !sk.Partial && st.Report.Execution == security.Completed {
+		if h, err := TreeHash(sk.Dir); err != nil || h != sk.Tree {
+			st.Report.Execution, st.Report.Error, st.Report.Complete = security.Failed, "changed", false
+		}
+	}
+	return st
+}
+
+// NeedsSecurityReview 报告这份结果不能自动放行：高风险、检查失败或不完整。
+// 警告照常显示，但不拦。
+func NeedsSecurityReview(r security.Report) bool {
+	return r.Execution != security.Completed || !r.Complete || r.Top() == security.HighRisk
+}
+
+// UpdateSecurityCheck 由应用设置，检查准备安装的新版本；nil 时不检查（测试）。
+var UpdateSecurityCheck func(ctx context.Context, dir string) security.Report
+
+// SecurityHoldError 是更新被安全检查拦下：要用户看过结果、明确放行。
+type SecurityHoldError struct{ Report security.Report }
+
+func (e *SecurityHoldError) Error() string { return locales.LibraryUpdateSecurityHold() }
+
+// securityHolds 记下被拦下的更新（名称 + 上游哈希 → 那次的报告），界面据此
+// 把它们放进“更新前需确认”，一键更新不再包含它们。上游变了自然不再匹配。
+var securityHolds sync.Map
+
+func holdKey(it UpdateItem) string { return it.Name + "\x00" + it.Upstream }
+
+// SecurityHold 返回这个更新项被拦下时的检查结果。
+func SecurityHold(it UpdateItem) (security.Report, bool) {
+	v, ok := securityHolds.Load(holdKey(it))
+	if !ok {
+		return security.Report{}, false
+	}
+	return v.(security.Report), true
+}
+
+func holdForSecurity(ctx context.Context, it UpdateItem, p *Prepared) error {
+	if UpdateSecurityCheck == nil || p.SecurityApproved {
+		securityHolds.Delete(holdKey(it))
+		return nil
+	}
+	rep := UpdateSecurityCheck(ctx, p.Dir)
+	if NeedsSecurityReview(rep) {
+		securityHolds.Store(holdKey(it), rep)
+		return &SecurityHoldError{Report: rep}
+	}
+	securityHolds.Delete(holdKey(it))
+	return nil
+}
+
+// SampleSecurity 是示例数据的检查结果：分析示例文件，只在内存里，不扫描
+// 本机目录。
+func SampleSecurity(l *Library) *SecurityService {
+	s := newSecurity("", make([]byte, 32), nil, 0)
+	s.sample = true
+	for _, sk := range l.Skills {
+		var in security.Input
+		for _, f := range sk.Files {
+			mode := fs.FileMode(0o644)
+			if strings.HasSuffix(f.Path, ".sh") {
+				mode = 0o755
+			}
+			in.Files = append(in.Files, security.File{Path: f.Path, Kind: security.Regular, Mode: mode, Data: []byte(f.Content)})
+		}
+		r := SecurityKey(sk)
+		st := s.root(r)
+		st.loaded, st.fresh = true, FreshCurrent
+		st.rec = &securityRecord{Root: r, Meta: "sample", Report: security.Analyze(context.Background(), in, security.DefaultPolicy(), s.fp)}
+	}
+	return s
 }
