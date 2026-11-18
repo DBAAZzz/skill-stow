@@ -16543,3 +16543,17 @@ func LibraryUpdateSecurityHold() string { return In(i18n.Locale()).LibraryUpdate
 func (msgs Messages) LibraryUpdateSecurityHold() string {
 	return Catalog.Format(msgs.locale, "libraryUpdateSecurityHold", nil)
 }
+
+// SecAckSaveFailed says "没能记下“已看过”，请再试一次。"
+// in the language the app shows.
+//
+// 本地安全检查：已看过标记写入失败的提示
+func SecAckSaveFailed() string { return In(i18n.Locale()).SecAckSaveFailed() }
+
+// SecAckSaveFailed says "没能记下“已看过”，请再试一次。"
+// in the language of msgs.
+//
+// 本地安全检查：已看过标记写入失败的提示
+func (msgs Messages) SecAckSaveFailed() string {
+	return Catalog.Format(msgs.locale, "secAckSaveFailed", nil)
+}

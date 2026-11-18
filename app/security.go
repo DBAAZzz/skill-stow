@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"slices"
 	"strings"
 	"sync/atomic"
@@ -53,7 +54,8 @@ type secJump struct {
 
 type impSecurity struct {
 	scanning bool
-	partial  bool // 检查时还没补齐
+	dir      string // 查的是哪个暂存目录
+	partial  bool   // 检查时还没补齐
 	report   *security.Report
 	unpicked bool // 检查出问题时替用户取消过勾选：之后用户再勾就不再动它
 }
@@ -70,8 +72,8 @@ func (a *app) startSecurity() {
 	}
 	a.sec.svc = library.NewSecurity(a.lib.Home, a.securityChanged)
 	svc := a.sec.svc
-	library.UpdateSecurityCheck = func(ctx context.Context, dir string) security.Report {
-		return svc.ScanStaged(ctx, dir, false).Report
+	library.UpdateSecurityCheck = func(ctx context.Context, dir string) library.StagedSecurity {
+		return svc.ScanStaged(ctx, dir, false)
 	}
 	a.syncSecurity()
 	stop := make(chan struct{})
@@ -114,24 +116,65 @@ func (a *app) syncSecurity() {
 	}
 	var roots []string
 	for _, s := range a.lib.Skills {
-		roots = append(roots, library.SecurityKey(s))
+		roots = append(roots, secKeys(s)...)
 	}
 	a.sec.svc.Sync(roots)
+}
+
+// secKeys 是一个技能要检查的全部实际目录：它自己，以及各 Agent 目录里
+// 内容不同的同名副本（Agent 实际读的可能是副本）。
+func secKeys(s *library.Skill) []string {
+	keys := []string{library.SecurityKey(s)}
+	for _, d := range s.CopyDirs() {
+		if d != "" && !slices.Contains(keys, d) {
+			keys = append(keys, d)
+		}
+	}
+	return keys
 }
 
 func (a *app) secOn() bool { return a.sec.svc != nil }
 
 func (a *app) secView(s *library.Skill) library.SkillSecurity {
+	_, v := a.secPick(s)
+	return v
+}
+
+// secPick 挑出这个技能最需要看的那一份（它自己或某个副本）：没看过的风险
+// 最严重的优先，其次是没能查完的；一样时用它自己。
+func (a *app) secPick(s *library.Skill) (string, library.SkillSecurity) {
 	if a.sec.svc == nil || s == nil {
-		return library.SkillSecurity{}
+		return "", library.SkillSecurity{}
 	}
-	return a.sec.svc.View(library.SecurityKey(s))
+	score := func(v library.SkillSecurity) int {
+		n := v.TopPending().Rank() * 4
+		if v.Unfinished() || v.Fresh == library.FreshUnknown {
+			n += 2
+		}
+		return n
+	}
+	var key string
+	var best library.SkillSecurity
+	for i, k := range secKeys(s) {
+		v := a.sec.svc.View(k)
+		if i == 0 || score(v) > score(best) {
+			key, best = k, v
+		}
+	}
+	return key, best
 }
 
 func (a *app) secRescan(s *library.Skill) {
 	if a.sec.svc != nil {
-		a.sec.svc.Scan([]string{library.SecurityKey(s)}, true)
+		a.sec.svc.Scan(secKeys(s), true)
 	}
+}
+
+// secOnCopy 报告最需要看的是同名副本而不是技能自己：阅读视图里的文件不是
+// 它的，证据要到副本里去看。
+func (a *app) secOnCopy(s *library.Skill) (string, bool) {
+	key, _ := a.secPick(s)
+	return key, key != "" && key != library.SecurityKey(s)
 }
 
 // ——— 文案 ———
@@ -460,8 +503,12 @@ func (a *app) secStatusLine(c *ui.Context, v library.SkillSecurity) {
 			ui.Image(c, symTagMuted).Size(16, 16).Shrink(0)
 			ui.Text(c, locales.SecAckedCount(v.Risky())).TextColor(colTextSecondary).SingleLine()
 		default:
+			// 上次没发现风险，但这次还没核实目录没变：写成灰色，标上次结果
 			ui.Image(c, symOK).Size(16, 16).Shrink(0)
-			ui.Text(c, locales.SecClean()).SingleLine()
+			t := ui.Text(c, locales.SecClean()).SingleLine()
+			if !v.Clean() {
+				t.TextColor(colTextSecondary)
+			}
 		}
 		if v.Report != nil {
 			switch {
@@ -469,6 +516,8 @@ func (a *app) secStatusLine(c *ui.Context, v library.SkillSecurity) {
 				ui.Spinner(c).Size(12, 12).TextColor(colTextMuted)
 			case v.Fresh == library.FreshStale:
 				tag(c, importTagSpec{text: locales.SecStale(), tone: tagToneMuted}, true)
+			case v.Fresh == library.FreshChecking:
+				tag(c, importTagSpec{text: locales.SecLastResult(), tone: tagToneMuted}, true)
 			}
 		}
 	})
@@ -540,7 +589,7 @@ func (a *app) securityFileRow(c *ui.Context, s *library.Skill) {
 
 // secFileMark 是文件列表里有风险的文件右边的小圆点颜色；没有时为 false。
 func (a *app) secFileMark(s *library.Skill, path string) (ui.Color, bool) {
-	if !a.secOn() {
+	if _, onCopy := a.secOnCopy(s); !a.secOn() || onCopy {
 		return ui.Color{}, false
 	}
 	v := a.secView(s)
@@ -596,7 +645,7 @@ func (a *app) securityReport(c *ui.Context, s *library.Skill, fresh bool) {
 		fadeIn(col, fresh, 220*time.Millisecond).Children(func() {
 			ui.Row(c).Gap(10).AlignItems(ui.Center).Children(func() {
 				ui.Text(c, locales.SecCheck()).FontSize(20).FontWeight(600).SingleLine()
-				if v.Report != nil && (v.Scanning || v.Fresh == library.FreshStale) {
+				if v.Report != nil && (v.Scanning || v.Fresh == library.FreshStale || v.Fresh == library.FreshChecking) {
 					tag(c, importTagSpec{text: locales.SecLastResult(), tone: tagToneMuted}, true)
 				}
 				ui.Spacer(c)
@@ -611,6 +660,10 @@ func (a *app) securityReport(c *ui.Context, s *library.Skill, fresh bool) {
 				return
 			}
 			r := v.Report
+			if dir, onCopy := a.secOnCopy(s); onCopy {
+				// 最需要看的是另一个 Agent 目录里的同名副本：写明是哪一份
+				ui.Text(c, a.lib.Display(dir)).Font("monospace").FontSize(12).TextColor(colTextSecondary).SingleLine().Margin(-8, 0, 0, 0)
+			}
 			metaLine(c, locales.SecCheckedAt(scanDay(r.FinishedAt, now)), locales.SecCheckedFiles(r.FilesAnalyzed, r.FilesDiscovered)).
 				FontSize(12).TextColor(colTextMuted).Margin(-8, 0, 0, 0)
 			ui.Text(c, locales.SecDisclaimer()).FontSize(12).TextColor(colTextDisabled).Margin(-10, 0, 0, 0)
@@ -704,11 +757,15 @@ func (a *app) findingCard(c *ui.Context, s *library.Skill, v library.SkillSecuri
 					ui.Text(c, locales.SecAcked()).FontSize(12).TextColor(colTextSecondary).SingleLine()
 				})
 				if b.Clicked() {
-					key := library.SecurityKey(s)
+					key, _ := a.secPick(s)
+					var err error
 					if acked {
-						a.sec.svc.Unack(key, f.Key)
+						err = a.sec.svc.Unack(key, f.Key)
 					} else {
-						a.sec.svc.Ack(key, f.Key)
+						err = a.sec.svc.Ack(key, f.Key)
+					}
+					if err != nil {
+						a.notify(fromAppData, toastError, locales.SecAckSaveFailed())
 					}
 				}
 			}
@@ -753,7 +810,12 @@ func (a *app) evidenceBlock(c *ui.Context, s *library.Skill, e security.Evidence
 }
 
 // jumpToEvidence 打开证据所在的文件，以原文显示，滚到那一行并标底色。
+// 证据在同名副本里时，用编辑器打开副本里的那个文件。
 func (a *app) jumpToEvidence(s *library.Skill, e security.Evidence) {
+	if dir, onCopy := a.secOnCopy(s); onCopy {
+		a.openInEditor(filepath.Join(dir, filepath.FromSlash(e.Path)))
+		return
+	}
 	i := slices.IndexFunc(s.Files, func(f library.File) bool { return f.Path == e.Path })
 	if i < 0 {
 		return
@@ -802,12 +864,11 @@ func (a *app) secRows(k library.Issue, acked bool) []secRow {
 	var out []secRow
 	seen := map[string]bool{}
 	for _, s := range a.lib.Skills {
-		key := library.SecurityKey(s)
+		key, v := a.secPick(s)
 		if seen[key] {
 			continue
 		}
 		seen[key] = true
-		v := a.secView(s)
 		if v.Report == nil {
 			continue
 		}
@@ -955,27 +1016,32 @@ func (a *app) scanImports() {
 	for _, sk := range b.Skills {
 		k := a.importKey(sk)
 		cur := a.sec.imp[k]
-		if cur != nil && (cur.scanning || cur.partial == sk.Partial) {
-			continue
+		if cur != nil && (cur.scanning || cur.partial == sk.Partial && cur.dir == sk.Dir) {
+			continue // 在查，或查的就是现在这一份；在查的那次结束时会再对一次
 		}
 		if st.fetching[k] {
 			continue
 		}
-		is := &impSecurity{scanning: true, partial: sk.Partial}
+		// 在界面线程上取好参数：补齐会改写这个对象，后台不碰它
+		dir, partial, tree := sk.Dir, sk.Partial, sk.Tree
+		is := &impSecurity{scanning: true, partial: partial, dir: dir}
 		if cur != nil {
 			is.unpicked = cur.unpicked
 		}
 		a.sec.imp[k] = is
 		a.holdBatch(b)
 		a.background(func(post func(func())) {
-			res := svc.ScanImport(ctx, sk)
+			res := svc.ScanImport(ctx, dir, partial, tree)
 			post(func() {
 				defer a.releaseBatch(b)
-				if a.sec.impBatch != b {
+				if a.sec.impBatch != b || a.sec.imp[k] != is {
 					return
 				}
 				is.scanning = false
 				is.report = &res.Report
+				if sk.Partial != partial || sk.Dir != dir {
+					defer a.scanImports() // 查的时候补齐了：结果是旧的那份，接着查新的
+				}
 				// 高风险、失败或不完整：替用户取消一次勾选，用户再勾就不再动
 				if !is.unpicked && !is.partial && library.NeedsSecurityReview(res.Report) && st.picked[k] {
 					is.unpicked = true
@@ -1147,7 +1213,7 @@ func (a *app) scanPrepared(ctx context.Context, p *library.Prepared) *security.R
 	if a.sec.svc == nil {
 		return nil
 	}
-	r := a.sec.svc.ScanStaged(ctx, p.Dir, false).Report
+	r := a.sec.svc.ScanStaged(ctx, p.Dir, false).Bind(p.Item.Upstream) // 对比页上看的就是要装的这一版
 	return &r
 }
 

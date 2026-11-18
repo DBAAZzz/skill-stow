@@ -1146,5 +1146,6 @@
   "secUpdateHeldHigh": "New version has high risk",
   "secUpdateUnchecked": "New version couldn't be fully checked",
   "secUpdateAnyway": "Update Anyway",
-  "libraryUpdateSecurityHold": "The new version's security check needs your review first"
+  "libraryUpdateSecurityHold": "The new version's security check needs your review first",
+  "secAckSaveFailed": "Couldn’t save “Reviewed”. Try again."
 }

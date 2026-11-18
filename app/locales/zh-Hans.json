@@ -7127,5 +7127,9 @@
   "libraryUpdateSecurityHold": "新版本的安全检查结果需要先确认",
   "@libraryUpdateSecurityHold": {
     "description": "本地安全检查：库层：更新被安全检查拦下"
+  },
+  "secAckSaveFailed": "没能记下“已看过”，请再试一次。",
+  "@secAckSaveFailed": {
+    "description": "本地安全检查：已看过标记写入失败的提示"
   }
 }
