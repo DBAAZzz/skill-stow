@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    # 界面规则（颜色、文案、点号、菜单）都由测试守着；部分代码只在 macOS 上编译
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: app/go.mod
+          cache-dependency-path: app/go.sum
+      - run: go vet ./...
+      - run: go test ./...
