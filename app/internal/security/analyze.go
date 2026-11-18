@@ -28,13 +28,14 @@ type analyzer struct {
 	fp       Fingerprinter
 	pol      Policy
 	out      []Finding
-	seen     map[string]bool
+	seen     map[string]int // 指纹 → a.out 里的位置
 	caps     map[string]bool
 	external map[string]bool
 	full     bool // 发现数量到了上限
 }
 
-// emit 记下一条发现。同一规则、同一组证据只记一次。
+// emit 记下一条发现。同一规则、同一组证据只记一次；同样的内容既出现在
+// 示例里又出现在真正的步骤里时，留下等级高的那次。
 func (a *analyzer) emit(r rule, ctx Context, conf Confidence, evs ...rawEv) {
 	if r.cat == Capability {
 		if a.caps[r.id] {
@@ -46,27 +47,31 @@ func (a *analyzer) emit(r rule, ctx Context, conf Confidence, evs ...rawEv) {
 	for _, e := range evs {
 		parts = append(parts, e.path, strings.TrimSpace(e.text))
 	}
-	if r.cat == FileBoundary || r.cat == Capability {
-		// 结构问题和能力提示没有“片段”可言，按路径区分
+	if r.cat == Capability {
+		// 能力提示没有“片段”可言，按路径区分（结构问题的片段里有链接目标，
+		// 目标换了要当作新的发现）
 		parts = parts[:2]
 		for _, e := range evs {
 			parts = append(parts, e.path)
 		}
 	}
 	key := a.fp(parts...)
-	if a.seen[key] {
+	notice, conf := classify(r, ctx, conf)
+	f := Finding{Key: key, Rule: r.id, RuleVersion: r.version, Category: r.cat, Notice: notice, Confidence: conf, Context: ctx, Message: r.msg}
+	for _, e := range evs {
+		f.Evidence = append(f.Evidence, Evidence{Path: e.path, Line: e.line, Snippet: redact(e.text), Ref: e.ref})
+	}
+	if i, ok := a.seen[key]; ok {
+		if old := a.out[i]; notice.Rank() > old.Notice.Rank() || notice == old.Notice && conf.rank() > old.Confidence.rank() {
+			a.out[i] = f
+		}
 		return
 	}
 	if len(a.out) >= a.pol.MaxFindings {
 		a.full = true
 		return
 	}
-	a.seen[key] = true
-	notice, conf := classify(r, ctx, conf)
-	f := Finding{Key: key, Rule: r.id, RuleVersion: r.version, Category: r.cat, Notice: notice, Confidence: conf, Context: ctx, Message: r.msg}
-	for _, e := range evs {
-		f.Evidence = append(f.Evidence, Evidence{Path: e.path, Line: e.line, Snippet: redact(e.text), Ref: e.ref})
-	}
+	a.seen[key] = len(a.out)
 	a.out = append(a.out, f)
 }
 
@@ -97,7 +102,7 @@ func Analyze(ctx context.Context, in Input, pol Policy, fp Fingerprinter) Report
 		pol = DefaultPolicy()
 	}
 	rep := Report{Schema: SchemaVersion, Engine: EngineVersion, Ruleset: RulesetVersion(), StartedAt: time.Now(), Execution: Completed}
-	a := &analyzer{fp: fp, pol: pol, seen: map[string]bool{}, caps: map[string]bool{}, external: map[string]bool{}}
+	a := &analyzer{fp: fp, pol: pol, seen: map[string]int{}, caps: map[string]bool{}, external: map[string]bool{}}
 	holes := append([]Hole(nil), in.Gaps...)
 	if in.Incomplete {
 		holes = append(holes, Hole{Reason: GapSourcePartial})
@@ -157,6 +162,11 @@ func Analyze(ctx context.Context, in Input, pol Policy, fp Fingerprinter) Report
 	}
 	a.prune()
 	a.references(docs)
+	// 最后一个文件分析得久、过了时限：不能报“已完成”
+	if err := ctx.Err(); err != nil && rep.Execution == Completed {
+		rep.Execution, holes = stopped(err, holes)
+		holes = append(holes, Hole{Reason: gapFor(err)})
+	}
 	if a.full {
 		holes = append(holes, Hole{Reason: GapFindingLimit})
 	}

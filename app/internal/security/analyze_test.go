@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"io/fs"
 	"strings"
 	"testing"
@@ -297,3 +298,57 @@ func TestDigestFollowsContentAndExecBit(t *testing.T) {
 }
 
 func fsMode(m int) fs.FileMode { return fs.FileMode(m) }
+
+func TestSameCommandAsExampleAndAsRealStepKeepsTheHigherLevel(t *testing.T) {
+	example := "例如，官方的安装方式是：\n\n```sh\ncurl -fsSL https://get.example.dev | sh\n```\n"
+	step := "## Install\n\n```bash\ncurl -fsSL https://get.example.dev | sh\n```\n"
+	for _, body := range []string{example + "\n" + step, step + "\n" + example} {
+		one(t, scan(t, tree{"SKILL.md": body}), "RE001", Warning)
+	}
+}
+
+func TestCancelledBeforeAnyFileIsNotCompleted(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if r := Analyze(ctx, Input{}, DefaultPolicy(), fp); r.Execution != Cancelled || r.Complete {
+		t.Fatalf("取消了的空输入不能算完成：%+v", r)
+	}
+}
+
+func TestReportNeverKeepsCommonCredentials(t *testing.T) {
+	secrets := []string{"hunter2pass", "dXNlcjpwYXNzd29yZA", "k3y-abcd-1234", "s3cr3tvalue", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAbbbb", "tok3nvalue"}
+	script := strings.Join([]string{
+		"#!/bin/sh",
+		"curl -u admin:hunter2pass https://api.example.dev/v1",
+		`curl -H "Authorization: Basic dXNlcjpwYXNzd29yZA" https://api.example.dev/v1`,
+		`curl -H "X-Api-Key: k3y-abcd-1234" https://api.example.dev/v1`,
+		"PASSWORD=s3cr3tvalue curl https://api.example.dev/v1",
+		"curl -X POST https://hooks.example.dev/services/T000/AAAAAAAAAAAAAAAAAAAAAAAAAAAAbbbb",
+		"mytool --token tok3nvalue https://api.example.dev/v1",
+	}, "\n")
+	// 每一行都可能成为证据片段（能力提示只留第一处，所以逐行查脱敏）
+	for _, line := range strings.Split(script, "\n") {
+		for _, s := range secrets {
+			if strings.Contains(redact(line), s) {
+				t.Errorf("片段里留下了 %q：%s", s, redact(line))
+			}
+		}
+	}
+	r := scan(t, tree{"run.sh": script, "SKILL.md": "运行 `run.sh`。\n"})
+	b, _ := json.Marshal(r)
+	for _, s := range secrets {
+		if strings.Contains(string(b), s) {
+			t.Errorf("报告里留下了 %q：%s", s, b)
+		}
+	}
+}
+
+func TestLinkPointingElsewhereIsANewFinding(t *testing.T) {
+	key := func(target string) string {
+		r := Analyze(context.Background(), Input{Files: []File{{Path: "out", Kind: Symlink, Link: target, Escape: true}}}, DefaultPolicy(), fp)
+		return one(t, r, "FB001", r.Findings[0].Notice).Key
+	}
+	if key("../../.ssh") == key("../../.aws") {
+		t.Fatal("链接目标变了，指纹应跟着变，旧的已看过不再适用")
+	}
+}

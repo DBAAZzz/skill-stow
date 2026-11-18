@@ -224,8 +224,16 @@ var (
 
 var (
 	urlSecretParam = regexp.MustCompile(`(?i)([?&](?:token|access_token|key|api_key|apikey|secret|password|sig|signature|auth)=)[^&\s"']+`)
-	urlUserinfo    = regexp.MustCompile(`(?i)(https?://)[^/\s:@]+:[^/\s@]+@`)
+	urlUserinfo    = regexp.MustCompile(`(?i)(https?://)[^/\s@'"]+@`)
 	bearer         = regexp.MustCompile(`(?i)(bearer\s+|token\s+|authorization:\s*)[A-Za-z0-9._~+/=-]{12,}`)
+	// 请求头里的认证值：Authorization: Basic …、X-Api-Key: …、Cookie: …
+	authHeader = regexp.MustCompile(`(?i)((?:authorization|proxy-authorization|cookie|x-[a-z0-9-]*(?:key|token|secret|auth)[a-z0-9-]*|api[-_]?key)\s*:\s*)(?:(?:basic|bearer|token|digest)\s+)?[^\s'"]+`)
+	// curl/wget 的用户名口令参数
+	userFlag = regexp.MustCompile(`((?:^|\s)(?:-u|--user|--proxy-user|--password|--http-password|--ftp-password|--token|--access-token|--api-key|--secret)(?:\s+|=)['"]?)[^\s'"]+`)
+	// 赋值或参数里的口令、令牌：password=…、--token …；变量引用不算
+	secretAssign = regexp.MustCompile(`(?i)(\b(?:password|passwd|pwd|secret|token|api[_-]?key|access[_-]?key|client[_-]?secret)\b['"]?\s*[=:]\s*['"]?)[^\s'"&$][^\s'"&]{3,}`)
+	// 地址路径里长串的令牌（例如 webhook 地址）
+	pathToken = regexp.MustCompile(`(/)[A-Za-z0-9_-]{24,}`)
 )
 
 const maxSnippet = 160
@@ -239,6 +247,10 @@ func redact(s string) string {
 	s = urlSecretParam.ReplaceAllString(s, "${1}••••")
 	s = urlUserinfo.ReplaceAllString(s, "${1}••••@")
 	s = bearer.ReplaceAllString(s, "${1}••••")
+	s = authHeader.ReplaceAllString(s, "${1}••••")
+	s = userFlag.ReplaceAllString(s, "${1}••••")
+	s = secretAssign.ReplaceAllString(s, "${1}••••")
+	s = pathToken.ReplaceAllString(s, "${1}••••")
 	if r := []rune(s); len(r) > maxSnippet {
 		s = string(r[:maxSnippet-1]) + "…"
 	}
@@ -253,9 +265,11 @@ func mask(v string) string {
 	return string(r[:4]) + "••••"
 }
 
-// redactURL 只保留地址的协议、主机和路径，去掉查询参数与用户信息。
+// redactURL 只保留地址的协议、主机和路径，去掉查询参数与用户信息，路径里
+// 像令牌的长串遮掉。
 func redactURL(u string) string {
 	u = urlUserinfo.ReplaceAllString(u, "${1}")
+	u = pathToken.ReplaceAllString(u, "${1}••••")
 	if i := strings.IndexAny(u, "?#"); i >= 0 {
 		u = u[:i]
 	}
