@@ -11,5 +11,9 @@
   },
   "macos": {
     "icon": "appicon/AppIcon.icns"
+  },
+  "updates": {
+    "publicKey": "c2HKnc2047NjmoM6lsyUXOKRGax13NREkxcRFbY8g+w=",
+    "github": "DBAAZzz/skill-stow"
   }
 }
