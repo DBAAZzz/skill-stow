@@ -10,6 +10,7 @@ require (
 	github.com/go-git/go-git/v5 v5.19.3
 	github.com/mozillazg/go-pinyin v0.21.0
 	golang.org/x/image v0.46.0
+	mvdan.cc/sh/v3 v3.14.1
 )
 
 require (
