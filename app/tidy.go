@@ -19,6 +19,7 @@ const scopeTidy = "tidy"
 // tidyState 是整理页的状态。
 type tidyState struct {
 	kind  library.Issue
+	auto  bool              // 进来后还没自己点过哪一类：一直停在第一类（安全检查晚到也换过去）
 	msg   string            // 上一次处理的结果（绿色），换一类或离开时清掉
 	err   string            // 上一次处理失败的原因（红色）
 	stats map[string]string // 内容不同的副本的差异统计，按技能 ID；重新扫描时清掉
@@ -124,6 +125,9 @@ func (a *app) tidyPage(c *ui.Context) {
 		})
 		return
 	}
+	if a.tidy.auto {
+		a.tidy.kind = a.firstTidyKind(&p)
+	}
 	if a.issueCount(&p, a.tidy.kind) == 0 {
 		// 这一类处理完了，左边那一项消失，换到下一类
 		for _, k := range a.tidyKinds() {
@@ -148,6 +152,19 @@ func (a *app) tidyPage(c *ui.Context) {
 		})
 	})
 }
+
+// firstTidyKind 是左边列出的第一类（有问题的）；都没有时不变。
+func (a *app) firstTidyKind(p *library.Problems) library.Issue {
+	for _, k := range a.tidyKinds() {
+		if a.issueCount(p, k) > 0 {
+			return k
+		}
+	}
+	return a.tidy.kind
+}
+
+// enterTidy 在换到整理页时调：从第一类看起。
+func (a *app) enterTidy() { a.tidy.auto = true }
 
 // minRescanSpin 是「重新检测」至少转多久：扫描常常一瞬间就完，太快了看不出
 // 点没点上。
@@ -189,6 +206,9 @@ func (a *app) issueRow(c *ui.Context, k library.Issue, n int) {
 	row := ui.ButtonBase(c).Height(40).Padding(0, 10).Gap(10).Radius(7).AlignItems(ui.Center).Label(k.Title()).
 		Transition(issueRowTransition)
 	selectableRow(row, a.tidy.kind == k, colInkSelected)
+	if row.Clicked() {
+		a.tidy.auto = false
+	}
 	if row.Clicked() && a.tidy.kind != k {
 		a.tidy.kind, a.tidy.msg, a.tidy.err = k, "", ""
 	}

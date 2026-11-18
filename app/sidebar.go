@@ -52,6 +52,9 @@ func (a *app) sidebar(c *ui.Context, vibrant bool) {
 	}
 	if bar.Changed() {
 		a.navigate(func() {
+			if next == scopeTidy && a.scope != scopeTidy {
+				a.enterTidy()
+			}
 			a.scope = next
 			a.closeMenusIn(menuWinMain)
 			a.selected, a.reading, a.coll, a.inColl, a.err, a.errAgent = nil, nil, nil, nil, "", ""

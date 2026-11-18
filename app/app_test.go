@@ -181,6 +181,12 @@ func TestTidy(t *testing.T) {
 	if err := tt.Click("整理"); err != nil {
 		t.Fatal(err)
 	}
+	if a.tidy.kind != a.tidyKinds()[0] {
+		t.Fatalf("进整理页应默认选中左边第一类：%v", a.tidy.kind)
+	}
+	if err := tt.Click("内容相同的副本"); err != nil {
+		t.Fatal(err)
+	}
 	p := a.lib.Problems()
 	total := a.issueTotal(&p)
 	for _, want := range []string{fmt.Sprintf("%d 个问题", total), "高风险", "安全警告", "内容相同的副本", "内容不同的副本", "重复的链接", "断掉的链接", "没写简介", "项目技能被全局链接", "全部收成一份", "brainstorming"} {
@@ -216,6 +222,7 @@ func TestMergingAllShowsProgressUntilItIsDone(t *testing.T) {
 	var work func(post func(func()))
 	a.bg = func(w func(post func(func()))) { work = w }
 	must(t, tt.Click("整理"))
+	must(t, tt.Click("内容相同的副本"))
 	must(t, tt.Click("全部收成一份"))
 
 	// 后台还没动：按钮变成进度胶囊，标题下面说正在收哪个，不能再点

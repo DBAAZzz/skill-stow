@@ -103,6 +103,9 @@ func (a *app) closePalette() { a.pal.open = false }
 // goTo 换到侧边栏的一页，像点了那一项。
 func (a *app) goTo(scope string) {
 	a.navigate(func() {
+		if scope == scopeTidy && a.scope != scopeTidy {
+			a.enterTidy()
+		}
 		a.scope = scope
 		a.selected, a.reading, a.coll, a.inColl, a.cmp = nil, nil, nil, nil, nil
 		a.exitBatch()

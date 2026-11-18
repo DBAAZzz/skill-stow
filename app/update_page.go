@@ -736,7 +736,7 @@ func (a *app) updateActions(c *ui.Context, it library.UpdateItem) {
 			if s := a.lib.Get(it.Name); s != nil {
 				if s.Identical() {
 					a.goTo(scopeTidy)
-					a.tidy.kind = library.SameCopies
+					a.tidy.kind, a.tidy.auto = library.SameCopies, false
 				} else {
 					a.openCompare(s, false)
 				}
