@@ -33,7 +33,8 @@ type securityUI struct {
 	svc       *library.SecurityService
 	pending   atomic.Bool // 已经排了一次重画，后台再报变化就不重复排
 	stopTick  chan struct{}
-	showAcked bool // 整理页：展开已看过的
+	showAcked bool            // 整理页：展开已看过的
+	rescans   map[string]bool // 用户点了重新检查、还没报结果的技能 ID
 	jump      secJump
 
 	// 添加技能：每个暂存技能的检查结果，按 importKey；换来源时清空
@@ -105,7 +106,10 @@ func (a *app) stopSecurity() {
 // securityChanged 由服务在任意 goroutine 调：合并成一次重画。
 func (a *app) securityChanged() {
 	if a.sec.pending.CompareAndSwap(false, true) {
-		a.post(func() { a.sec.pending.Store(false) })
+		a.post(func() {
+			a.sec.pending.Store(false)
+			a.secRescanDone()
+		})
 	}
 }
 
@@ -164,9 +168,59 @@ func (a *app) secPick(s *library.Skill) (string, library.SkillSecurity) {
 	return key, best
 }
 
+// secRescan 是用户点的“重新检查”：排到最前面，查完用提示条报结果。
 func (a *app) secRescan(s *library.Skill) {
-	if a.sec.svc != nil {
-		a.sec.svc.Scan(secKeys(s), true)
+	if a.sec.svc == nil {
+		return
+	}
+	a.sec.svc.Scan(secKeys(s), true)
+	if a.sec.rescans == nil {
+		a.sec.rescans = map[string]bool{}
+	}
+	a.sec.rescans[s.ID] = true
+}
+
+// secRescanDone 在服务报变化时调：用户点过重新检查、已经查完的，报一句结果。
+func (a *app) secRescanDone() {
+	for id := range a.sec.rescans {
+		s := a.lib.ByID(id)
+		if s == nil {
+			delete(a.sec.rescans, id)
+			continue
+		}
+		busy := false
+		for _, k := range secKeys(s) {
+			if v := a.sec.svc.View(k); v.Scanning || v.Queued {
+				busy = true
+			}
+		}
+		if busy {
+			continue
+		}
+		delete(a.sec.rescans, id)
+		v := a.secView(s)
+		switch {
+		case v.Unfinished() || v.Fresh == library.FreshUnknown:
+			a.notify(fromTidy, toastWarn, locales.SecRescanUnfinished(secUnfinishedText(v), s.Name))
+		case v.Pending() > 0:
+			a.notify(fromTidy, toastWarn, locales.SecRescanRisky(v.Pending(), s.Name))
+		default:
+			a.notify(fromTidy, toastOK, locales.SecRescanClean(s.Name))
+		}
+	}
+}
+
+// secRescanButton 是“重新检查”；在查的时候换成转圈和“正在检查”。
+func (a *app) secRescanButton(c *ui.Context, s *library.Skill, v library.SkillSecurity) {
+	if v.Scanning || v.Queued {
+		ui.Row(c).Gap(6).AlignItems(ui.Center).Children(func() {
+			ui.Spinner(c).Size(12, 12).TextColor(colTextMuted)
+			ui.Text(c, locales.SecScanning()).FontSize(12).TextColor(colTextMuted).SingleLine()
+		})
+		return
+	}
+	if pushButton(c, locales.SecRescan()).Clicked() {
+		a.secRescan(s)
 	}
 }
 
@@ -369,8 +423,28 @@ func secUnfinishedText(v library.SkillSecurity) string {
 		return secGapLabel(cond(v.Report.Execution == security.TimedOut, security.GapDeadline, security.GapCancelled))
 	case v.Fresh == library.FreshUnknown:
 		return locales.SecUnknown()
+	case v.Report != nil && len(v.Report.Holes) > 0:
+		return secHolesText(v.Report.Holes)
 	}
 	return locales.SecIncomplete()
+}
+
+// secHolesText 写明没检查到哪些文件、为什么：举第一个，其余只说个数。
+func secHolesText(holes []security.Hole) string {
+	h := holes[0]
+	if h.Path == "" {
+		return secGapLabel(h.Reason)
+	}
+	files := 0
+	for _, x := range holes {
+		if x.Path != "" {
+			files++
+		}
+	}
+	if files > 1 {
+		return locales.SecUnfinishedMany(h.Path, secGapLabel(h.Reason), files)
+	}
+	return locales.SecUnfinishedOne(h.Path, secGapLabel(h.Reason))
 }
 
 // topPending 是没看过的风险里最先要看的一条（报告已经按严重程度排好）。
@@ -552,6 +626,10 @@ func (a *app) openSecurityReport(s *library.Skill) {
 		return
 	}
 	a.navigate(func() {
+		// 整理、更新、添加技能页和对比页盖在阅读视图上面：先回到技能所在的列表
+		if a.cmp != nil || a.scope == scopeTidy || a.scope == scopeUpdates || a.scope == scopeImport {
+			a.showInList(s)
+		}
 		a.selected = s
 		a.showReader(s)
 		a.file = secFile
@@ -896,7 +974,7 @@ func (a *app) securityTable(c *ui.Context, k library.Issue) {
 	rows := a.secRows(k, false)
 	if k == library.SecurityUnfinished {
 		cols := []column{{locales.CommonSkills(), 0, 1}, {locales.CommonSource(), 0, 0.8}, {locales.TidyCondition(), 0, 2.4}}
-		table(c, cols, 110, len(rows), func(i, j int) {
+		table(c, cols, 180, len(rows), func(i, j int) {
 			r := rows[i]
 			switch j {
 			case 0:
@@ -904,11 +982,12 @@ func (a *app) securityTable(c *ui.Context, k library.Issue) {
 			case 1:
 				cellText(c, secSourceLabel(r.skill))
 			case 2:
-				cellText(c, secUnfinishedText(r.view)).Shrink(1)
+				cellText(c, secUnfinishedText(r.view)).Shrink(1).Tooltip(secUnfinishedText(r.view))
 			}
 		}, func(i int) {
-			if pushButton(c, locales.SecRescan()).Disabled(rows[i].view.Scanning || rows[i].view.Queued).Clicked() {
-				a.secRescan(rows[i].skill)
+			a.secRescanButton(c, rows[i].skill, rows[i].view)
+			if pushButton(c, locales.ActionView()).Clicked() {
+				a.openSecurityReport(rows[i].skill)
 			}
 		}, nil)
 		return
@@ -948,7 +1027,7 @@ func (a *app) secFindingTable(c *ui.Context, k library.Issue, rows []secRow) {
 		case 1:
 			cellText(c, secSourceLabel(r.skill))
 		case 2:
-			ui.Column(c).Gap(titleGap).MinWidth(0).Shrink(1).Children(func() {
+			ui.Column(c).Gap(5).MinWidth(0).Shrink(1).Children(func() {
 				ui.Row(c).Gap(6).AlignItems(ui.Center).MinWidth(0).Children(func() {
 					cellText(c, secSummary(first.Message)).Shrink(1)
 					if more > 0 {
@@ -969,7 +1048,7 @@ func (a *app) secFindingTable(c *ui.Context, k library.Issue, rows []secRow) {
 
 // twoLineRows 让问题一栏的两行（摘要、位置）上下留出和单行表格一样的
 // 余量：默认行高按一行字定，两行会顶着行的上下边。
-var twoLineRows = &rowStyle{apply: func(_ int, row ui.Element) { row.MinHeight(52).Padding(8, 24) }}
+var twoLineRows = &rowStyle{apply: func(_ int, row ui.Element) { row.MinHeight(58).Padding(10, 24) }}
 
 func secSourceLabel(s *library.Skill) string {
 	if s.Source == library.Project {

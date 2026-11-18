@@ -7131,5 +7131,65 @@
   "secAckSaveFailed": "没能记下“已看过”，请再试一次。",
   "@secAckSaveFailed": {
     "description": "本地安全检查：已看过标记写入失败的提示"
+  },
+  "secUnfinishedOne": "{path} 没有检查（{reason}）",
+  "@secUnfinishedOne": {
+    "description": "本地安全检查：没检查到的一个文件及原因",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "secUnfinishedMany": "{path} 等 {count} 个文件没有检查（{reason}）",
+  "@secUnfinishedMany": {
+    "description": "本地安全检查：没检查到的多个文件，举第一个",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "secRescanClean": "{name} 检查完成，未发现已知风险",
+  "@secRescanClean": {
+    "description": "本地安全检查：手动重新检查完成的提示",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "secRescanRisky": "{name} 检查完成，有 {count} 项需要看",
+  "@secRescanRisky": {
+    "description": "本地安全检查：手动重新检查完成、有风险的提示",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "secRescanUnfinished": "{name} 仍没能完整检查：{reason}",
+  "@secRescanUnfinished": {
+    "description": "本地安全检查：手动重新检查后仍不完整的提示",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

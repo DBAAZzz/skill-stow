@@ -16557,3 +16557,81 @@ func SecAckSaveFailed() string { return In(i18n.Locale()).SecAckSaveFailed() }
 func (msgs Messages) SecAckSaveFailed() string {
 	return Catalog.Format(msgs.locale, "secAckSaveFailed", nil)
 }
+
+// SecUnfinishedOne says "{path} 没有检查（{reason}）"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的一个文件及原因
+func SecUnfinishedOne(path string, reason string) string {
+	return In(i18n.Locale()).SecUnfinishedOne(path, reason)
+}
+
+// SecUnfinishedOne says "{path} 没有检查（{reason}）"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的一个文件及原因
+func (msgs Messages) SecUnfinishedOne(path string, reason string) string {
+	return Catalog.Format(msgs.locale, "secUnfinishedOne", map[string]any{"path": path, "reason": reason})
+}
+
+// SecUnfinishedMany says "{path} 等 {count} 个文件没有检查（{reason}）"
+// in the language the app shows.
+//
+// 本地安全检查：没检查到的多个文件，举第一个
+func SecUnfinishedMany(path string, reason string, count int) string {
+	return In(i18n.Locale()).SecUnfinishedMany(path, reason, count)
+}
+
+// SecUnfinishedMany says "{path} 等 {count} 个文件没有检查（{reason}）"
+// in the language of msgs.
+//
+// 本地安全检查：没检查到的多个文件，举第一个
+func (msgs Messages) SecUnfinishedMany(path string, reason string, count int) string {
+	return Catalog.Format(msgs.locale, "secUnfinishedMany", map[string]any{"path": path, "reason": reason, "count": count})
+}
+
+// SecRescanClean says "{name} 检查完成，未发现已知风险"
+// in the language the app shows.
+//
+// 本地安全检查：手动重新检查完成的提示
+func SecRescanClean(name string) string { return In(i18n.Locale()).SecRescanClean(name) }
+
+// SecRescanClean says "{name} 检查完成，未发现已知风险"
+// in the language of msgs.
+//
+// 本地安全检查：手动重新检查完成的提示
+func (msgs Messages) SecRescanClean(name string) string {
+	return Catalog.Format(msgs.locale, "secRescanClean", map[string]any{"name": name})
+}
+
+// SecRescanRisky says "{name} 检查完成，有 {count} 项需要看"
+// in the language the app shows.
+//
+// 本地安全检查：手动重新检查完成、有风险的提示
+func SecRescanRisky(count int, name string) string {
+	return In(i18n.Locale()).SecRescanRisky(count, name)
+}
+
+// SecRescanRisky says "{name} 检查完成，有 {count} 项需要看"
+// in the language of msgs.
+//
+// 本地安全检查：手动重新检查完成、有风险的提示
+func (msgs Messages) SecRescanRisky(count int, name string) string {
+	return Catalog.Format(msgs.locale, "secRescanRisky", map[string]any{"count": count, "name": name})
+}
+
+// SecRescanUnfinished says "{name} 仍没能完整检查：{reason}"
+// in the language the app shows.
+//
+// 本地安全检查：手动重新检查后仍不完整的提示
+func SecRescanUnfinished(reason string, name string) string {
+	return In(i18n.Locale()).SecRescanUnfinished(reason, name)
+}
+
+// SecRescanUnfinished says "{name} 仍没能完整检查：{reason}"
+// in the language of msgs.
+//
+// 本地安全检查：手动重新检查后仍不完整的提示
+func (msgs Messages) SecRescanUnfinished(reason string, name string) string {
+	return Catalog.Format(msgs.locale, "secRescanUnfinished", map[string]any{"reason": reason, "name": name})
+}

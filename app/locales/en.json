@@ -1147,5 +1147,10 @@
   "secUpdateUnchecked": "New version couldn't be fully checked",
   "secUpdateAnyway": "Update Anyway",
   "libraryUpdateSecurityHold": "The new version's security check needs your review first",
-  "secAckSaveFailed": "Couldn’t save “Reviewed”. Try again."
+  "secAckSaveFailed": "Couldn’t save “Reviewed”. Try again.",
+  "secUnfinishedOne": "{path} wasn’t checked ({reason})",
+  "secUnfinishedMany": "{count} files weren’t checked, including {path} ({reason})",
+  "secRescanClean": "{name} checked. No known risks found.",
+  "secRescanRisky": "{name} checked. {count} items need a look.",
+  "secRescanUnfinished": "{name} still couldn’t be fully checked: {reason}"
 }

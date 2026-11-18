@@ -103,6 +103,27 @@ func TestTidyListsSecurityFirst(t *testing.T) {
 	if a.reading == nil || a.reading.Name != "stock-docs" || a.file != secFile {
 		t.Fatalf("查看应打开 stock-docs 的安全检查：%v %d", a.reading, a.file)
 	}
+	tt.Frame()
+	if a.scope == scopeTidy || !tt.HasText("在文件里查看") {
+		t.Fatalf("整理页盖在阅读视图上，查看后应真的看到报告：scope=%s %q", a.scope, tt.Texts())
+	}
+	a.goHistory(-1)
+	tt.Frame()
+	if a.scope != scopeTidy {
+		t.Errorf("后退应回到整理页：%s", a.scope)
+	}
+}
+
+// 没检查完的写明是哪个文件、为什么，不只说“检查不完整”。
+func TestUnfinishedTextNamesTheFileAndReason(t *testing.T) {
+	one := []security.Hole{{Path: "scripts/a.tar.gz", Reason: security.GapBinary}}
+	if got := secHolesText(one); got != locales.SecUnfinishedOne("scripts/a.tar.gz", locales.SecGapBinary()) {
+		t.Errorf("一个文件：%q", got)
+	}
+	two := append(one, security.Hole{Path: "x.pyc", Reason: security.GapBinary})
+	if got := secHolesText(two); got != locales.SecUnfinishedMany("scripts/a.tar.gz", locales.SecGapBinary(), 2) {
+		t.Errorf("多个文件：%q", got)
+	}
 }
 
 // 页面历史记得看的是安全检查报告：后退再前进回到报告，不落到第一个文件。
