@@ -12,6 +12,25 @@ A macOS desktop app for managing the skills of every AI agent on your machine fr
 - **Usage**: counts how often each skill is invoked, based on Claude Code and Codex session logs.
 - **Tidy Up**: finds duplicate copies, redundant links, and broken links, and fixes them for you.
 
+## Install
+
+Requires macOS 12 or later, on Apple Silicon or Intel.
+
+1. Download `skill-stow-<version>.dmg` from [Releases](https://github.com/DBAAZzz/skill-stow/releases/latest), open it and drag Skill Stow into Applications.
+2. The first time you open it, macOS says it can't verify the developer. This is expected: the app isn't signed with an Apple Developer ID yet.
+   - macOS 15 and later: open the app once and click Done. Then go to System Settings › Privacy & Security, scroll to Security, click Open Anyway next to Skill Stow and confirm with your password.
+   - macOS 12 to 14: in Applications, Control-click Skill Stow, choose Open, then click Open.
+
+   After that it opens normally. Each new version needs to be allowed once more.
+
+   Removing the download flag in Terminal does the same:
+
+   ```sh
+   xattr -dr com.apple.quarantine "/Applications/Skill Stow.app"
+   ```
+
+If you'd rather not run a downloaded binary, build it yourself as described in [Running from source](#running-from-source).
+
 ## Supported agents
 
 Scans the skill folders of 32 agents, including Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot, OpenCode, Windsurf, Cline, Kiro, Trae, Qwen Code, Qoder, CodeBuddy, and ZCode. See [`app/internal/library/agents.go`](app/internal/library/agents.go) for the full list.
@@ -28,7 +47,7 @@ Turning a single skill on or off depends on support in the agent's own config. F
 
 Skills in other agents show as "Always On". If the app can't parse a config file, the skill's state shows as "Unknown" and the app doesn't write to that file.
 
-## Running
+## Running from source
 
 Requires Go 1.27+ (see [`app/go.mod`](app/go.mod) for the exact version). MyGo is installed with the module as a Go tool.
 

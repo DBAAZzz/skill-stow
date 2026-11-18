@@ -12,6 +12,25 @@ Skill Stow 是一个 macOS 桌面应用，在一个窗口里管理本机所有 A
 - **使用情况**：从 Claude Code、Codex 的会话记录里统计每个技能的调用。
 - **整理**：找出重复副本、多余链接和断掉的链接，并直接处理。
 
+## 安装
+
+需要 macOS 12 或更新版本，Apple Silicon 和 Intel Mac 都能用。
+
+1. 从 [Releases](https://github.com/DBAAZzz/skill-stow/releases/latest) 下载 `skill-stow-<版本>.dmg`，打开后把 Skill Stow 拖进「应用程序」。
+2. 第一次打开时，macOS 会提示无法验证开发者。应用还没有用 Apple 开发者证书签名，这个提示是预期的：
+   - macOS 15 及以后：先双击打开一次，在提示里点「完成」；然后打开「系统设置 › 隐私与安全性」，滚到「安全性」，点 Skill Stow 旁边的「仍要打开」，输入密码确认。
+   - macOS 12 到 14：在「应用程序」里按住 Control 点 Skill Stow，选「打开」，再点「打开」。
+
+   放行一次之后正常双击即可。每装一个新版本要再放行一次。
+
+   也可以在终端里去掉下载标记，效果相同：
+
+   ```sh
+   xattr -dr com.apple.quarantine "/Applications/Skill Stow.app"
+   ```
+
+不想运行下载的程序，可以按下面「从源码运行」自己构建。
+
 ## 支持的 Agent
 
 能扫描 32 个 Agent 的技能目录，包括 Claude Code、Codex、Cursor、Gemini CLI、GitHub Copilot、OpenCode、Windsurf、Cline、Kiro、Trae、Qwen Code、Qoder、CodeBuddy、ZCode 等，完整列表见 [`app/internal/library/agents.go`](app/internal/library/agents.go)。
@@ -28,7 +47,7 @@ Skill Stow 是一个 macOS 桌面应用，在一个窗口里管理本机所有 A
 
 其他 Agent 显示为“始终启用”。配置格式认不出来时状态显示为“未知”，不会写入。
 
-## 运行
+## 从源码运行
 
 需要 Go 1.27+（版本以 [`app/go.mod`](app/go.mod) 为准），MyGo 作为 Go tool 随模块安装。
 
