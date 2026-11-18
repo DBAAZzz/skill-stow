@@ -16993,3 +16993,175 @@ func DeleteGlobalLinksNote(count int, dirs string, agents string) string {
 func (msgs Messages) DeleteGlobalLinksNote(count int, dirs string, agents string) string {
 	return Catalog.Format(msgs.locale, "deleteGlobalLinksNote", map[string]any{"count": count, "dirs": dirs, "agents": agents})
 }
+
+// SettingsAppUpdates says "应用更新"
+// in the language the app shows.
+//
+// 设置 ›
+// 通用：应用自身更新的分组标题（和「技能更新」区分）
+func SettingsAppUpdates() string { return In(i18n.Locale()).SettingsAppUpdates() }
+
+// SettingsAppUpdates says "应用更新"
+// in the language of msgs.
+//
+// 设置 ›
+// 通用：应用自身更新的分组标题（和「技能更新」区分）
+func (msgs Messages) SettingsAppUpdates() string {
+	return Catalog.Format(msgs.locale, "settingsAppUpdates", nil)
+}
+
+// SettingsAppVersion says "版本 {version}"
+// in the language the app shows.
+//
+// 设置 › 通用 › 应用更新：当前版本
+func SettingsAppVersion(version string) string { return In(i18n.Locale()).SettingsAppVersion(version) }
+
+// SettingsAppVersion says "版本 {version}"
+// in the language of msgs.
+//
+// 设置 › 通用 › 应用更新：当前版本
+func (msgs Messages) SettingsAppVersion(version string) string {
+	return Catalog.Format(msgs.locale, "settingsAppVersion", map[string]any{"version": version})
+}
+
+// SettingsAppUpdateNeverChecked says "还没有检查过"
+// in the language the app shows.
+//
+// 设置 › 通用 › 应用更新：从没检查过更新
+func SettingsAppUpdateNeverChecked() string { return In(i18n.Locale()).SettingsAppUpdateNeverChecked() }
+
+// SettingsAppUpdateNeverChecked says "还没有检查过"
+// in the language of msgs.
+//
+// 设置 › 通用 › 应用更新：从没检查过更新
+func (msgs Messages) SettingsAppUpdateNeverChecked() string {
+	return Catalog.Format(msgs.locale, "settingsAppUpdateNeverChecked", nil)
+}
+
+// SettingsAppUpdateCheckedOn says "{date} 检查"
+// in the language the app shows.
+//
+// 设置 › 通用 › 应用更新：上次检查在今天以前，date
+// 是日期
+func SettingsAppUpdateCheckedOn(date string) string {
+	return In(i18n.Locale()).SettingsAppUpdateCheckedOn(date)
+}
+
+// SettingsAppUpdateCheckedOn says "{date} 检查"
+// in the language of msgs.
+//
+// 设置 › 通用 › 应用更新：上次检查在今天以前，date
+// 是日期
+func (msgs Messages) SettingsAppUpdateCheckedOn(date string) string {
+	return Catalog.Format(msgs.locale, "settingsAppUpdateCheckedOn", map[string]any{"date": date})
+}
+
+// SettingsAppUpdateAvailable says "{version} 可用"
+// in the language the app shows.
+//
+// 设置 › 通用 › 应用更新：找到的新版本标签
+func SettingsAppUpdateAvailable(version string) string {
+	return In(i18n.Locale()).SettingsAppUpdateAvailable(version)
+}
+
+// SettingsAppUpdateAvailable says "{version} 可用"
+// in the language of msgs.
+//
+// 设置 › 通用 › 应用更新：找到的新版本标签
+func (msgs Messages) SettingsAppUpdateAvailable(version string) string {
+	return Catalog.Format(msgs.locale, "settingsAppUpdateAvailable", map[string]any{"version": version})
+}
+
+// SettingsAppUpdateUnavailable says "不能自行更新"
+// in the language the app shows.
+//
+// 设置 › 通用 ›
+// 应用更新：这份应用不能自己更新（开发版、没有写入权限的位置），不解释原因
+func SettingsAppUpdateUnavailable() string { return In(i18n.Locale()).SettingsAppUpdateUnavailable() }
+
+// SettingsAppUpdateUnavailable says "不能自行更新"
+// in the language of msgs.
+//
+// 设置 › 通用 ›
+// 应用更新：这份应用不能自己更新（开发版、没有写入权限的位置），不解释原因
+func (msgs Messages) SettingsAppUpdateUnavailable() string {
+	return Catalog.Format(msgs.locale, "settingsAppUpdateUnavailable", nil)
+}
+
+// SettingsCheckForUpdates says "检查更新…"
+// in the language the app shows.
+//
+// 设置 › 通用 › 应用更新：按钮，打开更新窗口检查
+func SettingsCheckForUpdates() string { return In(i18n.Locale()).SettingsCheckForUpdates() }
+
+// SettingsCheckForUpdates says "检查更新…"
+// in the language of msgs.
+//
+// 设置 › 通用 › 应用更新：按钮，打开更新窗口检查
+func (msgs Messages) SettingsCheckForUpdates() string {
+	return Catalog.Format(msgs.locale, "settingsCheckForUpdates", nil)
+}
+
+// SettingsViewAppUpdate says "查看更新…"
+// in the language the app shows.
+//
+// 设置 › 通用 ›
+// 应用更新：有新版本时的按钮，打开更新窗口
+func SettingsViewAppUpdate() string { return In(i18n.Locale()).SettingsViewAppUpdate() }
+
+// SettingsViewAppUpdate says "查看更新…"
+// in the language of msgs.
+//
+// 设置 › 通用 ›
+// 应用更新：有新版本时的按钮，打开更新窗口
+func (msgs Messages) SettingsViewAppUpdate() string {
+	return Catalog.Format(msgs.locale, "settingsViewAppUpdate", nil)
+}
+
+// SettingsAutoCheckAppUpdates says "自动检查更新"
+// in the language the app shows.
+//
+// 设置 › 通用 › 应用更新：后台自动检查的开关
+func SettingsAutoCheckAppUpdates() string { return In(i18n.Locale()).SettingsAutoCheckAppUpdates() }
+
+// SettingsAutoCheckAppUpdates says "自动检查更新"
+// in the language of msgs.
+//
+// 设置 › 通用 › 应用更新：后台自动检查的开关
+func (msgs Messages) SettingsAutoCheckAppUpdates() string {
+	return Catalog.Format(msgs.locale, "settingsAutoCheckAppUpdates", nil)
+}
+
+// SettingsAutoCheckAppUpdatesHint says "每天在后台向 GitHub 查一次新版本。关闭时只在你点击「检查更新…」时联网。"
+// in the language the app shows.
+//
+// 设置 › 通用 › 应用更新：自动检查开关的说明
+func SettingsAutoCheckAppUpdatesHint() string {
+	return In(i18n.Locale()).SettingsAutoCheckAppUpdatesHint()
+}
+
+// SettingsAutoCheckAppUpdatesHint says "每天在后台向 GitHub 查一次新版本。关闭时只在你点击「检查更新…」时联网。"
+// in the language of msgs.
+//
+// 设置 › 通用 › 应用更新：自动检查开关的说明
+func (msgs Messages) SettingsAutoCheckAppUpdatesHint() string {
+	return Catalog.Format(msgs.locale, "settingsAutoCheckAppUpdatesHint", nil)
+}
+
+// AppUpdateUnavailableMessage says "{app} 不能自行更新。"
+// in the language the app shows.
+//
+// 更新窗口：应用不能自己更新时的说明，替换插件默认的「软件包管理器」说法；app
+// 由更新窗口填入应用名
+func AppUpdateUnavailableMessage(app string) string {
+	return In(i18n.Locale()).AppUpdateUnavailableMessage(app)
+}
+
+// AppUpdateUnavailableMessage says "{app} 不能自行更新。"
+// in the language of msgs.
+//
+// 更新窗口：应用不能自己更新时的说明，替换插件默认的「软件包管理器」说法；app
+// 由更新窗口填入应用名
+func (msgs Messages) AppUpdateUnavailableMessage(app string) string {
+	return Catalog.Format(msgs.locale, "appUpdateUnavailableMessage", map[string]any{"app": app})
+}

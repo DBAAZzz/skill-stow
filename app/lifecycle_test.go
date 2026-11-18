@@ -374,12 +374,12 @@ func TestMacOSSystemMenuIncludesAboutSettingsUpdatesAndFollowsLanguage(t *testin
 			gotAbout, meta.Name, meta.Version, meta.Copyright)
 	}
 
-	// 4. 点击「检查应用更新…」：打开仓库官方 Releases 页面
-	var openedURL string
-	a.openURL = func(u string) { openedURL = u }
+	// 4. 点击「检查应用更新…」：交给更新窗口检查
+	upd := &fakeAppUpdates{enabled: true}
+	a.appUpd = upd
 	updatesItem.Click(updatesItem, nil)
-	if openedURL != appReleasesURL {
-		t.Fatalf("检查应用更新打开了 %q, want %q", openedURL, appReleasesURL)
+	if upd.checks != 1 {
+		t.Fatalf("检查应用更新应打开更新窗口检查一次，检查了 %d 次", upd.checks)
 	}
 
 	// 5. 点击「设置…」：即使主窗口未打开也能打开设置窗口

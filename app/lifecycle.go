@@ -69,8 +69,6 @@ func startSingleInstance(lock func() bool, load func() *library.Library) (*app, 
 }
 
 const (
-	appReleasesURL = "https://github.com/DBAAZzz/skill-stow/releases"
-
 	menuIDAbout        = "about"
 	menuIDCheckUpdates = "check-app-updates"
 	menuIDSettings     = "settings"
@@ -135,9 +133,9 @@ func (a *app) showAbout() {
 	}
 }
 
-// checkAppUpdates 打开官方 Releases 页面供用户查看和下载新版本。
+// checkAppUpdates 打开更新窗口检查应用自身的新版本（app_update.go）。
 func (a *app) checkAppUpdates() {
-	a.openExternalURL(appReleasesURL)
+	a.appUpd.Check()
 }
 
 // buildAppMenu 构建 macOS 原生系统菜单栏：保留标准关于、服务、隐藏、退出、文件、编辑、

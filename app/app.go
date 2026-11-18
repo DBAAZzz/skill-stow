@@ -43,6 +43,7 @@ type app struct {
 
 	toasts   toastStack   // 内容区顶部的提示条（toast.go）
 	sup      supportState // 支持与诊断（support.go）
+	appUpd   appUpdater   // 应用自身的版本更新（app_update.go）
 	paneRoom float32      // 这一帧详情栏占的宽度，没开为 0：提示条在它左边居中
 
 	scope       string // 侧边栏选中的范围（library.Scope）或项目（projectPrefix + 路径）
@@ -168,6 +169,7 @@ func newApp(lib *library.Library) *app {
 		sharedOpen:   map[string]bool{},
 		cardScrolls:  map[string]*cardScrollState{},
 		projectsOpen: true,
+		appUpd:       noAppUpdates{},
 	}
 	a.set.scannedAt = time.Now()
 	if lib.Home != "" {

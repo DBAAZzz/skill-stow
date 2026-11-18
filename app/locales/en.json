@@ -1176,5 +1176,16 @@
   "importProjectDirectoryOutside": "{dir} points outside the project. Choose a skill folder inside the project.",
   "deleteProjectLocationChanged": "The project skill moved. Rescan the project before deleting it.",
   "projectInvalidFolder": "Choose an existing project folder other than your home folder or a root directory.",
-  "deleteGlobalLinksNote": "{count, plural, one {One of the links is in {dirs}, a global folder. Removing it means {agents} won't read it in any project.} other {{count} of the links are in {dirs}, global folders. Removing them means {agents} won't read it in any project.}}"
+  "deleteGlobalLinksNote": "{count, plural, one {One of the links is in {dirs}, a global folder. Removing it means {agents} won't read it in any project.} other {{count} of the links are in {dirs}, global folders. Removing them means {agents} won't read it in any project.}}",
+  "settingsAppUpdates": "App Updates",
+  "settingsAppVersion": "Version {version}",
+  "settingsAppUpdateNeverChecked": "Not checked yet",
+  "settingsAppUpdateCheckedOn": "Checked {date}",
+  "settingsAppUpdateAvailable": "{version} Available",
+  "settingsAppUpdateUnavailable": "Can’t update itself",
+  "settingsCheckForUpdates": "Check for Updates…",
+  "settingsViewAppUpdate": "View Update…",
+  "settingsAutoCheckAppUpdates": "Check for Updates Automatically",
+  "settingsAutoCheckAppUpdatesHint": "Checks GitHub for a new version once a day in the background. When off, the app only goes online when you click Check for Updates….",
+  "appUpdateUnavailableMessage": "{app} can’t update itself."
 }

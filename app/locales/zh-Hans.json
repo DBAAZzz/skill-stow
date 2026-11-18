@@ -7379,5 +7379,69 @@
         "type": "String"
       }
     }
+  },
+  "settingsAppUpdates": "应用更新",
+  "@settingsAppUpdates": {
+    "description": "设置 › 通用：应用自身更新的分组标题（和「技能更新」区分）"
+  },
+  "settingsAppVersion": "版本 {version}",
+  "@settingsAppVersion": {
+    "description": "设置 › 通用 › 应用更新：当前版本",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsAppUpdateNeverChecked": "还没有检查过",
+  "@settingsAppUpdateNeverChecked": {
+    "description": "设置 › 通用 › 应用更新：从没检查过更新"
+  },
+  "settingsAppUpdateCheckedOn": "{date} 检查",
+  "@settingsAppUpdateCheckedOn": {
+    "description": "设置 › 通用 › 应用更新：上次检查在今天以前，date 是日期",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsAppUpdateAvailable": "{version} 可用",
+  "@settingsAppUpdateAvailable": {
+    "description": "设置 › 通用 › 应用更新：找到的新版本标签",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsAppUpdateUnavailable": "不能自行更新",
+  "@settingsAppUpdateUnavailable": {
+    "description": "设置 › 通用 › 应用更新：这份应用不能自己更新（开发版、没有写入权限的位置），不解释原因"
+  },
+  "settingsCheckForUpdates": "检查更新…",
+  "@settingsCheckForUpdates": {
+    "description": "设置 › 通用 › 应用更新：按钮，打开更新窗口检查"
+  },
+  "settingsViewAppUpdate": "查看更新…",
+  "@settingsViewAppUpdate": {
+    "description": "设置 › 通用 › 应用更新：有新版本时的按钮，打开更新窗口"
+  },
+  "settingsAutoCheckAppUpdates": "自动检查更新",
+  "@settingsAutoCheckAppUpdates": {
+    "description": "设置 › 通用 › 应用更新：后台自动检查的开关"
+  },
+  "settingsAutoCheckAppUpdatesHint": "每天在后台向 GitHub 查一次新版本。关闭时只在你点击「检查更新…」时联网。",
+  "@settingsAutoCheckAppUpdatesHint": {
+    "description": "设置 › 通用 › 应用更新：自动检查开关的说明"
+  },
+  "appUpdateUnavailableMessage": "{app} 不能自行更新。",
+  "@appUpdateUnavailableMessage": {
+    "description": "更新窗口：应用不能自己更新时的说明，替换插件默认的「软件包管理器」说法；app 由更新窗口填入应用名",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
   }
 }

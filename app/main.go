@@ -33,6 +33,7 @@ func main() {
 	if !ok {
 		return
 	}
+	a.appUpd = useAppUpdates(a.changed)
 	a.bindLifecycle()
 	mygo.App.WhenReady(func() {
 		a.startLive(os.Getenv("SKILLS_WELCOME") != "")

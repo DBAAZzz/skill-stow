@@ -306,6 +306,7 @@ func (a *app) generalTab(c *ui.Context) {
 		})
 	})
 
+	a.appUpdateGroup(c)
 	a.supportGroup(c)
 }
 
