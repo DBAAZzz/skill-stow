@@ -846,6 +846,20 @@ func (msgs Messages) UsageNotInLogs(since string, agents string) string {
 	return Catalog.Format(msgs.locale, "usageNotInLogs", map[string]any{"since": since, "agents": agents})
 }
 
+// UsageNoLogsYet says "还没有 {agents} 的会话记录，其他 Agent 没有记录。"
+// in the language the app shows.
+//
+// usage.go: usagePane, no session logs at all
+func UsageNoLogsYet(agents string) string { return In(i18n.Locale()).UsageNoLogsYet(agents) }
+
+// UsageNoLogsYet says "还没有 {agents} 的会话记录，其他 Agent 没有记录。"
+// in the language of msgs.
+//
+// usage.go: usagePane, no session logs at all
+func (msgs Messages) UsageNoLogsYet(agents string) string {
+	return Catalog.Format(msgs.locale, "usageNoLogsYet", map[string]any{"agents": agents})
+}
+
 // UsageNoRecord says "没有记录"
 // in the language the app shows.
 //
@@ -888,6 +902,22 @@ func UsageRecordedSince(since string, agents string) string {
 // usage_page.go:56
 func (msgs Messages) UsageRecordedSince(since string, agents string) string {
 	return Catalog.Format(msgs.locale, "usageRecordedSince", map[string]any{"since": since, "agents": agents})
+}
+
+// UsageNoLogsRecordedYet says "还没有会话记录，只统计 {agents}"
+// in the language the app shows.
+//
+// usage_page.go: toolbar subtitle, no session logs at all
+func UsageNoLogsRecordedYet(agents string) string {
+	return In(i18n.Locale()).UsageNoLogsRecordedYet(agents)
+}
+
+// UsageNoLogsRecordedYet says "还没有会话记录，只统计 {agents}"
+// in the language of msgs.
+//
+// usage_page.go: toolbar subtitle, no session logs at all
+func (msgs Messages) UsageNoLogsRecordedYet(agents string) string {
+	return Catalog.Format(msgs.locale, "usageNoLogsRecordedYet", map[string]any{"agents": agents})
 }
 
 // UsageReadingLogs says "正在读会话记录…"

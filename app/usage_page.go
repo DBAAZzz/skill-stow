@@ -29,9 +29,12 @@ const usageRowsShown = 7
 func (a *app) usagePage(c *ui.Context) {
 	now := time.Now()
 	sub := ""
-	if a.lib.HasUsage() {
-		since, agents := a.usageSince(now), usageAgents()
-		sub = locales.UsageRecordedSince(since, agents)
+	switch {
+	case !a.lib.HasUsage():
+	case a.lib.UsageSince().IsZero():
+		sub = locales.UsageNoLogsRecordedYet(usageAgents())
+	default:
+		sub = locales.UsageRecordedSince(a.usageSince(now), usageAgents())
 	}
 	var pick func()
 	if a.lib.HasUsage() && len(a.unusedBySource()[library.Mine]) > 0 {

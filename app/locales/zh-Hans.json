@@ -369,6 +369,15 @@
       }
     }
   },
+  "usageNoLogsYet": "还没有 {agents} 的会话记录，其他 Agent 没有记录。",
+  "@usageNoLogsYet": {
+    "description": "usage.go: usagePane, no session logs at all",
+    "placeholders": {
+      "agents": {
+        "type": "String"
+      }
+    }
+  },
   "usageNoRecord": "没有记录",
   "@usageNoRecord": {
     "description": "usage.go:77",
@@ -390,6 +399,15 @@
       "since": {
         "type": "String"
       },
+      "agents": {
+        "type": "String"
+      }
+    }
+  },
+  "usageNoLogsRecordedYet": "还没有会话记录，只统计 {agents}",
+  "@usageNoLogsRecordedYet": {
+    "description": "usage_page.go: toolbar subtitle, no session logs at all",
+    "placeholders": {
       "agents": {
         "type": "String"
       }

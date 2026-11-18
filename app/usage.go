@@ -75,7 +75,11 @@ func (a *app) usagePane(c *ui.Context, s *library.Skill) {
 		note = locales.UsageCountedFrom(agents, since)
 	case a.lib.UsageTracked(s):
 		title = locales.UsageNeverCalled()
-		note = locales.UsageNotInLogs(since, agents)
+		if a.lib.UsageSince().IsZero() {
+			note = locales.UsageNoLogsYet(agents)
+		} else {
+			note = locales.UsageNotInLogs(since, agents)
+		}
 	default:
 		title = locales.UsageNoRecord()
 		note = locales.UsageAgentsCantRead(agents)

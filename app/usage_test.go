@@ -157,3 +157,20 @@ func TestUsageSnapshots(t *testing.T) {
 		writePNG(t, filepath.Join(dir, name+".png"), tt)
 	}
 }
+
+func TestUsageWithoutAnySessionLogsShowsNoStartDate(t *testing.T) {
+	a, tt := newUsageTester(t)
+	a.lib.SetUsage(&library.UsageLog{}) // 读完了，但 Claude Code 和 Codex 一条会话记录都没有
+	a.selected = a.lib.Get("git-flow")
+	tt.Frame()
+	if tt.HasText("1 年 1 月 1 日") || !tt.HasText("还没有 Claude Code 和 Codex 的会话记录，其他 Agent 没有记录。") {
+		t.Errorf("没有会话记录时详情栏不应编出起始日期：%q", tt.Texts())
+	}
+	a.selected = nil
+	if err := tt.Click("使用情况"); err != nil {
+		t.Fatal(err)
+	}
+	if tt.HasText("1 年 1 月 1 日") || !tt.HasText("还没有会话记录，只统计 Claude Code 和 Codex") {
+		t.Errorf("没有会话记录时使用情况页不应编出起始日期：%q", tt.Texts())
+	}
+}
