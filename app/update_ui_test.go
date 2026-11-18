@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"skillmanager/internal/library"
+	"skillmanager/locales"
 	"testing"
 	"time"
 )
@@ -138,12 +139,12 @@ func updateFullFixture(a *app) {
 			{Name: "vite", Source: library.SourceID{Type: "github", Repo: "antfu/skills"}, State: library.UpdReady, Reason: library.Note{Detail: "可更新"}, Commit: "3f8a21c", CommitDate: now.Add(-2 * 24 * time.Hour)},
 			{Name: "vitest", Source: library.SourceID{Type: "github", Repo: "antfu/skills"}, State: library.UpdReady, Reason: library.Note{Detail: "可更新"}, Commit: "91d0e4b", CommitDate: now.Add(-5 * 24 * time.Hour)},
 			{Name: "vue-best-practices", Source: library.SourceID{Type: "github", Repo: "vuejs-ai/skills"}, State: library.UpdBoth, Reason: library.Note{Detail: "本地改过，且上游有更新"}, Commit: "c74b92e", CommitDate: now.Add(-24 * time.Hour)},
-			{Name: "test-first", Source: library.SourceID{Type: "github", Repo: "anthropics/skills"}, State: library.UpdCopies, Reason: library.Note{Detail: "有 2 份独立副本，需先收成一份"}},
-			{Name: "kami", Source: library.SourceID{Type: "github", Repo: "obra/superpowers"}, State: library.UpdMovedOut, Reason: library.Note{Detail: "已从当前库移出"}},
-			{Name: "turborepo", Source: library.SourceID{Type: "github", Repo: "vercel/turborepo"}, State: library.UpdRemoved, Reason: library.Note{Detail: "上游仓库已删除此技能（404）"}},
-			{Name: "private-tools", Source: library.SourceID{Type: "github", Repo: "acme/private-skills"}, State: library.UpdFailed, Reason: library.Note{Detail: "仓库访问不了（可能已删除或转为私有）"}},
+			{Name: "test-first", Source: library.SourceID{Type: "github", Repo: "anthropics/skills"}, State: library.UpdCopies, Reason: library.Note{Detail: locales.UpdateIndependentCopiesNeedMerge()}},
+			{Name: "kami", Source: library.SourceID{Type: "github", Repo: "obra/superpowers"}, State: library.UpdMovedOut, Reason: library.Note{Detail: locales.UpdateMissingFromLibrary()}},
+			{Name: "turborepo", Source: library.SourceID{Type: "github", Repo: "vercel/turborepo"}, State: library.UpdRemoved, Reason: library.Note{Detail: locales.UpdateUpstreamSkillRemoved()}},
+			{Name: "private-tools", Source: library.SourceID{Type: "github", Repo: "acme/private-skills"}, State: library.UpdFailed, Reason: library.Note{Detail: locales.UpdateGithubRepositoryUnavailable()}},
 			{Name: "open.feishu.cn", Names: []string{"lark-doc", "lark-im"}, Source: library.SourceID{Type: "well-known", Repo: "open.feishu.cn"}, State: library.UpdWebsite, Command: "npx skills update lark-doc lark-im -g -y"},
-			{Name: "agently-mail", Names: []string{"agently-mail"}, Source: library.SourceID{Type: "well-known", Repo: "agently-mail.dev"}, State: library.UpdWebsite, Reason: library.Note{Detail: "安装记录不完整，建议重新安装"}, Command: "npx skills update agently-mail -g -y"},
+			{Name: "agently-mail", Names: []string{"agently-mail"}, Source: library.SourceID{Type: "well-known", Repo: "agently-mail.dev"}, State: library.UpdWebsite, Reason: library.Note{Detail: locales.UpdateIncompleteInstallRecord()}, Command: "npx skills update agently-mail -g -y"},
 		},
 	}
 }
@@ -261,6 +262,7 @@ func TestUpdateStateSnapshots(t *testing.T) {
 	}
 	save := func(name string, w, h int, a *app) {
 		tt := newUITester(a.view, w, h)
+		tt.SetScale(2) // 和其他页的截图一样出 2x
 		f, err := os.Create(filepath.Join(dir, name))
 		must(t, err)
 		must(t, png.Encode(f, tt.Image()))

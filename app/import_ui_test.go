@@ -206,13 +206,14 @@ func TestImportSnapshots(t *testing.T) {
 	}
 	shot := func(tt *ui.Tester, name string) {
 		tt.Advance(2 * time.Second)
+		tt.SetScale(2) // 和其他页的截图一样出 2x，README 里不糊
 		f, err := os.Create(filepath.Join(dir, name))
 		must(t, err)
 		must(t, png.Encode(f, tt.Image()))
 		must(t, f.Close())
 	}
 	a, tt, h := importApp(t)
-	writeTestSkill(t, h(".agents/skills/vue"), "我的 vue", "mine")
+	writeTestSkill(t, h(".agents/skills/vue"), "My Vue notes", "mine")
 	for _, d := range []string{".cursor", ".kiro", ".config/opencode", ".codebuddy"} {
 		must(t, os.MkdirAll(h(d), 0o755))
 		must(t, os.WriteFile(filepath.Join(h(d), "config.json"), []byte("{}"), 0o644))
@@ -238,11 +239,11 @@ func TestImportSnapshots(t *testing.T) {
 	a.imp.cancel = nil
 
 	src := h("Downloads/pack")
-	writeTestSkill(t, filepath.Join(src, "slidev"), "用 Markdown 写演示文稿：布局、主题、代码高亮、演讲者模式与导出 PDF。", "# Slidev\n\nSlidev is a slides maker for developers.\n\n## When to use\n\n- The user asks for a talk.\n\n```sh\npnpm create slidev\n```\n")
+	writeTestSkill(t, filepath.Join(src, "slidev"), "Write slides in Markdown: layouts, themes, code highlighting, presenter mode and PDF export.", "# Slidev\n\nSlidev is a slides maker for developers.\n\n## When to use\n\n- The user asks for a talk.\n\n```sh\npnpm create slidev\n```\n")
 	must(t, os.MkdirAll(filepath.Join(src, "slidev/scripts"), 0o755))
 	must(t, os.WriteFile(filepath.Join(src, "slidev/scripts/export.sh"), []byte("#!/bin/sh\n"), 0o755))
-	writeTestSkill(t, filepath.Join(src, "vue"), "Vue 3 组合式 API", "theirs")
-	writeTestSkill(t, filepath.Join(src, "unocss"), "UnoCSS 原子化 CSS 的写法、预设与配置", "x")
+	writeTestSkill(t, filepath.Join(src, "vue"), "Vue 3 Composition API", "theirs")
+	writeTestSkill(t, filepath.Join(src, "unocss"), "UnoCSS atomic CSS: syntax, presets and configuration", "x")
 	must(t, os.MkdirAll(filepath.Join(src, "notes"), 0o755))
 	must(t, os.WriteFile(filepath.Join(src, "notes/SKILL.md"), []byte("---\nname: web-design-guidelines\n---\n没有简介"), 0o644))
 	a.importPaths([]string{src})
@@ -417,6 +418,7 @@ func TestImportPreviewSnapshots(t *testing.T) {
 	}
 	shot := func(tt *ui.Tester, name string) {
 		tt.Advance(2 * time.Second)
+		tt.SetScale(2) // 和其他页的截图一样出 2x，README 里不糊
 		f, err := os.Create(filepath.Join(dir, name))
 		must(t, err)
 		must(t, png.Encode(f, tt.Image()))
