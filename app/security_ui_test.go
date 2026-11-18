@@ -169,3 +169,32 @@ func TestReaderFileListMarksRiskyFiles(t *testing.T) {
 		t.Errorf("文件列表应有安全检查：%q", tt.Texts())
 	}
 }
+
+// 整理页的安全警告可以整行标为已看过：这一行收起，计数归零；提示条上能撤销。
+// 高风险没有这个按钮，要进报告看。
+func TestWarningRowCanBeMarkedReviewedFromTidyAndUndone(t *testing.T) {
+	a, tt := newTester(t)
+	a.scope, a.tidy.kind = scopeTidy, library.SecurityHighRisk
+	tt.Frame()
+	if _, ok := tt.Find("已看过"); ok {
+		t.Fatal("高风险的表格不应有整行已看过")
+	}
+	a.tidy.kind = library.SecurityWarning
+	tt.Frame()
+	if err := tt.Click("已看过"); err != nil {
+		t.Fatal(err)
+	}
+	tt.Frame()
+	if n := a.secIssueCount(library.SecurityWarning); n != 0 {
+		t.Fatalf("标完后安全警告应为 0，实际 %d", n)
+	}
+	if !tt.HasText("已把 wechat-pay 的安全警告标为已看过") {
+		t.Fatalf("应提示并能撤销：%q", tt.Texts())
+	}
+	if err := tt.Click("撤销"); err != nil {
+		t.Fatal(err)
+	}
+	if n := a.secIssueCount(library.SecurityWarning); n != 1 {
+		t.Fatalf("撤销后应回来，实际 %d", n)
+	}
+}

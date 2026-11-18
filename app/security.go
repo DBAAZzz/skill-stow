@@ -976,7 +976,7 @@ func (a *app) securityTable(c *ui.Context, k library.Issue) {
 	if k == library.SecurityUnfinished {
 		a.secUnfinishedTable(c, rows, false)
 	} else {
-		a.secFindingTable(c, k, rows)
+		a.secFindingTable(c, k, rows, false)
 	}
 	hidden := a.secRows(k, true)
 	if len(hidden) == 0 {
@@ -994,7 +994,7 @@ func (a *app) securityTable(c *ui.Context, k library.Issue) {
 			if k == library.SecurityUnfinished {
 				a.secUnfinishedTable(c, hidden, true)
 			} else {
-				a.secFindingTable(c, k, hidden)
+				a.secFindingTable(c, k, hidden, true)
 			}
 		})
 	}
@@ -1032,7 +1032,7 @@ func (a *app) secUnfinishedTable(c *ui.Context, rows []secRow, ignored bool) {
 		r := rows[i]
 		if ignored {
 			if pushButton(c, locales.SecUnignore()).Clicked() {
-				a.secIgnore(r.key, false)
+				a.secIgnore(r, false)
 			}
 			return
 		}
@@ -1041,28 +1041,73 @@ func (a *app) secUnfinishedTable(c *ui.Context, rows []secRow, ignored bool) {
 			a.openSecurityReport(r.skill)
 		}
 		if pushButton(c, locales.SecIgnore()).Disabled(r.view.Scanning || r.view.Queued).Clicked() {
-			a.secIgnore(r.key, true)
+			a.secIgnore(r, true)
 		}
 	}, secRowStyle(rows, nil))
 }
 
-// secIgnore 忽略或取消忽略一份没检查完的结果；写不进磁盘时提示。
-func (a *app) secIgnore(key string, on bool) {
+// secAckAll 把这一行（这个技能那一份结果）的警告全部标为已看过，或全部撤销。
+func (a *app) secAckAll(r secRow, on bool) {
+	var keys []string
+	for _, f := range r.view.Report.Findings {
+		if f.Notice == security.Warning && r.view.Acked[f.Key] != on {
+			keys = append(keys, f.Key)
+		}
+	}
+	if len(keys) == 0 {
+		return
+	}
 	var err error
 	if on {
-		err = a.sec.svc.IgnoreUnfinished(key)
+		err = a.sec.svc.Ack(r.key, keys...)
 	} else {
-		err = a.sec.svc.UnignoreUnfinished(key)
+		err = a.sec.svc.Unack(r.key, keys...)
 	}
-	if err != nil {
-		a.notify(fromTidy, toastError, locales.SecIgnoreSaveFailed())
+	switch {
+	case err != nil:
+		a.notify(fromTidy, toastError, locales.SecAckSaveFailed())
+	case on:
+		// 标完最后一个，“安全警告”这一类连同折叠的已看过会从左边消失：撤销放在提示条上
+		key := r.key
+		a.showToast(&toast{source: fromTidy, kind: toastOK, text: locales.SecAckedToast(r.skill.Name),
+			action: &toastAction{label: locales.ActionUndo(), run: func() {
+				if a.sec.svc.Unack(key, keys...) != nil {
+					a.notify(fromTidy, toastError, locales.SecAckSaveFailed())
+				}
+			}}})
 	}
 }
 
-func (a *app) secFindingTable(c *ui.Context, k library.Issue, rows []secRow) {
+// secIgnore 忽略或取消忽略一份没检查完的结果；写不进磁盘时提示。忽略后的
+// 提示条带撤销（忽略完最后一个，这一类会从左边消失）。
+func (a *app) secIgnore(r secRow, on bool) {
+	var err error
+	if on {
+		err = a.sec.svc.IgnoreUnfinished(r.key)
+	} else {
+		err = a.sec.svc.UnignoreUnfinished(r.key)
+	}
+	switch {
+	case err != nil:
+		a.notify(fromTidy, toastError, locales.SecIgnoreSaveFailed())
+	case on:
+		key := r.key
+		a.showToast(&toast{source: fromTidy, kind: toastOK, text: locales.SecIgnoredToast(r.skill.Name),
+			action: &toastAction{label: locales.ActionUndo(), run: func() {
+				if a.sec.svc.UnignoreUnfinished(key) != nil {
+					a.notify(fromTidy, toastError, locales.SecIgnoreSaveFailed())
+				}
+			}}})
+	}
+}
+
+// acked 为真时列的是已经看过的。安全警告可以在这里整行标为已看过（或撤销）；
+// 高风险要进报告看过证据再逐条标，这里只给“查看”。
+func (a *app) secFindingTable(c *ui.Context, k library.Issue, rows []secRow, acked bool) {
 	want := cond(k == library.SecurityHighRisk, security.HighRisk, security.Warning)
 	cols := []column{{locales.CommonSkills(), 0, 1}, {locales.CommonSource(), 0, 0.7}, {locales.SecColumnIssue(), 0, 2.6}}
-	table(c, cols, 70, len(rows), func(i, j int) {
+	actions := cond(want == security.Warning, float32(160), 70)
+	table(c, cols, actions, len(rows), func(i, j int) {
 		r := rows[i]
 		var first security.Finding
 		more := 0
@@ -1095,8 +1140,19 @@ func (a *app) secFindingTable(c *ui.Context, k library.Issue, rows []secRow) {
 			})
 		}
 	}, func(i int) {
+		r := rows[i]
 		if pushButton(c, locales.ActionView()).Clicked() {
-			a.openSecurityReport(rows[i].skill)
+			a.openSecurityReport(r.skill)
+		}
+		if want != security.Warning {
+			return
+		}
+		if acked {
+			if pushButton(c, locales.ActionUndo()).Clicked() {
+				a.secAckAll(r, false)
+			}
+		} else if pushButton(c, locales.SecAcked()).Clicked() {
+			a.secAckAll(r, true)
 		}
 	}, secRowStyle(rows, func(row ui.Element) {
 		row.MinHeight(58).Padding(10, 24) // 问题一栏两行（摘要、位置），上下多留些

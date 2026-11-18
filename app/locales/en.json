@@ -1157,5 +1157,7 @@
   "secUnignore": "Stop Ignoring",
   "secShowIgnored": "Show {count} Ignored",
   "secHideIgnored": "Hide Ignored",
-  "secIgnoreSaveFailed": "Couldn’t save that. Try again."
+  "secIgnoreSaveFailed": "Couldn’t save that. Try again.",
+  "secAckedToast": "Marked warnings in {name} as reviewed.",
+  "secIgnoredToast": "Ignored the unchecked files in {name}."
 }

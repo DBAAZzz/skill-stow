@@ -564,41 +564,44 @@ func (s *SecurityService) saveIgnored(r, sig string) error {
 
 var errNoFinding = errors.New("security: finding not in current report")
 
-// Ack 把当前报告里的一条警告或高风险标为已看过。
-func (s *SecurityService) Ack(r, key string) error {
+// Ack 把当前报告里的警告或高风险标为已看过；一次可以标几条，一起落盘。
+// 有一条不在当前报告里就都不标。
+func (s *SecurityService) Ack(r string, keys ...string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	st := s.roots[r]
 	if st == nil || st.rec == nil {
 		return errNoFinding
 	}
-	for _, f := range st.rec.Report.Findings {
-		if f.Key != key || !f.Notice.Risky() {
-			continue
+	acks := slices.Clone(st.acks)
+	for _, key := range keys {
+		i := slices.IndexFunc(st.rec.Report.Findings, func(f security.Finding) bool { return f.Key == key && f.Notice.Risky() })
+		if i < 0 {
+			return errNoFinding
 		}
+		f := st.rec.Report.Findings[i]
 		a := SecurityAck{Key: key, Notice: f.Notice, Rule: f.Rule, RuleVersion: f.RuleVersion}
 		if f.Notice == security.HighRisk {
 			a.Content = st.rec.Report.ContentDigest
 		}
-		acks := append(slices.DeleteFunc(slices.Clone(st.acks), func(x SecurityAck) bool { return x.Key == key }), a)
-		if err := s.saveAcks(r, acks); err != nil {
-			return err
-		}
-		st.acks = acks
-		return nil
+		acks = append(slices.DeleteFunc(acks, func(x SecurityAck) bool { return x.Key == key }), a)
 	}
-	return errNoFinding
+	if err := s.saveAcks(r, acks); err != nil {
+		return err
+	}
+	st.acks = acks
+	return nil
 }
 
-// Unack 撤销一条“已看过”。
-func (s *SecurityService) Unack(r, key string) error {
+// Unack 撤销“已看过”，一次可以撤几条。
+func (s *SecurityService) Unack(r string, keys ...string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	st := s.roots[r]
 	if st == nil {
 		return nil
 	}
-	acks := slices.DeleteFunc(slices.Clone(st.acks), func(x SecurityAck) bool { return x.Key == key })
+	acks := slices.DeleteFunc(slices.Clone(st.acks), func(x SecurityAck) bool { return slices.Contains(keys, x.Key) })
 	if err := s.saveAcks(r, acks); err != nil {
 		return err
 	}

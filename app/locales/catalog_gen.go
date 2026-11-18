@@ -16705,3 +16705,31 @@ func SecIgnoreSaveFailed() string { return In(i18n.Locale()).SecIgnoreSaveFailed
 func (msgs Messages) SecIgnoreSaveFailed() string {
 	return Catalog.Format(msgs.locale, "secIgnoreSaveFailed", nil)
 }
+
+// SecAckedToast says "已把 {name} 的安全警告标为已看过"
+// in the language the app shows.
+//
+// 本地安全检查：整理页整行标为已看过后的提示，带撤销
+func SecAckedToast(name string) string { return In(i18n.Locale()).SecAckedToast(name) }
+
+// SecAckedToast says "已把 {name} 的安全警告标为已看过"
+// in the language of msgs.
+//
+// 本地安全检查：整理页整行标为已看过后的提示，带撤销
+func (msgs Messages) SecAckedToast(name string) string {
+	return Catalog.Format(msgs.locale, "secAckedToast", map[string]any{"name": name})
+}
+
+// SecIgnoredToast says "已忽略 {name} 没检查到的内容"
+// in the language the app shows.
+//
+// 本地安全检查：整理页忽略没检查完之后的提示，带撤销
+func SecIgnoredToast(name string) string { return In(i18n.Locale()).SecIgnoredToast(name) }
+
+// SecIgnoredToast says "已忽略 {name} 没检查到的内容"
+// in the language of msgs.
+//
+// 本地安全检查：整理页忽略没检查完之后的提示，带撤销
+func (msgs Messages) SecIgnoredToast(name string) string {
+	return Catalog.Format(msgs.locale, "secIgnoredToast", map[string]any{"name": name})
+}

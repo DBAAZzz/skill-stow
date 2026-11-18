@@ -7216,5 +7216,23 @@
   "secIgnoreSaveFailed": "没能记下忽略，请再试一次。",
   "@secIgnoreSaveFailed": {
     "description": "本地安全检查：忽略写入失败"
+  },
+  "secAckedToast": "已把 {name} 的安全警告标为已看过",
+  "@secAckedToast": {
+    "description": "本地安全检查：整理页整行标为已看过后的提示，带撤销",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "secIgnoredToast": "已忽略 {name} 没检查到的内容",
+  "@secIgnoredToast": {
+    "description": "本地安全检查：整理页忽略没检查完之后的提示，带撤销",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }
