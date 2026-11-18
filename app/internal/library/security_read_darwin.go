@@ -42,12 +42,15 @@ type readLimits struct {
 var defaultLimits = readLimits{entries: 2000, depth: 32, file: 1 << 20, total: 20 << 20}
 
 // metaEntry 是元信息清单的一项：只看类型、大小、修改时间、权限、链接目标，
-// 不读正文。
+// 不读正文。另记 inode 和状态变化时间：修改时间能被改回去，这两个不能，
+// 换了文件或改过内容一定对不上。
 type metaEntry struct {
 	path  string
 	kind  byte // f 普通文件、d 目录、l 链接、s 其他
 	size  int64
 	mtime int64
+	ctime int64
+	ino   uint64
 	perm  uint32
 	link  string
 }
@@ -66,6 +69,8 @@ func metaDigestOf(entries []metaEntry) string {
 		field(e.path)
 		field(strconv.FormatInt(e.size, 10))
 		field(strconv.FormatInt(e.mtime, 10))
+		field(strconv.FormatInt(e.ctime, 10))
+		field(strconv.FormatUint(e.ino, 10))
 		field(strconv.FormatUint(uint64(e.perm), 8))
 		field(e.link)
 	}
@@ -118,16 +123,31 @@ func openRoot(root string) (int, unix.Stat_t, error) {
 }
 
 func (w *walker) dir(fd int, rel string, depth int) error {
-	if err := w.ctx.Err(); err != nil {
-		return err
-	}
 	d := os.NewFile(uintptr(fd), rel)
 	// os.File 拿走 fd 的所有权，下面关它
 	defer d.Close()
-	names, err := d.Readdirnames(-1)
-	if err != nil {
-		w.hole(rel, security.GapUnreadable)
-		return nil
+	if err := w.ctx.Err(); err != nil {
+		return err
+	}
+	// 分批读目录项：一层里塞了海量条目时，到上限就停，不先全读进内存
+	var names []string
+	for {
+		if err := w.ctx.Err(); err != nil {
+			return err
+		}
+		batch, err := d.Readdirnames(256)
+		names = append(names, batch...)
+		if w.n+len(names) > w.lim.entries {
+			w.hole("", security.GapFileLimit)
+			return errWalkLimit
+		}
+		if err == io.EOF || err == nil && len(batch) == 0 {
+			break
+		}
+		if err != nil {
+			w.hole(rel, security.GapUnreadable)
+			return nil
+		}
 	}
 	sort.Strings(names)
 	for _, name := range names {
@@ -139,17 +159,13 @@ func (w *walker) dir(fd int, rel string, depth int) error {
 			p = rel + "/" + name
 		}
 		w.n++
-		if w.n > w.lim.entries {
-			w.hole("", security.GapFileLimit)
-			return errWalkLimit
-		}
 		var st unix.Stat_t
 		if err := unix.Fstatat(fd, name, &st, unix.AT_SYMLINK_NOFOLLOW); err != nil {
 			w.hole(p, security.GapUnreadable)
 			w.meta = append(w.meta, metaEntry{path: p, kind: '?'})
 			continue
 		}
-		e := metaEntry{path: p, mtime: st.Mtim.Nano(), perm: uint32(st.Mode & 0o7777)}
+		e := metaEntry{path: p, mtime: st.Mtim.Nano(), ctime: st.Ctim.Nano(), ino: st.Ino, perm: uint32(st.Mode & 0o7777)}
 		switch st.Mode & unix.S_IFMT {
 		case unix.S_IFDIR:
 			e.kind = 'd'
@@ -227,16 +243,24 @@ func (w *walker) file(dirfd int, name, p string, st *unix.Stat_t) {
 		f.Gap = security.GapChanged
 		return
 	}
-	b, err := io.ReadAll(io.LimitReader(h, w.lim.file+1))
+	// 读的量按单文件上限和剩余总量中小的那个算：读的时候文件在长也不会超
+	limit := min(w.lim.file, w.lim.total-w.total)
+	b, err := io.ReadAll(io.LimitReader(h, limit+1))
+	w.total += int64(len(b))
 	if err != nil {
 		f.Gap = security.GapUnreadable
 		return
 	}
-	if int64(len(b)) > w.lim.file {
+	if int64(len(b)) > limit {
 		f.Gap = security.GapByteLimit
 		return
 	}
-	w.total += int64(len(b))
+	// 读完再核对一次：读的过程中被改写的，读到的字节不代表任何一个版本
+	var after unix.Stat_t
+	if err := unix.Fstat(fd, &after); err != nil || after.Size != int64(len(b)) || after.Mtim != got.Mtim || after.Ctim != got.Ctim {
+		f.Gap = security.GapChanged
+		return
+	}
 	f.Data = b
 }
 

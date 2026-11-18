@@ -5,12 +5,13 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"errors"
-
 	"os"
 	"path/filepath"
 	"slices"
 	"strconv"
+	"strings"
 
+	"skillmanager/internal/security"
 	"skillmanager/locales"
 )
 
@@ -96,3 +97,67 @@ func gitObject(kind string, data []byte) []byte {
 
 // blobID 是文件内容的 Git blob 哈希，十六进制。
 func blobID(data []byte) string { return hex.EncodeToString(gitObject("blob", data)) }
+
+// inputTree 用安全检查读到的那份快照算出 Git tree 哈希，和 TreeHash 对同样
+// 内容的结果相同。检查的字节和要装的内容靠它对上：两次分别读目录，中间被
+// 换了也对不上。快照里有没读到正文的文件或特殊文件时算不出，返回 false。
+func inputTree(in security.Input) (string, bool) {
+	type node struct {
+		files map[string][]byte // 名称 → 「模式 名称\0哈希」那一行
+		dirs  map[string]*node
+	}
+	newNode := func() *node { return &node{files: map[string][]byte{}, dirs: map[string]*node{}} }
+	root := newNode()
+	for _, f := range in.Files {
+		parts := strings.Split(f.Path, "/")
+		n := root
+		for _, d := range parts[:len(parts)-1] {
+			if n.dirs[d] == nil {
+				n.dirs[d] = newNode()
+			}
+			n = n.dirs[d]
+		}
+		name := parts[len(parts)-1]
+		var mode string
+		var h []byte
+		switch {
+		case f.Kind == security.Symlink && f.Link != "":
+			mode, h = "120000", gitObject("blob", []byte(f.Link))
+		case f.Kind == security.Regular && f.Data != nil && f.Gap == "":
+			mode = "100644"
+			if f.Mode&0o100 != 0 {
+				mode = "100755"
+			}
+			h = gitObject("blob", f.Data)
+		default:
+			return "", false
+		}
+		n.files[name] = append(append([]byte(mode+" "+name), 0), h...)
+	}
+	var hash func(n *node) ([]byte, bool)
+	hash = func(n *node) ([]byte, bool) {
+		type item struct{ sort, line []byte }
+		var items []item
+		for name, line := range n.files {
+			items = append(items, item{[]byte(name), line})
+		}
+		for name, sub := range n.dirs {
+			h, ok := hash(sub)
+			if !ok {
+				continue // Git 不记空目录
+			}
+			items = append(items, item{[]byte(name + "/"), append(append([]byte("40000 "+name), 0), h...)})
+		}
+		slices.SortFunc(items, func(a, b item) int { return bytes.Compare(a.sort, b.sort) })
+		var body []byte
+		for _, it := range items {
+			body = append(body, it.line...)
+		}
+		return gitObject("tree", body), len(items) > 0
+	}
+	if len(in.Gaps) > 0 {
+		return "", false
+	}
+	sum, _ := hash(root)
+	return hex.EncodeToString(sum), true
+}

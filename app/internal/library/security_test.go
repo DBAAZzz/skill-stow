@@ -340,3 +340,128 @@ func TestReportsAreStoredPrivately(t *testing.T) {
 		t.Fatal("报告应只存脱敏的证据片段")
 	}
 }
+
+// 重扫没查完（这里是目录暂时读不了）：已知的高风险和“已看过”都留着，只标为无法核实。
+func TestFailedRescanKeepsKnownRisksAndAcks(t *testing.T) {
+	dir := t.TempDir()
+	r := secSkill(t, map[string]string{"SKILL.md": "# a", "b.sh": keyUpload, "i.sh": pipeInstall})
+	s := newTestSecurity(t, dir)
+	s.Scan([]string{r}, true)
+	waitFor(t, "扫描", scanned(s, r))
+	warn := finding(s.View(r), "RE001").Key
+	must(t, s.Ack(r, warn))
+
+	must(t, os.Chmod(r, 0))
+	t.Cleanup(func() { os.Chmod(r, 0o755) })
+	s.Scan([]string{r}, true)
+	waitFor(t, "重扫失败", func() bool { v := s.View(r); return !v.Scanning && !v.Queued && v.Fresh == FreshUnknown })
+	v := s.View(r)
+	if v.Report == nil || v.TopPending() != security.HighRisk || !v.Acked[warn] {
+		t.Fatalf("没查完不应让已知风险或已看过消失：%+v", v)
+	}
+	if acks := loadAcks(filepath.Join(reportDir(dir, r), "acks.json")); len(acks) != 1 {
+		t.Fatalf("落盘的已看过不应被清掉：%+v", acks)
+	}
+}
+
+// 第一次就没查完的（目录当时不在），下次启动再查一次，不一直停在无法核实。
+func TestUnfinishedScanIsRetriedAtNextStart(t *testing.T) {
+	dir := t.TempDir()
+	base, _ := filepath.EvalSymlinks(t.TempDir())
+	r := filepath.Join(base, "later")
+	s := newTestSecurity(t, dir)
+	s.Sync([]string{r})
+	waitFor(t, "第一次扫描", scanned(s, r))
+	s.Close()
+
+	must(t, os.MkdirAll(r, 0o755))
+	must(t, os.WriteFile(filepath.Join(r, "i.sh"), []byte(pipeInstall), 0o755))
+	s2 := newTestSecurity(t, dir)
+	s2.Sync([]string{r})
+	waitFor(t, "重启后重查", func() bool {
+		v := s2.View(r)
+		return v.Report != nil && v.Report.Execution == security.Completed && v.Risky() == 1
+	})
+}
+
+// 比对元信息时又来一批：并进正在比对的那次，不丢。
+func TestMetadataChecksArriveWhileBusyAreNotDropped(t *testing.T) {
+	dir := t.TempDir()
+	a := secSkill(t, map[string]string{"SKILL.md": "# a"})
+	b := secSkill(t, map[string]string{"SKILL.md": "# b"})
+	s := newTestSecurity(t, dir)
+	s.Scan([]string{a, b}, true)
+	waitFor(t, "扫描", func() bool { return scanned(s, a)() && scanned(s, b)() })
+	s.Close()
+
+	s2 := newTestSecurity(t, dir)
+	s2.mu.Lock()
+	for _, r := range []string{a, b} {
+		s2.load(r, s2.root(r))
+	}
+	s2.metaBusy = true // 假装有一批正在比对
+	s2.mu.Unlock()
+	s2.checkMeta([]string{a}) // 比对中又来的两批
+	s2.checkMeta([]string{b})
+	s2.mu.Lock()
+	s2.metaBusy = false
+	s2.mu.Unlock()
+	s2.checkMeta(nil) // 正在比对的那次排空等候集合
+	if va, vb := s2.View(a), s2.View(b); va.Fresh != FreshCurrent || vb.Fresh != FreshCurrent {
+		t.Fatalf("两个目录都应比对过：%v %v", va.Fresh, vb.Fresh)
+	}
+}
+
+// 已看过写不进磁盘：报错，界面也不显示成已看过（否则重启又冒出来）。
+func TestAckThatCannotBeSavedIsNotShown(t *testing.T) {
+	dir := t.TempDir()
+	r := secSkill(t, map[string]string{"i.sh": pipeInstall})
+	s := newTestSecurity(t, dir)
+	s.Scan([]string{r}, true)
+	waitFor(t, "扫描", scanned(s, r))
+	d := reportDir(dir, r)
+	must(t, os.Chmod(d, 0o500))
+	t.Cleanup(func() { os.Chmod(d, 0o700) })
+	if err := s.Ack(r, finding(s.View(r), "RE001").Key); err == nil {
+		t.Fatal("写不进去应返回错误")
+	}
+	if s.View(r).Pending() != 1 {
+		t.Fatal("没存下来的已看过不应生效")
+	}
+}
+
+// 检查读到的那份快照算出的 tree 哈希和 TreeHash 一致；对不上的结果不能放行。
+func TestStagedScanIsBoundToTheContentItRead(t *testing.T) {
+	r := secSkill(t, map[string]string{"SKILL.md": "# a", "scripts/run.sh": "#!/bin/sh\necho hi\n", "docs/x/y.md": "y"})
+	must(t, os.MkdirAll(filepath.Join(r, "empty"), 0o755))
+	must(t, os.Symlink("SKILL.md", filepath.Join(r, "link.md")))
+	want, err := TreeHash(r)
+	must(t, err)
+	s := newTestSecurity(t, t.TempDir())
+	st := s.ScanStaged(context.Background(), r, false)
+	if st.Tree != want {
+		t.Fatalf("快照的 tree 哈希应等于 TreeHash：%s != %s", st.Tree, want)
+	}
+	if rep := st.Bind(want); rep.Execution != security.Completed {
+		t.Fatalf("内容对得上应照常完成：%+v", rep)
+	}
+	if rep := st.Bind("0000"); rep.Execution != security.Failed || !NeedsSecurityReview(rep) {
+		t.Fatalf("内容对不上应记为失败、需要确认：%+v", rep)
+	}
+}
+
+// 阅读视图读文件列表时跳过管道，不会卡住。
+func TestReaderFileListSkipsPipes(t *testing.T) {
+	r := secSkill(t, map[string]string{"SKILL.md": "# a"})
+	must(t, syscall.Mkfifo(filepath.Join(r, "pipe"), 0o644))
+	done := make(chan []File, 1)
+	go func() { done <- readFiles(r) }()
+	select {
+	case files := <-done:
+		if len(files) != 2 {
+			t.Fatalf("应列出两个条目：%+v", files)
+		}
+	case <-time.After(3 * time.Second):
+		t.Fatal("读文件列表卡在了管道上")
+	}
+}

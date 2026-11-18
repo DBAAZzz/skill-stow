@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io/fs"
+	"maps"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -102,8 +103,9 @@ type secRoot struct {
 	loaded   bool
 	queued   bool
 	running  context.CancelFunc
-	again    bool // 扫描中目录又变了：扫完再排一次
-	verified bool // 这次启动后元信息比对过
+	again    bool      // 扫描中目录又变了：扫完再排一次
+	verified bool      // 这次启动后元信息比对过
+	failedAt time.Time // 上一次没查完（失败、超时）的时间
 }
 
 // SecurityService 是本地安全检查服务。
@@ -124,7 +126,9 @@ type SecurityService struct {
 	wake     chan struct{}
 	onChange func()
 	metaBusy bool
+	metaWant map[string]bool // 等着比对元信息的目录：比对中又来的请求并进来，由正在比对的那次排空
 	lastMeta time.Time
+	closed   bool
 	timers   map[string]*time.Timer
 }
 
@@ -155,9 +159,14 @@ func newSecurity(dir string, key []byte, onChange func(), workers int) *Security
 func (s *SecurityService) Close() {
 	s.stop()
 	s.mu.Lock()
+	s.closed = true
 	for _, t := range s.timers {
 		t.Stop()
 	}
+	for _, r := range s.queue {
+		s.roots[r].queued = false
+	}
+	s.queue = nil
 	s.mu.Unlock()
 }
 
@@ -227,6 +236,10 @@ func (s *SecurityService) Sync(roots []string) {
 				st.fresh = FreshStale
 			}
 			scan = append(scan, r)
+		case st.rec.Meta == "":
+			// 上次没能完整读下来（失败、中断、超限）：没有元信息可比，重新检查
+			st.fresh = FreshUnknown
+			scan = append(scan, r)
 		default:
 			check = append(check, r)
 		}
@@ -261,7 +274,7 @@ func (s *SecurityService) Scan(roots []string, manual bool) {
 
 // enqueue 调用方持锁。正在扫的目录记一笔，扫完再来一次。
 func (s *SecurityService) enqueue(roots []string, front bool) {
-	if len(roots) == 0 {
+	if len(roots) == 0 || s.closed {
 		return
 	}
 	if len(s.queue) == 0 && s.busy == 0 {
@@ -357,8 +370,14 @@ func (s *SecurityService) work() {
 		s.busy--
 		s.done++
 		st.running = nil
-		userCancelled := rec.Report.Execution == security.Cancelled && s.ctx.Err() == nil
-		if !userCancelled || st.rec == nil {
+		switch {
+		case s.ctx.Err() != nil:
+			// 应用在退出：这次不算，下次启动接着查
+		case rec.Report.Execution != security.Completed && st.rec != nil:
+			// 失败、超时或被停下：已有的结果和“已看过”都留着（不让已知的风险
+			// 因为一次没查完就消失），只标为无法核实
+			st.fresh, st.failedAt = FreshUnknown, time.Now()
+		default:
 			s.store(r, st, rec)
 		}
 		if st.again {
@@ -373,18 +392,24 @@ func (s *SecurityService) work() {
 
 // analyze 读取并分析一个目录。读不了时返回失败报告，不当作没有风险。
 func (s *SecurityService) analyze(ctx context.Context, r string, incomplete bool) *securityRecord {
+	rec, _ := s.analyzeInput(ctx, r, incomplete)
+	return rec
+}
+
+// analyzeInput 同 analyze，另外交出分析用的那份快照。
+func (s *SecurityService) analyzeInput(ctx context.Context, r string, incomplete bool) (*securityRecord, security.Input) {
 	in, meta, err := readSkill(ctx, r, s.lim)
 	if err != nil {
 		rep := security.Report{Schema: security.SchemaVersion, Engine: security.EngineVersion, Ruleset: security.RulesetVersion(),
 			StartedAt: time.Now(), FinishedAt: time.Now(), Execution: security.Failed, Error: readErrKind(err)}
-		return &securityRecord{Root: r, Report: rep}
+		return &securityRecord{Root: r, Report: rep}, security.Input{}
 	}
 	in.Incomplete = incomplete
 	rep := security.Analyze(ctx, in, security.DefaultPolicy(), s.fp)
 	if rep.Execution != security.Completed {
 		meta = ""
 	}
-	return &securityRecord{Root: r, Meta: meta, Report: rep}
+	return &securityRecord{Root: r, Meta: meta, Report: rep}, in
 }
 
 func readErrKind(err error) string {
@@ -410,8 +435,10 @@ func (s *SecurityService) store(r string, st *secRoot, rec *securityRecord) {
 		st.fresh = FreshUnknown
 	}
 	st.verified = true
-	valid := s.validAcks(st)
-	st.acks = slices.DeleteFunc(st.acks, func(a SecurityAck) bool { return !valid[a.Key] })
+	if rec.Report.Execution == security.Completed {
+		valid := s.validAcks(st)
+		st.acks = slices.DeleteFunc(st.acks, func(a SecurityAck) bool { return !valid[a.Key] })
+	}
 	if s.dir == "" {
 		return
 	}
@@ -496,8 +523,12 @@ func (s *SecurityService) Ack(r, key string) error {
 		if f.Notice == security.HighRisk {
 			a.Content = st.rec.Report.ContentDigest
 		}
-		st.acks = append(slices.DeleteFunc(st.acks, func(x SecurityAck) bool { return x.Key == key }), a)
-		return s.saveAcks(r, st)
+		acks := append(slices.DeleteFunc(slices.Clone(st.acks), func(x SecurityAck) bool { return x.Key == key }), a)
+		if err := s.saveAcks(r, acks); err != nil {
+			return err
+		}
+		st.acks = acks
+		return nil
 	}
 	return errNoFinding
 }
@@ -510,15 +541,20 @@ func (s *SecurityService) Unack(r, key string) error {
 	if st == nil {
 		return nil
 	}
-	st.acks = slices.DeleteFunc(st.acks, func(x SecurityAck) bool { return x.Key == key })
-	return s.saveAcks(r, st)
+	acks := slices.DeleteFunc(slices.Clone(st.acks), func(x SecurityAck) bool { return x.Key == key })
+	if err := s.saveAcks(r, acks); err != nil {
+		return err
+	}
+	st.acks = acks
+	return nil
 }
 
-func (s *SecurityService) saveAcks(r string, st *secRoot) error {
+// saveAcks 先落盘，成功了调用方再换内存里的：写不进去时界面不会显示成已看过。
+func (s *SecurityService) saveAcks(r string, acks []SecurityAck) error {
 	if s.dir == "" {
 		return nil
 	}
-	return writePrivate(filepath.Join(reportDir(s.dir, r), "acks.json"), st.acks)
+	return writePrivate(filepath.Join(reportDir(s.dir, r), "acks.json"), acks)
 }
 
 // ---- 失效 ----
@@ -552,9 +588,15 @@ func (s *SecurityService) CheckMeta(force bool) {
 
 func (s *SecurityService) checkMeta(roots []string) {
 	s.mu.Lock()
+	if s.metaWant == nil {
+		s.metaWant = map[string]bool{}
+	}
+	for _, r := range roots {
+		s.metaWant[r] = true
+	}
 	if s.metaBusy {
 		s.mu.Unlock()
-		return
+		return // 正在比对的那次会接着把这些也比完
 	}
 	s.metaBusy = true
 	s.lastMeta = time.Now()
@@ -565,36 +607,59 @@ func (s *SecurityService) checkMeta(roots []string) {
 		s.mu.Unlock()
 		s.onChange()
 	}()
-	for _, r := range roots {
-		if s.ctx.Err() != nil {
+	for {
+		s.mu.Lock()
+		if len(s.metaWant) == 0 || s.ctx.Err() != nil {
+			s.mu.Unlock()
 			return
 		}
-		ctx, cancel := context.WithTimeout(s.ctx, 5*time.Second)
-		d, err := metaDigest(ctx, r, s.lim)
-		cancel()
-		s.mu.Lock()
-		st := s.roots[r]
-		if st == nil || st.rec == nil || st.running != nil || st.queued {
-			s.mu.Unlock()
-			continue
-		}
-		st.verified = true
-		switch {
-		case err != nil && errors.Is(err, fs.ErrNotExist):
-			// 目录没了：等发现结果把它移出
-		case err != nil:
-			st.fresh = FreshUnknown
-		case st.rec.Meta == "":
-			st.fresh = FreshUnknown
-		case d == st.rec.Meta:
-			if st.fresh != FreshStale {
-				st.fresh = FreshCurrent
+		batch := slices.Sorted(maps.Keys(s.metaWant))
+		clear(s.metaWant)
+		s.mu.Unlock()
+		for _, r := range batch {
+			if s.ctx.Err() != nil {
+				return
 			}
-		default:
-			st.fresh = FreshStale
+			s.checkOne(r)
+		}
+	}
+}
+
+// retryAfter 是没能查完的目录多久后再自动重试：一直超时的不反复占着后台。
+const retryAfter = 10 * time.Minute
+
+func (s *SecurityService) checkOne(r string) {
+	ctx, cancel := context.WithTimeout(s.ctx, 5*time.Second)
+	d, err := metaDigest(ctx, r, s.lim)
+	cancel()
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	st := s.roots[r]
+	if st == nil || st.rec == nil || st.running != nil || st.queued {
+		return
+	}
+	st.verified = true
+	retry := time.Since(st.failedAt) > retryAfter
+	switch {
+	case err != nil && errors.Is(err, fs.ErrNotExist):
+		// 目录没了：等发现结果把它移出
+	case err != nil:
+		st.fresh = FreshUnknown
+	case st.rec.Meta == "":
+		// 上次没查完、没有元信息可比；现在读得了就再查一次
+		st.fresh = FreshUnknown
+		if retry && time.Since(st.rec.Report.FinishedAt) > retryAfter {
 			s.enqueue([]string{r}, false)
 		}
-		s.mu.Unlock()
+	case d == st.rec.Meta:
+		if st.fresh != FreshStale {
+			st.fresh = FreshCurrent
+		}
+	default:
+		st.fresh = FreshStale
+		if retry {
+			s.enqueue([]string{r}, false)
+		}
 	}
 }
 
@@ -649,10 +714,15 @@ func (s *SecurityService) debounce(r string) {
 
 // ---- 导入、更新 ----
 
-// StagedSecurity 是对暂存内容的一次检查，不落盘、不进队列。
+// StagedSecurity 是对暂存内容的一次检查，不落盘、不进队列。Tree 是分析用
+// 的那份快照的 Git tree 哈希；快照不全（有没读到的文件）时为空。
 type StagedSecurity struct {
 	Report security.Report
+	Tree   string
 }
+
+// stagedSlots 限制同时检查的暂存目录数：一个来源里几十个技能也只并行两个。
+var stagedSlots = make(chan struct{}, 2)
 
 // ScanStaged 同步检查一个暂存目录（导入、更新用）。incomplete 为真表示
 // 来源还没补齐（只下载了 SKILL.md），报告会标为不完整。
@@ -660,21 +730,40 @@ func (s *SecurityService) ScanStaged(ctx context.Context, dir string, incomplete
 	if s == nil || !SecuritySupported() {
 		return StagedSecurity{}
 	}
+	select {
+	case stagedSlots <- struct{}{}:
+		defer func() { <-stagedSlots }()
+	case <-ctx.Done():
+		return StagedSecurity{Report: security.Report{Schema: security.SchemaVersion, Engine: security.EngineVersion, Ruleset: security.RulesetVersion(),
+			StartedAt: time.Now(), FinishedAt: time.Now(), Execution: security.Cancelled}}
+	}
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
-	rec := s.analyze(ctx, dir, incomplete)
-	return StagedSecurity{Report: rec.Report}
+	rec, in := s.analyzeInput(ctx, dir, incomplete)
+	out := StagedSecurity{Report: rec.Report}
+	if rec.Report.Execution == security.Completed {
+		out.Tree, _ = inputTree(in)
+	}
+	return out
 }
 
-// ScanImport 检查一个导入暂存的技能。完整下载的还核对暂存目录的 tree 哈希
-// 等于读取时记下的：添加时会再核对复制出来的内容，三者一致，装进去的就是
-// 检查过的内容。
-func (s *SecurityService) ScanImport(ctx context.Context, sk *ImportSkill) StagedSecurity {
-	st := s.ScanStaged(ctx, sk.Dir, sk.Partial)
-	if !sk.Partial && st.Report.Execution == security.Completed {
-		if h, err := TreeHash(sk.Dir); err != nil || h != sk.Tree {
-			st.Report.Execution, st.Report.Error, st.Report.Complete = security.Failed, "changed", false
-		}
+// Bind 核对检查的那份内容就是 want（要装的内容的 tree 哈希）。对不上或
+// 算不出时把报告记为失败：检查结果不能拿来放行另一份内容。
+func (st StagedSecurity) Bind(want string) security.Report {
+	r := st.Report
+	if r.Execution == security.Completed && r.Complete && (st.Tree == "" || st.Tree != want) {
+		r.Execution, r.Error, r.Complete = security.Failed, "changed", false
+	}
+	return r
+}
+
+// ScanImport 检查一个导入暂存的技能。参数由调用方在界面线程上取好：补齐
+// 会替换暂存目录，后台不再碰那个对象。完整下载的要和读取时记下的 tree
+// 哈希对上；添加时会再核对复制出来的内容，所以装进去的就是检查过的内容。
+func (s *SecurityService) ScanImport(ctx context.Context, dir string, partial bool, tree string) StagedSecurity {
+	st := s.ScanStaged(ctx, dir, partial)
+	if !partial {
+		st.Report = st.Bind(tree)
 	}
 	return st
 }
@@ -686,7 +775,7 @@ func NeedsSecurityReview(r security.Report) bool {
 }
 
 // UpdateSecurityCheck 由应用设置，检查准备安装的新版本；nil 时不检查（测试）。
-var UpdateSecurityCheck func(ctx context.Context, dir string) security.Report
+var UpdateSecurityCheck func(ctx context.Context, dir string) StagedSecurity
 
 // SecurityHoldError 是更新被安全检查拦下：要用户看过结果、明确放行。
 type SecurityHoldError struct{ Report security.Report }
@@ -713,7 +802,8 @@ func holdForSecurity(ctx context.Context, it UpdateItem, p *Prepared) error {
 		securityHolds.Delete(holdKey(it))
 		return nil
 	}
-	rep := UpdateSecurityCheck(ctx, p.Dir)
+	// 检查的那份快照要正是上游这个版本，否则结果不算数
+	rep := UpdateSecurityCheck(ctx, p.Dir).Bind(it.Upstream)
 	if NeedsSecurityReview(rep) {
 		securityHolds.Store(holdKey(it), rep)
 		return &SecurityHoldError{Report: rep}

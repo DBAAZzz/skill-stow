@@ -71,7 +71,10 @@ func listFiles(dir string, strict bool) []File {
 			f.Size = int(fi.Size())
 			f.Exec = fi.Mode()&0o100 != 0
 		}
-		if f.Size <= maxFileSize {
+		// 只读普通文件（链接跟到普通文件也行）：管道、设备之类打开就可能卡住
+		if fi, err := os.Stat(p); err != nil || !fi.Mode().IsRegular() {
+			f.Binary, f.Unreadable = true, strict
+		} else if f.Size <= maxFileSize {
 			b, err := os.ReadFile(p)
 			switch {
 			case err != nil:
