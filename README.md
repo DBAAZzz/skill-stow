@@ -95,13 +95,15 @@ Counts how often each skill was called, based on Claude Code and Codex session l
    - macOS 15 and later: open the app once and click Done. Then go to System Settings › Privacy & Security, scroll to Security, click Open Anyway next to Skill Stow and confirm with your password.
    - macOS 12 to 14: in Applications, Control-click Skill Stow, choose Open, then click Open.
 
-   After that it opens normally. Each new version needs to be allowed once more.
+   After that it opens normally. A version you download and install by hand needs to be allowed once more.
 
    Removing the download flag in Terminal does the same:
 
    ```sh
    xattr -dr com.apple.quarantine "/Applications/Skill Stow.app"
    ```
+
+Versions after 0.1.1 update themselves: choose Skill Stow › Check for App Updates…, or click Check for Updates… in Settings › General › App Updates. The update window shows the release notes, downloads the new version (only the changed parts when it can), checks its signature and restarts the app. Turn on Check for Updates Automatically there to have it look once a day.
 
 If you'd rather not run a downloaded binary, build it yourself as described in [Running from source](#running-from-source).
 
@@ -139,6 +141,7 @@ The app only goes online for these:
 
 - **Adding a skill from a link**: reads the skill from GitHub (`api.github.com`, `raw.githubusercontent.com`, `codeload.github.com`), from skills.sh (file snapshot and security audit), or from the website you entered.
 - **Checking for or installing skill updates**: asks GitHub for the latest commit. This only happens when you click Check for Skill Updates.
+- **Checking for or installing app updates**: reads the latest release of Skill Stow on GitHub and downloads the new version. This only happens when you click Check for App Updates…, or once a day if you turn on Check for Updates Automatically in Settings › General.
 - **Source icons**: shows the GitHub owner's avatar or the website's icon next to skills you installed from them. Each icon is fetched once and cached in the app data folder.
 
 If you turn on Use Local gh Login in the Skill Updates settings, your `gh` token is sent only to GitHub, to raise the API rate limit. Diagnostic info is copied only when you choose Help › Report an Issue…, after you've seen what it contains.
