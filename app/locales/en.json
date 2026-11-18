@@ -731,7 +731,7 @@
   "commonMoreItems": "{p0} more…",
   "settingsRemoveFolderHint": "Remove from list",
   "settingsElapsedUnderTenth": "Took under 0.1s",
-  "commonOtherCopies": "{copies, plural, one {# other copy} other {# other copies}}",
+  "commonOtherCopies": "{copies, plural, one {+# copy} other {+# copies}}",
   "commonSameNameAsMine": "Same Name as Mine",
   "commonGlobalLink": "Global Link",
   "actionSearch": "Search",
