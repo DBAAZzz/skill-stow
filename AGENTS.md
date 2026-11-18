@@ -74,10 +74,13 @@ README 的截图在 `docs/screenshots/zh/`、`docs/screenshots/en/`，每个功�
 
 ## 发版
 
-1. 改 `app/mygo.json` 的 `version`，提交 `build(release): …`。
-2. 在 `app/` 下执行 `go tool mygo build -platform darwin/universal`，产物是 `build/darwin-universal/skill-stow-<版本>.dmg`。
-3. 打标签 `v<版本>` 并推送，用 `gh release create` 建 Release，附上 dmg。
-4. Release 说明先写完整的 `## 中文`，再写完整的 `## English`，两节内容对应，不逐段交替。末尾附 dmg 的 SHA-256。还没有签名时，两节都要写第一次打开的放行步骤（参考 v0.1.0）。
+应用通过 MyGo 的 updater 自更新（`app/app_update.go`）：`app/mygo.json` 的 `updates` 里是签名公钥和发布仓库，已安装的应用只读 GitHub 上最新 Release 里的 `update-darwin-universal.json`，只接受用对应私钥签名的包。私钥 `mygo-update.key` 在 `~/Library/Application Support/mygo/update-keys/`，不进仓库，另存一份到密码管理器；丢了它，已安装的应用就再也收不到更新。
+
+1. 改 `app/mygo.json` 的 `version`，在 `app/CHANGELOG.md` 加 `## <版本>` 一节（文件存在时构建要求有这一节，内容就是更新窗口里的「更新说明」）。说明用编号列表，不用 `-`：更新窗口把无序列表画成 `•`。提交 `build(release): …`。
+2. 打标签 `v<版本>` 并推送。
+3. 在 `app/` 下执行 `MYGO_UPDATER_PRIVATE_KEY="$(cat ~/Library/Application\ Support/mygo/update-keys/mygo-update.key)" go tool mygo build -platform darwin/universal -upload`。它建草稿 Release `v<版本>`，上传 `skill-stow-<版本>.dmg`、更新包 `.tar.gz`、相对前几个版本的增量包 `.delta`、`update-darwin-universal.json` 和 `SHA256SUMS`。第一个带 `updates` 的版本没有可比的旧包，不出增量包。
+4. 用 `gh release edit v<版本> --notes-file …` 写 Release 说明：先写完整的 `## 中文`，再写完整的 `## English`，两节内容对应，不逐段交替。末尾附 dmg 的 SHA-256。还没有签名时，两节都要写第一次打开的放行步骤（参考 v0.1.0）。
+5. 核对附件齐全后 `gh release edit v<版本> --draft=false` 发布；发布后已安装的应用才能检查到它。
 
 ## 提交规范
 
