@@ -16,6 +16,8 @@
 
 项目会从 Claude Code、Codex 和 VS Code 系编辑器的使用记录里自动找出来，也可以手动添加任意文件夹。
 
+![看板：一个 Agent 一列](docs/screenshots/zh/board.png)
+
 ### 按 Agent 开关单个技能
 
 在 Claude Code、Codex、Gemini CLI、OpenCode 或 ZCode 上拨一下开关，应用会直接改这个 Agent 自己的配置文件，Agent 那边看到的状态和这里完全一致。「添加到其他 Agent…」会把技能链接进其他 Agent 的目录；「移除」只删本应用建的链接。
@@ -25,6 +27,8 @@
 粘贴 GitHub 链接、`owner/repo`、`npx skills add …` 命令或网站地址，或者直接把文件夹、`.zip` 拖进窗口。选好要加哪些技能、放到哪里：通用技能库、指定的 Agent，或者某个项目。
 
 每个技能加进来之前都会先做本地安全检查；GitHub 来源还会同时列出 skills.sh 的安全审计。高风险或没能检查完的技能，要你点「仍然添加」才会加进来。
+
+![添加技能：从文件夹里挑技能，附检查结果](docs/screenshots/zh/add.png)
 
 ### 本地安全检查
 
@@ -38,6 +42,8 @@
 
 每条结果都能直接跳到对应的那一行。看过之后勾上「已看过」；技能内容一变，它会重新出现。首次打开会在后台检查全部技能，之后哪个技能的文件变了，就标成「已过期」并重新检查。这是基于规则的检查，不能保证绝对安全。
 
+![安全检查：高风险结果和对应的代码行](docs/screenshots/zh/security.png)
+
 ### 更新不踩坑
 
 从 GitHub 添加的技能会记下来源 commit。「技能更新」列出上游有新 commit 的技能，「查看差异」会在改动之前逐个文件展示差异。
@@ -48,6 +54,8 @@
 - 只在你点「检查技能更新」时才联网检查。网络受限时可以设代理，也可以用本机的 `gh` 登录提高 API 限额。
 
 装在项目里的技能暂时不参与更新。
+
+![技能更新：可更新、需确认、需处理](docs/screenshots/zh/updates.png)
 
 ### 整理
 
@@ -60,14 +68,16 @@
 - 技能删了、安装记录还留着
 - 全局链接指向项目里的技能，项目一挪就断
 
+<p>
+  <img src="docs/screenshots/zh/tidy.png" width="49%" alt="整理：所有问题列在一处">
+  <img src="docs/screenshots/zh/compare.png" width="49%" alt="左右对比同一技能的两份副本">
+</p>
+
 ### 使用情况
 
 根据本机 Claude Code 和 Codex 的会话记录，统计每个技能被调用了多少次：哪些常用、哪些从没用过，一眼就能看出来，方便清理。其他 Agent 没有留下调用记录。
 
-<p>
-  <img src="docs/screenshots/zh/tidy.png" width="49%" alt="整理：找出重复副本和断掉的链接，一键处理">
-  <img src="docs/screenshots/zh/usage.png" width="49%" alt="使用情况：每个技能被调用的次数">
-</p>
+![使用情况：近 8 周和每个技能的调用](docs/screenshots/zh/usage.png)
 
 ### 用起来像原生 Mac 应用
 
@@ -75,6 +85,8 @@
 - 界面跟着磁盘走：在终端里装了技能，不用刷新就会出现。
 - 删除的技能进废纸篓，提示条上就有「撤销」（⌘Z）。
 - 支持前进后退（⌘[ 和 ⌘]）、拖放、浅色和深色外观，界面有简体中文和英文。
+
+![⌘K 搜索名称、简介和正文](docs/screenshots/zh/search.png)
 
 ## 安装
 

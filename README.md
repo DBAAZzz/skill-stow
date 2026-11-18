@@ -16,6 +16,8 @@ Skill Stow scans the skill folders of 32 agents plus your projects, and shows wh
 
 Projects are found automatically from Claude Code, Codex and VS Code–based editor history, and you can add any folder by hand.
 
+![Board view: one column per agent](docs/screenshots/en/board.png)
+
 ### Turn a skill on or off per agent
 
 Flip the switch for Claude Code, Codex, Gemini CLI, OpenCode or ZCode, and the app edits that agent's own config file, so the agent sees exactly the state the app shows. Add to Another Agent… links a skill into any other agent's folder, and Remove deletes only links the app created.
@@ -25,6 +27,8 @@ Flip the switch for Claude Code, Codex, Gemini CLI, OpenCode or ZCode, and the a
 Paste a GitHub link, `owner/repo`, an `npx skills add …` command or a website URL, or drop a folder or `.zip` onto the window. Pick which skills to add and where they go: the shared library, specific agents, or a project.
 
 Every skill gets the local security check before it's added, and for GitHub sources the skills.sh security audit is shown next to it. A skill that is high risk or couldn't be fully checked is only added if you choose Add Anyway.
+
+![Add Skills: pick skills from a folder, with their check results](docs/screenshots/en/add.png)
 
 ### Local security check
 
@@ -38,6 +42,8 @@ An offline analyzer reads every file of every skill, including SKILL.md, scripts
 
 Each finding links to the exact line. Mark it Reviewed once you've looked; if the skill's content changes, the finding comes back. The first launch checks everything in the background, and a skill whose files change is marked Outdated and checked again. It's a heuristic check, not a guarantee of safety.
 
+![Security check: a high-risk finding with the exact lines](docs/screenshots/en/security.png)
+
 ### Update without surprises
 
 Skills added from GitHub remember the commit they came from. Skill Updates lists the ones with newer upstream commits, and View Differences shows a file-by-file diff before anything changes.
@@ -48,6 +54,8 @@ Skills added from GitHub remember the commit they came from. Skill Updates lists
 - Update checks only run when you click Check for Skill Updates. Proxy settings and your local `gh` login are supported for restricted networks and higher rate limits.
 
 Skills installed into a project aren't included in updates yet.
+
+![Skill Updates: ready, needs confirmation, needs attention](docs/screenshots/en/updates.png)
 
 ### Tidy Up
 
@@ -60,14 +68,16 @@ One list of everything that needs attention, and most fixes take one click:
 - install records left behind by skills you deleted
 - global links that point into a project, which break if the project moves
 
+<p>
+  <img src="docs/screenshots/en/tidy.png" width="49%" alt="Tidy Up: every issue in one list">
+  <img src="docs/screenshots/en/compare.png" width="49%" alt="Comparing two copies of a skill side by side">
+</p>
+
 ### Usage
 
 Counts how often each skill was called, based on Claude Code and Codex session logs on your Mac, so you can see what you actually use and clear out what you don't. Other agents don't keep call records.
 
-<p>
-  <img src="docs/screenshots/en/tidy.png" width="49%" alt="Tidy Up: duplicate copies and broken links, fixed in one click">
-  <img src="docs/screenshots/en/usage.png" width="49%" alt="Usage: how often each skill is called">
-</p>
+![Usage: calls over the last 8 weeks and per skill](docs/screenshots/en/usage.png)
 
 ### Feels like a Mac app
 
@@ -75,6 +85,8 @@ Counts how often each skill was called, based on Claude Code and Codex session l
 - The window follows the disk: install a skill from the terminal and it shows up without a refresh.
 - Deleting moves skills to the Trash, with Undo (⌘Z) right in the notification.
 - Back and forward history (⌘[ and ⌘]), drag and drop, light and dark appearance, English and Simplified Chinese.
+
+![⌘K search across names, descriptions and full text](docs/screenshots/en/search.png)
 
 ## Install
 

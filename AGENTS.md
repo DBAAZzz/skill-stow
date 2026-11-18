@@ -19,7 +19,7 @@ go tool mygo build                # 打包 .app / .dmg 到 build/
 mkdir -p /tmp/shots && SNAPSHOT_DIR=/tmp/shots go test -run Snapshots .
 ```
 
-README 的截图在 `docs/screenshots/zh/`、`docs/screenshots/en/`，取自上面截图命令的 `2-cards-selected`（main）、`t1-tidy`（tidy）、`u1-usage` 上面 1600 像素（usage），缩到 1760 像素宽。界面有明显变化时重新生成。
+README 的截图在 `docs/screenshots/zh/`、`docs/screenshots/en/`，每个功能小节一张，由上面的截图命令加 `-run 'TestSnapshots$|TestUsageSnapshots|TestImportSnapshots|TestUpdate.*Snapshot'` 生成：main=`2-cards-selected`、board=`4-board`、add=`import-pick`、security=`s5-sec-report`、updates=`updates-full`、tidy=`t1-tidy`、compare=`d1-compare`、usage=`u1-usage`（取上面 1600 像素）、search=`k2-palette-test`，都缩到 1760 像素宽。界面有明显变化时重新生成。
 
 ## 代码分层
 
