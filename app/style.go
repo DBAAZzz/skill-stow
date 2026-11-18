@@ -102,9 +102,10 @@ func theme(c *ui.Context) *ui.Theme {
 
 // flag 是橙色的提示：图标 + 文字。
 func flag(c *ui.Context, icon *ui.SVG, text string) ui.Element {
-	return ui.Row(c).Gap(3).AlignItems(ui.Center).Shrink(0).TextColor(colWarnText).Children(func() {
-		ui.Icon(c, icon).Size(11, 11)
-		ui.Text(c, text).FontSize(11).FontWeight(500).SingleLine()
+	// 放不下时（英文较长）文字省略，不伸出卡片；完整内容在各自的 Tooltip 里
+	return ui.Row(c).Gap(3).AlignItems(ui.Center).MinWidth(0).TextColor(colWarnText).Children(func() {
+		ui.Icon(c, icon).Size(11, 11).Shrink(0)
+		ui.Text(c, text).FontSize(11).FontWeight(500).SingleLine().MinWidth(0)
 	})
 }
 

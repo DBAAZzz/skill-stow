@@ -218,7 +218,7 @@ func (a *app) agentToggle(c *ui.Context, s *library.Skill, ag library.Agent, fir
 			}
 		}
 		// 状态词靠右，和开关的距离每行一样
-		word := ui.Text(c, label).Width(52).TextAlign(ui.End).FontSize(12).TextColor(color).SingleLine()
+		word := ui.Text(c, label).MinWidth(52).Shrink(0).TextAlign(ui.End).FontSize(12).TextColor(color).SingleLine()
 		if st.Kind == library.StateUnsupported && !added {
 			word.Tooltip(locales.InspectorAlwaysOnTip(ag.DisplayName()))
 		}
