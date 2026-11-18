@@ -104,13 +104,20 @@ func TestTidyListsSecurityFirst(t *testing.T) {
 		t.Fatalf("查看应打开 stock-docs 的安全检查：%v %d", a.reading, a.file)
 	}
 	tt.Frame()
-	if a.scope == scopeTidy || !tt.HasText("在文件里查看") {
-		t.Fatalf("整理页盖在阅读视图上，查看后应真的看到报告：scope=%s %q", a.scope, tt.Texts())
+	if !tt.HasText("在文件里查看") {
+		t.Fatalf("查看后应真的看到报告：%q", tt.Texts())
 	}
-	a.goHistory(-1)
+	// 报告左上角的返回：回到整理页，而且是后退（还能前进回报告）
+	if err := tt.Click("返回（Esc）"); err != nil {
+		t.Fatal(err)
+	}
 	tt.Frame()
-	if a.scope != scopeTidy {
-		t.Errorf("后退应回到整理页：%s", a.scope)
+	if a.reading != nil || a.scope != scopeTidy || a.tidy.kind != library.SecurityHighRisk {
+		t.Fatalf("返回应回到整理页的高风险：scope=%s reading=%v", a.scope, a.reading)
+	}
+	a.goHistory(1)
+	if a.reading == nil || a.file != secFile {
+		t.Fatal("前进应回到报告")
 	}
 }
 

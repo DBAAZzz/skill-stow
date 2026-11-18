@@ -626,10 +626,9 @@ func (a *app) openSecurityReport(s *library.Skill) {
 		return
 	}
 	a.navigate(func() {
-		// 整理、更新、添加技能页和对比页盖在阅读视图上面：先回到技能所在的列表
-		if a.cmp != nil || a.scope == scopeTidy || a.scope == scopeUpdates || a.scope == scopeImport {
-			a.showInList(s)
-		}
+		// 阅读视图盖在当前页上面（整理页也是），返回时回到这里；只有对比页
+		// 盖在阅读视图上，先把它关掉
+		a.cmp = nil
 		a.selected = s
 		a.showReader(s)
 		a.file = secFile

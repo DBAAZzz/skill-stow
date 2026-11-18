@@ -290,15 +290,16 @@ func (a *app) page(c *ui.Context) (string, func()) {
 	switch p := a.project(); {
 	case a.cmp != nil:
 		return "compare", func() { a.comparePage(c, a.cmp) }
+	// 阅读视图盖在整理、更新、添加技能、使用情况页上面：从那里打开的技能
+	// （如整理页的安全检查「查看」），返回时回到原来那一页
+	case a.reading != nil:
+		return "reader", func() { a.reader(c, a.reading) }
 	case a.scope == scopeTidy:
 		return "tidy", func() { a.tidyPage(c) }
 	case a.scope == scopeUpdates:
 		return "updates", func() { a.updatePage(c) }
 	case a.scope == scopeImport:
 		return "import", func() { a.importPage(c) }
-	// 阅读视图盖在使用情况页上面：从那里打开的技能，返回时回到使用情况页
-	case a.reading != nil:
-		return "reader", func() { a.reader(c, a.reading) }
 	case a.scope == scopeUsage:
 		return "usage", func() { a.usagePage(c) }
 	case p != nil:
@@ -337,11 +338,11 @@ func (a *app) closeReader() {
 }
 
 // manage 是阅读视图的「管理」：回到技能所在的列表，详情栏显示它。从使用
-// 情况页打开的，返回是回使用情况页，这里要换到它所在的列表。
+// 情况、整理等页打开的，返回是回原来那页，这里要换到它所在的列表。
 func (a *app) manage(s *library.Skill) {
 	a.navigate(func() {
 		a.closeReader()
-		if a.scope == scopeUsage {
+		if a.scope == scopeUsage || a.scope == scopeTidy || a.scope == scopeUpdates || a.scope == scopeImport {
 			a.showInList(s)
 		}
 	})
@@ -454,14 +455,14 @@ func (a *app) back() {
 	switch {
 	case a.windowMenuOpen(menuWinMain):
 		a.closeMenusIn(menuWinMain)
+	case a.cmp != nil:
+		a.closeCompare()
+	case a.reading != nil: // 盖在更新、添加技能页上的阅读视图先关
+		a.closeReader()
 	case a.scope == scopeUpdates && a.upd.prepared != nil:
 		a.closeUpdateCompare()
 	case a.scope == scopeImport && a.imp.cmp != nil:
 		a.imp.cmp = nil
-	case a.cmp != nil:
-		a.closeCompare()
-	case a.reading != nil:
-		a.closeReader()
 	case a.batch.on:
 		a.exitBatch()
 	case a.scope == scopeUsage && a.del.picking:
