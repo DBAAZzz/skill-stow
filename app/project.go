@@ -11,18 +11,20 @@ import (
 )
 
 // projectPage 是一个项目的技能（p1-b / p3-b）：卡片，或按技能目录
-// 分列的看板。项目技能只读；有技能被全局链接时项目名旁边有感叹号。
+// 分列的看板。有技能被全局链接时项目名旁边有感叹号。
 func (a *app) projectPage(c *ui.Context, p *library.ProjectInfo) {
 	skills := library.Filter(p.Skills, a.query)
 	a.toolbar(c, p.Name, func() {
 		ui.Text(c, locales.CommonSkillCount(len(p.Skills))).FontFeatures("tnum").SingleLine()
-		readOnlyTag(c)
 	}, func() {
 		if n := len(p.Linked()); n > 0 && alertButton(c, locales.ProjectGlobalLinksHint(n)).Clicked() {
 			a.showLinked(p)
 		}
 	}, func() {
 		ui.Spacer(c)
+		if updButton(c.Key("add-skill"), iconPlus, locales.ActionAddSkills(), false).Clicked() {
+			a.openImportForProject(p.Dir)
+		}
 		segmented(c.Key("view-mode"), &a.mode, locales.BrowseCards(), locales.BrowseBoard()).Label(locales.BrowseView())
 		if iconButton(c, iconFolder, locales.ActionShowInFinder()).Clicked() {
 			a.reveal(p.Dir)

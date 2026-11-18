@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"errors"
-
+	"path/filepath"
 	"slices"
 	"strings"
 
@@ -86,6 +86,58 @@ func (a *app) openImport() {
 		a.exitBatch()
 	})
 	a.checkClipboard()
+}
+
+// openImportForProject 打开添加技能页，并把「装到」预设为指定项目。
+func (a *app) openImportForProject(projectDir string) {
+	a.openImport()
+	a.setPlacement(library.ImportPlacement{
+		Project: projectDir,
+		Agents:  a.lib.ImportProjectDefaultAgents(),
+	})
+}
+
+func (a *app) importProjectName(dir string) string {
+	if p := a.lib.Project(dir); p != nil {
+		return p.Name
+	}
+	return filepath.Base(dir)
+}
+
+func (a *app) chooseProjectForImport() {
+	if !a.live {
+		a.err = locales.ProjectsSampleCantAdd()
+		return
+	}
+	parent := a.dialogParent(false)
+	go func() {
+		dirs, err := mygo.Dialog.Open(mygo.OpenDialogOptions{
+			Parent: parent, Title: locales.NavAddProject(), ButtonLabel: locales.ProjectsDialogAdd(), Directory: true,
+			Message: locales.ProjectsDialogMessage(),
+		})
+		if err != nil || len(dirs) == 0 {
+			return
+		}
+		a.post(func() {
+			dir, ok := a.lib.ValidProjectDir(dirs[0])
+			if !ok {
+				a.err = locales.ProjectInvalidFolder()
+				a.changed()
+				return
+			}
+			if err := a.lib.AddProjects([]string{dir}); err != nil {
+				a.err = err.Error()
+				a.changed()
+				return
+			}
+			a.rescan()
+			agents := a.imp.place.Agents
+			if a.imp.place.Project == "" {
+				agents = a.lib.ImportProjectDefaultAgents()
+			}
+			a.setPlacement(library.ImportPlacement{Project: dir, Agents: agents})
+		})
+	}()
 }
 
 // checkClipboard 读一次剪贴板：是能识别的链接或命令时，输入框下面提示粘贴。
@@ -414,6 +466,9 @@ func (a *app) importReplacing(k string) bool {
 
 // setPlacement 换装到哪里：记住作为下次的默认，重新查冲突。
 func (a *app) setPlacement(p library.ImportPlacement) {
+	if old := a.imp.place; old.Library != p.Library || old.Project != p.Project || !slices.Equal(old.Agents, p.Agents) {
+		a.imp.results = nil
+	}
 	a.imp.place, a.imp.placed = p, true
 	a.refreshImportChecks()
 }
@@ -510,7 +565,7 @@ func (a *app) addImports() {
 			defer a.releaseBatch(b)
 			st.adding = false
 			a.useScan(next, rep)
-			current := st.batch == b // 添加期间换了来源时，结果只发通知，不写进新来源的页面
+			current := st.batch == b && st.place.Project == p.Project // 添加期间换了来源时，结果只发通知，不写进新来源的页面
 			if current && st.results == nil {
 				st.results = map[string]library.ImportOutcome{}
 			}
@@ -540,13 +595,13 @@ func (a *app) addImports() {
 			}
 			switch {
 			case failed == 0:
-				first := addedNames[0]
+				first := out[0]
 				text := locales.ImportAddedNames(added, strings.Join(addedNames, locales.ListSeparator()))
 				if replaced > 0 {
 					text = locales.ImportAddedReplacedNames(added, replaced, strings.Join(addedNames, locales.ListSeparator()))
 				}
 				a.showToast(&toast{source: fromImport, kind: toastOK, text: text,
-					action: &toastAction{label: locales.ActionView(), run: func() { a.showImported(first) }}})
+					action: &toastAction{label: locales.ActionView(), run: func() { a.showImported(first.Name, p.Project, first.Place) }}})
 			case added == 0:
 				a.notify(fromImport, toastWarn, locales.ImportFailedSkillCount(failed))
 			default:
@@ -583,11 +638,26 @@ func (a *app) dropToImport(paths []string) {
 	a.importPaths(paths)
 }
 
-// showImported 去「我的技能」选中刚添加的技能。
-func (a *app) showImported(name string) {
+// showImported 去「我的技能」或目标项目选中刚添加的技能。
+func (a *app) showImported(name, project, place string) {
 	a.navigate(func() {
 		a.closeMenusIn(menuWinMain)
-		a.scope, a.inColl, a.coll, a.reading, a.cmp = string(library.ScopeMine), nil, nil, nil, nil
-		a.selected = a.lib.Get(name)
+		a.inColl, a.coll, a.reading, a.cmp, a.selected = nil, nil, nil, nil, nil
+		if project != "" {
+			if p := a.lib.Project(project); p != nil {
+				a.scope, a.projectsOpen = projectScope(p), true
+				for _, s := range p.Skills {
+					if library.SamePlace(s.Real, place) {
+						a.selected = s
+						break
+					}
+				}
+				return
+			}
+		}
+		a.scope = string(library.ScopeMine)
+		if s := a.lib.Get(name); s != nil && s.Source == library.Mine && project == "" {
+			a.selected = s
+		}
 	})
 }

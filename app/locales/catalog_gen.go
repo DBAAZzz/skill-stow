@@ -160,13 +160,13 @@ func (msgs Messages) DeleteUndoExpired() string {
 	return Catalog.Format(msgs.locale, "deleteUndoExpired", nil)
 }
 
-// DeleteReadOnly says "内置和项目技能不能删除"
+// DeleteReadOnly says "内置和插件技能不能删除"
 // in the language the app shows.
 //
 // 删除：只读技能
 func DeleteReadOnly() string { return In(i18n.Locale()).DeleteReadOnly() }
 
-// DeleteReadOnly says "内置和项目技能不能删除"
+// DeleteReadOnly says "内置和插件技能不能删除"
 // in the language of msgs.
 //
 // 删除：只读技能
@@ -14756,4 +14756,234 @@ func MenuReportIssue() string { return In(i18n.Locale()).MenuReportIssue() }
 // macOS「帮助」菜单：预览诊断信息后前往 GitHub 新建问题
 func (msgs Messages) MenuReportIssue() string {
 	return Catalog.Format(msgs.locale, "menuReportIssue", nil)
+}
+
+// ImportPlaceProjectDetail says "放进某个项目，只在这个项目里生效"
+// in the language the app shows.
+//
+// 添加技能「装到」菜单：项目选项的说明
+func ImportPlaceProjectDetail() string { return In(i18n.Locale()).ImportPlaceProjectDetail() }
+
+// ImportPlaceProjectDetail says "放进某个项目，只在这个项目里生效"
+// in the language of msgs.
+//
+// 添加技能「装到」菜单：项目选项的说明
+func (msgs Messages) ImportPlaceProjectDetail() string {
+	return Catalog.Format(msgs.locale, "importPlaceProjectDetail", nil)
+}
+
+// ImportProjectConflictExisting says "{project} 里已经有 {name}，内容和这份不一致。"
+// in the language the app shows.
+//
+// 添加到项目时已有同名且内容不同的冲突标题
+func ImportProjectConflictExisting(project string, name string) string {
+	return In(i18n.Locale()).ImportProjectConflictExisting(project, name)
+}
+
+// ImportProjectConflictExisting says "{project} 里已经有 {name}，内容和这份不一致。"
+// in the language of msgs.
+//
+// 添加到项目时已有同名且内容不同的冲突标题
+func (msgs Messages) ImportProjectConflictExisting(project string, name string) string {
+	return Catalog.Format(msgs.locale, "importProjectConflictExisting", map[string]any{"project": project, "name": name})
+}
+
+// ImportProjectAgentSubtitle says "按它们在项目里读的目录放"
+// in the language the app shows.
+//
+// 添加技能「谁会读到」菜单（项目模式）：标题旁说明
+func ImportProjectAgentSubtitle() string { return In(i18n.Locale()).ImportProjectAgentSubtitle() }
+
+// ImportProjectAgentSubtitle says "按它们在项目里读的目录放"
+// in the language of msgs.
+//
+// 添加技能「谁会读到」菜单（项目模式）：标题旁说明
+func (msgs Messages) ImportProjectAgentSubtitle() string {
+	return Catalog.Format(msgs.locale, "importProjectAgentSubtitle", nil)
+}
+
+// ImportProjectAlsoReads says "{agents} 也读 {dirs}"
+// in the language the app shows.
+//
+// 添加技能「谁会读到」菜单（项目模式）：顺带也会读到的说明
+func ImportProjectAlsoReads(agents string, dirs string) string {
+	return In(i18n.Locale()).ImportProjectAlsoReads(agents, dirs)
+}
+
+// ImportProjectAlsoReads says "{agents} 也读 {dirs}"
+// in the language of msgs.
+//
+// 添加技能「谁会读到」菜单（项目模式）：顺带也会读到的说明
+func (msgs Messages) ImportProjectAlsoReads(agents string, dirs string) string {
+	return Catalog.Format(msgs.locale, "importProjectAlsoReads", map[string]any{"agents": agents, "dirs": dirs})
+}
+
+// ListOr says "{rest} 或 {last}"
+// in the language the app shows.
+//
+// 列举最后两项之间用「或」连接
+func ListOr(rest string, last string) string { return In(i18n.Locale()).ListOr(rest, last) }
+
+// ListOr says "{rest} 或 {last}"
+// in the language of msgs.
+//
+// 列举最后两项之间用「或」连接
+func (msgs Messages) ListOr(rest string, last string) string {
+	return Catalog.Format(msgs.locale, "listOr", map[string]any{"rest": rest, "last": last})
+}
+
+// ImportViewInProject says "在「{project}」中查看"
+// in the language the app shows.
+//
+// 添加到项目完成后顶栏的主按钮
+func ImportViewInProject(project string) string {
+	return In(i18n.Locale()).ImportViewInProject(project)
+}
+
+// ImportViewInProject says "在「{project}」中查看"
+// in the language of msgs.
+//
+// 添加到项目完成后顶栏的主按钮
+func (msgs Messages) ImportViewInProject(project string) string {
+	return Catalog.Format(msgs.locale, "importViewInProject", map[string]any{"project": project})
+}
+
+// ImportProjectSourceLocal says "来源记为 {path}，项目里的技能暂不参与更新。"
+// in the language the app shows.
+//
+// 添加到项目后（本地来源）详情栏状态块的来源说明
+func ImportProjectSourceLocal(path string) string {
+	return In(i18n.Locale()).ImportProjectSourceLocal(path)
+}
+
+// ImportProjectSourceLocal says "来源记为 {path}，项目里的技能暂不参与更新。"
+// in the language of msgs.
+//
+// 添加到项目后（本地来源）详情栏状态块的来源说明
+func (msgs Messages) ImportProjectSourceLocal(path string) string {
+	return Catalog.Format(msgs.locale, "importProjectSourceLocal", map[string]any{"path": path})
+}
+
+// ImportProjectSourceWebsite says "来源记为 {site}，项目里的技能暂不参与更新。"
+// in the language the app shows.
+//
+// 添加到项目后（网站来源）详情栏状态块的来源说明
+func ImportProjectSourceWebsite(site string) string {
+	return In(i18n.Locale()).ImportProjectSourceWebsite(site)
+}
+
+// ImportProjectSourceWebsite says "来源记为 {site}，项目里的技能暂不参与更新。"
+// in the language of msgs.
+//
+// 添加到项目后（网站来源）详情栏状态块的来源说明
+func (msgs Messages) ImportProjectSourceWebsite(site string) string {
+	return Catalog.Format(msgs.locale, "importProjectSourceWebsite", map[string]any{"site": site})
+}
+
+// ImportProjectSourceGitHub says "来源记为 {repo}（{commit}），项目里的技能暂不参与更新。"
+// in the language the app shows.
+//
+// 添加到项目后（GitHub 来源）详情栏状态块的来源说明
+func ImportProjectSourceGitHub(repo string, commit string) string {
+	return In(i18n.Locale()).ImportProjectSourceGitHub(repo, commit)
+}
+
+// ImportProjectSourceGitHub says "来源记为 {repo}（{commit}），项目里的技能暂不参与更新。"
+// in the language of msgs.
+//
+// 添加到项目后（GitHub 来源）详情栏状态块的来源说明
+func (msgs Messages) ImportProjectSourceGitHub(repo string, commit string) string {
+	return Catalog.Format(msgs.locale, "importProjectSourceGitHub", map[string]any{"repo": repo, "commit": commit})
+}
+
+// ImportProjectReplaceOwnCopy says "{dir} 里的这一份是文件夹，不是链接，替换不会动它。先在 Finder …"
+// in the language the app shows.
+//
+// 添加到项目时链接位置已有真实文件夹，无法替换的提示
+func ImportProjectReplaceOwnCopy(dir string, agents string) string {
+	return In(i18n.Locale()).ImportProjectReplaceOwnCopy(dir, agents)
+}
+
+// ImportProjectReplaceOwnCopy says "{dir} 里的这一份是文件夹，不是链接，替换不会动它。先在 Finder …"
+// in the language of msgs.
+//
+// 添加到项目时链接位置已有真实文件夹，无法替换的提示
+func (msgs Messages) ImportProjectReplaceOwnCopy(dir string, agents string) string {
+	return Catalog.Format(msgs.locale, "importProjectReplaceOwnCopy", map[string]any{"dir": dir, "agents": agents})
+}
+
+// ImportProjectSymlinkPermission says "需要同时放进多个目录，但系统拒绝创建符号链接。请打开 Windows …"
+// in the language the app shows.
+//
+// Windows 上没有权限建符号链接时添加到项目失败的提示
+func ImportProjectSymlinkPermission() string {
+	return In(i18n.Locale()).ImportProjectSymlinkPermission()
+}
+
+// ImportProjectSymlinkPermission says "需要同时放进多个目录，但系统拒绝创建符号链接。请打开 Windows …"
+// in the language of msgs.
+//
+// Windows 上没有权限建符号链接时添加到项目失败的提示
+func (msgs Messages) ImportProjectSymlinkPermission() string {
+	return Catalog.Format(msgs.locale, "importProjectSymlinkPermission", nil)
+}
+
+// ImportProjectDirectoryOutside says "{dir} 指向项目外，请选择项目内的技能目录。"
+// in the language the app shows.
+//
+// 项目技能目录指向项目外时的提示
+func ImportProjectDirectoryOutside(dir string) string {
+	return In(i18n.Locale()).ImportProjectDirectoryOutside(dir)
+}
+
+// ImportProjectDirectoryOutside says "{dir} 指向项目外，请选择项目内的技能目录。"
+// in the language of msgs.
+//
+// 项目技能目录指向项目外时的提示
+func (msgs Messages) ImportProjectDirectoryOutside(dir string) string {
+	return Catalog.Format(msgs.locale, "importProjectDirectoryOutside", map[string]any{"dir": dir})
+}
+
+// DeleteProjectLocationChanged says "项目技能的位置已变化，请重新扫描后再删除。"
+// in the language the app shows.
+//
+// 项目技能的实际路径与扫描记录不一致时取消删除
+func DeleteProjectLocationChanged() string { return In(i18n.Locale()).DeleteProjectLocationChanged() }
+
+// DeleteProjectLocationChanged says "项目技能的位置已变化，请重新扫描后再删除。"
+// in the language of msgs.
+//
+// 项目技能的实际路径与扫描记录不一致时取消删除
+func (msgs Messages) DeleteProjectLocationChanged() string {
+	return Catalog.Format(msgs.locale, "deleteProjectLocationChanged", nil)
+}
+
+// ProjectInvalidFolder says "请选择现有的项目文件夹，家目录和根目录不能作为项目。"
+// in the language the app shows.
+//
+// 添加项目时选了用户主目录或根目录的提示
+func ProjectInvalidFolder() string { return In(i18n.Locale()).ProjectInvalidFolder() }
+
+// ProjectInvalidFolder says "请选择现有的项目文件夹，家目录和根目录不能作为项目。"
+// in the language of msgs.
+//
+// 添加项目时选了用户主目录或根目录的提示
+func (msgs Messages) ProjectInvalidFolder() string {
+	return Catalog.Format(msgs.locale, "projectInvalidFolder", nil)
+}
+
+// DeleteGlobalLinksNote says "{count, plural, =1 {其中一个链接在 {dirs}，是全局链接。删掉后，{agents} …"
+// in the language the app shows.
+//
+// 删除项目技能时还有全局链接指向它的说明
+func DeleteGlobalLinksNote(count int, dirs string, agents string) string {
+	return In(i18n.Locale()).DeleteGlobalLinksNote(count, dirs, agents)
+}
+
+// DeleteGlobalLinksNote says "{count, plural, =1 {其中一个链接在 {dirs}，是全局链接。删掉后，{agents} …"
+// in the language of msgs.
+//
+// 删除项目技能时还有全局链接指向它的说明
+func (msgs Messages) DeleteGlobalLinksNote(count int, dirs string, agents string) string {
+	return Catalog.Format(msgs.locale, "deleteGlobalLinksNote", map[string]any{"count": count, "dirs": dirs, "agents": agents})
 }

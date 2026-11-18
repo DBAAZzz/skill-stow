@@ -99,19 +99,23 @@ type Skill struct {
 
 	// Links 是 Agent 自己的技能目录里的那一项；Via 是 Agent 没有自己的
 	// 那一项、经别的目录（通用目录等）读到它时，那个目录。
-	Links       map[string]string
-	Via         map[string]string
-	places      []place
-	elsewhere   []place   // 没装的 Agent 的目录和早年的目录里的同名副本
-	versions    []Version // 有副本时，按内容分成的几种，基准在前
-	copied      []string  // 读到另一份副本的 Agent：不在 Enabled 里，开关拨不动
-	redundant   []string  // 读通用目录、自己目录里又链到同一份的 Agent
-	globalLinks []string  // 项目技能：全局目录里指向它的链接
-	KeptLinks   bool      // 项目技能：全局链接是有意建的，不再提醒
+	Links        map[string]string
+	Via          map[string]string
+	places       []place
+	elsewhere    []place   // 没装的 Agent 的目录和早年的目录里的同名副本
+	versions     []Version // 有副本时，按内容分成的几种，基准在前
+	copied       []string  // 读到另一份副本的 Agent：不在 Enabled 里，开关拨不动
+	redundant    []string  // 读通用目录、自己目录里又链到同一份的 Agent
+	projectLinks []string  // 扫描到的项目内链接，可与原件不同名
+	globalLinks  []string  // 项目技能：全局目录里指向它的链接
+	KeptLinks    bool      // 项目技能：全局链接是有意建的，不再提醒
 }
 
-// ReadOnly 报告技能是否只读：内置、插件装的与项目技能不能在这里启用或修改。
-func (s *Skill) ReadOnly() bool { return s.Source != Mine }
+// ReadOnly 报告技能是否只读：内置与插件装的不能删除或修改；项目技能可以删除但不能启用/停用。
+func (s *Skill) ReadOnly() bool { return s.Source != Mine && s.Source != Project }
+
+// GlobalLinks 返回项目技能被全局链接的路径副本。
+func (s *Skill) GlobalLinks() []string { return slices.Clone(s.globalLinks) }
 
 // Origin 是一句话的来源说明，用在详情栏和阅读视图的标题下。只读不写在
 // 这句话里，界面另画「只读」标签。
@@ -134,7 +138,7 @@ func (s *Skill) EnabledIn(agent string) bool { return slices.Contains(s.Enabled,
 
 // SetEnabled 启用或停用：只改启用关系，不动技能本身（示例数据用）。
 func (s *Skill) SetEnabled(agent string, on bool) {
-	if s.ReadOnly() {
+	if s.Source != Mine {
 		return
 	}
 	if s.Available == nil {
@@ -285,14 +289,15 @@ type Library struct {
 	Agents         []Agent // 本机装了的 Agent，按 Catalog 的顺序
 	custom         []Agent // 本次扫描到的自定义技能目录 Agent
 	Skills         []*Skill
-	Collections    []*Collection  // 技能集合，大的在前
-	Projects       []*ProjectInfo // 有技能的项目和手动加的项目，最近用过的在前
-	Broken         []string       // 指向不存在目录的链接
-	Settings       Settings       // 设置弹窗里的选项
-	Discovery      Discovery      // 项目是从哪些使用记录里找到的
-	manual         []*ProjectInfo // 手动添加的文件夹，含没有技能的
-	disk           bool           // 来自 Scan：启用 / 停用会改磁盘
-	usageLog       *UsageLog      // 会话记录里的技能调用，nil 是还没读
+	Collections    []*Collection           // 技能集合，大的在前
+	Projects       []*ProjectInfo          // 有技能的项目和手动加的项目，最近用过的在前
+	Broken         []string                // 指向不存在目录的链接
+	Settings       Settings                // 设置弹窗里的选项
+	Discovery      Discovery               // 项目是从哪些使用记录里找到的
+	knownProjects  map[string]*ProjectInfo // 含尚未安装技能的已发现项目
+	manual         []*ProjectInfo          // 手动添加的文件夹，含没有技能的
+	disk           bool                    // 来自 Scan：启用 / 停用会改磁盘
+	usageLog       *UsageLog               // 会话记录里的技能调用，nil 是还没读
 	usage          map[*Skill]*Usage
 	calls          []call // 对到技能上的调用，按时间
 	readers        map[string][]string
@@ -365,7 +370,7 @@ func (l *Library) Tidy(s *Skill) error {
 // Enable 只控制已经可发现的技能，不创建或删除链接。
 func (l *Library) Enable(s *Skill, agent string, on bool) (err error) {
 	defer l.track("native", toggleOp(on), s.Name+" @ "+agent)(&err)
-	if s.ReadOnly() {
+	if s.Source != Mine {
 		return errors.New(locales.LibraryReadOnlyToggle())
 	}
 	if !s.DiscoveredIn(agent) {
@@ -451,4 +456,12 @@ func (l *Library) Project(dir string) *ProjectInfo {
 		}
 	}
 	return nil
+}
+
+// KnownProject 按目录查项目，也包括侧边栏省略的空项目。
+func (l *Library) KnownProject(dir string) *ProjectInfo {
+	if p := l.knownProjects[canonicalProjectDir(dir)]; p != nil {
+		return p
+	}
+	return l.Project(dir)
 }

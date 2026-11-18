@@ -12,6 +12,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"skillmanager/internal/library"
+	"skillmanager/locales"
 )
 
 func must(t *testing.T, err error) {
@@ -356,10 +357,13 @@ func TestProjectPageAndInspector(t *testing.T) {
 	if p := a.project(); p == nil || p.Name != "stock-plan" {
 		t.Fatalf("scope = %q", a.scope)
 	}
-	for _, want := range []string{"项目技能", "2 个技能", "只读", "release-checklist", "全局链接"} {
+	for _, want := range []string{"项目技能", "2 个技能", "添加技能", "release-checklist", "全局链接"} {
 		if !tt.HasText(want) {
 			t.Errorf("项目页缺少 %q：%q", want, tt.Texts())
 		}
+	}
+	if tt.HasText("只读") {
+		t.Error("项目页不应再显示只读标签")
 	}
 	if err := tt.Click("release-checklist"); err != nil {
 		t.Fatal(err)
@@ -694,6 +698,48 @@ func TestSnapshots(t *testing.T) {
 				a.scope, a.mode = projectScope(p), viewBoard
 			}
 		}},
+		{"pj-place-submenu", func(a *app) {
+			setupProjectImportSnapshot(t, a, "stock-plan")
+			a.menuEntry("import.place").open = true
+		}},
+		{"pj-readers", func(a *app) {
+			setupProjectImportSnapshot(t, a, "stock-plan")
+			a.imp.place.Agents = []string{"claude-code", "codex"}
+			a.menuEntry("import.readers").open = true
+		}},
+		{"pj-done", func(a *app) {
+			setupProjectImportSnapshot(t, a, "stock-plan")
+			p := projectNamed(a, "stock-plan")
+			a.imp.picked = map[string]bool{}
+			a.imp.results = map[string]library.ImportOutcome{
+				"release-checklist": {Name: "release-checklist", Added: true, Place: filepath.Join(p.Dir, ".agents/skills/release-checklist")},
+			}
+		}},
+		{"pj-conflict-blocked", func(a *app) {
+			setupProjectImportSnapshot(t, a, "stock-plan")
+			p := projectNamed(a, "stock-plan")
+			a.imp.checks["release-checklist"] = library.ImportCheck{
+				State:    library.ImportConflict,
+				Existing: filepath.Join(p.Dir, ".claude/skills/release-checklist"),
+				Blocked:  locales.ImportProjectReplaceOwnCopy(".claude/skills", "Claude Code"),
+			}
+		}},
+		{"pj-project-board", func(a *app) {
+			if p := projectNamed(a, "stock-plan", "seedmux"); p != nil {
+				a.scope, a.mode = projectScope(p), viewBoard
+			}
+		}},
+		{"pj-card-hover", func(a *app) {
+			if p := projectNamed(a, "stock-plan"); p != nil {
+				a.scope, a.mode = projectScope(p), viewCards
+			}
+		}},
+		{"pj-delete", func(a *app) {
+			if p := projectNamed(a, "stock-plan"); p != nil && len(p.Skills) > 0 {
+				a.scope = projectScope(p)
+				a.requestDelete(p.Skills[0])
+			}
+		}},
 	}
 	// SNAPSHOT_REAL=1 时用本机的真实数据（只读）
 	load := library.Sample
@@ -707,6 +753,28 @@ func TestSnapshots(t *testing.T) {
 		tt := newUITester(a.view, 1280, 800)
 		tt.SetScale(2)
 		tt.Frame()
+		if s.name == "pj-place-submenu" {
+			if r, ok := tt.Find("放进某个项目，只在这个项目里生效"); ok {
+				tt.Move(r.X+r.W/2, r.Y+r.H/2)
+				tt.Advance(300 * time.Millisecond)
+				tt.Frame()
+			}
+			if !tt.HasText("添加项目…") {
+				tt.Key(0, ui.KeyDown)
+				tt.Key(0, ui.KeyDown)
+				tt.Key(0, ui.KeyDown)
+				tt.Key(0, ui.KeyRight)
+				tt.Advance(250 * time.Millisecond)
+				tt.Frame()
+			}
+		}
+		if s.name == "pj-card-hover" {
+			if r, ok := tt.Find("release-checklist"); ok {
+				tt.Move(r.X+r.W/2, r.Y+r.H/2)
+				tt.Advance(250 * time.Millisecond)
+				tt.Frame()
+			}
+		}
 		if a.pal.open { // 等弹窗淡入完
 			tt.Advance(paletteTransition.Duration * 2)
 			tt.Frame()
@@ -743,6 +811,31 @@ func TestSnapshots(t *testing.T) {
 	writePNG(t, filepath.Join(dir, "w3-welcome-stow.png"), tt)
 	tt.Advance(700 * time.Millisecond)
 	writePNG(t, filepath.Join(dir, "w4-welcome-landed.png"), tt)
+}
+
+func setupProjectImportSnapshot(t *testing.T, a *app, projName string) {
+	t.Helper()
+	p := projectNamed(a, projName)
+	if p == nil {
+		return
+	}
+	a.scope = scopeImport
+	root := t.TempDir()
+	skillDir := filepath.Join(root, "pack", "release-checklist")
+	must(t, os.MkdirAll(skillDir, 0o755))
+	md := "---\nname: release-checklist\ndescription: 发版前的检查项与回滚步骤\n---\n\n# release-checklist\n\n发版前逐项核对，任一步失败即按回滚步骤恢复。\n\n## 发布前检查\n\n1. 确认所有集成测试与端到端检查通过。\n2. 核对版本号、变更日志与迁移脚本。\n3. 确认回滚预案与监控告警已就绪。\n"
+	must(t, os.WriteFile(filepath.Join(skillDir, "SKILL.md"), []byte(md), 0o644))
+	b, err := library.ReadLocalImport(t.TempDir(), []string{skillDir})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(b.Discard)
+	a.imp.batch = b
+	a.imp.place = library.ImportPlacement{Project: p.Dir, Agents: a.lib.ImportProjectDefaultAgents()}
+	a.imp.placed = true
+	a.imp.picked = map[string]bool{"release-checklist": true}
+	a.imp.checks = map[string]library.ImportCheck{"release-checklist": {State: library.ImportNew}}
+	a.imp.focus = "release-checklist"
 }
 
 // snapshotDark 为真（SNAPSHOT_DARK=1）时测试窗口一开始就是深色外观，截图

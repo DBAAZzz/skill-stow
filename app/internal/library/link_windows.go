@@ -50,6 +50,15 @@ func makeLinkPlatform(target, dst string) error {
 	return makeJunction(abs, dst)
 }
 
+// makeSymlinkPlatform 只建符号链接，不退回目录联接；没有权限时说明原因。
+func makeSymlinkPlatform(target, dst string) error {
+	err := os.Symlink(target, dst)
+	if errors.Is(err, errPrivilegeNotHeld) {
+		return errors.New(locales.ImportProjectSymlinkPermission())
+	}
+	return err
+}
+
 // realPathPlatform 逐段解开链接。filepath.EvalSymlinks 只跟 ModeSymlink，
 // 不跟目录联接，所以这里自己走一遍。
 func realPathPlatform(p string) (string, error) {

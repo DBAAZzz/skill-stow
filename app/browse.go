@@ -300,7 +300,11 @@ func (a *app) sections(skills []*library.Skill) []section {
 	}
 	for _, src := range []library.Source{library.ViaPlugin, library.Builtin, library.Project} {
 		sets, rest := a.group(bySource(skills, src))
-		out = append(out, section{key: fmt.Sprint("source", int(src)), title: src.Label(), sets: sets, setCounts: setCounts, skills: rest, rows: 1, note: readOnly})
+		var note func(*ui.Context)
+		if src != library.Project {
+			note = readOnly
+		}
+		out = append(out, section{key: fmt.Sprint("source", int(src)), title: src.Label(), sets: sets, setCounts: setCounts, skills: rest, rows: 1, note: note})
 	}
 	return slices.DeleteFunc(out, func(sec section) bool { return len(sec.sets)+len(sec.skills) == 0 })
 }

@@ -11,7 +11,7 @@ import (
 )
 
 func (l *Library) CanAddToAgent(s *Skill, id string) bool {
-	if s.ReadOnly() || s.DiscoveredIn(id) || !slices.ContainsFunc(l.Agents, func(a Agent) bool { return a.ID == id }) {
+	if s.Source != Mine || s.DiscoveredIn(id) || !slices.ContainsFunc(l.Agents, func(a Agent) bool { return a.ID == id }) {
 		return false
 	}
 	a, ok := l.agentByID(id)
