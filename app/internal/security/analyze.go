@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"path"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -313,24 +314,41 @@ func (a *analyzer) file(f File, text string, docs map[string][]string) (err erro
 // prose 检查文档正文的一行：给 Agent 的指令、隐藏注释，以及写在正文里的命令。
 func (a *analyzer) prose(p string, r region) {
 	ev := rawEv{path: p, line: r.line, text: r.text}
-	if r.comment && commentCmd.MatchString(r.text) {
+	// HTML 等文件里的注释是给作者看的备注；Markdown 里看不见的注释才可能藏指令
+	if r.comment && markdownFile(p) && commentCmd.MatchString(r.text) {
 		a.emit(rHiddenComment, CtxInstruction, Medium, ev)
 	}
 	checks := []struct {
-		re   interface{ MatchString(string) bool }
-		r    rule
-		conf Confidence
+		re        *regexp.Regexp
+		r         rule
+		conf      Confidence
+		negatable bool // 说法本身不带否定：前面有“不能”“不要”就是在禁止
 	}{
-		{ignoreInstr, rIgnoreInstr, High},
-		{conceal, rConceal, Medium},
-		{bypass, rBypass, Medium},
-		{leakContext, rLeakContext, Medium},
-		{secretChat, rSecretInChat, Medium},
+		{ignoreInstr, rIgnoreInstr, High, true},
+		{conceal, rConceal, Medium, false},
+		{bypass, rBypass, Medium, true},
+		{bypassWeak, rBypass, Low, true},
+		{leakContext, rLeakContext, Medium, true},
+		{secretChat, rSecretInChat, Medium, false},
 	}
 	for _, c := range checks {
-		if c.re.MatchString(r.text) {
-			a.emit(c.r, r.ctx, c.conf, ev)
+		loc := c.re.FindStringIndex(r.text)
+		if loc == nil || c.negatable && negation.MatchString(r.text[:loc[0]]) {
+			continue
 		}
+		if c.re == bypassWeak && !dangerVerb.MatchString(r.text) {
+			continue // “无需确认就翻页”不算，“无需确认就删除”才算
+		}
+		ctx, conf := r.ctx, c.conf
+		if ctx == CtxInstruction && quoted(r.text, loc[0]) {
+			// 引号里的说法：在教 Agent 防范的算讲解，否则证据不充分
+			if defenseWords.MatchString(r.text) || teachingWords.MatchString(r.text) {
+				ctx = CtxTeaching
+			} else {
+				conf = Low
+			}
+		}
+		a.emit(c.r, ctx, conf, ev)
 	}
 	a.secrets(p, []string{r.text}, r.line, r.ctx)
 	if !r.comment {
@@ -538,4 +556,27 @@ func Digest(in Input) (string, bool) {
 		field(h, f.Data)
 	}
 	return hex.EncodeToString(h.Sum(nil)), true
+}
+
+// quoted 报告 i 处是否在一对引号里（ASCII 双引号、反引号、中文引号、直角引号）。
+func quoted(s string, i int) bool {
+	before := s[:i]
+	if strings.Count(before, `"`)%2 == 1 || strings.Count(before, "`")%2 == 1 {
+		return true
+	}
+	for _, q := range [][2]string{{"“", "”"}, {"「", "」"}, {"『", "』"}} {
+		if strings.LastIndex(before, q[0]) > strings.LastIndex(before, q[1]) {
+			return true
+		}
+	}
+	return false
+}
+
+// markdownFile 报告这是不是 Markdown 文档（Agent 当说明读的那种）。
+func markdownFile(p string) bool {
+	switch strings.ToLower(path.Ext(p)) {
+	case ".md", ".markdown", ".mdx", "":
+		return true
+	}
+	return false
 }

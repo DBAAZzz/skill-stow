@@ -58,11 +58,11 @@ var (
 	rEncodedExec    = rule{"OB001", 1, Obfuscation, Warning, MsgEncodedExec, false}
 	rBidi           = rule{"OB002", 1, Obfuscation, Warning, MsgBidi, true}
 	rInvisible      = rule{"OB003", 1, Obfuscation, Warning, MsgInvisible, true}
-	rHiddenComment  = rule{"OB004", 1, Obfuscation, Warning, MsgHiddenComment, false}
-	rIgnoreInstr    = rule{"IO001", 1, InstructionOverride, Warning, MsgIgnoreInstr, false}
-	rConceal        = rule{"IO002", 1, InstructionOverride, Warning, MsgConceal, false}
-	rBypass         = rule{"IO003", 1, InstructionOverride, Warning, MsgBypassConfirm, false}
-	rLeakContext    = rule{"IO004", 1, DataExfiltration, Warning, MsgLeakContext, false}
+	rHiddenComment  = rule{"OB004", 2, Obfuscation, Warning, MsgHiddenComment, false}
+	rIgnoreInstr    = rule{"IO001", 2, InstructionOverride, Warning, MsgIgnoreInstr, false}
+	rConceal        = rule{"IO002", 2, InstructionOverride, Warning, MsgConceal, false}
+	rBypass         = rule{"IO003", 2, InstructionOverride, Warning, MsgBypassConfirm, false}
+	rLeakContext    = rule{"IO004", 2, DataExfiltration, Warning, MsgLeakContext, false}
 	rSecretInChat   = rule{"CR001", 1, CredentialHandling, Warning, MsgSecretInChat, false}
 	rReadCreds      = rule{"CR002", 1, CredentialHandling, Warning, MsgReadCredentials, false}
 	rCredUpload     = rule{"EX001", 1, DataExfiltration, HighRisk, MsgCredentialUpload, false}
@@ -198,11 +198,18 @@ func realSecret(match, next string) bool {
 
 var (
 	ignoreInstr = regexp.MustCompile(`(?i)\b(?:ignore|disregard|forget|override)\s+(?:all\s+|any\s+)?(?:of\s+)?(?:the\s+|your\s+)?(?:previous|prior|above|earlier|preceding|system|original)\s+(?:instructions?|prompts?|rules|messages|guidelines)|(?:忽略|无视|忘记|忘掉|覆盖)(?:你)?(?:之前|以上|前面|上面|先前|系统|原有)(?:的)?(?:所有|全部|一切)?(?:指令|指示|提示词?|说明|规则|要求)`)
-	conceal     = regexp.MustCompile(`(?i)\b(?:do\s+not|don'?t|never)\s+(?:tell|inform|notify|alert|show|mention\s+(?:this\s+|it\s+)?to|reveal\s+(?:this\s+|it\s+)?to)\s+the\s+user\b|\bwithout\s+(?:telling|informing|notifying|alerting)\s+the\s+user\b|\bhide\s+(?:this|it|the\s+\w+)\s+from\s+the\s+user\b|(?:不要|别|切勿|不得)(?:告诉|通知|提醒|让|向)用户|瞒着用户|(?:悄悄|偷偷|暗中)(?:地)?(?:执行|运行|发送|上传|修改|删除|安装)`)
-	bypass      = regexp.MustCompile(`(?i)--dangerously-skip-permissions|\bbypass(?:ing)?\s+(?:the\s+|any\s+|all\s+)?(?:permission|approval|confirmation|sandbox|safety)|\bwithout\s+(?:asking\s+(?:the\s+user\s+)?for\s+)?(?:confirmation|permission|approval)\b|(?:跳过|绕过)(?:用户)?(?:的)?(?:确认|授权|审批|批准|权限|沙箱)|(?:无需|不需要|不用|不必)(?:征求|询问|经过)?用户(?:的)?(?:确认|授权|同意|批准)`)
+	// 隐瞒：只认“别让用户知道你做了什么”，不认“别让用户以为……”“别告诉用户去做某事”
+	conceal = regexp.MustCompile(`(?i)\b(?:do\s+not|don'?t|never)\s+(?:tell|inform|notify|alert)\s+the\s+user(?:\s+(?:about\b|that\s+you\b|what\s+you\b|you\b|anything\b)|\s*(?:[.,;!)]|$))|\b(?:do\s+not|don'?t|never)\s+(?:mention|reveal|disclose|show)\s+(?:this\s+|it\s+|these\s+|that\s+)?to\s+the\s+user\b|\bwithout\s+(?:telling|informing|notifying|alerting)\s+the\s+user\b|\bhide\s+(?:this|it|the\s+\w+)\s+from\s+the\s+user\b|(?:不要|别|切勿|不得)(?:告诉|通知|提醒)用户(?:你|我们|这|此|自己|任何|[。，；！、,.;!）)]|$)|(?:不要|别|切勿|不得)让用户(?:知道|发现|察觉)|(?:不要|别|切勿|不得)(?:向|对)用户(?:透露|提及|披露|泄露)|瞒着用户|(?:悄悄|偷偷|暗中)(?:地)?(?:执行|运行|发送|上传|修改|删除|安装)`)
+	// 跳过确认：直接说绕过、跳过权限的；“不用确认”只有和危险操作在同一行才算（bypassWeak）
+	bypass     = regexp.MustCompile(`(?i)--dangerously-skip-permissions|\bbypass(?:ing)?\s+(?:the\s+|any\s+|all\s+)?(?:permission|approval|confirmation|sandbox|safety)|(?:跳过|绕过)(?:用户)?(?:的)?(?:确认|授权|审批|批准|权限|沙箱)`)
+	bypassWeak = regexp.MustCompile(`(?i)\bwithout\s+(?:asking\s+(?:the\s+user\s+)?for\s+)?(?:confirmation|permission|approval)\b|(?:无需|不需要|不用|不必)(?:征求|询问|经过)?用户(?:的)?(?:确认|授权|同意|批准)`)
+	dangerVerb = regexp.MustCompile(`(?i)\b(?:delete|remove|rm|drop|overwrite|wipe|run|execute|install|upload|send|push|deploy|publish|pay|transfer|purchase)\b|删除|删掉|清空|覆盖|执行|运行|安装|上传|发送|推送|部署|发布|支付|转账|购买`)
+	// 否定：“不能绕过审批”“不要忽略之前的指令”说的是不许这么做
+	negation    = regexp.MustCompile(`(?i)(?:\bnot|\bnever|\bcannot|\bcan'?t|\bdon'?t|\bwon'?t|\bmustn'?t|\bshouldn'?t|\bunable\s+to|不要|不得|不能|不会|不可|不应|不允许|切勿|勿|禁止|别|绝不|决不)\s*$`)
 	leakContext = regexp.MustCompile(`(?i)\b(?:send|post|upload|forward|exfiltrate|transmit)\s+(?:the\s+|your\s+|all\s+|this\s+)?(?:conversation|chat\s+history|context|system\s+prompt|instructions|memory|session)\s+(?:\w+\s+)?to\b|(?:发送|上传|转发|提交|发)(?:当前|全部|所有|完整)?(?:的)?(?:对话|聊天记录|上下文|系统提示词?)(?:内容)?(?:到|给|至)`)
 	secretChat  = regexp.MustCompile(`(?i)\bpaste\s+(?:your\s+|the\s+)?(?:api[\s_-]?key|token|password|secret|private\s+key|credentials?)\s+(?:here|into\s+(?:the\s+|this\s+)?(?:chat|conversation)|in\s+(?:the\s+|this\s+)?(?:chat|conversation))|\b(?:send|give|tell)\s+me\s+your\s+(?:api[\s_-]?key|token|password|secret|private\s+key)|(?:把|将)?(?:你的)?(?:API\s*Key|api\s*key|密钥|令牌|token|Token|密码|私钥)(?:直接)?(?:粘贴|贴|发送|发|告诉)(?:到|给|在)?(?:聊天|对话|这里|我)`)
-	commentCmd  = regexp.MustCompile(`(?i)\b(?:run|execute|curl|wget|ignore|send|upload|delete|rm\s+-|you\s+must|always|never\s+tell)\b|执行|运行|忽略|发送|上传|删除|必须|不要告诉`)
+	// 注释里的指令：要像一句吩咐 Agent 做事的话，“执行摘要”“必须 2 页”这类作者备注不算
+	commentCmd = regexp.MustCompile(`(?i)\b(?:run|execute)\s+(?:the\s+|this\s+|these\s+|following\s+)?(?:commands?|scripts?|code)\b|\bcurl\s+\S|\bwget\s+\S|\bignore\s+(?:all|any|previous|prior|the\s+user)|\b(?:send|upload|post)\b[^.]{0,40}\bto\s+(?:https?://|\S+@)|\brm\s+-|\byou\s+must\b|\b(?:never|do\s+not|don'?t)\s+tell\b|(?:执行|运行)(?:以下|下面|这个|此|这段|这条)?(?:命令|脚本|代码)|忽略(?:之前|以上|前面|用户|所有)|(?:发送|上传)(?:到|给|至)|不要告诉|必须(?:执行|运行|发送|上传|删除)`)
 )
 
 // ---- 逐行模式：shell 解析不了的脚本、文档正文和其他语言的脚本用 ----

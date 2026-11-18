@@ -116,6 +116,8 @@ var (
 	// 这些词出现在代码块前面或同一段里，说明是安全说明或反例。
 	teachingWords = regexp.MustCompile(`(?i)不要|切勿|禁止|避免|危险|恶意|攻击|注入|警惕|反例|钓鱼|\bnever\b|\bdon'?t\b|\bdo not\b|\bavoid\b|dangerous|malicious|attack|injection|beware|phishing|anti-?pattern|bad example`)
 	// 这些词说明是给人看的示例。
+	// 这些词说明是在教 Agent 防范：引号里的危险说法是在举要防的例子。
+	defenseWords = regexp.MustCompile(`(?i)绝不|决不|不得|切勿|伪装|疑似|注入|防护|防范|一律忽略|当作数据|是数据|不是.{0,8}指令|prompt\s+injection|\binjection\b|treat\s+(?:it|them|this)?\s*as\s+data|do\s+not\s+follow|never\s+follow|don'?t\s+follow`)
 	exampleWords = regexp.MustCompile(`(?i)示例|例如|比如|样例|举例|\bexample\b|\be\.g\.|for instance|\bsample\b`)
 	fenceOpen    = regexp.MustCompile("^\\s{0,3}(`{3,}|~{3,})\\s*([A-Za-z0-9_+.-]*)")
 	headingLine  = regexp.MustCompile(`^\s{0,3}#{1,6}\s`)
@@ -199,7 +201,7 @@ func codeContext(around string) Context {
 }
 
 func proseContext(l string) Context {
-	if teachingWords.MatchString(l) && (strings.ContainsAny(l, "\"'“”「」`") || exampleWords.MatchString(l)) {
+	if (teachingWords.MatchString(l) || defenseWords.MatchString(l)) && (strings.ContainsAny(l, "\"'“”「」`") || exampleWords.MatchString(l)) {
 		return CtxTeaching
 	}
 	return CtxInstruction
