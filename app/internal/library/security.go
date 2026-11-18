@@ -392,13 +392,13 @@ func (s *SecurityService) work() {
 
 // analyze 读取并分析一个目录。读不了时返回失败报告，不当作没有风险。
 func (s *SecurityService) analyze(ctx context.Context, r string, incomplete bool) *securityRecord {
-	rec, _ := s.analyzeInput(ctx, r, incomplete)
+	rec, _ := s.analyzeInput(ctx, r, incomplete, s.lim)
 	return rec
 }
 
 // analyzeInput 同 analyze，另外交出分析用的那份快照。
-func (s *SecurityService) analyzeInput(ctx context.Context, r string, incomplete bool) (*securityRecord, security.Input) {
-	in, meta, err := readSkill(ctx, r, s.lim)
+func (s *SecurityService) analyzeInput(ctx context.Context, r string, incomplete bool, lim readLimits) (*securityRecord, security.Input) {
+	in, meta, err := readSkill(ctx, r, lim)
 	if err != nil {
 		rep := security.Report{Schema: security.SchemaVersion, Engine: security.EngineVersion, Ruleset: security.RulesetVersion(),
 			StartedAt: time.Now(), FinishedAt: time.Now(), Execution: security.Failed, Error: readErrKind(err)}
@@ -739,7 +739,10 @@ func (s *SecurityService) ScanStaged(ctx context.Context, dir string, incomplete
 	}
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
-	rec, in := s.analyzeInput(ctx, dir, incomplete)
+	// 暂存的内容要和版本核对：太大没分析的文件也算出哈希
+	lim := s.lim
+	lim.hashLarge, lim.hashTotal = true, 512<<20
+	rec, in := s.analyzeInput(ctx, dir, incomplete, lim)
 	out := StagedSecurity{Report: rec.Report}
 	if rec.Report.Execution == security.Completed {
 		out.Tree, _ = inputTree(in)

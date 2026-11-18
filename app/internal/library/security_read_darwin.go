@@ -2,10 +2,12 @@ package library
 
 import (
 	"context"
+	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"io"
 	"io/fs"
 	"os"
@@ -33,10 +35,12 @@ func SecuritySupported() bool { return true }
 
 // readLimits 是一次读取的上限（初值，基准验证后再调）。
 type readLimits struct {
-	entries int
-	depth   int
-	file    int64
-	total   int64
+	entries   int
+	depth     int
+	file      int64
+	total     int64
+	hashLarge bool  // 超过上限的文件也流式算出 Git blob 哈希（导入、更新要和版本核对）
+	hashTotal int64 // 流式算哈希的总量上限
 }
 
 var defaultLimits = readLimits{entries: 2000, depth: 32, file: 1 << 20, total: 20 << 20}
@@ -81,14 +85,15 @@ var errWalkLimit = errors.New("walk limit")
 
 // walker 在目录句柄上逐级遍历。read 为假时只收集元信息。
 type walker struct {
-	ctx   context.Context
-	lim   readLimits
-	read  bool
-	bad   bool // 只看元信息时遇到读不了的条目：清单不可信
-	n     int
-	total int64
-	meta  []metaEntry
-	in    security.Input
+	ctx    context.Context
+	lim    readLimits
+	read   bool
+	bad    bool // 只看元信息时遇到读不了的条目：清单不可信
+	n      int
+	total  int64
+	hashed int64
+	meta   []metaEntry
+	in     security.Input
 }
 
 type fileID struct {
@@ -216,14 +221,6 @@ func (w *walker) dir(fd int, rel string, depth int) error {
 func (w *walker) file(dirfd int, name, p string, st *unix.Stat_t) {
 	f := security.File{Path: p, Kind: security.Regular, Mode: fs.FileMode(st.Mode & 0o777)}
 	defer func() { w.in.Files = append(w.in.Files, f) }()
-	if st.Size > w.lim.file {
-		f.Gap = security.GapByteLimit
-		return
-	}
-	if w.total+st.Size > w.lim.total {
-		f.Gap = security.GapByteLimit
-		return
-	}
 	var fd int
 	var err error
 	for {
@@ -243,6 +240,28 @@ func (w *walker) file(dirfd int, name, p string, st *unix.Stat_t) {
 		f.Gap = security.GapChanged
 		return
 	}
+	// 读完再核对一次：读的过程中被改写的，读到的字节不代表任何一个版本
+	unchanged := func(n int64) bool {
+		var after unix.Stat_t
+		return unix.Fstat(fd, &after) == nil && after.Size == n && after.Mtim == got.Mtim && after.Ctim == got.Ctim
+	}
+	if got.Size > w.lim.file || w.total+got.Size > w.lim.total {
+		// 太大不分析：只看开头认出图片之类；要和版本核对时流式算出哈希
+		f.Gap = security.GapByteLimit
+		head := make([]byte, 4096)
+		n, _ := io.ReadFull(h, head)
+		f.Head = head[:n]
+		if w.lim.hashLarge && w.hashed+got.Size <= w.lim.hashTotal {
+			w.hashed += got.Size
+			sum := sha1.New()
+			fmt.Fprintf(sum, "blob %d\x00", got.Size)
+			sum.Write(f.Head)
+			if m, err := io.Copy(sum, io.LimitReader(h, got.Size-int64(n)+1)); err == nil && int64(n)+m == got.Size && unchanged(got.Size) {
+				f.Blob = sum.Sum(nil)
+			}
+		}
+		return
+	}
 	// 读的量按单文件上限和剩余总量中小的那个算：读的时候文件在长也不会超
 	limit := min(w.lim.file, w.lim.total-w.total)
 	b, err := io.ReadAll(io.LimitReader(h, limit+1))
@@ -255,9 +274,7 @@ func (w *walker) file(dirfd int, name, p string, st *unix.Stat_t) {
 		f.Gap = security.GapByteLimit
 		return
 	}
-	// 读完再核对一次：读的过程中被改写的，读到的字节不代表任何一个版本
-	var after unix.Stat_t
-	if err := unix.Fstat(fd, &after); err != nil || after.Size != int64(len(b)) || after.Mtim != got.Mtim || after.Ctim != got.Ctim {
+	if !unchanged(int64(len(b))) {
 		f.Gap = security.GapChanged
 		return
 	}

@@ -12,7 +12,7 @@ import (
 // 两者任一变化，旧报告都不能当作当前结果。
 const (
 	SchemaVersion = 1
-	EngineVersion = 1
+	EngineVersion = 2
 )
 
 // Notice 是界面上固定的三种提示类型。
@@ -124,6 +124,8 @@ type File struct {
 	Link   string      // 链接的原始目标
 	Escape bool        // 链接能确定指向根目录外
 	Gap    Gap         // 非空表示这一项没有读取或没有读全
+	Head   []byte      // 没读全的普通文件的开头 4KB，用来认出图片等不可执行的文件
+	Blob   []byte      // 没读全时流式算出的 Git blob 哈希（只在需要和版本核对时算）
 }
 
 // Input 是一次分析的输入。

@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 // rawEv 是还没脱敏的证据：text 是原文一行，只在内存里、只用于计算指纹。
@@ -86,6 +87,28 @@ var (
 	elf   = []byte{0x7F, 'E', 'L', 'F'}
 )
 
+// inertMedia 按文件头认出图片、PDF、字体、音视频这类只会被查看、不会被执行
+// 的文件。只看内容不看扩展名：改名成 .png 的脚本认不出来，照常算没检查到。
+// binary 为真表示已经知道它不是文本；只有开头几十个字节时自己判断。
+func inertMedia(b []byte, binary bool) bool {
+	// 先得不是文本：开头恰好是“BM”“ID3”的文本文件照常分析。看前 4KB：
+	// PDF 开头几行可能全是可读字符，后面的压缩流才是二进制
+	head := b[:min(len(b), 4096)]
+	if t := head[:max(0, len(head)-3)]; !binary && utf8.Valid(t) && bytes.IndexByte(t, 0) < 0 {
+		return false
+	}
+	has := func(off int, sig string) bool { return len(b) >= off+len(sig) && string(b[off:off+len(sig)]) == sig }
+	switch {
+	case has(0, "\x89PNG\r\n\x1a\n"), has(0, "\xff\xd8\xff"), has(0, "GIF87a"), has(0, "GIF89a"),
+		has(0, "RIFF") && (has(8, "WEBP") || has(8, "WAVE") || has(8, "AVI ")),
+		has(0, "%PDF-"), has(0, "\x00\x00\x01\x00"), has(0, "BM"), has(0, "II*\x00"), has(0, "MM\x00*"),
+		has(0, "wOFF"), has(0, "wOF2"), has(0, "\x00\x01\x00\x00\x00"), has(0, "OTTO"),
+		has(0, "ID3"), has(0, "OggS"), has(0, "fLaC"), has(4, "ftyp"):
+		return true
+	}
+	return false
+}
+
 func executableBinary(b []byte) bool {
 	for _, m := range machO {
 		if bytes.HasPrefix(b, m) {
@@ -133,6 +156,11 @@ func Analyze(ctx context.Context, in Input, pol Policy, fp Fingerprinter) Report
 			a.emit(rSpecialFile, CtxStructure, High, rawEv{path: f.Path, text: f.Path})
 			continue
 		}
+		// 图片、PDF、字体、音视频不会被执行：不分析，也不算没检查到
+		if f.Data == nil && f.Gap == GapByteLimit && inertMedia(f.Head, false) {
+			rep.FilesAnalyzed++
+			continue
+		}
 		if f.Gap != "" {
 			holes = append(holes, Hole{Path: f.Path, Reason: f.Gap})
 		}
@@ -146,6 +174,10 @@ func Analyze(ctx context.Context, in Input, pol Policy, fp Fingerprinter) Report
 			continue
 		}
 		text, gap := decode(f.Data)
+		if gap == GapBinary && inertMedia(f.Data, true) {
+			rep.FilesAnalyzed++
+			continue
+		}
 		if gap != "" {
 			if f.Gap == "" {
 				holes = append(holes, Hole{Path: f.Path, Reason: gap})

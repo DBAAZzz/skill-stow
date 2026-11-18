@@ -123,12 +123,15 @@ func inputTree(in security.Input) (string, bool) {
 		switch {
 		case f.Kind == security.Symlink && f.Link != "":
 			mode, h = "120000", gitObject("blob", []byte(f.Link))
-		case f.Kind == security.Regular && f.Data != nil && f.Gap == "":
+		case f.Kind == security.Regular && (f.Data != nil && f.Gap == "" || f.Blob != nil):
 			mode = "100644"
 			if f.Mode&0o100 != 0 {
 				mode = "100755"
 			}
-			h = gitObject("blob", f.Data)
+			h = f.Blob
+			if h == nil {
+				h = gitObject("blob", f.Data)
+			}
 		default:
 			return "", false
 		}

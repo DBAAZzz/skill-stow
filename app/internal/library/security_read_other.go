@@ -15,10 +15,12 @@ import (
 func SecuritySupported() bool { return false }
 
 type readLimits struct {
-	entries int
-	depth   int
-	file    int64
-	total   int64
+	entries   int
+	depth     int
+	file      int64
+	total     int64
+	hashLarge bool
+	hashTotal int64
 }
 
 var defaultLimits = readLimits{entries: 2000, depth: 32, file: 1 << 20, total: 20 << 20}
