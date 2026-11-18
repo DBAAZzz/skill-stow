@@ -15,3 +15,7 @@
 
 # 提交规范工具（commitlint + husky）
 node_modules/
+
+# 宣传视频工程和它的逐帧素材测试：仅本地保留
+/promo/
+/app/promo_frames_test.go
