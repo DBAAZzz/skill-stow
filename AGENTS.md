@@ -1,5 +1,7 @@
 # 项目约定
 
+`CLAUDE.md` 是指向本文件的软链，约定只改 `AGENTS.md`。
+
 应用在 `app/`，Go + MyGo 原生 UI。下面的界面规则都有测试守着，违反了 `go test ./...` 会直接失败，失败信息会指出文件和行号。
 
 ## 开发与测试
@@ -47,6 +49,25 @@ mkdir -p /tmp/shots && SNAPSHOT_DIR=/tmp/shots go test -run Snapshots .
 - 批量搬运旧文案用 `app/tools/i18nextract`（先 `scan` 出计划，改完再 `apply`），用法见 [它的 README](app/tools/i18nextract/README.md)。
 
 由 `TestUIStringsLiveInTheCatalogs`、`TestEveryMessageHasAnEnglishTranslation` 检查。
+
+## 不用点号分隔
+
+界面上不用 `·`、`•`、`‧`、`⋅`、`・` 把几段信息拼成一行（如 `今天 · 3 个文件`、`高风险 1 · 警告 1`）。
+
+- 并排的几段短信息用 `metaLine`（段与段之间只留间距），或各自一个控件；状态用 Tag；附注用括号或写成完整句子。
+- 只能交出一个字符串的地方（Tooltip、菜单项、读屏标签、提示）把整句写进 locales；句子里的列举用 `locales.ListSeparator()`（中文是“、”）。
+- 列表的项目符号也不用点号，用 `-` 或编号。
+
+由 `separators_test.go` 里的 `TestUITextDoesNotJoinInformationWithDots` 检查。确实不是界面文字时，在同一行加 `//separator:ignore` 并写明原因。
+
+## 设计稿与界面示意
+
+上面的菜单、颜色、文案、点号规则同样适用于设计稿、画板（`.ryugi/artifacts/`）、需求文档和回复里的界面示例。测试只检查代码，设计阶段的偏差要到实现时才暴露，所以画之前就要守住。
+
+- 先读要改的界面的现有代码，按实际字号、尺寸、圆角和 `colors.go` 里的颜色画，不凭截图估。
+- 有现成组件就照它画，不另造样式：卡片底栏标记 `flag`、标签 `tag`（添加技能页每项只显示一个）、分组 `insetGroup` 加 `sectionLabel`、并列信息 `metaLine`、整理页图标 `issueIcon`、详情页状态栏 `strip`。
+- 新增内容放进已有位置前，先看那里已经显示什么（例如添加技能页已有 skills.sh 的“安全审计”），避免重复或名字相近。
+- 交付前和 `SNAPSHOT_DIR` 截出的现有页面并排对照一遍。
 
 ## 提交规范
 
