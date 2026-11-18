@@ -2,7 +2,7 @@
   "name": "Skill Stow",
   "slug": "skill-stow",
   "identifier": "io.github.dbaazzz.skillstow",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "copyright": "Copyright (c) 2026 DBAAZzz",
   "out": "build",
   "i18n": {
