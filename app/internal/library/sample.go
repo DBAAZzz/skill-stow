@@ -9,6 +9,8 @@ import (
 	"slices"
 	"strings"
 	"time"
+
+	"github.com/egoist/mygo/i18n"
 )
 
 // sample/ 下是有完整目录的示例技能；其余示例只有一份生成的 SKILL.md。
@@ -75,9 +77,9 @@ func Sample() *Library {
 		mine("wechat-pay", "微信支付接入与回调校验", cb),
 		mine("i18n-copy", "中英文案对照与术语表", cb),
 		mine("sql-review", "慢查询与索引检查清单", cb),
-		mine("stock-analysis", "行情、K 线与资金面分析", cl, wb),
-		mine("stock-docs", "把研报和判断存进股票文档流", cl, wb),
-		mine("position-decision", "逐条核对条件，给出仓位操作", cl, wb),
+		mine("log-analysis", "从日志里找出报错和慢请求", cl, wb),
+		mine("notes-sync", "把笔记同步备份到远端", cl, wb),
+		mine("incident-review", "按时间线复盘线上故障", cl, wb),
 		mine("dataviz", "图表配色与版式规范", cl, wb),
 		mine("spark", "把想法聊成一份需求文档"),
 		mine("design-lab", "一次生成五种界面方案对比", sh),
@@ -99,10 +101,10 @@ func Sample() *Library {
 		builtin("memory", "按日期记录工作笔记与上下文", wb),
 		builtin("cloud-deploy", "一键部署到云开发环境", cb),
 
-		project("release-checklist", "发版前的检查项与回滚步骤", "stock-plan", cl),
-		project("api-conventions", "本项目的接口命名与分页约定", "stock-plan"),
-		project("db-migration", "数据库迁移脚本的写法与校验", "seedmux"),
-		project("e2e-testing", "端到端测试的启动与数据准备", "seedmux"),
+		project("release-checklist", "发版前的检查项与回滚步骤", "storefront", cl),
+		project("api-conventions", "本项目的接口命名与分页约定", "storefront"),
+		project("db-migration", "数据库迁移脚本的写法与校验", "admin-console"),
+		project("e2e-testing", "端到端测试的启动与数据准备", "admin-console"),
 	}}
 
 	for _, s := range l.Skills {
@@ -148,6 +150,14 @@ func Sample() *Library {
 	for _, s := range l.Skills {
 		s.Defects = sampleDefects(l, s)
 	}
+	if strings.HasPrefix(i18n.Locale(), "en") {
+		// 英文界面（截图、README）里卡片和详情栏显示英文简介；正文仍是中文
+		for _, s := range l.Skills {
+			if d, ok := sampleEnglish[s.Name]; ok {
+				s.Description = d
+			}
+		}
+	}
 	for _, id := range []string{cl, cx, cu, "gemini", "opencode", cb, wb} {
 		a, _ := l.agentByID(id)
 		l.Agents = append(l.Agents, a)
@@ -159,7 +169,7 @@ func Sample() *Library {
 		{"VS Code 系编辑器", "vscode", "…/User/workspaceStorage", 189, "Code、Cursor"},
 		{"Codex", cx, "~/.codex/sessions", 6, ""},
 	}, Total: 212, WithSkills: 1, Took: 100 * time.Millisecond}
-	if p := l.Project("~/code/seedmux"); p != nil {
+	if p := l.Project("~/code/admin-console"); p != nil {
 		p.Manual = true
 		l.manual = append(l.manual, p)
 	}
@@ -187,6 +197,53 @@ func Sample() *Library {
 	sampleNativeStates(l)
 	sampleUsage(l)
 	return l
+}
+
+// sampleEnglish 是示例技能的英文简介，界面是英文时替换中文简介。
+// doc-coauthoring 故意没有简介（整理页「没有简介」的示例），不在这里。
+var sampleEnglish = map[string]string{
+	"test-first":            "Write behavior tests first, watch them fail, then make them pass",
+	"vue-best-practices":    "Vue component structure, state management and Composition API conventions",
+	"code-review":           "Review changes against a checklist, correctness first",
+	"code-comments":         "Decide who a comment is for before writing it: callers or maintainers",
+	"systematic-debugging":  "Reproduce, locate, then fix. No guessing",
+	"interface-craft":       "How to judge interface design, with a review checklist",
+	"kami":                  "Typeset documents into printable PDFs and slides",
+	"git-flow":              "Branching and release conventions",
+	"context-compression":   "Explain findings to someone who hasn't read the code",
+	"brainstorming":         "Pin down the requirements before you start",
+	"api-design":            "REST endpoint naming and error code conventions",
+	"tailwind-rules":        "Tailwind class ordering and extraction rules",
+	"miniprogram-guide":     "Mini program folder layout and subpackage rules",
+	"wechat-pay":            "WeChat Pay integration and callback verification",
+	"i18n-copy":             "Bilingual UI copy and a terminology glossary",
+	"sql-review":            "Slow query and index review checklist",
+	"log-analysis":          "Find errors and slow requests in logs",
+	"notes-sync":            "Back up notes to a remote server",
+	"incident-review":       "Walk through an outage timeline and write the postmortem",
+	"dataviz":               "Chart color and layout guidelines",
+	"spark":                 "Turn an idea into a requirements doc through conversation",
+	"design-lab":            "Generate five interface variations to compare",
+	"web-artifacts-builder": "Build multi-component HTML artifacts",
+	"frontend-design":       "Distinctive frontend interfaces, not generic ones",
+	"code-ablation":         "Remove code piece by piece to find what actually matters",
+	"pre-mortem":            "Assume the project already failed and work out why",
+	"lark-calendar":         "Lark Calendar: view, search and create events",
+	"lark-doc":              "Lark Docs: read, create and edit documents",
+	"lark-im":               "Lark Messenger: send messages and manage group chats",
+	"lark-meeting":          "Lark Meetings: find recordings, notes and minutes",
+	"lark-minutes":          "Only when lark-minutes is named explicitly; otherwise lark-meeting handles it",
+	"lark-vc":               "Only when lark-vc is named explicitly; otherwise lark-meeting handles it",
+	"skill-creator":         "Create and edit skills, and evaluate how they trigger",
+	"pdf":                   "Read, split and merge PDF files",
+	"docx":                  "Create and edit Word documents",
+	"xlsx":                  "Read and write spreadsheets, formulas and charts",
+	"memory":                "Keep dated work notes and context",
+	"cloud-deploy":          "Deploy to a cloud dev environment in one step",
+	"release-checklist":     "Pre-release checks and rollback steps",
+	"api-conventions":       "This project's API naming and pagination rules",
+	"db-migration":          "How to write and verify database migrations",
+	"e2e-testing":           "Starting end-to-end tests and preparing test data",
 }
 
 // sampleProblems 是整理页的示例：同名副本（test-first 有两种内容，
@@ -314,11 +371,11 @@ func sampleNativeStates(l *Library) {
 			s.Enabled = slices.DeleteFunc(s.Enabled, func(v string) bool { return v == id })
 		}
 	}
-	set("test-first", "gemini", AgentState{Kind: StateRestart, Message: "可在会话中执行 /skills reload 立即生效。stock-plan 里仍停用。", Projects: []string{"stock-plan"}})
+	set("test-first", "gemini", AgentState{Kind: StateRestart, Message: "可在会话中执行 /skills reload 立即生效。storefront 里仍停用。", Projects: []string{"storefront"}})
 	set("test-first", "opencode", AgentState{Kind: StateUnknown, Message: "无法读取 OpenCode 配置，请检查格式后重试。"})
 	set("git-flow", cl, AgentState{Kind: StateDisabled})
 	set("code-comments", cx, AgentState{Kind: StateRestart, Enabled: true})
-	set("stock-docs", cl, AgentState{Kind: StateFailed, Enabled: true, Message: "配置文件没有写入权限，未改动。", RetryOn: false})
+	set("notes-sync", cl, AgentState{Kind: StateFailed, Enabled: true, Message: "配置文件没有写入权限，未改动。", RetryOn: false})
 }
 
 // sampleRecords 是示例的安装记录：集合里的技能，加上已经删掉、记录还在的

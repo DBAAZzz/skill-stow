@@ -468,7 +468,7 @@ func sampleUsage(l *Library) {
 		"vue-best-practices":  {6, now.AddDate(0, 0, -6), map[string]int{cl: 4, cx: 2}},
 		"brainstorming":       {5, now.AddDate(0, 0, -9), map[string]int{cl: 5}},
 		"kami":                {4, now.AddDate(0, 0, -12), map[string]int{cl: 4}},
-		"stock-analysis":      {3, now.AddDate(0, 0, -4), map[string]int{cl: 3}},
+		"log-analysis":      {3, now.AddDate(0, 0, -4), map[string]int{cl: 3}},
 		"lark-doc":            {2, now.AddDate(0, 0, -20), map[string]int{cx: 2}},
 		"pdf":                 {7, now.AddDate(0, 0, -3), map[string]int{cl: 7}},
 		"release-checklist":   {1, now.AddDate(0, 0, -15), map[string]int{cl: 1}},

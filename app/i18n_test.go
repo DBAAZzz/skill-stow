@@ -23,7 +23,7 @@ import (
 var testLocale atomic.Value
 
 func TestMain(m *testing.M) {
-	testLocale.Store("")
+	testLocale.Store(snapshotLang) // 平时为空（中文）；SNAPSHOT_LANG=en 时示例数据一开始就是英文
 	i18n.SetLocaleFunc(func() string { return testLocale.Load().(string) })
 	applyLanguage = func(id string) { testLocale.Store(id) }
 	applyTheme = func(string) {} // 真的换外观要 mygo 在跑，测试里不碰系统

@@ -24,7 +24,7 @@ func usageHome(t *testing.T) string {
 	slash := func(at, name string) string {
 		return `{"type":"user","timestamp":"` + at + `","cwd":"` + jsonStr(home) + `","message":{"content":"<command-message>` + name + `</command-message>\n<command-name>/` + name + `</command-name>"}}`
 	}
-	proj := h("code/stock-plan")
+	proj := h("code/storefront")
 	write(h(".claude/projects/a/1.jsonl"),
 		`{"type":"summary"}`,
 		`{"type":"user","timestamp":"2026-10-01T08:00:00Z","message":{"content":"你好"}}`,
@@ -38,7 +38,7 @@ func usageHome(t *testing.T) string {
 		// 手动 /test-first 之后模型再载入它：只算一次
 		slash("2026-10-05T08:00:00Z", "test-first"),
 		tool("2026-10-05T08:00:01Z", home, "test-first"),
-		tool("2026-10-06T08:00:00Z", filepath.Join(proj, "src"), "stock-docs"),
+		tool("2026-10-06T08:00:00Z", filepath.Join(proj, "src"), "notes-sync"),
 	)
 	write(h(".codex/sessions/2026/10/07/s.jsonl"),
 		`{"timestamp":"2026-10-07T08:00:00Z","type":"session_meta","payload":{"cwd":"`+jsonStr(proj)+`","instructions":"技能清单 ~/.agents/skills/spark/SKILL.md"}}`,
@@ -70,7 +70,7 @@ func TestUsageCountsSkillCallsFromSessionLogs(t *testing.T) {
 	}
 	var docs *Skill
 	for _, s := range l.Skills {
-		if s.Source == Project && s.Name == "stock-docs" {
+		if s.Source == Project && s.Name == "notes-sync" {
 			docs = s
 		}
 	}
@@ -135,8 +135,8 @@ func TestUsedRanksSkillsByCallsThenRecency(t *testing.T) {
 	for _, s := range l.Used() {
 		names = append(names, s.Name)
 	}
-	// test-first 3 次；stock-docs（10-06）和 pua（10-02）各 1 次，近的在前
-	if got := strings.Join(names, " "); got != "test-first stock-docs pua" {
+	// test-first 3 次；notes-sync（10-06）和 pua（10-02）各 1 次，近的在前
+	if got := strings.Join(names, " "); got != "test-first notes-sync pua" {
 		t.Errorf("用过的 = %q", got)
 	}
 }

@@ -212,15 +212,15 @@ func TestFixLinks(t *testing.T) {
 		t.Error("处理完不应再列出")
 	}
 
-	sd := l.ByID("project:" + h("code/stock-plan/.claude/skills/stock-docs"))
+	sd := l.ByID("project:" + h("code/storefront/.claude/skills/notes-sync"))
 	if sd == nil || len(sd.GlobalDirs()) != 1 {
-		t.Fatalf("stock-docs 应被全局链接：%v", sd)
+		t.Fatalf("notes-sync 应被全局链接：%v", sd)
 	}
 	must(t, l.Unglobal(sd))
-	if _, err := os.Lstat(h(".claude/skills/stock-docs")); err == nil {
+	if _, err := os.Lstat(h(".claude/skills/notes-sync")); err == nil {
 		t.Error("全局链接应已删掉")
 	}
-	if _, err := os.Stat(h("code/stock-plan/.claude/skills/stock-docs/SKILL.md")); err != nil {
+	if _, err := os.Stat(h("code/storefront/.claude/skills/notes-sync/SKILL.md")); err != nil {
 		t.Error("项目里的技能不应动")
 	}
 }

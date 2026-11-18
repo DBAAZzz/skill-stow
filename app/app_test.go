@@ -123,7 +123,7 @@ func TestBoardShowsSharedSkillsOnlyInSharedColumn(t *testing.T) {
 	if n := countText(tt, "code-review"); n != 2 {
 		t.Errorf("通用技能应只显示一张卡片，实际有 %d 个名称标签", n)
 	}
-	if n := countText(tt, "stock-analysis"); n != 4 {
+	if n := countText(tt, "log-analysis"); n != 4 {
 		t.Errorf("通用之外的技能应保留两张 Agent 卡片，实际有 %d 个名称标签", n)
 	}
 	if _, ok := tt.Find("Claude Code 中 code-review 的操作"); ok {
@@ -368,10 +368,10 @@ func TestIdenticalCopies(t *testing.T) {
 
 func TestProjectPageAndInspector(t *testing.T) {
 	a, tt := newTester(t)
-	if err := tt.Click("stock-plan"); err != nil {
+	if err := tt.Click("storefront"); err != nil {
 		t.Fatal(err)
 	}
-	if p := a.project(); p == nil || p.Name != "stock-plan" {
+	if p := a.project(); p == nil || p.Name != "storefront" {
 		t.Fatalf("scope = %q", a.scope)
 	}
 	for _, want := range []string{"项目技能", "2 个技能", "添加技能", "release-checklist", "全局链接"} {
@@ -386,7 +386,7 @@ func TestProjectPageAndInspector(t *testing.T) {
 		t.Fatal(err)
 	}
 	tt.Advance(paneDuration) // 详情栏滑进来
-	for _, want := range []string{"谁会读到", "在 stock-plan 里工作时", "在任何项目里（全局链接）", "被 1 个 Agent 全局链接"} {
+	for _, want := range []string{"谁会读到", "在 storefront 里工作时", "在任何项目里（全局链接）", "被 1 个 Agent 全局链接"} {
 		if !tt.HasText(want) {
 			t.Errorf("详情栏缺少 %q", want)
 		}
@@ -397,7 +397,7 @@ func TestProjectPageAndInspector(t *testing.T) {
 	if err := tt.Click("查看…"); err != nil {
 		t.Fatal(err)
 	}
-	if !a.linkedOpen || !tt.HasText("1 个技能被全局链接到 stock-plan") {
+	if !a.linkedOpen || !tt.HasText("1 个技能被全局链接到 storefront") {
 		t.Errorf("「查看…」应打开全局链接弹窗：%q", tt.Texts())
 	}
 	if err := tt.Click("暂不处理"); err != nil {
@@ -410,7 +410,7 @@ func TestProjectPageAndInspector(t *testing.T) {
 
 func TestProjectBoardHasAColumnPerSkillDir(t *testing.T) {
 	a, tt := newTester(t)
-	a.scope, a.mode = projectScope(projectNamed(a, "stock-plan")), viewBoard
+	a.scope, a.mode = projectScope(projectNamed(a, "storefront")), viewBoard
 	tt.Frame()
 	for _, want := range []string{"Claude Code", ".claude/skills", "release-checklist", "api-conventions"} {
 		if !tt.HasText(want) {
@@ -646,18 +646,18 @@ func TestSnapshots(t *testing.T) {
 		}},
 		{"5-reader", func(a *app) { a.open(a.lib.Get("test-first")) }},
 		{"6-project", func(a *app) {
-			if p := projectNamed(a, "stock-plan"); p != nil {
+			if p := projectNamed(a, "storefront"); p != nil {
 				a.scope = projectScope(p)
 			}
 		}},
 		{"7-project-selected", func(a *app) {
-			p := projectNamed(a, "stock-plan")
+			p := projectNamed(a, "storefront")
 			if p != nil && len(p.Skills) > 0 {
 				a.scope, a.selected = projectScope(p), p.Skills[0]
 			}
 		}},
 		{"8-project-linked", func(a *app) {
-			if p := projectNamed(a, "stock-plan"); p != nil {
+			if p := projectNamed(a, "storefront"); p != nil {
 				a.scope = projectScope(p)
 				a.showLinked(p)
 			}
@@ -686,10 +686,10 @@ func TestSnapshots(t *testing.T) {
 		{"t9-tidy-incomplete", func(a *app) { a.scope, a.tidy.kind = scopeTidy, library.Incomplete }},
 		{"s1-sec-tidy-high", func(a *app) { a.scope, a.tidy.kind = scopeTidy, library.SecurityHighRisk }},
 		{"s2-sec-tidy-warning", func(a *app) { a.scope, a.tidy.kind = scopeTidy, library.SecurityWarning }},
-		{"s3-sec-inspector", func(a *app) { a.selected = a.lib.Get("stock-docs") }},
+		{"s3-sec-inspector", func(a *app) { a.selected = a.lib.Get("notes-sync") }},
 		{"s4-sec-inspector-warn", func(a *app) { a.selected = a.lib.Get("wechat-pay") }},
 		{"s5-sec-report", func(a *app) {
-			if s := a.lib.Get("stock-docs"); s != nil {
+			if s := a.lib.Get("notes-sync"); s != nil {
 				a.openSecurityReport(s)
 			}
 		}},
@@ -699,7 +699,7 @@ func TestSnapshots(t *testing.T) {
 			}
 		}},
 		{"s7-sec-jump", func(a *app) {
-			if s := a.lib.Get("stock-docs"); s != nil {
+			if s := a.lib.Get("notes-sync"); s != nil {
 				a.openSecurityReport(s)
 				if v := a.secView(s); v.Report != nil && len(v.Report.Findings) > 0 && len(v.Report.Findings[0].Evidence) > 0 {
 					a.jumpToEvidence(s, v.Report.Findings[0].Evidence[0])
@@ -733,30 +733,30 @@ func TestSnapshots(t *testing.T) {
 		{"k4-palette-none", func(a *app) { a.openPalette(); a.pal.query = "kubernetes 部署" }},
 		{"k5-palette-pinyin", func(a *app) { a.openPalette(); a.pal.query = "ceshi" }},
 		{"9-project-board", func(a *app) {
-			if p := projectNamed(a, "wechat", "seedmux"); p != nil {
+			if p := projectNamed(a, "wechat", "admin-console"); p != nil {
 				a.scope, a.mode = projectScope(p), viewBoard
 			}
 		}},
 		{"pj-place-submenu", func(a *app) {
-			setupProjectImportSnapshot(t, a, "stock-plan")
+			setupProjectImportSnapshot(t, a, "storefront")
 			a.menuEntry("import.place").open = true
 		}},
 		{"pj-readers", func(a *app) {
-			setupProjectImportSnapshot(t, a, "stock-plan")
+			setupProjectImportSnapshot(t, a, "storefront")
 			a.imp.place.Agents = []string{"claude-code", "codex"}
 			a.menuEntry("import.readers").open = true
 		}},
 		{"pj-done", func(a *app) {
-			setupProjectImportSnapshot(t, a, "stock-plan")
-			p := projectNamed(a, "stock-plan")
+			setupProjectImportSnapshot(t, a, "storefront")
+			p := projectNamed(a, "storefront")
 			a.imp.picked = map[string]bool{}
 			a.imp.results = map[string]library.ImportOutcome{
 				"release-checklist": {Name: "release-checklist", Added: true, Place: filepath.Join(p.Dir, ".agents/skills/release-checklist")},
 			}
 		}},
 		{"pj-conflict-blocked", func(a *app) {
-			setupProjectImportSnapshot(t, a, "stock-plan")
-			p := projectNamed(a, "stock-plan")
+			setupProjectImportSnapshot(t, a, "storefront")
+			p := projectNamed(a, "storefront")
 			a.imp.checks["release-checklist"] = library.ImportCheck{
 				State:    library.ImportConflict,
 				Existing: filepath.Join(p.Dir, ".claude/skills/release-checklist"),
@@ -764,17 +764,17 @@ func TestSnapshots(t *testing.T) {
 			}
 		}},
 		{"pj-project-board", func(a *app) {
-			if p := projectNamed(a, "stock-plan", "seedmux"); p != nil {
+			if p := projectNamed(a, "storefront", "admin-console"); p != nil {
 				a.scope, a.mode = projectScope(p), viewBoard
 			}
 		}},
 		{"pj-card-hover", func(a *app) {
-			if p := projectNamed(a, "stock-plan"); p != nil {
+			if p := projectNamed(a, "storefront"); p != nil {
 				a.scope, a.mode = projectScope(p), viewCards
 			}
 		}},
 		{"pj-delete", func(a *app) {
-			if p := projectNamed(a, "stock-plan"); p != nil && len(p.Skills) > 0 {
+			if p := projectNamed(a, "storefront"); p != nil && len(p.Skills) > 0 {
 				a.scope = projectScope(p)
 				a.requestDelete(p.Skills[0])
 			}
@@ -990,7 +990,7 @@ func TestCardScrollIsolatedAcrossPages(t *testing.T) {
 		t.Fatalf("返回浏览页应保留原滚动位置 %v，实际 Y = %v", browseY, a.cardScroll().Y)
 	}
 
-	if p := projectNamed(a, "stock-plan"); p != nil {
+	if p := projectNamed(a, "storefront"); p != nil {
 		a.scope = projectScope(p)
 		tt.Frame()
 		if a.cardScroll().Y != 0 {

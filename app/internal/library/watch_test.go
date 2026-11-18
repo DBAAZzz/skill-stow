@@ -36,7 +36,7 @@ func TestLibraryWatchPlanCoversSkillsAgentsConfigsAndProjects(t *testing.T) {
 	must(t, os.MkdirAll(filepath.Join(home, ".claude"), 0o755))
 	must(t, os.WriteFile(filepath.Join(home, ".claude/settings.json"), []byte("{}"), 0o644))
 	must(t, os.WriteFile(filepath.Join(home, ".agents/.skill-lock.json"), []byte(`{"version":3,"skills":{}}`), 0o644))
-	projGemCfg := filepath.Join(home, "code/stock-plan/.gemini/settings.json")
+	projGemCfg := filepath.Join(home, "code/storefront/.gemini/settings.json")
 	must(t, os.MkdirAll(filepath.Dir(projGemCfg), 0o755))
 	must(t, os.WriteFile(projGemCfg, []byte("{}"), 0o644))
 
@@ -51,7 +51,7 @@ func TestLibraryWatchPlanCoversSkillsAgentsConfigsAndProjects(t *testing.T) {
 		filepath.Join(home, ".claude/skills"),
 		filepath.Join(home, ".cursor/skills"),
 		customDir,
-		filepath.Join(home, "code/stock-plan/.claude/skills"),
+		filepath.Join(home, "code/storefront/.claude/skills"),
 	}
 	for _, want := range wantDirs {
 		if !slices.Contains(plan.Dirs, want) {

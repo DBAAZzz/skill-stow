@@ -142,13 +142,13 @@ func TestBuiltinSkillsAreNotListedInTidy(t *testing.T) {
 }
 
 func TestCollectWarnsAboutReferencesThatBreakAfterCopying(t *testing.T) {
-	// Given 项目技能 stock-docs 链到项目里的 ../shared/api.md（存在）和自己的 references/a.md
+	// Given 项目技能 notes-sync 链到项目里的 ../shared/api.md（存在）和自己的 references/a.md
 	home := fakeHome(t)
 	h := func(p string) string { return filepath.Join(home, p) }
-	dir := h("code/stock-plan/.claude/skills/stock-docs")
+	dir := h("code/storefront/.claude/skills/notes-sync")
 	writeSkill(t, dir, "\n[api](../shared/api.md) [a](references/a.md)\n")
 	writeFile(t, filepath.Join(dir, "references/a.md"), "a")
-	writeFile(t, h("code/stock-plan/.claude/skills/shared/api.md"), "api")
+	writeFile(t, h("code/storefront/.claude/skills/shared/api.md"), "api")
 	l := Scan(home)
 	s := stockDocs(t, l, h)
 
@@ -193,13 +193,13 @@ func TestEmptyFrontmatterIsClosedButHasNoName(t *testing.T) {
 }
 
 func TestCollectDoesNotWarnAboutReferencesBackIntoTheSkill(t *testing.T) {
-	// Given 项目技能用 ../stock-docs/… 绕一圈链到自己目录里的文件，目录里的链接也一样
+	// Given 项目技能用 ../notes-sync/… 绕一圈链到自己目录里的文件，目录里的链接也一样
 	home := fakeHome(t)
 	h := func(p string) string { return filepath.Join(home, p) }
-	dir := h("code/stock-plan/.claude/skills/stock-docs")
-	writeSkill(t, dir, "\n[a](../stock-docs/references/a.md)\n")
+	dir := h("code/storefront/.claude/skills/notes-sync")
+	writeSkill(t, dir, "\n[a](../notes-sync/references/a.md)\n")
 	writeFile(t, filepath.Join(dir, "references/a.md"), "a")
-	mustLink(t, "../../stock-docs/references/a.md", filepath.Join(dir, "references/b.md"))
+	mustLink(t, "../../notes-sync/references/a.md", filepath.Join(dir, "references/b.md"))
 	l := Scan(home)
 	s := stockDocs(t, l, h)
 

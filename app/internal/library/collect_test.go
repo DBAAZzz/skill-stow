@@ -8,15 +8,15 @@ import (
 
 func stockDocs(t *testing.T, l *Library, h func(string) string) *Skill {
 	t.Helper()
-	s := l.ByID("project:" + h("code/stock-plan/.claude/skills/stock-docs"))
+	s := l.ByID("project:" + h("code/storefront/.claude/skills/notes-sync"))
 	if s == nil || len(s.GlobalDirs()) == 0 {
-		t.Fatalf("stock-docs 应被全局链接：%v", s)
+		t.Fatalf("notes-sync 应被全局链接：%v", s)
 	}
 	return s
 }
 
 func TestCollectingProjectSkillCopiesIntoLibraryAndRepointsGlobalLinks(t *testing.T) {
-	// Given 项目技能 stock-docs 被 ~/.claude/skills 全局链接
+	// Given 项目技能 notes-sync 被 ~/.claude/skills 全局链接
 	home := fakeHome(t)
 	h := func(p string) string { return filepath.Join(home, p) }
 	l := Scan(home)
@@ -27,17 +27,17 @@ func TestCollectingProjectSkillCopiesIntoLibraryAndRepointsGlobalLinks(t *testin
 	must(t, l.Collect(s))
 
 	// Then 技能库里有一份真实目录，全局链接改指向它，项目原件不动
-	if fi, err := os.Lstat(h(".agents/skills/stock-docs")); err != nil || !fi.IsDir() {
+	if fi, err := os.Lstat(h(".agents/skills/notes-sync")); err != nil || !fi.IsDir() {
 		t.Fatalf("技能库里应有真实目录：%v", err)
 	}
-	if real, _ := realPath(h(".claude/skills/stock-docs")); real != h(".agents/skills/stock-docs") {
+	if real, _ := realPath(h(".claude/skills/notes-sync")); real != h(".agents/skills/notes-sync") {
 		t.Errorf("全局链接应指向技能库，实际 %s", real)
 	}
-	if _, err := os.Stat(h("code/stock-plan/.claude/skills/stock-docs/SKILL.md")); err != nil {
+	if _, err := os.Stat(h("code/storefront/.claude/skills/notes-sync/SKILL.md")); err != nil {
 		t.Error("项目里的原件不应动")
 	}
 	l = Scan(home)
-	mine := l.Get("stock-docs")
+	mine := l.Get("notes-sync")
 	if mine == nil || mine.Source != Mine {
 		t.Fatalf("应成为我的技能：%+v", mine)
 	}
@@ -54,13 +54,13 @@ func TestCollectingProjectSkillCopiesIntoLibraryAndRepointsGlobalLinks(t *testin
 func TestCollectRefusesWhenLibraryHasSameName(t *testing.T) {
 	home := fakeHome(t)
 	h := func(p string) string { return filepath.Join(home, p) }
-	writeSkill(t, h(".agents/skills/stock-docs"), "技能库里已有的")
+	writeSkill(t, h(".agents/skills/notes-sync"), "技能库里已有的")
 	l := Scan(home)
 	s := stockDocs(t, l, h)
 	if err := l.Collect(s); err == nil {
 		t.Fatal("技能库已有同名项时应拒绝")
 	}
-	if real, _ := realPath(h(".claude/skills/stock-docs")); real != h("code/stock-plan/.claude/skills/stock-docs") {
+	if real, _ := realPath(h(".claude/skills/notes-sync")); real != h("code/storefront/.claude/skills/notes-sync") {
 		t.Errorf("拒绝时链接不应动，实际 %s", real)
 	}
 }
@@ -77,7 +77,7 @@ func TestKeptLinksStopBeingReportedAndSurviveRescan(t *testing.T) {
 	if len(l.Problems().Global) != 0 {
 		t.Error("重新扫描后仍不应提醒")
 	}
-	if real, _ := realPath(h(".claude/skills/stock-docs")); real != h("code/stock-plan/.claude/skills/stock-docs") {
+	if real, _ := realPath(h(".claude/skills/notes-sync")); real != h("code/storefront/.claude/skills/notes-sync") {
 		t.Error("保持链接不应改链接")
 	}
 }

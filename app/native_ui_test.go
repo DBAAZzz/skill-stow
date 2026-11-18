@@ -133,7 +133,7 @@ func TestInspectorTipsOnlyExplainWhatTheStateWordCannot(t *testing.T) {
 	tt.Advance(paneDuration)
 	// Gemini 需要重启：只补充状态词说不了的（立即生效的办法、项目里仍停用）；
 	// OpenCode 读不了配置：写原因，可以重试
-	for _, want := range []string{"可在会话中执行 /skills reload 立即生效。stock-plan 里仍停用。", "无法读取 OpenCode 配置，请检查格式后重试。", "重试"} {
+	for _, want := range []string{"可在会话中执行 /skills reload 立即生效。storefront 里仍停用。", "无法读取 OpenCode 配置，请检查格式后重试。", "重试"} {
 		if !tt.HasText(want) {
 			t.Errorf("提示区应有 %q：%q", want, tt.Texts())
 		}

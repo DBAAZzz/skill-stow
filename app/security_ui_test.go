@@ -20,14 +20,14 @@ func TestEverySecurityMessageHasItsOwnText(t *testing.T) {
 	}
 }
 
-// 示例数据里 stock-docs 会把私钥发出去、wechat-pay 会下载脚本直接执行：
+// 示例数据里 notes-sync 会把私钥发出去、wechat-pay 会下载脚本直接执行：
 // 卡片上标出来，详情栏写明，点进去是报告；标为已看过后卡片和整理页都不再算它。
 func TestSecurityFindingsShowOnCardInspectorAndReport(t *testing.T) {
 	a, tt := newTester(t)
 	if !tt.HasText("高风险") || !tt.HasText("安全警告") {
 		t.Fatalf("卡片上应标出高风险和安全警告：%q", tt.Texts())
 	}
-	s := a.lib.Get("stock-docs")
+	s := a.lib.Get("notes-sync")
 	a.selected = s
 	tt.Frame()
 	tt.Advance(paneDuration) // 详情栏滑进来
@@ -92,7 +92,7 @@ func TestTidyListsSecurityFirst(t *testing.T) {
 	if a.tidy.kind = library.SecurityHighRisk; true {
 		tt.Frame()
 	}
-	for _, want := range []string{"stock-docs", "会读取凭据并发往外部地址", "scripts/sync.sh:3"} {
+	for _, want := range []string{"notes-sync", "会读取凭据并发往外部地址", "scripts/sync.sh:3"} {
 		if !tt.HasText(want) {
 			t.Errorf("整理页高风险缺少 %q：%q", want, tt.Texts())
 		}
@@ -100,8 +100,8 @@ func TestTidyListsSecurityFirst(t *testing.T) {
 	if err := tt.Click("查看"); err != nil {
 		t.Fatal(err)
 	}
-	if a.reading == nil || a.reading.Name != "stock-docs" || a.file != secFile {
-		t.Fatalf("查看应打开 stock-docs 的安全检查：%v %d", a.reading, a.file)
+	if a.reading == nil || a.reading.Name != "notes-sync" || a.file != secFile {
+		t.Fatalf("查看应打开 notes-sync 的安全检查：%v %d", a.reading, a.file)
 	}
 	tt.Frame()
 	if !tt.HasText("在文件里查看") {

@@ -51,10 +51,10 @@ func fakeHome(t *testing.T) string {
 		[]byte(`{"plugins":{"pua@m":[{"installPath":"`+jsonStr(h(".claude/plugins/cache/m/pua/1.0"))+`"}]}}`), 0o644))
 
 	// 项目：Claude Code 用过；项目里的技能被全局链接到 Claude Code
-	proj := h("code/stock-plan")
-	skill(filepath.Join(proj, ".claude/skills/stock-docs"), "股票文档")
-	link(filepath.Join(proj, ".claude/skills/stock-docs"), h(".claude/skills/stock-docs"))
-	link("../../.claude/skills/stock-docs", filepath.Join(proj, ".agents/skills/stock-docs")) // 同一份
+	proj := h("code/storefront")
+	skill(filepath.Join(proj, ".claude/skills/notes-sync"), "股票文档")
+	link(filepath.Join(proj, ".claude/skills/notes-sync"), h(".claude/skills/notes-sync"))
+	link("../../.claude/skills/notes-sync", filepath.Join(proj, ".agents/skills/notes-sync")) // 同一份
 	must(t, os.WriteFile(h(".claude.json"), []byte(`{"projects":{"`+jsonStr(proj)+`":{},"`+jsonStr(home)+`":{}}}`), 0o644))
 	return home
 }
@@ -223,17 +223,17 @@ func TestScan(t *testing.T) {
 	if len(plugged) != 1 || plugged[0].Name != "pua" || plugged[0].Provider != "claude-code" {
 		t.Errorf("插件装的：%v", plugged)
 	}
-	if len(project) != 1 || project[0].Name != "stock-docs" || project[0].Project != "stock-plan" {
+	if len(project) != 1 || project[0].Name != "notes-sync" || project[0].Project != "storefront" {
 		t.Fatalf("项目里同一份技能只算一个：%v", project)
 	}
 	// 链到 ~/.claude/skills：Claude Code 读，Cursor 也读
 	if !slices.Equal(project[0].Enabled, []string{"claude-code", "cursor"}) {
-		t.Errorf("stock-docs 被全局链接：%v", project[0].Enabled)
+		t.Errorf("notes-sync 被全局链接：%v", project[0].Enabled)
 	}
 	if got := project[0].Readers(false); !slices.Equal(got, []string{"claude-code", "cursor", "gemini"}) {
-		t.Errorf("在项目里读到 stock-docs 的：%v", got)
+		t.Errorf("在项目里读到 notes-sync 的：%v", got)
 	}
-	if len(l.Projects) != 1 || l.Projects[0].Name != "stock-plan" || len(l.Projects[0].Linked()) != 1 {
+	if len(l.Projects) != 1 || l.Projects[0].Name != "storefront" || len(l.Projects[0].Linked()) != 1 {
 		t.Fatalf("项目：%+v", l.Projects)
 	}
 	var rels []string
@@ -243,7 +243,7 @@ func TestScan(t *testing.T) {
 	if !slices.Equal(rels, []string{".claude/skills", ".agents/skills"}) {
 		t.Errorf("项目里的技能目录：%v", rels)
 	}
-	if l.Get("stock-docs").Source != Project {
+	if l.Get("notes-sync").Source != Project {
 		t.Error("全局链接的项目技能不应算成我的")
 	}
 }
@@ -302,7 +302,7 @@ func TestManualProjects(t *testing.T) {
 	home := fakeHome(t)
 	empty := filepath.Join(home, "code", "empty")
 	must(t, os.MkdirAll(empty, 0o755))
-	stock := filepath.Join(home, "code", "stock-plan")
+	stock := filepath.Join(home, "code", "storefront")
 	must(t, Scan(home).AddProjects([]string{empty, stock}))
 	l := Scan(home)
 	if l.Project(empty) != nil {
@@ -345,11 +345,11 @@ func TestSettingsPersist(t *testing.T) {
 func TestDiscoveryAndWorktrees(t *testing.T) {
 	home := fakeHome(t)
 	h := func(p string) string { return filepath.Join(home, p) }
-	// stock-plan 的一个 worktree，Codex 在里面用过
-	wt := h("code/stock-plan-wt")
-	must(t, os.MkdirAll(h("code/stock-plan/.git/worktrees/wt"), 0o755))
+	// storefront 的一个 worktree，Codex 在里面用过
+	wt := h("code/storefront-wt")
+	must(t, os.MkdirAll(h("code/storefront/.git/worktrees/wt"), 0o755))
 	must(t, os.MkdirAll(wt, 0o755))
-	must(t, os.WriteFile(filepath.Join(wt, ".git"), []byte("gitdir: "+h("code/stock-plan/.git/worktrees/wt")+"\n"), 0o644))
+	must(t, os.WriteFile(filepath.Join(wt, ".git"), []byte("gitdir: "+h("code/storefront/.git/worktrees/wt")+"\n"), 0o644))
 	must(t, os.MkdirAll(h(".codex/sessions/2026"), 0o755))
 	must(t, os.WriteFile(h(".codex/sessions/2026/a.jsonl"), []byte(`{"payload":{"cwd":"`+jsonStr(wt)+`"}}`+"\n"), 0o644))
 
