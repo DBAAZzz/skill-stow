@@ -44,6 +44,9 @@ type Deletion struct {
 	spent bool // 撤销过或放下了
 }
 
+// FirstSkillID 是撤销时要选中的技能 ID，同名技能按位置区分。
+func (d *Deletion) FirstSkillID() string { return d.items[0].skill.ID }
+
 // deleted 是一次删除里的一个技能。
 type deleted struct {
 	skill    *Skill  // 删除前的样子：撤销时按它写回停用记录、放回列表
@@ -53,10 +56,14 @@ type deleted struct {
 	lock     *string      // npx skills 安装记录里它那一条的原文，没有为 nil
 	marks    []importMark // 「添加技能」记下的来源（import_add.go），撤销时写回
 	disabled []string     // 本应用停用过它的 Agent：撤销时再停用
+	original fs.FileInfo  // 已放回的原件，重试剩余的链接与记录时先核对身份
 	restored bool         // 这项已经撤销放回
 }
 
-type removedLink struct{ path, target string }
+type removedLink struct {
+	path, target string
+	trash        bool // 项目内链接随原件一起进废纸篓，其余（全局链接）直接移除
+}
 
 // RealOutside 报告 s 的真实目录是否落在任何已知技能目录（技能库、各 Agent 目录、
 // 早年目录）之外；在外时返回真实目录路径。
@@ -114,7 +121,7 @@ func isUnderDir(p, dir string) bool {
 	return rel != "." && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator))
 }
 
-// CanDelete 报告技能能不能删除，不能时返回原因：只有「我的」技能能删；
+// CanDelete 报告技能能不能删除，不能时返回原因：支持「我的」和项目技能；
 // 有同名副本时返回 ErrHasCopies，要先收成一份。
 func (l *Library) CanDelete(s *Skill) error {
 	switch {
@@ -122,12 +129,27 @@ func (l *Library) CanDelete(s *Skill) error {
 		return errReadOnlyDelete
 	case s.Copies > 0:
 		return ErrHasCopies
+	case s.Source == Project && l.disk:
+		root, err := realPath(s.ProjectDir)
+		if err != nil {
+			return err
+		}
+		real, err := realPath(s.Real)
+		if err != nil {
+			return err
+		}
+		if real != s.Real || !isUnderDir(real, root) {
+			return errors.New(locales.DeleteProjectLocationChanged())
+		}
 	}
 	return nil
 }
 
 // DeleteImpact 是删除 s 后读不到它的 Agent，各自因为什么，按 Agent 的顺序。
 func (l *Library) DeleteImpact(s *Skill) []Impact {
+	if s.Source == Project {
+		return l.projectDeleteImpact(s)
+	}
 	agents := s.Available
 	if len(agents) == 0 {
 		agents = s.Enabled // 示例数据没有 Available
@@ -144,6 +166,41 @@ func (l *Library) DeleteImpact(s *Skill) []Impact {
 			im.Kind, im.Dir = ImpactShared, s.Via[id]
 		}
 		out = append(out, im)
+	}
+	return out
+}
+
+func (l *Library) projectDeleteImpact(s *Skill) []Impact {
+	var out []Impact
+	seen := map[string]bool{}
+	for _, r := range s.Reads {
+		if seen[r.Agent] {
+			continue
+		}
+		seen[r.Agent] = true
+		if r.Global {
+			out = append(out, Impact{Agent: r.Agent, Kind: ImpactLink})
+			continue
+		}
+		linked := false
+		if l.disk {
+			linked = isLink(filepath.Join(s.ProjectDir, r.Dir, s.Name))
+		} else {
+			linked = !samePlace(filepath.Dir(s.Real), filepath.Join(s.ProjectDir, r.Dir))
+		}
+		if linked {
+			out = append(out, Impact{Agent: r.Agent, Kind: ImpactLink})
+			continue
+		}
+		if r.Dir == sharedDir {
+			out = append(out, Impact{Agent: r.Agent, Kind: ImpactShared, Dir: sharedDir})
+			continue
+		}
+		if a, ok := l.agentByID(r.Agent); ok && len(a.Project) > 0 && a.Project[0] != r.Dir {
+			out = append(out, Impact{Agent: r.Agent, Kind: ImpactShared, Dir: r.Dir})
+			continue
+		}
+		out = append(out, Impact{Agent: r.Agent, Kind: ImpactOriginal})
 	}
 	return out
 }
@@ -208,7 +265,13 @@ func (l *Library) deleteOne(s *Skill) (*deleted, error) {
 	item := &deleted{skill: s, stage: stage, disabled: disabled}
 	var errs []error
 	for _, ln := range links {
-		if err := os.Remove(ln.path); err != nil {
+		var err error
+		if ln.trash {
+			err = Trash(l.Home, ln.path)
+		} else {
+			err = os.Remove(ln.path)
+		}
+		if err != nil {
 			errs = append(errs, err)
 			continue
 		}
@@ -239,10 +302,35 @@ func (l *Library) deleteOne(s *Skill) (*deleted, error) {
 	return item, errors.Join(errs...)
 }
 
-// linksTo 是全局目录里指向 s 原件的链接。整组链接里的那一项不算：它不是
-// 自己的链接，删了会删到整组。
+// linksTo 是指向 s 原件的链接。项目技能包括项目内链接（进废纸篓）和全局链接；
+// 「我的」技能只算全局目录里指向 s 原件的链接（整组链接里的那一项不算）。
 func (l *Library) linksTo(s *Skill) []removedLink {
 	var out []removedLink
+	if s.Source == Project {
+		for _, p := range s.projectLinks {
+			if p == s.Real || !isLink(p) {
+				continue
+			}
+			if real, err := realPath(p); err != nil || real != s.Real {
+				continue
+			}
+			if target, err := os.Readlink(p); err == nil {
+				out = append(out, removedLink{path: p, target: target, trash: true})
+			}
+		}
+		for _, p := range s.globalLinks {
+			if !isLink(p) {
+				continue
+			}
+			if real, err := realPath(p); err != nil || real != s.Real {
+				continue
+			}
+			if target, err := os.Readlink(p); err == nil {
+				out = append(out, removedLink{path: p, target: target})
+			}
+		}
+		return out
+	}
 	for _, p := range slices.Concat(s.places, s.elsewhere) {
 		if p.nested || p.path == s.Real || !isLink(p.path) {
 			continue
@@ -251,7 +339,7 @@ func (l *Library) linksTo(s *Skill) []removedLink {
 			continue
 		}
 		if target, err := os.Readlink(p.path); err == nil {
-			out = append(out, removedLink{p.path, target})
+			out = append(out, removedLink{path: p.path, target: target})
 		}
 	}
 	return out
@@ -306,47 +394,71 @@ func (l *Library) undoOne(item *deleted) error {
 		l.relist(s, item.at)
 		return nil
 	}
-	kept := filepath.Join(item.stage, s.Name)
-	if !exists(kept) {
-		return ErrUndoExpired
-	}
-	if exists(s.Real) {
-		return errors.New(locales.DeleteRestoreNameExists(l.Display(s.Real)))
-	}
-	if err := os.MkdirAll(filepath.Dir(s.Real), 0o755); err != nil {
-		return err
-	}
-	if err := os.Rename(kept, s.Real); err != nil {
-		// 临时目录在别的卷上时改名不了，复制回去
-		if err := copyDir(kept, s.Real); err != nil {
+	if item.original == nil {
+		kept := filepath.Join(item.stage, s.Name)
+		if !exists(kept) {
+			return ErrUndoExpired
+		}
+		if exists(s.Real) {
+			return errors.New(locales.DeleteRestoreNameExists(l.Display(s.Real)))
+		}
+		if err := os.MkdirAll(filepath.Dir(s.Real), 0o755); err != nil {
 			return err
 		}
+		if err := os.Rename(kept, s.Real); err != nil {
+			// 临时目录在别的卷上时改名不了，复制回去
+			if err := copyDir(kept, s.Real); err != nil {
+				return err
+			}
+		}
+		fi, err := os.Stat(s.Real)
+		if err != nil {
+			return err
+		}
+		item.original = fi
+		os.RemoveAll(item.stage)
+		item.stage = ""
+		l.relist(s, item.at)
+
+	} else if fi, err := os.Lstat(s.Real); err != nil || !os.SameFile(fi, item.original) {
+		return errors.New(locales.DeleteRestoreNameExists(l.Display(s.Real)))
 	}
-	os.RemoveAll(item.stage)
-	l.relist(s, item.at)
 
 	var errs []error
-	for _, ln := range item.links {
+	item.links = slices.DeleteFunc(item.links, func(ln removedLink) bool {
 		if exists(ln.path) {
 			errs = append(errs, errors.New(locales.DeleteRestoreLinkNameExists(l.Display(ln.path))))
-			continue
+			return false
 		}
-		if err := makeLink(ln.target, ln.path); err != nil {
+		var err error
+		if ln.trash {
+			err = makeSymlink(ln.target, ln.path)
+		} else {
+			err = makeLink(ln.target, ln.path)
+		}
+		if err != nil {
 			errs = append(errs, err)
 		}
-	}
+		return err == nil
+	})
 	if item.lock != nil {
 		if err := restoreInstallRecord(l.Home, s.Name, *item.lock); err != nil {
 			errs = append(errs, fmt.Errorf("%s%w", locales.DeleteInstallRecordRestoreFailed(), err))
+		} else {
+			item.lock = nil
 		}
 	}
-	for _, id := range item.disabled {
+	item.disabled = slices.DeleteFunc(item.disabled, func(id string) bool {
 		if err := l.setNative(s, id, false); err != nil {
 			errs = append(errs, fmt.Errorf("%s%w", locales.DeleteDisableAgainFailed(AgentName(id)), err))
+			return false
 		}
-	}
+		return true
+	})
 	if err := l.restoreImportMarks(item.marks); err != nil {
 		errs = append(errs, fmt.Errorf("%s%w", locales.DeleteAddRecordRestoreFailed(), err))
+	} else {
+		item.marks = nil
 	}
 	return errors.Join(errs...)
 }
@@ -373,14 +485,37 @@ type listing struct {
 	index     int
 	coll      *Collection
 	collIndex int // 集合因为只剩一个而撤掉时，它在 Collections 里的位置；没撤为 -1
+	proj      *ProjectInfo
+	projIndex int
+	projDirs  []projDirPos
 }
 
-// unlist 把技能从列表和它所在的集合里拿掉。集合只剩一个技能时不再算集合，
+type projDirPos struct {
+	dirIndex   int
+	skillIndex int
+}
+
+// unlist 把技能从列表、集合和所在项目里拿掉。集合只剩一个技能时不再算集合，
 // 和扫描时的规则一样。
 func (l *Library) unlist(s *Skill) listing {
-	at := listing{index: slices.Index(l.Skills, s), coll: s.Collection, collIndex: -1}
+	at := listing{index: slices.Index(l.Skills, s), coll: s.Collection, collIndex: -1, projIndex: -1}
 	if at.index >= 0 {
 		l.Skills = slices.Delete(l.Skills, at.index, at.index+1)
+	}
+	if s.Source == Project {
+		if p := l.Project(s.ProjectDir); p != nil {
+			at.proj = p
+			at.projIndex = slices.Index(p.Skills, s)
+			if at.projIndex >= 0 {
+				p.Skills = slices.Delete(p.Skills, at.projIndex, at.projIndex+1)
+			}
+			for i := range p.Dirs {
+				if j := slices.Index(p.Dirs[i].Skills, s); j >= 0 {
+					at.projDirs = append(at.projDirs, projDirPos{i, j})
+					p.Dirs[i].Skills = slices.Delete(p.Dirs[i].Skills, j, j+1)
+				}
+			}
+		}
 	}
 	if c := s.Collection; c != nil {
 		c.Skills = slices.DeleteFunc(c.Skills, func(k *Skill) bool { return k == s })
@@ -399,6 +534,17 @@ func (l *Library) unlist(s *Skill) listing {
 func (l *Library) relist(s *Skill, at listing) {
 	if at.index >= 0 {
 		l.Skills = slices.Insert(l.Skills, min(at.index, len(l.Skills)), s)
+	}
+	if p := at.proj; p != nil {
+		if at.projIndex >= 0 {
+			p.Skills = slices.Insert(p.Skills, min(at.projIndex, len(p.Skills)), s)
+		}
+		for _, pos := range at.projDirs {
+			if pos.dirIndex < len(p.Dirs) {
+				d := &p.Dirs[pos.dirIndex]
+				d.Skills = slices.Insert(d.Skills, min(pos.skillIndex, len(d.Skills)), s)
+			}
+		}
 	}
 	c := at.coll
 	if c == nil {

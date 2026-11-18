@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -322,7 +323,7 @@ func (a *app) recentImports(c *ui.Context) {
 				ui.Icon(c, iconChevronRight).Size(11, 11).TextColor(colTextDisabled).Shrink(0)
 			})
 			if row.Clicked() {
-				a.showImported(r.Name)
+				a.showImported(r.Name, r.Project, r.Place)
 			}
 		}
 	})
@@ -425,7 +426,11 @@ func (a *app) importSourceBar(c *ui.Context) {
 			if updButton(c, nil, locales.ImportContinueAdding(), false).Clicked() {
 				a.discardImport()
 			}
-			if filledButton(c, locales.ImportViewInMySkills(), colAccent).Clicked() {
+			viewLabel := locales.ImportViewInMySkills()
+			if st.place.Project != "" {
+				viewLabel = locales.ImportViewInProject(a.importProjectName(st.place.Project))
+			}
+			if filledButton(c, viewLabel, colAccent).Clicked() {
 				first := ""
 				for _, s := range b.Skills {
 					if st.results[s.Name].Added {
@@ -433,7 +438,7 @@ func (a *app) importSourceBar(c *ui.Context) {
 						break
 					}
 				}
-				a.showImported(first)
+				a.showImported(first, st.place.Project, st.results[first].Place)
 			}
 			return
 		}
@@ -511,11 +516,14 @@ func (a *app) importSourceIcon(c *ui.Context, b *library.ImportBatch) {
 	squircleIcon(c, iconNavFolder, 34, squircleBlue)
 }
 
-// placementMenu 是「装到」：技能库（通用）或指定的 Agent。
+// placementMenu 是「装到」：技能库（通用）、指定的 Agent 或项目。
 func (a *app) placementMenu(c *ui.Context) {
 	st := &a.imp
 	current := locales.ImportSharedLibraryTarget()
-	if !st.place.Library {
+	switch {
+	case st.place.Project != "":
+		current = a.importProjectName(st.place.Project)
+	case !st.place.Library:
 		current = locales.ImportSelectedAgents()
 	}
 	a.selectButton(c, "import.place", locales.ImportInstallTo(), current, st.adding, func(fm *frostedMenu) {
@@ -523,7 +531,7 @@ func (a *app) placementMenu(c *ui.Context) {
 		if fm.radio(locales.ImportSharedLibraryTarget(), st.place.Library, withDetail(locales.ImportPlaceLibraryDetail(readers)), withKey("place-lib")) && !st.place.Library {
 			a.setPlacement(importPlacementDefault())
 		}
-		if fm.radio(locales.ImportSelectedAgentsEllipsis(), !st.place.Library, withDetail(locales.ImportAgentDirectoryHint()), withKey("place-agents")) && st.place.Library {
+		if fm.radio(locales.ImportSelectedAgentsEllipsis(), !st.place.Library && st.place.Project == "", withDetail(locales.ImportAgentDirectoryHint()), withKey("place-agents")) && (st.place.Library || st.place.Project != "") {
 			p := library.ImportPlacement{}
 			if ids := a.lib.ImportPlaceable(); len(ids) > 0 {
 				p.Agents = []string{ids[0]}
@@ -531,6 +539,30 @@ func (a *app) placementMenu(c *ui.Context) {
 			a.setPlacement(p)
 			a.menuEntry("import.readers").open = true
 		}
+		fm.submenu(locales.SourceProject(), "", []menuOpt{withChecked(st.place.Project != ""), withDetail(locales.ImportPlaceProjectDetail()), withKey("place-project")}, menuPanelOpts{width: 232, padLead: true}, func(sub *frostedMenu) {
+			projects := slices.Clip(a.lib.Projects)
+			for _, p := range a.lib.ManualProjects() {
+				if !p.Missing && len(p.Skills) == 0 {
+					projects = append(projects, p)
+				}
+			}
+			for _, p := range projects {
+				on := library.SamePlace(st.place.Project, p.Dir)
+				if sub.check(p.Name, on, withIcon(iconNavFolder), withIconMuted(), withTrailCheck(), withKey("place-proj-"+p.Dir)) && !on {
+					agents := st.place.Agents
+					if st.place.Project == "" {
+						agents = a.lib.ImportProjectDefaultAgents()
+					}
+					a.setPlacement(library.ImportPlacement{Project: p.Dir, Agents: agents})
+				}
+			}
+			if len(projects) > 0 {
+				sub.separator()
+			}
+			if sub.action(locales.NavAddProjectEllipsis(), withIcon(iconFolderAdd), withKey("place-add-project")) {
+				a.chooseProjectForImport()
+			}
+		})
 	})
 }
 
@@ -563,14 +595,14 @@ func (a *app) readersMenu(c *ui.Context) {
 		if st.place.Library {
 			fm.header(locales.ImportDirectLibraryReaders(), locales.ImportDirectLibraryReadersHint())
 			for _, id := range a.lib.SharedReaders() {
-				fm.check(library.AgentName(id), true, withDisabled(true), withTrailing(locales.CommonShared()), withBadge(func(c *ui.Context) { agentBadge(c, id, 18) }), withKey("shared-"+id))
+				fm.check(library.AgentName(id), true, withDisabled(true), withTrailing(locales.CommonShared()), withTrailCheck(), withBadge(func(c *ui.Context) { agentBadge(c, id, 18) }), withKey("shared-"+id))
 			}
 			if linkable := a.lib.ImportLinkable(); len(linkable) > 0 {
 				fm.separator()
 				fm.header(locales.ImportAlsoAddTo(), locales.ImportCreateLinks())
 				for _, id := range linkable {
 					on := slices.Contains(st.place.Agents, id)
-					if fm.check(library.AgentName(id), on, withKeepOpen(), withTrailing(a.lib.Display(a.lib.AgentSkillsDir(id))),
+					if fm.check(library.AgentName(id), on, withKeepOpen(), withTrailing(a.lib.Display(a.lib.AgentSkillsDir(id))), withTrailCheck(),
 						withBadge(func(c *ui.Context) { agentBadge(c, id, 18) }), withKey("link-"+id)) {
 						p := st.place
 						p.Agents = toggleID(p.Agents, id)
@@ -581,10 +613,37 @@ func (a *app) readersMenu(c *ui.Context) {
 			fm.note(locales.ImportAgentChoiceScope())
 			return
 		}
+		if st.place.Project != "" {
+			fm.header(locales.ImportInstallForAgents(), locales.ImportProjectAgentSubtitle())
+			for _, id := range a.lib.ImportProjectPlaceable() {
+				on := slices.Contains(st.place.Agents, id)
+				dir := a.lib.ImportProjectAgentDir(id, st.place)
+				if fm.check(library.AgentName(id), on, withKeepOpen(), withTrailing(dir), withTrailCheck(),
+					withBadge(func(c *ui.Context) { agentBadge(c, id, 18) }), withKey("proj-agent-"+id)) {
+					p := st.place
+					p.Agents = toggleID(p.Agents, id)
+					a.setPlacement(p)
+				}
+			}
+			if len(also) > 0 {
+				fm.separator()
+				fm.header(locales.ImportIndirectReaders(), "")
+				var readDirs []string
+				for _, d := range a.lib.ImportProjectTargetDirs(st.place) {
+					for _, id := range also {
+						if ag, ok := a.lib.AgentByID(id); ok && slices.Contains(ag.Project, d) && !slices.Contains(readDirs, d) {
+							readDirs = append(readDirs, d)
+						}
+					}
+				}
+				fm.note(locales.ImportProjectAlsoReads(agentNames(also), library.JoinOr(readDirs)))
+			}
+			return
+		}
 		fm.header(locales.ImportInstallForAgents(), locales.ImportOwnDirectory())
 		for _, id := range a.lib.ImportPlaceable() {
 			on := slices.Contains(st.place.Agents, id)
-			if fm.check(library.AgentName(id), on, withKeepOpen(), withTrailing(a.lib.Display(a.lib.AgentSkillsDir(id))),
+			if fm.check(library.AgentName(id), on, withKeepOpen(), withTrailing(a.lib.Display(a.lib.AgentSkillsDir(id))), withTrailCheck(),
 				withBadge(func(c *ui.Context) { agentBadge(c, id, 18) }), withKey("agent-"+id)) {
 				p := st.place
 				p.Agents = toggleID(p.Agents, id)
@@ -814,7 +873,7 @@ func (a *app) importRow(c *ui.Context, s *library.ImportSkill) {
 			case chk.State == library.ImportConflict:
 				desc = a.conflictLine(chk)
 			case chk.State == library.ImportInvalid:
-				desc, col = s.Problem, colWarnText
+				desc, col = cmp.Or(chk.Blocked, s.Problem), colWarnText
 			case s.MissingDescription():
 				desc, col = locales.ImportMissingDescriptionHint(), colTextMuted
 			}
@@ -882,9 +941,15 @@ func (a *app) importStatusNotes(c *ui.Context, s *library.ImportSkill) {
 				ui.Row(c).Padding(10, 14).Gap(10).AlignItems(ui.Center).Children(func() {
 					ui.Image(c, symOK).Size(16, 16).Shrink(0).AlignSelf(ui.Start).Margin(1, 0, 0, 0)
 					ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
-						title := locales.ImportAddedTo(a.lib.Display(o.Place))
+						place := a.lib.Display(o.Place)
+						if st.place.Project != "" {
+							if rel, err := filepath.Rel(st.place.Project, o.Place); err == nil && !strings.HasPrefix(rel, "..") {
+								place = a.importProjectName(st.place.Project) + "/" + filepath.ToSlash(rel)
+							}
+						}
+						title := locales.ImportAddedTo(place)
 						if o.Replaced {
-							title = locales.ImportReplacedAt(a.lib.Display(o.Place))
+							title = locales.ImportReplacedAt(place)
 						}
 						ui.Text(c, title).FontSize(13).FontWeight(600).TextColor(colTextPrimary)
 						ui.Text(c, a.importedNote(s)).FontSize(12).LineHeight(1.45).TextColor(colTextSecondary)
@@ -909,14 +974,18 @@ func (a *app) importStatusNotes(c *ui.Context, s *library.ImportSkill) {
 		render = func() { errorLine(c, o.Err.Error()) }
 	case chk.State == library.ImportConflict:
 		render = func() {
-			a.conflictCard(c, s, chk.Existing, locales.ImportConflictExisting(a.placeName(chk.Existing), s.Name), "")
+			title := locales.ImportConflictExisting(a.placeName(chk.Existing), s.Name)
+			if st.place.Project != "" {
+				title = locales.ImportProjectConflictExisting(a.importProjectName(st.place.Project), s.Name)
+			}
+			a.conflictCard(c, s, chk.Existing, title, "")
 		}
 	case chk.State == library.ImportSame:
 		render = func() {
 			ui.Text(c, locales.ImportSameExisting(a.placeName(chk.Existing))).FontSize(12).TextColor(colTextSecondary)
 		}
 	case chk.State == library.ImportInvalid:
-		render = func() { errorLine(c, s.Problem) }
+		render = func() { errorLine(c, cmp.Or(chk.Blocked, s.Problem)) }
 	}
 	if render != nil {
 		ui.Column(c).Margin(14, 0, 0, 0).Gap(10).Children(render)
@@ -926,6 +995,15 @@ func (a *app) importStatusNotes(c *ui.Context, s *library.ImportSkill) {
 // importedNote 说明添加后来源记成什么、会不会出现在「更新」里。
 func (a *app) importedNote(s *library.ImportSkill) string {
 	b := a.imp.batch
+	if a.imp.place.Project != "" {
+		switch b.Source.Kind {
+		case library.ImportLocal:
+			return locales.ImportProjectSourceLocal(a.lib.Display(s.RepoPath))
+		case library.ImportWebsite:
+			return locales.ImportProjectSourceWebsite(b.Site)
+		}
+		return locales.ImportProjectSourceGitHub(b.Source.Repo, shortCommit(b.Commit))
+	}
 	switch b.Source.Kind {
 	case library.ImportLocal:
 		return locales.ImportSourceLocal(a.lib.Display(s.RepoPath))
@@ -935,8 +1013,13 @@ func (a *app) importedNote(s *library.ImportSkill) string {
 	return locales.ImportSourceGitHub(b.Source.Repo, shortCommit(b.Commit))
 }
 
-// placeName 是已有那一项所在的位置怎么说：技能库，或 Agent 的目录。
+// placeName 是已有那一项所在的位置怎么说：技能库、项目，或 Agent 的目录。
 func (a *app) placeName(existing string) string {
+	if proj := a.imp.place.Project; proj != "" {
+		if rel, err := filepath.Rel(proj, existing); err == nil && !strings.HasPrefix(rel, "..") {
+			return a.importProjectName(proj)
+		}
+	}
 	dir := filepath.Dir(existing)
 	if dir == a.lib.Root {
 		return locales.NavLibrary()
@@ -1010,11 +1093,17 @@ func (a *app) conflictCard(c *ui.Context, s *library.ImportSkill, existing, titl
 		mine := ""
 		if src, ok := a.lib.ImportedFrom(existing); ok {
 			mine = src.String()
-		} else if rec, ok := a.lib.InstallRecord(s.Name); ok && rec.Source != "" {
+		} else if rec, ok := a.lib.InstallRecord(s.Name); ok && a.imp.place.Project == "" && rec.Source != "" {
 			mine = rec.Source
 		}
+		existingShown := a.lib.Display(existing)
+		if proj := a.imp.place.Project; proj != "" {
+			if rel, err := filepath.Rel(proj, existing); err == nil && !strings.HasPrefix(rel, "..") {
+				existingShown = filepath.ToSlash(rel)
+			}
+		}
 		ui.Column(c).Padding(1, 14, 11, 40).Gap(3).Children(func() {
-			for _, r := range [][3]string{{locales.ImportYourCopy(), a.lib.Display(existing), mine}, {locales.ImportIncomingCopy(), theirs, meta}} {
+			for _, r := range [][3]string{{locales.ImportYourCopy(), existingShown, mine}, {locales.ImportIncomingCopy(), theirs, meta}} {
 				ui.Row(c.Key(r[0])).Gap(10).AlignItems(ui.Center).Children(func() {
 					ui.Text(c, r[0]).FontSize(12).TextColor(colTextSecondary).Width(56).Shrink(0).SingleLine()
 					ui.Text(c, r[1]).FontSize(12).Font("monospace").TextColor(colTextBody).Grow(1).MinWidth(0).SingleLine()

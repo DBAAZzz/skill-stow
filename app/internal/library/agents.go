@@ -113,6 +113,11 @@ func (l *Library) agentByID(id string) (Agent, bool) {
 	return agentByID(l.custom, id)
 }
 
+// AgentByID 按 ID 查找 Agent。
+func (l *Library) AgentByID(id string) (Agent, bool) {
+	return l.agentByID(id)
+}
+
 func agentByID(custom []Agent, id string) (Agent, bool) {
 	if i := slices.IndexFunc(Catalog, func(a Agent) bool { return a.ID == id }); i >= 0 {
 		return Catalog[i], true

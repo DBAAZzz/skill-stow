@@ -97,28 +97,25 @@ func TestDeletingASkillLeavesLinksToOtherSkillsAlone(t *testing.T) {
 	}
 }
 
-func TestBuiltinAndProjectSkillsCannotBeDeleted(t *testing.T) {
-	// Given 一个 Antigravity 自带的技能和一个项目里的技能
+func TestBuiltinSkillsCannotBeDeleted(t *testing.T) {
+	// Given 一个 Antigravity 自带的技能
 	home, h := deleteHome(t, "antigravity")
 	writeSkill(t, h(".gemini/antigravity/builtin/skills/browser"), "")
-	writeSkill(t, h("code/app/.claude/skills/release"), "")
-	must(t, writeManual(home, []manualProject{{Dir: h("code/app")}}))
 	l := Scan(home)
 
-	for _, s := range []*Skill{l.ByID("builtin:" + h(".gemini/antigravity/builtin/skills/browser")), l.ByID("project:" + h("code/app/.claude/skills/release"))} {
-		if s == nil {
-			t.Fatal("示例技能没扫到")
-		}
-		// When 删除它
-		_, err := l.Delete(s)
+	s := l.ByID("builtin:" + h(".gemini/antigravity/builtin/skills/browser"))
+	if s == nil {
+		t.Fatal("示例技能没扫到")
+	}
+	// When 删除它
+	_, err := l.Delete(s)
 
-		// Then 报错，什么都不动
-		if err == nil {
-			t.Errorf("%s 不应能删除", s.ID)
-		}
-		if !exists(s.Real) {
-			t.Errorf("%s 被移走了", s.Real)
-		}
+	// Then 报错，什么都不动
+	if err == nil {
+		t.Errorf("%s 不应能删除", s.ID)
+	}
+	if !exists(s.Real) {
+		t.Errorf("%s 被移走了", s.Real)
 	}
 }
 

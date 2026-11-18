@@ -226,7 +226,27 @@ func sampleProblems(l *Library) {
 
 	l.Broken = []string{"~/.claude/skills/lark-doc", "~/.codebuddy/skills/old-notes"}
 	if rc := l.Get("release-checklist"); rc != nil {
+		rc.Dir = filepath.Join(rc.ProjectDir, sharedDir, rc.Name)
+		rc.Real = rc.Dir
 		rc.globalLinks = []string{"~/.claude/skills/release-checklist"}
+		rc.Reads = []Read{
+			{cl, ".claude/skills", false},
+			{cx, sharedDir, false},
+			{"gemini", sharedDir, false},
+			{cu, sharedDir, false},
+			{cl, "~/.claude/skills", true},
+		}
+		if sp := l.Project(rc.ProjectDir); sp != nil {
+			api := l.Get("api-conventions")
+			if api != nil {
+				api.Dir = filepath.Join(api.ProjectDir, sharedDir, api.Name)
+				api.Real = api.Dir
+			}
+			sp.Dirs = []ProjectDir{
+				{Rel: sharedDir, Skills: []*Skill{rc, api}},
+				{Rel: ".claude/skills", Skills: []*Skill{rc}},
+			}
+		}
 	}
 }
 

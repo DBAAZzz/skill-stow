@@ -12,6 +12,10 @@ func makeLinkPlatform(target, dst string) error {
 	return os.Symlink(target, dst)
 }
 
+func makeSymlinkPlatform(target, dst string) error {
+	return os.Symlink(target, dst)
+}
+
 func realPathPlatform(p string) (string, error) {
 	return filepath.EvalSymlinks(p)
 }

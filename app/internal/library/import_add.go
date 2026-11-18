@@ -30,8 +30,10 @@ import (
 // ImportPlacement 是装到哪里。
 type ImportPlacement struct {
 	// Library：放进技能库 ~/.agents/skills，Agents 是另外建链接的 Agent。
-	// 否则是「指定的 Agent」：文件放进 Agents[0] 自己的目录，其余建链接。
+	// Project：非空时放进该项目目录，Agents 是勾选用这个技能的 Agent。
+	// 都为假/空时是「指定的 Agent」：文件放进 Agents[0] 自己的目录，其余建链接。
 	Library bool
+	Project string
 	Agents  []string
 }
 
@@ -79,6 +81,45 @@ type importLink struct{ agent, path string }
 func (l *Library) importTargets(name string, p ImportPlacement) (target string, links []importLink, err error) {
 	if p.Library {
 		target = filepath.Join(l.Root, name)
+	} else if p.Project != "" {
+		if len(p.Agents) == 0 {
+			return "", nil, errors.New(locales.ImportChooseAgent())
+		}
+		dirs, err := l.projectTargetDirs(p.Agents)
+		if err != nil {
+			return "", nil, err
+		}
+		project := p.Project
+		if l.disk {
+			if _, valid := l.ValidProjectDir(project); !valid {
+				return "", nil, errors.New(locales.ProjectInvalidFolder())
+			}
+			project, err = realPath(project)
+			if err != nil {
+				return "", nil, err
+			}
+		}
+		seen := map[string]bool{}
+		for _, rel := range dirs {
+			dir := filepath.Join(project, rel)
+			if l.disk {
+				dir, err = projectInstallDir(project, rel)
+				if err != nil {
+					return "", nil, err
+				}
+			}
+			if seen[dir] {
+				continue
+			}
+			seen[dir] = true
+			dst := filepath.Join(dir, name)
+			if target == "" {
+				target = dst
+			} else {
+				links = append(links, importLink{path: dst})
+			}
+		}
+		return target, links, nil
 	} else {
 		if len(p.Agents) == 0 {
 			return "", nil, errors.New(locales.ImportChooseAgent())
@@ -108,6 +149,171 @@ func (l *Library) importTargets(name string, p ImportPlacement) (target string, 
 	return target, links, nil
 }
 
+// 逐层解开已有目录的链接，尚不存在的部分留给安装时创建。
+func projectInstallDir(project, rel string) (string, error) {
+	dir := project
+	for _, part := range strings.Split(filepath.ToSlash(rel), "/") {
+		dir = filepath.Join(dir, part)
+		if _, err := os.Lstat(dir); errors.Is(err, fs.ErrNotExist) {
+			continue
+		} else if err != nil {
+			return "", err
+		}
+		resolved, err := realPath(dir)
+		if err != nil {
+			return "", err
+		}
+		if !isUnderDir(resolved, project) {
+			return "", errors.New(locales.ImportProjectDirectoryOutside(rel))
+		}
+		dir = resolved
+	}
+	return dir, nil
+}
+
+// ProjectTargetDirs 算出覆盖 agents 全部项目读取需求的最少项目目录组合。
+// 目录数相同时优先含 .agents/skills，再按 Catalog 顺序；真实文件放在第一个目录。
+func ProjectTargetDirs(agents []string) ([]string, error) {
+	return projectTargetDirs(nil, agents)
+}
+
+func (l *Library) projectTargetDirs(agents []string) ([]string, error) {
+	return projectTargetDirs(l.custom, agents)
+}
+
+func projectTargetDirs(custom []Agent, agents []string) ([]string, error) {
+	if len(agents) == 0 {
+		return nil, nil
+	}
+	var chosen []Agent
+	for _, id := range agents {
+		a, ok := agentByID(custom, id)
+		if !ok {
+			return nil, errors.New(locales.ImportUnknownAgentId(id))
+		}
+		if len(a.Project) == 0 {
+			return nil, errors.New(locales.ImportChooseAgent())
+		}
+		chosen = append(chosen, a)
+	}
+	// 候选目录排序：.agents/skills 在最前，其余按 Catalog（projectSkillDirs）顺序。
+	dirRank := make(map[string]int, len(projectSkillDirs)+1)
+	dirRank[sharedDir] = 0
+	rank := 1
+	for _, d := range projectSkillDirs {
+		if d != sharedDir {
+			dirRank[d] = rank
+			rank++
+		}
+	}
+	var cand []string
+	for _, a := range chosen {
+		for _, d := range a.Project {
+			if !slices.Contains(cand, d) {
+				if _, ok := dirRank[d]; !ok {
+					dirRank[d] = rank
+					rank++
+				}
+				cand = append(cand, d)
+			}
+		}
+	}
+	slices.SortFunc(cand, func(a, b string) int { return cmp.Compare(dirRank[a], dirRank[b]) })
+
+	// 只读单个目录的 Agent 必须选该目录；先固定下来再对剩余 Agent 做最小集合覆盖。
+	forced := make([]bool, len(cand))
+	candIdx := make(map[string]int, len(cand))
+	for i, d := range cand {
+		candIdx[d] = i
+	}
+	for _, a := range chosen {
+		if len(a.Project) == 1 {
+			forced[candIdx[a.Project[0]]] = true
+		}
+	}
+	var rem []Agent
+	for _, a := range chosen {
+		covered := false
+		for _, d := range a.Project {
+			if forced[candIdx[d]] {
+				covered = true
+				break
+			}
+		}
+		if !covered {
+			rem = append(rem, a)
+		}
+	}
+	extra := make([]bool, len(cand))
+	if len(rem) > 0 {
+		// 每个剩余 Agent 的候选目录索引列表（按 cand 顺序）。
+		remOpts := make([][]int, len(rem))
+		for i, a := range rem {
+			for _, d := range a.Project {
+				remOpts[i] = append(remOpts[i], candIdx[d])
+			}
+		}
+		var avail []int
+		for i := range cand {
+			if !forced[i] {
+				avail = append(avail, i)
+			}
+		}
+		var picked []int
+		var search func(pos, left int, cov []bool) bool
+		search = func(pos, left int, cov []bool) bool {
+			allCov := true
+			for _, c := range cov {
+				if !c {
+					allCov = false
+					break
+				}
+			}
+			if allCov {
+				return true
+			}
+			if left == 0 || pos >= len(avail) {
+				return false
+			}
+			for i := pos; i <= len(avail)-left; i++ {
+				idx := avail[i]
+				next := slices.Clone(cov)
+				gains := false
+				for r, opts := range remOpts {
+					if !next[r] && slices.Contains(opts, idx) {
+						next[r] = true
+						gains = true
+					}
+				}
+				if !gains {
+					continue
+				}
+				picked = append(picked, idx)
+				if search(i+1, left-1, next) {
+					return true
+				}
+				picked = picked[:len(picked)-1]
+			}
+			return false
+		}
+		for k := 1; k <= len(rem); k++ {
+			if search(0, k, make([]bool, len(rem))) {
+				for _, idx := range picked {
+					extra[idx] = true
+				}
+				break
+			}
+		}
+	}
+	var out []string
+	for i, d := range cand {
+		if forced[i] || extra[i] {
+			out = append(out, d)
+		}
+	}
+	return out, nil
+}
+
 // CheckImport 查一个技能装到 p 时的情况。
 func (l *Library) CheckImport(sk *ImportSkill, p ImportPlacement) ImportCheck {
 	if sk.Problem != "" {
@@ -115,28 +321,53 @@ func (l *Library) CheckImport(sk *ImportSkill, p ImportPlacement) ImportCheck {
 	}
 	target, links, err := l.importTargets(sk.Name, p)
 	if err != nil {
+		if p.Project != "" {
+			return ImportCheck{State: ImportInvalid, Blocked: err.Error()}
+		}
 		return ImportCheck{State: ImportNew}
 	}
 	if _, err := os.Lstat(target); err == nil {
-		real, err := realPath(target)
-		if err == nil && sk.Tree != "" {
-			if h, err := TreeHash(real); err == nil && h == sk.Tree {
-				return ImportCheck{State: ImportSame, Existing: target}
+		if (p.Project == "" || !isLink(target)) && matchingImportTree(target, sk) {
+			if p.Project != "" {
+				missing := false
+				for _, link := range links {
+					if !exists(link.path) {
+						missing = true
+					} else if !pointsAt(link.path, target) {
+						return l.conflictCheck(link.path, target, links, p)
+					}
+				}
+				if missing {
+					return ImportCheck{State: ImportNew}
+				}
 			}
+			return ImportCheck{State: ImportSame, Existing: target}
 		}
-		return l.conflictCheck(target, target, links)
+		return l.conflictCheck(target, target, links, p)
 	}
 	for _, k := range links {
 		if _, err := os.Lstat(k.path); err == nil {
-			return l.conflictCheck(k.path, target, links)
+			return l.conflictCheck(k.path, target, links, p)
 		}
 	}
 	return ImportCheck{State: ImportNew}
 }
 
+func matchingImportTree(target string, sk *ImportSkill) bool {
+	if sk.Tree == "" {
+		return false
+	}
+	real, err := realPath(target)
+	if err != nil {
+		return false
+	}
+	hash, err := TreeHash(real)
+	return err == nil && hash == sk.Tree
+}
+
 // conflictCheck 是已有同名时的检查结果：替换要换掉哪些、能不能换，以及它们
 // 现在的样子。
-func (l *Library) conflictCheck(existing, target string, links []importLink) ImportCheck {
+func (l *Library) conflictCheck(existing, target string, links []importLink, p ImportPlacement) ImportCheck {
 	c := ImportCheck{State: ImportConflict, Existing: existing}
 	var stamp []string
 	add := func(p string) {
@@ -156,8 +387,23 @@ func (l *Library) conflictCheck(existing, target string, links []importLink) Imp
 			continue
 		}
 		if !isLink(k.path) && c.Blocked == "" {
-			// Agent 自己目录里的一份不归这次添加管，替换不能顺手扔掉它
-			c.Blocked = locales.ImportReplaceOwnCopy(AgentName(k.agent), l.Display(k.path))
+			if p.Project != "" {
+				relDir, err := filepath.Rel(p.Project, filepath.Dir(k.path))
+				if err != nil {
+					relDir = filepath.Dir(k.path)
+				}
+				relDir = filepath.ToSlash(relDir)
+				var readers []string
+				for _, id := range p.Agents {
+					if a, ok := l.agentByID(id); ok && slices.Contains(a.Project, relDir) {
+						readers = append(readers, a.DisplayName())
+					}
+				}
+				c.Blocked = locales.ImportProjectReplaceOwnCopy(relDir, JoinAnd(readers))
+			} else {
+				// Agent 自己目录里的一份不归这次添加管，替换不能顺手扔掉它
+				c.Blocked = locales.ImportReplaceOwnCopy(AgentName(k.agent), l.Display(k.path))
+			}
 		}
 		add(k.path)
 	}
@@ -233,6 +479,26 @@ func (l *Library) ImportReaders(p ImportPlacement) (chosen, also []string) {
 		}
 		return chosen, nil
 	}
+	if p.Project != "" {
+		for _, a := range l.Agents {
+			if len(a.Project) > 0 && slices.Contains(p.Agents, a.ID) {
+				chosen = append(chosen, a.ID)
+			}
+		}
+		dirs, _ := l.projectTargetDirs(chosen)
+		for _, a := range l.Agents {
+			if slices.Contains(chosen, a.ID) {
+				continue
+			}
+			for _, d := range dirs {
+				if slices.Contains(a.Project, d) {
+					also = append(also, a.ID)
+					break
+				}
+			}
+		}
+		return chosen, also
+	}
 	for _, id := range p.Agents {
 		if installed(id) && !slices.Contains(chosen, id) {
 			chosen = append(chosen, id)
@@ -250,6 +516,51 @@ func (l *Library) ImportReaders(p ImportPlacement) (chosen, also []string) {
 		}
 	}
 	return chosen, also
+}
+
+// ImportProjectPlaceable 是项目模式下能勾选的 Agent：本机装了、在项目里读技能目录的。
+func (l *Library) ImportProjectPlaceable() []string {
+	var out []string
+	for _, a := range l.Agents {
+		if len(a.Project) > 0 {
+			out = append(out, a.ID)
+		}
+	}
+	return out
+}
+
+// ImportProjectDefaultAgents 是项目模式默认勾选的 Agent：本机装了的、能被 .agents/skills 读到的，
+// 加上 Claude Code（装了的话）。
+func (l *Library) ImportProjectDefaultAgents() []string {
+	var out []string
+	for _, a := range l.Agents {
+		if a.ID == "claude-code" || slices.Contains(a.Project, sharedDir) {
+			out = append(out, a.ID)
+		}
+	}
+	return out
+}
+
+// ImportProjectAgentDir 返回项目模式下 id 实际会读的项目内目录（未勾选时是它读的首选目录，
+// 若已选目录已覆盖它则返回已选目录）。
+func (l *Library) ImportProjectAgentDir(id string, p ImportPlacement) string {
+	a, ok := l.agentByID(id)
+	if !ok || len(a.Project) == 0 {
+		return ""
+	}
+	dirs, _ := l.projectTargetDirs(p.Agents)
+	for _, d := range dirs {
+		if slices.Contains(a.Project, d) {
+			return d
+		}
+	}
+	return a.Project[0]
+}
+
+// ImportProjectTargetDirs 返回项目模式下选中的目标目录列表（相对项目根）。
+func (l *Library) ImportProjectTargetDirs(p ImportPlacement) []string {
+	dirs, _ := l.projectTargetDirs(p.Agents)
+	return dirs
 }
 
 // ImportLinkable 是技能库模式下能另外建链接的 Agent：本机装了、不直接读技能库的。
@@ -296,6 +607,9 @@ func (l *Library) InstalledIn(it UpdateItem) string {
 	}
 	return filepath.Base(filepath.Dir(filepath.Dir(it.Record.Place)))
 }
+
+// SamePlace 报告两个路径是否指向同一位置。
+func SamePlace(a, b string) bool { return samePlace(a, b) }
 
 // ImportOutcome 是一个技能的添加结果。
 type ImportOutcome struct {
@@ -374,15 +688,23 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 		return replace != nil && slices.ContainsFunc(replace.Replaces, func(e ImportExisting) bool { return e.Path == p })
 	}
 	// 替换时已经指向目标位置的链接不动，换完照样指向新版
-	kept := func(p string) bool { return replace != nil && p != target && pointsAt(p, target) }
+	reuse := p.Project != "" && replace == nil && len(links) > 0 && !isLink(target) && matchingImportTree(target, sk)
+	kept := func(path string) bool {
+		if path == target {
+			return reuse
+		}
+		return (replace != nil || reuse) && pointsAt(path, target)
+	}
 	for _, q := range append([]string{target}, linkPaths(links)...) {
 		if exists(q) && !replacing(q) && !kept(q) {
 			return ImportOutcome{Conflict: q}
 		}
 	}
-	for _, k := range links {
-		if a, _ := l.agentByID(k.agent); !a.hasHome(l.Home) {
-			return ImportOutcome{Err: errors.New(locales.ImportAgentNotFound(a.DisplayName()))}
+	if p.Project == "" {
+		for _, k := range links {
+			if a, _ := l.agentByID(k.agent); !a.hasHome(l.Home) {
+				return ImportOutcome{Err: errors.New(locales.ImportAgentNotFound(a.DisplayName()))}
+			}
 		}
 	}
 
@@ -427,33 +749,35 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 
 	// 换入：复制到暂存、核对，再不覆盖地改名进去（替换时和已有的原子交换）
 	swap := replacing(target)
-	placed, old, tmp, err := l.placeImport(sk, target, swap)
-	if old != "" {
-		heldItems = append(heldItems, &heldItem{home: l.Home, from: target, at: old, tmp: tmp})
-	}
-	if errors.Is(err, os.ErrExist) {
-		return ImportOutcome{Conflict: target}
-	}
-	if err != nil {
-		return ImportOutcome{Err: fmt.Errorf("%s%w", locales.ImportWriteFailedNoFiles(l.Display(filepath.Dir(target))), err)}
-	}
-	if swap {
-		h := heldItems[0]
-		undo = append(undo, func() {
-			// 目标位置还是我们换进去的：原子换回；不是了（被别的工具动过）就
-			// 放回空出来的位置，再不行移到废纸篓
-			if fi, err := os.Lstat(target); err == nil && os.SameFile(fi, placed) && swapDirectories(h.at, target) == nil {
-				h.restored = true
-				return
-			}
-			h.putBack()
-		})
-	} else {
-		undo = append(undo, func() {
-			if fi, err := os.Lstat(target); err == nil && os.SameFile(fi, placed) {
-				os.RemoveAll(target)
-			}
-		})
+	if !reuse {
+		placed, old, tmp, err := l.placeImport(sk, target, swap)
+		if old != "" {
+			heldItems = append(heldItems, &heldItem{home: l.Home, from: target, at: old, tmp: tmp})
+		}
+		if errors.Is(err, os.ErrExist) {
+			return ImportOutcome{Conflict: target}
+		}
+		if err != nil {
+			return ImportOutcome{Err: fmt.Errorf("%s%w", locales.ImportWriteFailedNoFiles(l.Display(filepath.Dir(target))), err)}
+		}
+		if swap {
+			h := heldItems[0]
+			undo = append(undo, func() {
+				// 目标位置还是我们换进去的：原子换回；不是了（被别的工具动过）就
+				// 放回空出来的位置，再不行移到废纸篓
+				if fi, err := os.Lstat(target); err == nil && os.SameFile(fi, placed) && swapDirectories(h.at, target) == nil {
+					h.restored = true
+					return
+				}
+				h.putBack()
+			})
+		} else {
+			undo = append(undo, func() {
+				if fi, err := os.Lstat(target); err == nil && os.SameFile(fi, placed) {
+					os.RemoveAll(target)
+				}
+			})
+		}
 	}
 	real, err := realPath(target)
 	if err != nil {
@@ -464,9 +788,11 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 	// 上的旧链接先挪开，最后和旧版一起移到废纸篓。
 	var made []importLink
 	if len(links) > 0 {
-		l.loadNativeData()
-		if l.nativeErr != nil {
-			return ImportOutcome{Err: l.nativeErr}
+		if p.Project == "" {
+			l.loadNativeData()
+			if l.nativeErr != nil {
+				return ImportOutcome{Err: l.nativeErr}
+			}
 		}
 		prev := map[string]*string{} // 改之前本应用建的链接里这一项的值，没有为 nil
 		for _, k := range links {
@@ -491,13 +817,22 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 			}
 			rel, err := filepath.Rel(from, real)
 			if err != nil {
+				if p.Project != "" {
+					return ImportOutcome{Err: err}
+				}
 				rel = real
 			}
-			if err := makeLink(rel, k.path); err != nil {
+			var linkErr error
+			if p.Project != "" {
+				linkErr = makeSymlink(rel, k.path)
+			} else {
+				linkErr = makeLink(rel, k.path)
+			}
+			if linkErr != nil {
 				if exists(k.path) {
 					return ImportOutcome{Conflict: k.path}
 				}
-				return ImportOutcome{Err: err}
+				return ImportOutcome{Err: linkErr}
 			}
 			// 撤回时认链接本身（同一个文件、同样的指向），不解析它指向哪里：
 			// 新版被别的工具挪走时它悬空了，但仍是这次建的，要删掉好让旧链接回来
@@ -514,15 +849,17 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 					}
 				}
 			})
-			if was, ok := l.nativeData.Links[k.path]; ok {
-				prev[k.path] = &was
-			} else {
-				prev[k.path] = nil
+			if p.Project == "" {
+				if was, ok := l.nativeData.Links[k.path]; ok {
+					prev[k.path] = &was
+				} else {
+					prev[k.path] = nil
+				}
+				l.nativeData.Links[k.path] = real
 			}
-			l.nativeData.Links[k.path] = real
 			made = append(made, k)
 		}
-		if len(made) > 0 {
+		if len(made) > 0 && p.Project == "" {
 			if err := l.saveNativeData(); err != nil {
 				return ImportOutcome{Err: err}
 			}
@@ -579,7 +916,7 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 	}
 
 	// 应用记录（和更新的应用状态同一份）
-	mark := importMark{Name: sk.Name, Place: target, Library: p.Library, Links: linkPaths(made), Agents: slices.Clone(p.Agents),
+	mark := importMark{Name: sk.Name, Place: target, Library: p.Library, Project: p.Project, Links: linkPaths(made), Agents: slices.Clone(p.Agents),
 		Tree: sk.Tree, At: time.Now()}
 	switch src.Kind {
 	case ImportGitHub:
@@ -639,6 +976,15 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 			l.updates, l.updatesErr = st, nil
 		}
 	})
+
+	if p.Project != "" && l.KnownProject(p.Project) == nil && !slices.ContainsFunc(readManual(l.Home), func(m manualProject) bool {
+		return samePlace(m.Dir, p.Project)
+	}) {
+		if err := l.AddProjects([]string{p.Project}); err != nil {
+			return ImportOutcome{Err: err}
+		}
+		undo = append(undo, func() { _ = l.RemoveProjects([]string{p.Project}) })
+	}
 
 	// 最后一步：换下来的移到废纸篓，旧链接在前、旧版最后。任何一项移不进去
 	// 就整个撤回：已经进了废纸篓的旧链接照原样重建，旧版换回原处。
@@ -913,6 +1259,7 @@ type importMark struct {
 	Tree    string    `json:"tree"`             // 装进去的目录哈希
 	Place   string    `json:"place"`            // 文件所在的目录
 	Library bool      `json:"library,omitempty"`
+	Project string    `json:"project,omitempty"`
 	Agents  []string  `json:"agents,omitempty"`
 	Links   []string  `json:"links,omitempty"` // 本次建的链接
 	At      time.Time `json:"at"`
@@ -923,9 +1270,9 @@ type importMark struct {
 const appRecordFile = "app:imports"
 
 // tracked 报告这条应用记录要由「更新」页按应用记录追踪：「指定的 Agent」
-// 模式装进 Agent 目录的 GitHub 技能。技能库里的按安装记录追踪，不在这里。
+// 模式装进 Agent 目录的 GitHub 技能。技能库和项目里的不在这里。
 func (m importMark) tracked(root string) bool {
-	return !m.Library && m.Source.Type == "github" && !samePlace(filepath.Dir(m.Place), root)
+	return !m.Library && m.Project == "" && m.Source.Type == "github" && !samePlace(filepath.Dir(m.Place), root)
 }
 
 // entry 把应用记录写成和安装记录一样的条目，「更新」页统一处理。Raw 是
@@ -1019,10 +1366,11 @@ func (l *Library) restoreImportMarks(marks []importMark) error {
 
 // RecentImport 是最近添加的一个技能。
 type RecentImport struct {
-	Name   string
-	Source SourceID // Type 是 github、well-known 或 local；local 的 Repo 是本机路径
-	Place  string
-	At     time.Time
+	Project string
+	Name    string
+	Source  SourceID // Type 是 github、well-known 或 local；local 的 Repo 是本机路径
+	Place   string
+	At      time.Time
 }
 
 // RecentImports 是最近添加的技能，新的在前，最多 n 个；文件已经不在的不列。
@@ -1030,7 +1378,7 @@ func (l *Library) RecentImports(n int) []RecentImport {
 	var out []RecentImport
 	for _, m := range l.updateState().Imports {
 		if exists(m.Place) {
-			out = append(out, RecentImport{m.Name, m.Source, m.Place, m.At})
+			out = append(out, RecentImport{Name: m.Name, Source: m.Source, Place: m.Place, Project: m.Project, At: m.At})
 		}
 	}
 	slices.SortStableFunc(out, func(a, b RecentImport) int { return b.At.Compare(a.At) })

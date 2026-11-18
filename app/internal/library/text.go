@@ -50,3 +50,15 @@ func JoinAnd(items []string) string {
 	last := len(items) - 1
 	return locales.ListAnd(strings.Join(items[:last], locales.ListSeparator()), items[last])
 }
+
+// JoinOr 列举几项：「A 或 B」「A、B 或 C」/「A or B」「A, B or C」。
+func JoinOr(items []string) string {
+	switch len(items) {
+	case 0:
+		return ""
+	case 1:
+		return items[0]
+	}
+	last := len(items) - 1
+	return locales.ListOr(strings.Join(items[:last], locales.ListSeparator()), items[last])
+}

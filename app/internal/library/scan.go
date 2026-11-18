@@ -130,12 +130,17 @@ func (sc *scanner) scan() {
 	var projEntries []projEntry
 	projectOwned := map[string]bool{}
 	for _, p := range projects {
+		root, err := realPath(p.Dir)
+		if err != nil {
+			continue
+		}
 		for _, rel := range projectSkillDirs {
 			for _, e := range sc.list(filepath.Join(p.Dir, rel)) {
-				projEntries = append(projEntries, projEntry{e, p, rel})
-				if !e.link || strings.HasPrefix(e.real, p.Dir+string(filepath.Separator)) {
-					projectOwned[e.real] = true
+				if !isUnderDir(e.real, root) || !isUnderDir(underRealDir(e.path), root) {
+					continue
 				}
+				projEntries = append(projEntries, projEntry{e, p, rel})
+				projectOwned[e.real] = true
 			}
 		}
 	}
@@ -220,9 +225,6 @@ func (sc *scanner) scan() {
 	byReal := map[string]*Skill{}
 	inDir := map[*ProjectInfo]map[string][]*Skill{}
 	for _, e := range projEntries {
-		if !projectOwned[e.real] {
-			continue
-		}
 		s := byReal[e.real]
 		if s == nil {
 			s = &Skill{
@@ -243,6 +245,9 @@ func (sc *scanner) scan() {
 			byReal[e.real] = s
 			project = append(project, s)
 			e.project.Skills = append(e.project.Skills, s)
+		}
+		if e.link && !e.nested {
+			s.projectLinks = append(s.projectLinks, e.path)
 		}
 		for _, ag := range projectReaders[e.rel] {
 			r := Read{ag, e.rel, false}
@@ -541,17 +546,7 @@ func (sc *scanner) projects() (out []*ProjectInfo, auto map[string]bool) {
 	manual := map[string]bool{}
 	auto = map[string]bool{}
 	clean := func(p string) string {
-		if p == "" || !filepath.IsAbs(p) {
-			return ""
-		}
-		p = canonicalProjectDir(p)
-		if p == canonicalProjectDir(sc.home) || p == "/" {
-			return ""
-		}
-		if fi, err := os.Stat(p); err != nil || !fi.IsDir() {
-			return ""
-		}
-		return p
+		return cleanProjectDir(sc.home, p)
 	}
 	add := func(p string, t time.Time) {
 		if old, ok := used[p]; !ok || t.After(old) {
@@ -684,8 +679,11 @@ func (sc *scanner) projects() (out []*ProjectInfo, auto map[string]bool) {
 		}
 	}
 
+	sc.lib.knownProjects = make(map[string]*ProjectInfo, len(used))
 	for p, t := range used {
-		out = append(out, &ProjectInfo{Name: filepath.Base(p), Dir: p, Used: t, Manual: manual[p]})
+		project := &ProjectInfo{Name: filepath.Base(p), Dir: p, Used: t, Manual: manual[p]}
+		sc.lib.knownProjects[p] = project
+		out = append(out, project)
 	}
 	slices.SortFunc(out, func(a, b *ProjectInfo) int { return strings.Compare(a.Dir, b.Dir) })
 	sc.lib.Discovery.Took = time.Since(start)
@@ -849,6 +847,38 @@ func readManualFile(home string) ([]manualProject, string) {
 	}
 	cfg, moved := readJSON(manualFile(home), cfg)
 	return cfg.Projects, moved
+}
+
+// cleanProjectDir 规范化项目目录；家目录本身、根目录或不存在的目录返回空。
+func cleanProjectDir(home, p string) string {
+	if p == "" || !filepath.IsAbs(p) {
+		return ""
+	}
+	p = canonicalProjectDir(p)
+	if p == canonicalProjectDir(home) || filepath.Dir(p) == p {
+		return ""
+	}
+	if fi, err := os.Stat(p); err != nil || !fi.IsDir() {
+		return ""
+	}
+	return p
+}
+
+// ValidProjectDir 报告 p 能不能作为项目目录（不能是家目录本身或根目录），返回规范化后的路径。
+func (l *Library) ValidProjectDir(p string) (string, bool) {
+	if l == nil {
+		return "", false
+	}
+	c := cleanProjectDir(l.Home, p)
+	if c == "" {
+		return "", false
+	}
+	real, err := realPath(c)
+	home, _ := realPath(l.Home)
+	if err != nil || samePlace(real, home) || filepath.Dir(real) == real {
+		return "", false
+	}
+	return c, true
 }
 
 // AddProjects 记下用户手动加的项目目录，重新扫描后列出。

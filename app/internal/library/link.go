@@ -27,6 +27,11 @@ func makeLink(target, dst string) error {
 	return makeLinkPlatform(target, dst)
 }
 
+// makeSymlink 在 dst 建一个指向 target 的符号链接，不退回目录联接。
+func makeSymlink(target, dst string) error {
+	return makeSymlinkPlatform(target, dst)
+}
+
 // realPath 解开 p 里所有的链接，返回真实路径。路径不存在时返回错误，
 // 和 filepath.EvalSymlinks 一致。
 func realPath(p string) (string, error) {

@@ -299,7 +299,7 @@ func (l *Library) CanMerge(s *Skill) bool {
 func (l *Library) Merge(s *Skill, keep int) (_ MergeResult, err error) {
 	defer l.track("tidy", "merge", s.Name)(&err)
 	var r MergeResult
-	if s.ReadOnly() || keep < 0 || keep >= len(s.versions) {
+	if s.Source != Mine || keep < 0 || keep >= len(s.versions) {
 		return r, errors.New(locales.CopiesNothingToMerge())
 	}
 	release, err := lockSkill(s.Name)

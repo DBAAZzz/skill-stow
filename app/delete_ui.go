@@ -99,7 +99,7 @@ func (a *app) undoDelete() {
 	}
 	a.del.last = nil
 	a.dismissToast(fromDelete)
-	if s := a.lib.Get(d.Names[0]); s != nil {
+	if s := a.lib.ByID(d.FirstSkillID()); s != nil {
 		a.selected, a.coll = s, nil
 	}
 }
@@ -119,7 +119,13 @@ func (a *app) nextSelection(gone []*library.Skill) *library.Skill {
 		return a.selected
 	}
 	same := bySource(a.lib.Skills, a.selected.Source)
+	if p := a.project(); p != nil {
+		same = p.Skills
+	}
 	i := slices.Index(same, a.selected)
+	if i < 0 {
+		return nil
+	}
 	for _, s := range slices.Concat(same[i+1:], reverse(same[:i])) {
 		if !slices.Contains(gone, s) {
 			return s
@@ -274,6 +280,25 @@ func (a *app) confirmDeleteDialog(c *ui.Context) {
 			a.batchImpacts(c, skills, impacts)
 		} else {
 			a.skillImpacts(c, impacts[skills[0]])
+			if s := skills[0]; s.Source == library.Project {
+				if gl := s.GlobalLinks(); len(gl) > 0 {
+					var dirs []string
+					for _, p := range gl {
+						d := a.lib.Display(filepath.Dir(p))
+						if !slices.Contains(dirs, d) {
+							dirs = append(dirs, d)
+						}
+					}
+					var agents []string
+					for _, id := range s.Enabled {
+						if name := library.AgentName(id); !slices.Contains(agents, name) {
+							agents = append(agents, name)
+						}
+					}
+					ui.Text(c, locales.DeleteGlobalLinksNote(len(gl), joinNames(dirs), joinNames(agents))).
+						FontSize(12).LineHeight(1.5).TextColor(colTextSecondary).Margin(10, 0, 0, 0)
+				}
+			}
 		}
 	}, func() {
 		cancel := dialogButton(c, locales.ActionCancel(), false).AutoFocus()
@@ -313,7 +338,9 @@ func (a *app) impactText(im library.Impact) string {
 	switch im.Kind {
 	case library.ImpactShared:
 		where := locales.NavLibrary()
-		if im.Dir != a.lib.Root {
+		if im.Dir == library.SharedDir {
+			where = locales.AgentsSharedDirectory()
+		} else if im.Dir != a.lib.Root {
 			where = a.lib.Display(im.Dir)
 		}
 		return locales.DeleteImpactReads(where)

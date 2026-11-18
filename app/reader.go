@@ -168,6 +168,8 @@ func (a *app) strip(c *ui.Context, s *library.Skill) {
 	ui.Row(c).Height(38).Shrink(0).Padding(0, 28).Gap(8).AlignItems(ui.Center).
 		BorderWidth(0, 0, 1, 0).BorderColor(colBorderSubtle).TextColor(colTextSecondary).Children(func() {
 		switch {
+		case s.Source == library.Project:
+			ui.Text(c, s.Origin()).FontSize(12)
 		case s.ReadOnly():
 			ui.Text(c, s.Origin()).FontSize(12)
 			readOnlyTag(c)

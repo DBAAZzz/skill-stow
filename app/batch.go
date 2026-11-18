@@ -52,7 +52,7 @@ func (a *app) setBatchPicked(skills []*library.Skill, on bool) {
 // pickState 是一组技能的勾选情况：勾了几个、能勾几个。
 func (a *app) pickState(skills []*library.Skill) (picked, can int) {
 	for _, s := range skills {
-		if s.ReadOnly() || !a.pickable(s) {
+		if s.Source != library.Mine || !a.pickable(s) {
 			continue
 		}
 		can++
@@ -102,7 +102,7 @@ func (a *app) batchSelection(shown []*library.Skill) batchSelection {
 		}
 	}
 	for _, s := range rest {
-		can := !s.ReadOnly() && a.pickable(s)
+		can := s.Source == library.Mine && a.pickable(s)
 		sel.blocked = sel.blocked || !can
 		if !can {
 			continue
@@ -280,7 +280,7 @@ func batchCheck(c *ui.Context, on, part, can bool) {
 // unpickableWhy 是选择态下 s 勾不上的原因，用作卡片的悬停提示。
 func (a *app) unpickableWhy(s *library.Skill) string {
 	switch {
-	case s.ReadOnly():
+	case s.Source != library.Mine:
 		return locales.BatchReadOnlyCannotDelete()
 	case !a.pickable(s):
 		return copiesRule()
@@ -290,7 +290,7 @@ func (a *app) unpickableWhy(s *library.Skill) string {
 
 // batchSkill 是选择态下技能卡片的点击：勾上或取消。返回它勾没勾、能不能勾。
 func (a *app) batchSkill(card ui.Element, s *library.Skill) (on, can bool) {
-	can = !s.ReadOnly() && a.pickable(s)
+	can = s.Source == library.Mine && a.pickable(s)
 	on = can && a.batch.picked[s.ID]
 	if can && card.Clicked() {
 		on = !on
@@ -321,7 +321,7 @@ func (a *app) pruneBatchPicked(shown []*library.Skill) {
 	}
 	keep := map[string]bool{}
 	for _, s := range a.shownForBatch(shown) {
-		if !s.ReadOnly() && a.pickable(s) {
+		if s.Source == library.Mine && a.pickable(s) {
 			keep[s.ID] = true
 		}
 	}

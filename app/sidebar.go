@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"runtime"
+	"slices"
 	"strings"
 	"time"
 
@@ -194,10 +195,10 @@ func (a *app) projectItems(c *ui.Context) {
 	more := total > recentProjects
 	if more && !a.allProjects {
 		projects = projects[:recentProjects]
-		// 选中的项目不在最近几个里时也要列出来
-		if p := a.project(); p != nil && !containsProject(projects, p) {
-			projects = append(projects, p)
-		}
+	}
+	// 删掉最后一个技能后，正在查看的项目也要留在侧边栏。
+	if p := a.project(); p != nil && !containsProject(projects, p) {
+		projects = append(slices.Clone(projects), p)
 	}
 	for _, p := range projects {
 		id := projectScope(p)
@@ -234,7 +235,7 @@ func (a *app) project() *library.ProjectInfo {
 	if !ok {
 		return nil
 	}
-	return a.lib.Project(dir)
+	return a.lib.KnownProject(dir)
 }
 
 // chooseProjects 打开系统的选择文件夹面板（可多选），选中的目录记成项目，

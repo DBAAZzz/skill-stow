@@ -135,7 +135,7 @@ func (a *app) historyTarget(d int) int {
 
 // exists 报告这一页还在不在：项目没移除，集合、技能没删。
 func (a *app) exists(p place) bool {
-	if dir, ok := strings.CutPrefix(p.scope, projectPrefix); ok && a.lib.Project(dir) == nil {
+	if dir, ok := strings.CutPrefix(p.scope, projectPrefix); ok && a.lib.KnownProject(dir) == nil {
 		return false
 	}
 	if p.set != "" && a.lib.CollectionByID(p.set) == nil {

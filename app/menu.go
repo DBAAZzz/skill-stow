@@ -337,6 +337,7 @@ type menuItemOpts struct {
 	checkMark  bool
 	trailCheck bool
 	checked    bool
+	iconMuted  bool
 	activeBg   bool
 	roleCheck  bool
 	roleRadio  bool
@@ -358,6 +359,8 @@ func withDanger() menuOpt                  { return func(o *menuItemOpts) { o.da
 func withMuted() menuOpt                   { return func(o *menuItemOpts) { o.muted = true } }
 func withKeepOpen() menuOpt                { return func(o *menuItemOpts) { o.keepOpen = true } }
 func withTrailCheck() menuOpt              { return func(o *menuItemOpts) { o.trailCheck = true } }
+func withChecked(v bool) menuOpt           { return func(o *menuItemOpts) { o.checkMark = true; o.checked = v; o.activeBg = v } }
+func withIconMuted() menuOpt               { return func(o *menuItemOpts) { o.iconMuted = true } }
 func withActiveBg() menuOpt                { return func(o *menuItemOpts) { o.activeBg = true } }
 
 func (fm *frostedMenu) triggered(el ui.Element, o menuItemOpts) bool {
@@ -503,6 +506,8 @@ func (fm *frostedMenu) row(label string, o menuItemOpts) ui.Element {
 		iconFg = colDangerText
 	} else if o.disabled {
 		iconFg = colTextDisabled
+	} else if o.iconMuted {
+		iconFg = colTextDisabled
 	}
 
 	el.Children(func() {
@@ -541,8 +546,12 @@ func (fm *frostedMenu) row(label string, o menuItemOpts) ui.Element {
 		if o.shortcut != "" {
 			ui.Text(c, o.shortcut).FontSize(menuSubSize).TextColor(colTextMuted).SingleLine().Shrink(0)
 		}
-		if o.trailCheck && o.checked {
-			ui.Icon(c, iconCheck).Size(13, 13).TextColor(colTextPrimary).Shrink(0)
+		if o.trailCheck {
+			if o.checked {
+				ui.Icon(c, iconCheck).Size(13, 13).TextColor(colTextPrimary).Shrink(0)
+			} else {
+				ui.Box(c).Size(13, 13).Shrink(0)
+			}
 		}
 		if o.isSub {
 			ui.Icon(c, iconChevronRight).Size(12, 12).TextColor(colTextMuted).Shrink(0)

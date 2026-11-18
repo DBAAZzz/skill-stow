@@ -850,3 +850,118 @@ func TestImportDetailKeepsTheFileTotalWhenTheFilesTabShowsFewer(t *testing.T) {
 	// Then 页签写可预览的 2 个，路径旁仍写出一共 3 个文件
 	wantTexts(t, tt, "文件 2", "3 个文件")
 }
+
+func TestProjectImportAndDeleteFlow(t *testing.T) {
+	a, tt, h := importApp(t)
+	proj := h("code/my-app")
+	must(t, os.MkdirAll(proj, 0o755))
+	must(t, a.lib.AddProjects([]string{proj}))
+	writeTestSkill(t, filepath.Join(proj, ".claude/skills/existing-skill"), "已有技能", "# existing")
+	a.rescan()
+	tt.Frame()
+
+	// 从项目页打开导入页，装到预设为该项目
+	must(t, tt.Click("my-app"))
+	if !tt.HasText("添加技能") || tt.HasText("只读") {
+		t.Fatalf("项目页应有「添加技能」且无「只读」：%v", tt.Texts())
+	}
+	a.openImportForProject(proj)
+	tt.Frame()
+	if a.scope != scopeImport || a.imp.place.Project != proj {
+		t.Fatalf("应打开添加页并预设项目 %q，实际 scope=%q place=%+v", proj, a.scope, a.imp.place)
+	}
+
+	// 读取本地技能并添加到项目
+	src := h("Downloads/proj-skill")
+	writeTestSkill(t, src, "项目新技能", "# proj")
+	a.importPaths([]string{src})
+	waitUntil(t, 5*time.Second, "等待读取本地技能", func() bool { tt.Frame(); return tt.HasText("添加 1 个技能") })
+
+	must(t, tt.Click("添加 1 个技能"))
+	waitUntil(t, 5*time.Second, "等待添加到项目完成", func() bool { tt.Frame(); return tt.HasText("在「my-app」中查看") })
+	wantTexts(t, tt, "已放进 my-app/.agents/skills/proj-skill。", "项目里的技能暂不参与更新。")
+
+	// 点「在「my-app」中查看」回到项目页并选中该技能
+	must(t, tt.Click("在「my-app」中查看"))
+	if a.selected == nil || a.selected.Name != "proj-skill" {
+		t.Fatalf("应回到项目页并选中 proj-skill，实际 selected=%+v", a.selected)
+	}
+
+	// 在项目页删掉它
+	a.requestDelete(a.selected)
+	tt.Frame()
+	wantTexts(t, tt, "删除 proj-skill？")
+	must(t, tt.Click("移到废纸篓"))
+	waitUntil(t, 5*time.Second, "等待删除完成", func() bool { tt.Frame(); return a.lib.Project(proj) != nil && len(a.lib.Project(proj).Skills) == 1 })
+}
+
+func TestRecentProjectImportOpensInstalledCopy(t *testing.T) {
+	a, tt, h := importApp(t)
+	proj := h("work")
+	must(t, os.MkdirAll(proj, 0755))
+	writeTestSkill(t, h("Downloads/demo"), "Project copy", "")
+	writeTestSkill(t, h(".agents/skills/demo"), "Global copy", "")
+	b, err := library.ReadLocalImport(a.lib.Home, []string{h("Downloads/demo")})
+	must(t, err)
+	defer b.Discard()
+	out := a.lib.AddImport(b, []string{"demo"}, library.ImportPlacement{Project: proj, Agents: []string{"codex"}}, nil)
+	if !out[0].Added {
+		t.Fatal(out)
+	}
+	a.rescan()
+	a.openImport()
+	tt.Frame()
+	must(t, tt.Click("demo"))
+	if a.selected == nil || a.selected.Real != out[0].Place || a.scope != projectScope(a.lib.Project(proj)) {
+		t.Fatalf("recent item opened %v in %q", a.selected, a.scope)
+	}
+}
+
+func TestProjectDeleteSelectionStaysInProjectAndUndoSelectsOriginal(t *testing.T) {
+	a, _, h := importApp(t)
+	for _, dir := range []string{".agents/skills/demo", "work/.agents/skills/demo", "other/.agents/skills/another"} {
+		writeTestSkill(t, h(dir), "description", "")
+	}
+	must(t, a.lib.AddProjects([]string{h("work"), h("other")}))
+	a.rescan()
+	p := a.lib.Project(h("work"))
+	a.scope, a.selected = projectScope(p), p.Skills[0]
+	id := a.selected.ID
+	a.requestDelete(a.selected)
+	a.doDelete()
+	if a.project() == nil {
+		t.Error("deleting the last project skill left the project page")
+	}
+	if a.selected != nil {
+		t.Errorf("selected a skill from %q after deleting the project's last skill", a.selected.ProjectDir)
+	}
+	a.undoDelete()
+	if a.selected == nil || a.selected.ID != id {
+		t.Fatalf("did not select the restored project skill %q", id)
+	}
+}
+
+func TestImportMenuOffersRegisteredEmptyProject(t *testing.T) {
+	a, tt, h := importApp(t)
+	must(t, os.MkdirAll(h("work/empty-project"), 0755))
+	must(t, a.lib.AddProjects([]string{h("work/empty-project")}))
+	a.rescan()
+	writeTestSkill(t, h("Downloads/demo"), "description", "")
+	a.importPaths([]string{h("Downloads/demo")})
+	tt.Frame()
+	must(t, tt.Click("技能库（通用）"))
+	r, ok := tt.Find("放进某个项目，只在这个项目里生效")
+	if !ok {
+		t.Fatal("missing project submenu")
+	}
+	tt.Move(r.X+r.W/2, r.Y+r.H/2)
+	tt.Advance(300 * time.Millisecond)
+	tt.Frame()
+	if !tt.HasText("添加项目…") {
+		t.Fatal("project submenu did not open")
+	}
+	must(t, tt.Click("empty-project"))
+	if a.imp.place.Project != h("work/empty-project") {
+		t.Fatal(a.imp.place)
+	}
+}

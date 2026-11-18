@@ -36,7 +36,7 @@
   "@deleteUndoExpired": {
     "description": "删除：撤销时那份已经清掉了"
   },
-  "deleteReadOnly": "内置和项目技能不能删除",
+  "deleteReadOnly": "内置和插件技能不能删除",
   "@deleteReadOnly": {
     "description": "删除：只读技能"
   },
@@ -7231,6 +7231,133 @@
     "description": "本地安全检查：整理页忽略没检查完之后的提示，带撤销",
     "placeholders": {
       "name": {
+        "type": "String"
+      }
+    }
+  },
+  "importPlaceProjectDetail": "放进某个项目，只在这个项目里生效",
+  "@importPlaceProjectDetail": {
+    "description": "添加技能「装到」菜单：项目选项的说明"
+  },
+  "importProjectConflictExisting": "{project} 里已经有 {name}，内容和这份不一致。",
+  "@importProjectConflictExisting": {
+    "description": "添加到项目时已有同名且内容不同的冲突标题",
+    "placeholders": {
+      "project": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "importProjectAgentSubtitle": "按它们在项目里读的目录放",
+  "@importProjectAgentSubtitle": {
+    "description": "添加技能「谁会读到」菜单（项目模式）：标题旁说明"
+  },
+  "importProjectAlsoReads": "{agents} 也读 {dirs}",
+  "@importProjectAlsoReads": {
+    "description": "添加技能「谁会读到」菜单（项目模式）：顺带也会读到的说明",
+    "placeholders": {
+      "agents": {
+        "type": "String"
+      },
+      "dirs": {
+        "type": "String"
+      }
+    }
+  },
+  "listOr": "{rest} 或 {last}",
+  "@listOr": {
+    "description": "列举最后两项之间用「或」连接",
+    "placeholders": {
+      "rest": {
+        "type": "String"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  },
+  "importViewInProject": "在「{project}」中查看",
+  "@importViewInProject": {
+    "description": "添加到项目完成后顶栏的主按钮",
+    "placeholders": {
+      "project": {
+        "type": "String"
+      }
+    }
+  },
+  "importProjectSourceLocal": "来源记为 {path}，项目里的技能暂不参与更新。",
+  "@importProjectSourceLocal": {
+    "description": "添加到项目后（本地来源）详情栏状态块的来源说明",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "importProjectSourceWebsite": "来源记为 {site}，项目里的技能暂不参与更新。",
+  "@importProjectSourceWebsite": {
+    "description": "添加到项目后（网站来源）详情栏状态块的来源说明",
+    "placeholders": {
+      "site": {
+        "type": "String"
+      }
+    }
+  },
+  "importProjectSourceGitHub": "来源记为 {repo}（{commit}），项目里的技能暂不参与更新。",
+  "@importProjectSourceGitHub": {
+    "description": "添加到项目后（GitHub 来源）详情栏状态块的来源说明",
+    "placeholders": {
+      "repo": {
+        "type": "String"
+      },
+      "commit": {
+        "type": "String"
+      }
+    }
+  },
+  "importProjectReplaceOwnCopy": "{dir} 里的这一份是文件夹，不是链接，替换不会动它。先在 Finder 里处理掉，或者在「谁会读到」里不勾 {agents}。",
+  "@importProjectReplaceOwnCopy": {
+    "description": "添加到项目时链接位置已有真实文件夹，无法替换的提示",
+    "placeholders": {
+      "dir": {
+        "type": "String"
+      },
+      "agents": {
+        "type": "String"
+      }
+    }
+  },
+  "importProjectSymlinkPermission": "需要同时放进多个目录，但系统拒绝创建符号链接。请打开 Windows 开发者模式，或只勾选读取同一目录的 Agent。",
+  "@importProjectSymlinkPermission": {
+    "description": "Windows 上没有权限建符号链接时添加到项目失败的提示"
+  },
+  "importProjectDirectoryOutside": "{dir} 指向项目外，请选择项目内的技能目录。",
+  "@importProjectDirectoryOutside": {
+    "description": "项目技能目录指向项目外时的提示",
+    "placeholders": { "dir": { "type": "String" } }
+  },
+  "deleteProjectLocationChanged": "项目技能的位置已变化，请重新扫描后再删除。",
+  "@deleteProjectLocationChanged": {
+    "description": "项目技能的实际路径与扫描记录不一致时取消删除"
+  },
+  "projectInvalidFolder": "请选择现有的项目文件夹，家目录和根目录不能作为项目。",
+  "@projectInvalidFolder": {
+    "description": "添加项目时选了用户主目录或根目录的提示"
+  },
+  "deleteGlobalLinksNote": "{count, plural, =1 {其中一个链接在 {dirs}，是全局链接。删掉后，{agents} 在任何项目里都读不到它。} other {其中 {count} 个链接在 {dirs}，是全局链接。删掉后，{agents} 在任何项目里都读不到它。}}",
+  "@deleteGlobalLinksNote": {
+    "description": "删除项目技能时还有全局链接指向它的说明",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "dirs": {
+        "type": "String"
+      },
+      "agents": {
         "type": "String"
       }
     }
