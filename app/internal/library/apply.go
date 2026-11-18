@@ -152,11 +152,13 @@ func downloadUpdateFiles(ctx context.Context, remote Remote, it UpdateItem, dir 
 	close(jobs)
 
 	var (
-		mu       sync.Mutex
-		total    int
-		done     int
-		firstErr error
-		wg       sync.WaitGroup
+		mu    sync.Mutex
+		total int
+		done  int
+		// 进度回调在 progressMu 里按顺序调用：并发下载时先数先报，进度条不会倒退
+		progressMu sync.Mutex
+		firstErr   error
+		wg         sync.WaitGroup
 	)
 	workers := min(downloadWorkers, totalFiles)
 	wg.Add(workers)
@@ -211,11 +213,10 @@ func downloadUpdateFiles(ctx context.Context, remote Remote, it UpdateItem, dir 
 					return
 				}
 				if progress != nil {
-					mu.Lock()
+					progressMu.Lock()
 					done++
-					d := done
-					mu.Unlock()
-					progress(d, totalFiles)
+					progress(done, totalFiles)
+					progressMu.Unlock()
 				}
 			}
 		}()
