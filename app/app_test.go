@@ -881,9 +881,18 @@ func setupProjectImportSnapshot(t *testing.T, a *app, projName string) {
 // 测试出的是深色版：SNAPSHOT_DARK=1 SNAPSHOT_DIR=… go test -run Snapshot .
 var snapshotDark = os.Getenv("SNAPSHOT_DARK") != ""
 
-// newUITester 是 ui.NewTester，按 snapshotDark 定深浅色。
+// snapshotLang 是截图的界面语言（SNAPSHOT_LANG=en），空为源语言简体中文。
+// 只配合 -run Snapshot 用：其余测试按中文找控件，换了语言会失败。
+var snapshotLang = os.Getenv("SNAPSHOT_LANG")
+
+// newUITester 是 ui.NewTester，按 snapshotDark 定深浅色、按 snapshotLang 定语言。
 func newUITester(view func(*ui.Context), width, height int) *ui.Tester {
-	return ui.NewTesterWith(view, width, height, ui.TesterOptions{Dark: snapshotDark})
+	tt := ui.NewTesterWith(view, width, height, ui.TesterOptions{Dark: snapshotDark})
+	if snapshotLang != "" {
+		testLocale.Store(snapshotLang)
+		tt.SetLocale(snapshotLang)
+	}
+	return tt
 }
 
 func writePNG(t *testing.T, file string, tt *ui.Tester) {

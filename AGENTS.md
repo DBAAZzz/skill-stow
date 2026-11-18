@@ -14,7 +14,8 @@ go tool mygo dev                  # 本机真实数据（会写 Agent 配置，�
 go test ./...                     # 无窗口；扫描用临时目录造的假 home
 go tool mygo build                # 打包 .app / .dmg 到 build/
 
-# 各页 2x 截图；加 SNAPSHOT_DARK=1 出深色版，加 SNAPSHOT_REAL=1 用本机真实数据（只读）
+# 各页 2x 截图；加 SNAPSHOT_DARK=1 出深色版，加 SNAPSHOT_REAL=1 用本机真实数据（只读），
+# 加 SNAPSHOT_LANG=en 出英文版（按中文找按钮的几张会失败，属预期）
 mkdir -p /tmp/shots && SNAPSHOT_DIR=/tmp/shots go test -run Snapshots .
 ```
 
