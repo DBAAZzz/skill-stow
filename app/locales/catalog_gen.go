@@ -17132,7 +17132,7 @@ func (msgs Messages) SettingsAutoCheckAppUpdates() string {
 	return Catalog.Format(msgs.locale, "settingsAutoCheckAppUpdates", nil)
 }
 
-// SettingsAutoCheckAppUpdatesHint says "每天在后台向 GitHub 查一次新版本。关闭时只在你点击「检查更新…」时联网。"
+// SettingsAutoCheckAppUpdatesHint says "打开后，每次启动和之后每天在后台向 GitHub …"
 // in the language the app shows.
 //
 // 设置 › 通用 › 应用更新：自动检查开关的说明
@@ -17140,7 +17140,7 @@ func SettingsAutoCheckAppUpdatesHint() string {
 	return In(i18n.Locale()).SettingsAutoCheckAppUpdatesHint()
 }
 
-// SettingsAutoCheckAppUpdatesHint says "每天在后台向 GitHub 查一次新版本。关闭时只在你点击「检查更新…」时联网。"
+// SettingsAutoCheckAppUpdatesHint says "打开后，每次启动和之后每天在后台向 GitHub …"
 // in the language of msgs.
 //
 // 设置 › 通用 › 应用更新：自动检查开关的说明
