@@ -70,6 +70,18 @@ When the app runs on your real data, it writes to your machine:
 
 The app keeps its own settings, records and an event log (`logs/`, capped at about 1 MB) in `~/Library/Application Support/Skill Stow/`. The log records what the app changed and what failed; it never contains skill contents, config contents or tokens. To report a problem, use Help › Report an Issue…, which shows the diagnostic info before copying it. To keep your machine untouched, run with `SKILLS_SAMPLE=1`.
 
+## Privacy and network
+
+There is no telemetry, analytics or account. Usage stats are read from session logs on your Mac and never leave it, and the security check runs offline.
+
+The app only goes online for these:
+
+- **Adding a skill from a link**: reads the skill from GitHub (`api.github.com`, `raw.githubusercontent.com`, `codeload.github.com`), from skills.sh (file snapshot and security audit), or from the website you entered.
+- **Checking for or installing skill updates**: asks GitHub for the latest commit. This only happens when you click Check for Skill Updates.
+- **Source icons**: shows the GitHub owner's avatar or the website's icon next to skills you installed from them. Each icon is fetched once and cached in the app data folder.
+
+If you turn on "Use Local gh Login" in the Skill Updates settings, your `gh` token is sent only to GitHub, to raise the API rate limit. Diagnostic info is copied only when you choose Help › Report an Issue…, after you've seen what it contains.
+
 ## Contributing
 
 [AGENTS.md](AGENTS.md) covers development conventions (UI components, colors, UI strings, commit messages) and test commands.

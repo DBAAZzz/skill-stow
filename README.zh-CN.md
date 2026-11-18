@@ -70,6 +70,18 @@ go tool mygo build -platform darwin/arm64  # Apple Silicon；产物在 app/build
 
 应用自己的设置、记录和事件日志（`logs/`，上限约 1 MB）放在 `~/Library/Application Support/Skill Stow/`。日志只记应用改了什么、哪里失败了，不含技能内容、配置原文和 token。遇到问题时用「帮助 › 反馈问题…」，诊断信息会先给你预览再复制。不想动本机，就用 `SKILLS_SAMPLE=1`。
 
+## 隐私与联网
+
+没有遥测、统计上报，也不需要账号。使用情况是从本机的会话记录里统计的，不会传出去；安全检查在本机离线完成。
+
+只有下面这些情况会联网：
+
+- **从链接添加技能**：从 GitHub（`api.github.com`、`raw.githubusercontent.com`、`codeload.github.com`）、skills.sh（文件快照和安全审计）或你填的网站读取技能。
+- **检查或安装技能更新**：向 GitHub 查询最新的 commit。只在你点「检查技能更新」时进行。
+- **来源图标**：在从 GitHub 或网站装的技能旁边显示所有者头像或网站图标。每个图标只抓一次，缓存在应用数据目录里。
+
+在技能更新设置里打开「使用本机 gh 登录状态」后，`gh` 的 token 只发给 GitHub，用来提高 API 限额。诊断信息只在你用「帮助 › 反馈问题…」并预览过之后才会复制。
+
 ## 参与开发
 
 开发约定（界面组件、颜色、界面文案、提交规范）和测试命令见 [AGENTS.md](AGENTS.md)。
