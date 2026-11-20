@@ -29,6 +29,10 @@ func main() {
 		err = runRender(os.Args[2:])
 	case "verify":
 		err = runVerify(os.Args[2:])
+	case "plan":
+		err = runPlan(os.Args[2:])
+	case "bump":
+		err = runBump(os.Args[2:])
 	default:
 		usage()
 		os.Exit(2)
@@ -40,7 +44,7 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: releasenotes <render|verify> [flags]")
+	fmt.Fprintln(os.Stderr, "usage: releasenotes <render|verify|plan|bump> [flags]")
 }
 
 type renderOptions struct {

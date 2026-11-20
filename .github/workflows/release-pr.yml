@@ -1,0 +1,174 @@
+name: Release PR
+
+# main 合入新功能或修复后，自动维护一个发版准备 PR（更新 app/mygo.json 版本号与 app/CHANGELOG.md 草稿）。
+# 合并该 PR 到 main 后，本工作流会自动打 v<版本> 标签，并通过 workflow_call 调用 release.yml 构建与更新草稿 Release。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write      # 推送 release/prepare 分支、合并后打标签、调用 release.yml 上传草稿
+  pull-requests: write # 创建与更新发版 PR
+
+concurrency:
+  group: release-pr-main
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    outputs:
+      should_release: ${{ steps.tag.outputs.should_release || 'false' }}
+      tag: ${{ steps.plan.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # 需要完整提交历史和标签来计算下一版本与变更列表
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: app/go.mod
+          cache-dependency-path: app/go.sum
+
+      - name: Compute release plan
+        id: plan
+        run: |
+          cur_version="$(jq -r .version mygo.json)"
+          latest_tag="$(git tag --list 'v*' --sort=-v:refname | head -n1)"
+          tag_exists="false"
+          if git rev-parse -q --verify "refs/tags/v$cur_version" >/dev/null; then
+            tag_exists="true"
+          fi
+
+          commits_file="$RUNNER_TEMP/commits.log"
+          if [ -n "$latest_tag" ]; then
+            git log --format='%H%x1f%s%x1f%b%x1e' "$latest_tag..HEAD" > "$commits_file"
+          else
+            git log --format='%H%x1f%s%x1f%b%x1e' HEAD > "$commits_file"
+          fi
+
+          plan_file="$RUNNER_TEMP/plan.json"
+          go run ./tools/releasenotes plan \
+            -mygo mygo.json \
+            -latest-tag "$latest_tag" \
+            -tag-exists="$tag_exists" \
+            -commits "$commits_file" \
+            > "$plan_file"
+
+          cat "$plan_file"
+          {
+            echo "action=$(jq -r .action "$plan_file")"
+            echo "latest_tag=$latest_tag"
+            echo "next_version=$(jq -r '.next_version // empty' "$plan_file")"
+            echo "tag=$(jq -r '.tag // empty' "$plan_file")"
+            echo "commits_file=$commits_file"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Tag merged release and trigger build
+        id: tag
+        if: steps.plan.outputs.action == 'tag'
+        env:
+          VERSION: ${{ steps.plan.outputs.next_version }}
+          TAG: ${{ steps.plan.outputs.tag }}
+        run: |
+          slug="$(jq -r .slug mygo.json)"
+          go run ./tools/releasenotes render \
+            -version "$VERSION" \
+            -changelog CHANGELOG.md \
+            -override "../docs/releases/$TAG.md" \
+            -template ../.github/release-notes.tmpl.md \
+            -dmg-name "$slug-$VERSION.dmg" \
+            -sha256 "0000000000000000000000000000000000000000000000000000000000000000" \
+            -out /dev/null
+
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "标签 $TAG 已存在于远端，跳过重复打标与触发"
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git tag "$TAG" "$GITHUB_SHA"
+          git push origin "$TAG"
+          git push origin --delete release/prepare 2>/dev/null || true
+          echo "should_release=true" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update release PR
+        if: steps.plan.outputs.action == 'pr'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEXT_VERSION: ${{ steps.plan.outputs.next_version }}
+          LATEST_TAG: ${{ steps.plan.outputs.latest_tag }}
+          COMMITS_FILE: ${{ steps.plan.outputs.commits_file }}
+        run: |
+          pr_number="$(gh pr list \
+            --repo "$GITHUB_REPOSITORY" \
+            --base main \
+            --head release/prepare \
+            --state open \
+            --json number \
+            --jq '.[0].number // empty')"
+
+          if [ -n "$pr_number" ] && git fetch origin release/prepare 2>/dev/null; then
+            non_bot="$(git log "HEAD..origin/release/prepare" --format='%an' | grep -Fvx 'github-actions[bot]' || true)"
+            if [ -n "$non_bot" ]; then
+              echo "发版 PR #$pr_number 已有人工修改，保持分支与说明不动" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+          fi
+
+          pr_body="$RUNNER_TEMP/pr-body.md"
+          git checkout -B release/prepare "$GITHUB_SHA"
+
+          go run ./tools/releasenotes bump \
+            -version "$NEXT_VERSION" \
+            -mygo mygo.json \
+            -changelog CHANGELOG.md \
+            -commits "$COMMITS_FILE" \
+            -latest-tag "$LATEST_TAG" \
+            -pr-body-out "$pr_body"
+
+          slug="$(jq -r .slug mygo.json)"
+          go run ./tools/releasenotes render \
+            -version "$NEXT_VERSION" \
+            -changelog CHANGELOG.md \
+            -override "../docs/releases/v$NEXT_VERSION.md" \
+            -template ../.github/release-notes.tmpl.md \
+            -dmg-name "$slug-$NEXT_VERSION.dmg" \
+            -sha256 "0000000000000000000000000000000000000000000000000000000000000000" \
+            -out /dev/null
+          go test ./tools/releasenotes
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mygo.json CHANGELOG.md
+          git commit -m "build(release): prepare v$NEXT_VERSION"
+          git push --force origin release/prepare
+
+          title="build(release): prepare v$NEXT_VERSION"
+          if [ -z "$pr_number" ]; then
+            pr_url="$(gh pr create \
+              --repo "$GITHUB_REPOSITORY" \
+              --base main \
+              --head release/prepare \
+              --title "$title" \
+              --body-file "$pr_body")"
+            echo "已创建发版 PR：$pr_url" >> "$GITHUB_STEP_SUMMARY"
+          else
+            gh pr edit "$pr_number" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$title" \
+              --body-file "$pr_body"
+            echo "已更新发版 PR #$pr_number（目标版本 v$NEXT_VERSION）" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  release:
+    needs: prepare
+    if: needs.prepare.outputs.should_release == 'true'
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.prepare.outputs.tag }}
+    secrets: inherit

@@ -6,12 +6,18 @@ name: Release
 on:
   push:
     tags: ["v*"]
+  workflow_call:
+    inputs:
+      tag:
+        description: "要构建并上传草稿 Release 的版本标签（如 v0.3.0）"
+        required: true
+        type: string
 
 permissions:
   contents: write # 建草稿 Release、上传附件并更新说明
 
 concurrency:
-  group: release-${{ github.ref_name }}
+  group: release-${{ inputs.tag || github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -22,14 +28,18 @@ jobs:
         working-directory: app
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
 
       - name: Check the tag and version agree
+        env:
+          TAG_NAME: ${{ inputs.tag || github.ref_name }}
         run: |
           version="$(jq -r .version mygo.json)"
           name="$(jq -r .name mygo.json)"
           slug="$(jq -r .slug mygo.json)"
-          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
-            echo "::error::标签 $GITHUB_REF_NAME 和 app/mygo.json 的版本 $version 不一致"
+          if [ "$TAG_NAME" != "v$version" ]; then
+            echo "::error::标签 $TAG_NAME 和 app/mygo.json 的版本 $version 不一致"
             exit 1
           fi
           {
