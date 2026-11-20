@@ -2,6 +2,18 @@
 
 每个版本一节，标题是 `## <版本>`。这一节就是应用内更新窗口里的「更新说明」，先写中文、再写英文。用编号列表，不用 `-`：更新窗口会把无序列表画成圆点。
 
+## 0.3.0
+
+中文
+
+1. feat(browse): list uncommitted project skills in the toolbar
+2. feat(library): read git state of project skills
+
+English
+
+1. feat(browse): list uncommitted project skills in the toolbar
+2. feat(library): read git state of project skills
+
 ## 0.2.0
 
 中文
