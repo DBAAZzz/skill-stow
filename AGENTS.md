@@ -76,13 +76,14 @@ README 的截图在 `docs/screenshots/zh/`、`docs/screenshots/en/`，每个功�
 
 应用通过 MyGo 的 updater 自更新（`app/app_update.go`）：`app/mygo.json` 的 `updates` 里是签名公钥和发布仓库，已安装的应用只读 GitHub 上最新 Release 里的 `update-darwin-universal.json`，只接受用对应私钥签名的包。私钥 `mygo-update.key` 在 `~/Library/Application Support/mygo/update-keys/` 和仓库 secret `MYGO_UPDATER_PRIVATE_KEY` 里，不进仓库，另存一份到密码管理器；丢了它，已安装的应用就再也收不到更新。
 
-1. 改 `app/mygo.json` 的 `version`，在 `app/CHANGELOG.md` 加 `## <版本>` 一节，先写 `中文` 再写 `English`（签名构建要求有这一节，内容就是应用内更新窗口里的「更新说明」）。说明用编号列表，不用 `-`：更新窗口会把无序列表画成 `•`。如果希望 GitHub Release 页面比应用内更新说明更详细，再加一个可选的 `docs/releases/v<版本>.md`（只写 `## 中文` 和 `## English` 两节变更正文，不用写安装说明和 SHA-256）。提交 `build(release): …` 并推送。
-2. 打标签 `v<版本>` 并推送。`.github/workflows/release.yml` 会依次完成：
+1. `main` 合入新的 `feat` / `fix` / `perf` / `revert` 提交后，`.github/workflows/release-pr.yml` 会自动维护一个 `build(release): prepare v<版本>` 的发版 PR（分支 `release/prepare`）：按 Conventional Commits 推算下一版本号，更新 `app/mygo.json`，并在 `app/CHANGELOG.md` 顶部生成 `## <版本>` 双语草稿。
+2. 准备发版时，在发版 PR 里润色 `app/CHANGELOG.md` 的 `中文` / `English` 更新说明（签名构建要求有这一节，内容就是应用内更新窗口里的「更新说明」；用编号列表，不用 `-`，因为更新窗口会把无序列表画成 `•`）。一旦 PR 分支有人工提交，CI 不会再覆盖它。如果希望 GitHub Release 页面比应用内更新说明更详细，在同一个 PR 里加一个可选的 `docs/releases/v<版本>.md`（只写 `## 中文` 和 `## English` 两节变更正文，不用写安装说明和 SHA-256）。确认 CI 通过后合并该 PR。
+3. 发版 PR 合并到 `main` 后，`.github/workflows/release-pr.yml` 检测到 `app/mygo.json` 的新版本尚未打标，会自动打 `v<版本>` 标签并调用 `.github/workflows/release.yml`（也可以直接手工改版本后推 `v<版本>` 标签触发）依次完成：
    - 核对标签、`version` 和发布说明格式（`app/tools/releasenotes`）并跑完测试；
    - 执行 `go tool mygo build -platform darwin/universal -upload`（私钥在仓库 secret `MYGO_UPDATER_PRIVATE_KEY`），建草稿 Release `v<版本>`，上传 `skill-stow-<版本>.dmg`、更新包 `.tar.gz`、`update-darwin-universal.json` 和 `SHA256SUMS`，能做时再加相对前几个版本的增量包 `.delta`（增量包按条件生成：没有可比的旧包、旧包下载失败、签名不符或补丁不比全包小时会跳过，构建照样成功）；
    - 用 `.github/release-notes.tmpl.md` 拼上固定安装/放行说明和 dmg 的 SHA-256，自动更新草稿标题为 `Skill Stow <版本>` 并写入中英文说明（有 `docs/releases/v<版本>.md` 时优先用它，否则用 `app/CHANGELOG.md`）；
    - 自动核对 `update-darwin-universal.json` 里引用的全包和增量包都已上传到该草稿 Release。
-3. CI 完成后，去 GitHub 草稿页面预览确认，直接点 **Publish release**（或执行 `gh release edit v<版本> --draft=false`）；发布后已安装的应用才能检查到它，发出去就撤不回，所以不让 CI 自动发布。
+4. CI 完成后，去 GitHub 草稿页面预览确认，直接点 **Publish release**（或执行 `gh release edit v<版本> --draft=false`）；发布后已安装的应用才能检查到它，发出去就撤不回，所以不让 CI 自动发布。
 
 发版前想本地预览渲染后的 Release 说明，可在 `app/` 下执行 `go run ./tools/releasenotes render -version <版本> -override ../docs/releases/v<版本>.md -dmg-name skill-stow-<版本>.dmg -sha256 <预览占位>`。CI 不可用时在本机构建：在 `app/` 下执行 `MYGO_UPDATER_PRIVATE_KEY="$(cat ~/Library/Application\ Support/mygo/update-keys/mygo-update.key)" go tool mygo build -platform darwin/universal -upload`，再运行 `app/tools/releasenotes` 更新草稿说明并核对附件。
 
