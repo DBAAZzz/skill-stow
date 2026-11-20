@@ -17165,3 +17165,63 @@ func AppUpdateUnavailableMessage(app string) string {
 func (msgs Messages) AppUpdateUnavailableMessage(app string) string {
 	return Catalog.Format(msgs.locale, "appUpdateUnavailableMessage", map[string]any{"app": app})
 }
+
+// GitUncommittedCount says "{n} 个未提交"
+// in the language the app shows.
+func GitUncommittedCount(n int) string { return In(i18n.Locale()).GitUncommittedCount(n) }
+
+// GitUncommittedCount says "{n} 个未提交"
+// in the language of msgs.
+func (msgs Messages) GitUncommittedCount(n int) string {
+	return Catalog.Format(msgs.locale, "gitUncommittedCount", map[string]any{"n": n})
+}
+
+// GitUncommittedButton says "查看 {n} 个未提交的技能"
+// in the language the app shows.
+func GitUncommittedButton(n int) string { return In(i18n.Locale()).GitUncommittedButton(n) }
+
+// GitUncommittedButton says "查看 {n} 个未提交的技能"
+// in the language of msgs.
+func (msgs Messages) GitUncommittedButton(n int) string {
+	return Catalog.Format(msgs.locale, "gitUncommittedButton", map[string]any{"n": n})
+}
+
+// GitUncommittedMore says "另外 {n} 个技能也没提交"
+// in the language the app shows.
+func GitUncommittedMore(n int) string { return In(i18n.Locale()).GitUncommittedMore(n) }
+
+// GitUncommittedMore says "另外 {n} 个技能也没提交"
+// in the language of msgs.
+func (msgs Messages) GitUncommittedMore(n int) string {
+	return Catalog.Format(msgs.locale, "gitUncommittedMore", map[string]any{"n": n})
+}
+
+// GitFileCount says "{n} 个文件"
+// in the language the app shows.
+func GitFileCount(n int) string { return In(i18n.Locale()).GitFileCount(n) }
+
+// GitFileCount says "{n} 个文件"
+// in the language of msgs.
+func (msgs Messages) GitFileCount(n int) string {
+	return Catalog.Format(msgs.locale, "gitFileCount", map[string]any{"n": n})
+}
+
+// GitRowAdded says "新增 {name}"
+// in the language the app shows.
+func GitRowAdded(name string) string { return In(i18n.Locale()).GitRowAdded(name) }
+
+// GitRowAdded says "新增 {name}"
+// in the language of msgs.
+func (msgs Messages) GitRowAdded(name string) string {
+	return Catalog.Format(msgs.locale, "gitRowAdded", map[string]any{"name": name})
+}
+
+// GitRowModified says "修改 {name}"
+// in the language the app shows.
+func GitRowModified(name string) string { return In(i18n.Locale()).GitRowModified(name) }
+
+// GitRowModified says "修改 {name}"
+// in the language of msgs.
+func (msgs Messages) GitRowModified(name string) string {
+	return Catalog.Format(msgs.locale, "gitRowModified", map[string]any{"name": name})
+}

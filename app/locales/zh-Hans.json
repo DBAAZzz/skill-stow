@@ -7443,5 +7443,53 @@
         "type": "String"
       }
     }
+  },
+  "gitUncommittedCount": "{n} 个未提交",
+  "@gitUncommittedCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "gitUncommittedButton": "查看 {n} 个未提交的技能",
+  "@gitUncommittedButton": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "gitUncommittedMore": "另外 {n} 个技能也没提交",
+  "@gitUncommittedMore": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "gitFileCount": "{n} 个文件",
+  "@gitFileCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "gitRowAdded": "新增 {name}",
+  "@gitRowAdded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gitRowModified": "修改 {name}",
+  "@gitRowModified": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

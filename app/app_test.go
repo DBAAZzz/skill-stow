@@ -822,6 +822,18 @@ func TestSnapshots(t *testing.T) {
 			tt.Advance(time.Second)
 		}
 		writePNG(t, filepath.Join(dir, s.name+".png"), tt)
+		if s.name == "6-project" && a.lib.Home == "" {
+			must(t, tt.Click(locales.GitUncommittedButton(2)))
+			tt.Advance(250 * time.Millisecond)
+			writePNG(t, filepath.Join(dir, "6b-project-git-menu.png"), tt)
+			tt.Key(0, ui.KeyEnd)
+			tt.Key(0, ui.KeyRight)
+			tt.Advance(250 * time.Millisecond)
+			if !tt.HasText("examples/pagination.md") {
+				t.Fatal("missing git file submenu")
+			}
+			writePNG(t, filepath.Join(dir, "6c-project-git-submenu.png"), tt)
+		}
 	}
 	// 设置窗口四个标签，固定 760×540
 	for i, name := range []string{"s1-general", "s2-agents", "s3-projects", "s4-updates"} {

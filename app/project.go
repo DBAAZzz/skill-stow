@@ -15,7 +15,8 @@ import (
 func (a *app) projectPage(c *ui.Context, p *library.ProjectInfo) {
 	skills := library.Filter(p.Skills, a.query)
 	a.toolbar(c, p.Name, func() {
-		ui.Text(c, locales.CommonSkillCount(len(p.Skills))).FontFeatures("tnum").SingleLine()
+		ui.Text(c, locales.CommonSkillCount(len(p.Skills))).FontFeatures("tnum").SingleLine().Shrink(1).MinWidth(0)
+		a.gitUncommittedMenu(c, p)
 	}, func() {
 		if n := len(p.Linked()); n > 0 && alertButton(c, locales.ProjectGlobalLinksHint(n)).Clicked() {
 			a.showLinked(p)

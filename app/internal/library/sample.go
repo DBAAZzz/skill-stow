@@ -196,6 +196,7 @@ func Sample() *Library {
 	sampleProblems(l)
 	sampleNativeStates(l)
 	sampleUsage(l)
+	sampleProjectGit(l)
 	return l
 }
 
@@ -427,4 +428,24 @@ func sampleDefects(l *Library, s *Skill) []Defect {
 	}
 	sibling := func(name string) bool { return l.Get(name) != nil }
 	return textDefects(s.Files[0].Content, exists, sibling)
+}
+
+func sampleProjectGit(l *Library) {
+	for _, p := range l.Projects {
+		p.Git = &ProjectGit{Check: GitUnchecked}
+		if p.Name != "storefront" {
+			continue
+		}
+		g := &ProjectGit{Check: GitReady, Installs: map[string][]GitInstall{}}
+		for _, s := range p.Skills {
+			state := GitAdded
+			files := []GitFile{{"SKILL.md", GitAdded}}
+			if s.Name == "api-conventions" {
+				state = GitModified
+				files = []GitFile{{"SKILL.md", GitModified}, {"examples/pagination.md", GitAdded}}
+			}
+			g.Installs[s.Dir] = []GitInstall{{State: state, Files: files}}
+		}
+		p.Git = g
+	}
 }

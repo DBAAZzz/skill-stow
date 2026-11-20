@@ -1187,5 +1187,11 @@
   "settingsViewAppUpdate": "View Update…",
   "settingsAutoCheckAppUpdates": "Check for Updates Automatically",
   "settingsAutoCheckAppUpdatesHint": "When on, checks GitHub for a new version in the background each time the app starts and once a day after that. When off, the app only goes online when you click Check for Updates….",
-  "appUpdateUnavailableMessage": "{app} can’t update itself."
+  "appUpdateUnavailableMessage": "{app} can’t update itself.",
+  "gitUncommittedCount": "{n} not committed",
+  "gitUncommittedButton": "Show {n} skills not committed",
+  "gitUncommittedMore": "{n} more skills aren't committed",
+  "gitFileCount": "{n} files",
+  "gitRowAdded": "Added {name}",
+  "gitRowModified": "Modified {name}"
 }
