@@ -838,19 +838,20 @@ func TestAWebsiteSourceIsReadAndAddedLikeNpx(t *testing.T) {
 }
 
 func TestImportDetailKeepsTheFileTotalWhenTheFilesTabShowsFewer(t *testing.T) {
-	// Given 要添加的技能里有个隐藏文件：会一起装上，但「文件」页签不列它
+	// Given 要添加的技能里有隐藏配置（应可预览）和 .DS_Store（不预览但会一起装上）
 	a, tt, h := importApp(t)
 	src := h("Downloads/deploy")
 	writeTestSkill(t, src, "部署脚本", "# deploy")
 	must(t, os.WriteFile(filepath.Join(src, "README.md"), []byte("# readme"), 0o644))
 	must(t, os.WriteFile(filepath.Join(src, ".config"), []byte("x"), 0o644))
+	must(t, os.WriteFile(filepath.Join(src, ".DS_Store"), []byte("finder"), 0o644))
 
 	// When 打开它的详情
 	a.importPaths([]string{src})
 	tt.Frame()
 
-	// Then 页签写可预览的 2 个，路径旁仍写出一共 3 个文件
-	wantTexts(t, tt, "文件 2", "3 个文件")
+	// Then 页签写可预览的 3 个（含 .config），路径旁仍写出一共 4 个文件
+	wantTexts(t, tt, "文件 3", "4 个文件")
 }
 
 func TestProjectImportAndDeleteFlow(t *testing.T) {

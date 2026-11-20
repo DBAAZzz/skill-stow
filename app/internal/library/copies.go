@@ -158,10 +158,10 @@ func (l *Library) dirOwner(dir string) string {
 	return ""
 }
 
-// skipped 是不算技能内容的文件：隐藏文件、依赖、Python 运行脚本时自己
-// 生成的缓存。缓存不跳过的话，Agent 跑过一次脚本的那份就成了「另一种内容」。
+// skipped 是不算技能内容的系统垃圾、版本库内部目录和依赖缓存：不进文件树、
+// 搜索和修改时间；真实隐藏文件（如 .env、.gitignore、.claude/）照常保留。
 func skipped(name string) bool {
-	return strings.HasPrefix(name, ".") || name == "node_modules" || name == "__pycache__"
+	return name == ".DS_Store" || strings.HasPrefix(name, "._") || name == ".git" || name == "node_modules" || name == "__pycache__"
 }
 
 // modified 是目录里文件最近一次修改的时间。
@@ -182,8 +182,8 @@ func modified(dir string) time.Time {
 	return t
 }
 
-// VersionFiles 是一种内容的文件，SKILL.md 在前。和阅读视图不同，隐藏
-// 文件、缓存也列出来：对比副本要看到全部不同。
+// VersionFiles 是一种内容的文件，SKILL.md 在前。和阅读视图不同，.DS_Store、
+// .git、缓存也列出来：对比副本要看到全部不同。
 func (l *Library) VersionFiles(v *Version) []File {
 	if !l.disk {
 		return v.files

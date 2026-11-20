@@ -16,8 +16,8 @@ const (
 )
 
 // LoadFiles 读出技能目录下的文件，打开阅读视图时才读。SKILL.md 在最前，
-// 其余按路径排；跳过隐藏文件和 node_modules。太大或不是文本的文件
-// 只列出，不读内容（Binary）。
+// 其余按路径排；跳过 .DS_Store、.git、node_modules、__pycache__ 等噪音项，
+// 其余隐藏文件照常列出。太大或不是文本的文件只列出，不读内容（Binary）。
 func (l *Library) LoadFiles(s *Skill) {
 	if s.Files != nil || s.Real == "" {
 		return
@@ -28,7 +28,7 @@ func (l *Library) LoadFiles(s *Skill) {
 // readFiles 读出目录下的文件，规则同 LoadFiles。
 func readFiles(dir string) []File { return listFiles(dir, false) }
 
-// readFilesStrict 读出目录下的全部文件：不跳过隐藏文件和缓存，记下执行位；
+// readFilesStrict 读出目录下的全部文件：不跳过任何噪音项和缓存，记下执行位；
 // 链接列成一个文件，内容是它指向哪里；读不了的标出来。对比副本用。
 func readFilesStrict(dir string) []File { return listFiles(dir, true) }
 

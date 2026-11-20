@@ -420,6 +420,35 @@ func TestLoadFiles(t *testing.T) {
 	}
 }
 
+func TestLoadFilesIncludesHiddenFilesAndSkipsNoise(t *testing.T) {
+	home := fakeHome(t)
+	dir := filepath.Join(home, ".agents/skills/test-first")
+	write := func(rel, body string) {
+		p := filepath.Join(dir, rel)
+		must(t, os.MkdirAll(filepath.Dir(p), 0o755))
+		must(t, os.WriteFile(p, []byte(body), 0o644))
+	}
+	write(".env.example", "TOKEN=\n")
+	write(".hidden/run.sh", "#!/bin/sh\necho hi\n")
+	write(".DS_Store", "finder")
+	write("._SKILL.md", "appledouble")
+	write(".git/HEAD", "ref: refs/heads/main\n")
+	write("node_modules/pkg/index.js", "module.exports = {}\n")
+	write("__pycache__/a.pyc", "pyc")
+
+	l := Scan(home)
+	s := l.ByID("mine:test-first")
+	l.LoadFiles(s)
+	var paths []string
+	for _, f := range s.Files {
+		paths = append(paths, f.Path)
+	}
+	want := []string{"SKILL.md", ".env.example", "notes.md", ".hidden/run.sh"}
+	if !slices.Equal(paths, want) {
+		t.Fatalf("files = %v，期望 %v", paths, want)
+	}
+}
+
 func TestParseBlockDescription(t *testing.T) {
 	md := ParseSkillMD("---\nname: a\ndescription: |\n  第一行\n  第二行\nmetadata:\n  k: v\n---\n")
 	if md.Description != "第一行\n第二行" {

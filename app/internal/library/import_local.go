@@ -141,7 +141,7 @@ func findLocalSkills(root string) (skills, others []string) {
 			skills = append(skills, found...)
 			continue
 		}
-		if !skipped(it.Name()) {
+		if !strings.HasPrefix(it.Name(), ".") && !skipped(it.Name()) {
 			others = append(others, it.Name())
 		}
 	}

@@ -139,7 +139,7 @@ func (a *app) importHead(c *ui.Context, s *library.ImportSkill, files []library.
 			}
 			ui.Text(c, where).FontSize(12).Font("monospace").TextColor(colTextMuted).SingleLine().Shrink(1).MinWidth(0)
 			// 「文件」页签上的数和实际总数一样时不重复写；没有页签，或页签
-			// 少列了（隐藏文件、node_modules 不预览但照样装上）时写出总数
+			// 少列了（.DS_Store、node_modules 之类不预览但照样装上）时写出总数
 			if s.Count > 1 && (!multi || s.Count != len(files)) {
 				ui.Text(c, locales.CommonFileCount(s.Count)).FontSize(12).TextColor(colTextMuted).FontFeatures("tnum").SingleLine()
 			}

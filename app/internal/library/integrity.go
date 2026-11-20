@@ -184,8 +184,8 @@ func hasScheme(s string) bool {
 	return true
 }
 
-// walkLinks 对 dir 里的每个链接调 fn（相对路径、完整路径），跳过隐藏项和
-// node_modules，不进链接指向的目录。
+// walkLinks 对 dir 里的每个链接调 fn（相对路径、完整路径），跳过系统垃圾、
+// .git 和依赖缓存，不进链接指向的目录。
 func walkLinks(dir string, fn func(rel, p string)) {
 	n := 0
 	filepath.WalkDir(dir, func(p string, d fs.DirEntry, err error) error {

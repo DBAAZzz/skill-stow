@@ -895,6 +895,9 @@ func (a *app) jumpToEvidence(s *library.Skill, e security.Evidence) {
 	}
 	i := slices.IndexFunc(s.Files, func(f library.File) bool { return f.Path == e.Path })
 	if i < 0 {
+		if s.Real != "" {
+			a.openInEditor(filepath.Join(s.Real, filepath.FromSlash(e.Path)))
+		}
 		return
 	}
 	a.file = i
