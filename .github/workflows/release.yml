@@ -1,14 +1,14 @@
 name: Release
 
-# 推送 v<版本> 标签后构建 macOS 通用版，连同签名的更新包传到草稿 Release。
-# 草稿不自动发布：写好中英文说明、核对附件后手动发布（见 AGENTS.md「发版」），
+# 推送 v<版本> 标签后构建 macOS 通用版，上传签名的更新包，自动生成中英文 Release 说明并核对附件。
+# 草稿不自动发布：预览无误后在 GitHub 点击 Publish release 或执行 gh release edit v<版本> --draft=false（见 AGENTS.md「发版」），
 # 发布后已安装的应用才会检查到它。
 on:
   push:
     tags: ["v*"]
 
 permissions:
-  contents: write # 建草稿 Release 并上传附件
+  contents: write # 建草稿 Release、上传附件并更新说明
 
 concurrency:
   group: release-${{ github.ref_name }}
@@ -23,23 +23,37 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Check the tag, version and changelog agree
+      - name: Check the tag and version agree
         run: |
           version="$(jq -r .version mygo.json)"
+          name="$(jq -r .name mygo.json)"
+          slug="$(jq -r .slug mygo.json)"
           if [ "$GITHUB_REF_NAME" != "v$version" ]; then
             echo "::error::标签 $GITHUB_REF_NAME 和 app/mygo.json 的版本 $version 不一致"
             exit 1
           fi
-          if ! grep -Eq "^## \[?${version//./\\.}\]?( |$)" CHANGELOG.md; then
-            echo "::error::app/CHANGELOG.md 里没有 ## $version 一节，更新窗口会没有更新说明"
-            exit 1
-          fi
-          echo "VERSION=$version" >> "$GITHUB_ENV"
+          {
+            echo "VERSION=$version"
+            echo "APP_NAME=$name"
+            echo "DMG_NAME=$slug-$version.dmg"
+            echo "NOTES_OVERRIDE=../docs/releases/v$version.md"
+          } >> "$GITHUB_ENV"
 
       - uses: actions/setup-go@v7
         with:
           go-version-file: app/go.mod
           cache-dependency-path: app/go.sum
+
+      - name: Validate release notes before building
+        run: |
+          go run ./tools/releasenotes render \
+            -version "$VERSION" \
+            -changelog CHANGELOG.md \
+            -override "$NOTES_OVERRIDE" \
+            -template ../.github/release-notes.tmpl.md \
+            -dmg-name "$DMG_NAME" \
+            -sha256 "0000000000000000000000000000000000000000000000000000000000000000" \
+            -out /dev/null
 
       - run: go test ./...
 
@@ -49,17 +63,48 @@ jobs:
           MYGO_UPDATER_PRIVATE_KEY: ${{ secrets.MYGO_UPDATER_PRIVATE_KEY }}
         run: go tool mygo build -platform darwin/universal -upload
 
+      - name: Update draft release notes and verify assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          dmg="build/darwin-universal/$DMG_NAME"
+          notes="$RUNNER_TEMP/release-notes.md"
+
+          go run ./tools/releasenotes render \
+            -version "$VERSION" \
+            -changelog CHANGELOG.md \
+            -override "$NOTES_OVERRIDE" \
+            -template ../.github/release-notes.tmpl.md \
+            -dmg "$dmg" \
+            -out "$notes"
+
+          gh release edit "v$VERSION" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "$APP_NAME $VERSION" \
+            --notes-file "$notes"
+
+          gh release view "v$VERSION" \
+            --repo "$GITHUB_REPOSITORY" \
+            --json assets \
+            | go run ./tools/releasenotes verify \
+                -version "$VERSION" \
+                -dmg "$DMG_NAME" \
+                -manifest build/darwin-universal/update-darwin-universal.json \
+                -assets -
+
       - name: Summarize
         run: |
-          dmg="build/darwin-universal/skill-stow-$VERSION.dmg"
+          dmg="build/darwin-universal/$DMG_NAME"
+          source_label="app/CHANGELOG.md"
+          if [ -f "$NOTES_OVERRIDE" ]; then
+            source_label="docs/releases/v$VERSION.md"
+          fi
           {
-            echo "## v$VERSION 草稿已上传"
+            echo "## v$VERSION 草稿已就绪"
             echo
-            echo "dmg 的 SHA-256（贴进 Release 说明末尾）："
+            echo "- Release 标题与中英文说明已自动更新（正文来源：\`$source_label\`）"
+            echo "- 已核对 \`update-darwin-universal.json\` 引用的所有更新包与附件均已上传"
+            echo "- \`$DMG_NAME\` 的 SHA-256：\`$(shasum -a 256 "$dmg" | cut -d' ' -f1)\`"
             echo
-            echo '```'
-            shasum -a 256 "$dmg" | cut -d' ' -f1
-            echo '```'
-            echo
-            echo "写好说明后发布：\`gh release edit v$VERSION --draft=false\`"
+            echo "在 GitHub 草稿页面预览确认后点击 **Publish release**，或执行：\`gh release edit v$VERSION --draft=false\`"
           } >> "$GITHUB_STEP_SUMMARY"
