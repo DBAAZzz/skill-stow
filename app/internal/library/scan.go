@@ -134,8 +134,13 @@ func (sc *scanner) scan() {
 		if err != nil {
 			continue
 		}
+		p.gitScan.dir = root
 		for _, rel := range projectSkillDirs {
-			for _, e := range sc.list(filepath.Join(p.Dir, rel)) {
+			entries := sc.list(filepath.Join(p.Dir, rel))
+			if len(entries) > 0 {
+				p.gitScan.dirs = append(p.gitScan.dirs, rel)
+			}
+			for _, e := range entries {
 				if !isUnderDir(e.real, root) || !isUnderDir(underRealDir(e.path), root) {
 					continue
 				}
@@ -246,6 +251,8 @@ func (sc *scanner) scan() {
 			project = append(project, s)
 			e.project.Skills = append(e.project.Skills, s)
 		}
+		physicalPath := filepath.Join(e.project.gitScan.dir, gitRel(e.project.Dir, e.path))
+		e.project.gitScan.installs = append(e.project.gitScan.installs, gitPlace{physicalPath, e.real})
 		if e.link && !e.nested {
 			s.projectLinks = append(s.projectLinks, e.path)
 		}

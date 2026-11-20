@@ -23,6 +23,8 @@ const (
 
 // app 是窗口的全部状态。
 type app struct {
+	gitPage place // 上一次开始 Git 检查时所在的页面
+
 	upd               updatePageState
 	imp               importPageState // 添加技能页（import_page.go）
 	sec               securityUI      // 本地安全检查（security.go）
@@ -289,6 +291,7 @@ func (a *app) view(c *ui.Context) {
 
 // page 是右边这一页：它的键和画它的函数。
 func (a *app) page(c *ui.Context) (string, func()) {
+	a.syncPageGit()
 	switch p := a.project(); {
 	case a.cmp != nil:
 		return "compare", func() { a.comparePage(c, a.cmp) }
@@ -389,6 +392,7 @@ func (a *app) applyScan(lib *library.Library, report library.UpdateReport, reloa
 		lib.Settings = a.lib.Settings
 	}
 	a.lib = lib
+	a.gitPage = place{}
 	a.noticeRecovered(lib)
 	a.upd.report = report
 	a.tidy.stats, a.cmp = nil, nil

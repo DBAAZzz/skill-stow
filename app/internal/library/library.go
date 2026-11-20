@@ -251,6 +251,8 @@ func (sc Scope) match(s *Skill) bool {
 
 // ProjectInfo 是一个项目：Agent 用过的，或用户手动加的目录。
 type ProjectInfo struct {
+	Git       *ProjectGit
+	gitScan   gitPlaces
 	Name, Dir string
 	Used      time.Time    // 最近一次被 Agent 用到
 	Manual    bool         // 用户手动加的
