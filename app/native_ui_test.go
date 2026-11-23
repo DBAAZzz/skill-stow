@@ -221,7 +221,7 @@ func TestZCodeMasterSwitchOffLocksTheInspectorSwitch(t *testing.T) {
 	a.selected = a.lib.Get("kami")
 	tt.Frame()
 	tt.Advance(paneDuration)
-	if !tt.HasText("ZCode 设置里关闭了全部技能，要先在 ZCode 里打开技能功能。") {
+	if !tt.HasText("ZCode 设置里关闭了全部 Skill，要先在 ZCode 里打开 Skill 功能。") {
 		t.Fatalf("要说明为什么拨不动：%q", tt.Texts())
 	}
 	_ = tt.Click("开关 ZCode")
@@ -249,7 +249,7 @@ func TestZCodeProjectSkillShowsItIsDisabledInZCode(t *testing.T) {
 	tt.Frame()
 	tt.Advance(paneDuration)
 	if !tt.HasText("ZCode") || !tt.HasText("已停用") {
-		t.Fatalf("读得到不等于启用：项目技能要写出在 ZCode 里已停用：%q", tt.Texts())
+		t.Fatalf("读得到不等于启用：项目 Skill 要写出在 ZCode 里已停用：%q", tt.Texts())
 	}
 }
 

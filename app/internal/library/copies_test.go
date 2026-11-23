@@ -18,7 +18,7 @@ func TestVersions(t *testing.T) {
 		t.Fatalf("应有 3 种内容，得到 %d", len(vs))
 	}
 	if !vs[0].Shared || len(vs[0].Places) != 2 {
-		t.Errorf("基准应是技能库那种，含 Claude Code 的链接：%+v", vs[0])
+		t.Errorf("基准应是 Skill 库那种，含 Claude Code 的链接：%+v", vs[0])
 	}
 	if !tf.CopyIn("codebuddy") || tf.CopyIn("claude-code") {
 		t.Errorf("CodeBuddy 目录里是副本，Claude Code 是链接：%v", tf.Copied())
@@ -43,7 +43,7 @@ func TestMergeKeepBase(t *testing.T) {
 	}
 	cb := filepath.Join(home, ".codebuddy/skills/test-first")
 	if real, _ := realPath(cb); real != filepath.Join(home, ".agents/skills/test-first") {
-		t.Errorf("CodeBuddy 的应指向技能库，指向 %s", real)
+		t.Errorf("CodeBuddy 的应指向 Skill 库，指向 %s", real)
 	}
 	if _, err := os.Stat(filepath.Join(home, ".Trash/test-first/SKILL.md")); err != nil {
 		t.Error("Codex 的拷贝应在废纸篓里")
@@ -66,17 +66,17 @@ func TestMergeKeepOther(t *testing.T) {
 	r, err := l.Merge(tf, keep)
 	must(t, err)
 	if r.Trashed != 2 || r.Linked != 1 {
-		t.Errorf("结果 %+v：技能库原来那份和 Codex 的进废纸篓，CodeBuddy 的换成链接", r)
+		t.Errorf("结果 %+v：Skill 库原来那份和 Codex 的进废纸篓，CodeBuddy 的换成链接", r)
 	}
 	md, _ := os.ReadFile(filepath.Join(home, ".agents/skills/test-first/SKILL.md"))
 	if !strings.Contains(string(md), "一份拷贝") {
-		t.Errorf("技能库应换成 CodeBuddy 那份：%s", md)
+		t.Errorf("Skill 库应换成 CodeBuddy 那份：%s", md)
 	}
 	if _, err := os.Stat(filepath.Join(home, ".agents/skills/test-first/notes.md")); err == nil {
-		t.Error("技能库原来那份的文件不应留下")
+		t.Error("Skill 库原来那份的文件不应留下")
 	}
 	if real, _ := realPath(filepath.Join(home, ".claude/skills/test-first")); real != filepath.Join(home, ".agents/skills/test-first") {
-		t.Error("Claude Code 的链接应仍指向技能库")
+		t.Error("Claude Code 的链接应仍指向 Skill 库")
 	}
 	if tf := Scan(home).ByID("mine:test-first"); tf.Copies != 0 {
 		t.Errorf("还有 %d 份副本", tf.Copies)
@@ -175,7 +175,7 @@ func TestProblemsSample(t *testing.T) {
 		}
 	}
 	if !p.Broken[0].Relink || p.Broken[1].Relink {
-		t.Errorf("技能库有 lark-doc 的能重新连上，old-notes 不能：%+v", p.Broken)
+		t.Errorf("Skill 库有 lark-doc 的能重新连上，old-notes 不能：%+v", p.Broken)
 	}
 	r, err := l.Merge(l.Get("brainstorming"), 0)
 	must(t, err)
@@ -221,6 +221,6 @@ func TestFixLinks(t *testing.T) {
 		t.Error("全局链接应已删掉")
 	}
 	if _, err := os.Stat(h("code/storefront/.claude/skills/notes-sync/SKILL.md")); err != nil {
-		t.Error("项目里的技能不应动")
+		t.Error("项目里的 Skill 不应动")
 	}
 }

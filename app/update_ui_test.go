@@ -27,7 +27,7 @@ func TestUpdatePageSeparatesSafeUpdatesFromConfirmations(t *testing.T) {
 	a := newApp(library.Sample())
 	updateFixture(a)
 	tt := newUITester(a.view, 1280, 800)
-	for _, s := range []string{"更新这 1 个技能", "更新前需确认", "需要处理", "检查失败", "由发布网站维护"} {
+	for _, s := range []string{"更新这 1 个 Skill", "更新前需确认", "需要处理", "检查失败", "由发布网站维护"} {
 		if !tt.HasText(s) {
 			t.Errorf("missing %s: %v", s, tt.Texts())
 		}
@@ -45,7 +45,7 @@ func TestUpdateFirstVisitDoesNotClaimEverythingIsLatest(t *testing.T) {
 	}
 	a.upd.report = library.UpdateReport{Checked: time.Now(), Complete: false}
 	tt.Frame()
-	if tt.HasText("目前没有需要更新的技能") {
+	if tt.HasText("目前没有需要更新的 Skill") {
 		t.Fatal("partial check claimed completion")
 	}
 }
@@ -163,7 +163,7 @@ func TestUpdateFullGroupsAndSecondaryStates(t *testing.T) {
 	updateFullFixture(a)
 	tt := newUITester(a.view, 1280, 960)
 	for _, want := range []string{
-		"更新这 2 个技能",
+		"更新这 2 个 Skill",
 		"上游提交（Commit）",
 		"查看差异",
 		"vitest",
@@ -171,7 +171,7 @@ func TestUpdateFullGroupsAndSecondaryStates(t *testing.T) {
 		"有内容不同的副本，需先收成一份",
 		"装回后可更新",
 		"保留本地，不再检查更新",
-		"删除技能",
+		"删除 Skill",
 		"复制更新命令",
 	} {
 		if !tt.HasText(want) {
@@ -209,7 +209,7 @@ func TestUpdateFullGroupsAndSecondaryStates(t *testing.T) {
 	}
 	a.notify(fromUpdate, toastOK, "已更新 vite。")
 	tt = newUITester(a.view, 1280, 900)
-	for _, want := range []string{"正在更新 1/2 个技能", "正在更新 1/2", "已更新到", "正在下载新版本…", "已更新 vite。", "GitHub 请求额度已用完"} {
+	for _, want := range []string{"正在更新 1/2 个 Skill", "正在更新 1/2", "已更新到", "正在下载新版本…", "已更新 vite。", "GitHub 请求额度已用完"} {
 		if !tt.HasText(want) {
 			t.Errorf("missing %q in progress view: %v", want, tt.Texts())
 		}
@@ -342,9 +342,9 @@ func TestUpdateStateSnapshots(t *testing.T) {
 	a5.upd.report = library.UpdateReport{
 		Items: []library.UpdateItem{
 			{Name: "skill-creator", Source: library.SourceID{Type: "github", Repo: "anthropics/skills"}, State: library.UpdCopies, Reason: library.Note{Detail: "有独立副本，需先收成一份"}},
-			{Name: "kami", Source: library.SourceID{Type: "github", Repo: "tw93/kami"}, State: library.UpdMovedOut, Reason: library.Note{Detail: "技能库中找不到，其他位置有同名技能；装回技能库后才能更新"}},
+			{Name: "kami", Source: library.SourceID{Type: "github", Repo: "tw93/kami"}, State: library.UpdMovedOut, Reason: library.Note{Detail: "Skill 库中找不到，其他位置有同名 Skill；装回 Skill 库后才能更新"}},
 			{Name: "code-ablation", Source: library.SourceID{Type: "github", Repo: "DBAAZzz/skills"}, State: library.UpdCopies, Reason: library.Note{Detail: "有独立副本，需先收成一份"}},
-			{Name: "better-readme", Source: library.SourceID{Type: "github", Repo: "tommy0103/better-readme-skill"}, State: library.UpdMovedOut, Reason: library.Note{Detail: "技能库中找不到，其他位置有同名技能；装回技能库后才能更新"}},
+			{Name: "better-readme", Source: library.SourceID{Type: "github", Repo: "tommy0103/better-readme-skill"}, State: library.UpdMovedOut, Reason: library.Note{Detail: "Skill 库中找不到，其他位置有同名 Skill；装回 Skill 库后才能更新"}},
 			{Name: "agently-mail", Names: []string{"agently-mail"}, Source: library.SourceID{Type: "well-known", Repo: "agent.qq.com"}, State: library.UpdWebsite, Reason: library.Note{Detail: "安装记录不完整，建议重新安装"}, Command: "npx skills add https://agent.qq.com -g -y"},
 			{Name: "open.feishu.cn", Names: make([]string, 27), Source: library.SourceID{Type: "well-known", Repo: "open.feishu.cn"}, State: library.UpdWebsite, Command: "npx skills update -g -y"},
 		},

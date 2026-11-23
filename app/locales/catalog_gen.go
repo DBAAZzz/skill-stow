@@ -76,13 +76,13 @@ func (msgs Messages) SettingsLanguageSystem() string {
 	return Catalog.Format(msgs.locale, "settingsLanguageSystem", nil)
 }
 
-// BusyRetryLater says "这个技能正在处理，请稍后再试"
+// BusyRetryLater says "这个 Skill 正在处理，请稍后再试"
 // in the language the app shows.
 //
 // 同一个技能正在被另一个操作处理
 func BusyRetryLater() string { return In(i18n.Locale()).BusyRetryLater() }
 
-// BusyRetryLater says "这个技能正在处理，请稍后再试"
+// BusyRetryLater says "这个 Skill 正在处理，请稍后再试"
 // in the language of msgs.
 //
 // 同一个技能正在被另一个操作处理
@@ -118,13 +118,13 @@ func (msgs Messages) UpdateUnsupportedFiles() string {
 	return Catalog.Format(msgs.locale, "updateUnsupportedFiles", nil)
 }
 
-// UpdateSkillRenamed says "技能名称已改变或无法确认，不能直接更新"
+// UpdateSkillRenamed says "Skill 名称已改变或无法确认，不能直接更新"
 // in the language the app shows.
 //
 // 更新：来源里技能改了名
 func UpdateSkillRenamed() string { return In(i18n.Locale()).UpdateSkillRenamed() }
 
-// UpdateSkillRenamed says "技能名称已改变或无法确认，不能直接更新"
+// UpdateSkillRenamed says "Skill 名称已改变或无法确认，不能直接更新"
 // in the language of msgs.
 //
 // 更新：来源里技能改了名
@@ -160,13 +160,13 @@ func (msgs Messages) DeleteUndoExpired() string {
 	return Catalog.Format(msgs.locale, "deleteUndoExpired", nil)
 }
 
-// DeleteReadOnly says "内置和插件技能不能删除"
+// DeleteReadOnly says "内置和插件 Skill 不能删除"
 // in the language the app shows.
 //
 // 删除：只读技能
 func DeleteReadOnly() string { return In(i18n.Locale()).DeleteReadOnly() }
 
-// DeleteReadOnly says "内置和插件技能不能删除"
+// DeleteReadOnly says "内置和插件 Skill 不能删除"
 // in the language of msgs.
 //
 // 删除：只读技能
@@ -174,13 +174,13 @@ func (msgs Messages) DeleteReadOnly() string {
 	return Catalog.Format(msgs.locale, "deleteReadOnly", nil)
 }
 
-// ImportPending says "这个技能还没下载完"
+// ImportPending says "这个 Skill 还没下载完"
 // in the language the app shows.
 //
 // 添加技能：还在补齐文件
 func ImportPending() string { return In(i18n.Locale()).ImportPending() }
 
-// ImportPending says "这个技能还没下载完"
+// ImportPending says "这个 Skill 还没下载完"
 // in the language of msgs.
 //
 // 添加技能：还在补齐文件
@@ -330,13 +330,13 @@ func (msgs Messages) NavTidy() string {
 	return Catalog.Format(msgs.locale, "navTidy", nil)
 }
 
-// NavLibrary says "技能库"
+// NavLibrary says "Skill 库"
 // in the language the app shows.
 //
 // 侧边栏分组标题
 func NavLibrary() string { return In(i18n.Locale()).NavLibrary() }
 
-// NavLibrary says "技能库"
+// NavLibrary says "Skill 库"
 // in the language of msgs.
 //
 // 侧边栏分组标题
@@ -372,13 +372,13 @@ func (msgs Messages) NavBuiltin() string {
 	return Catalog.Format(msgs.locale, "navBuiltin", nil)
 }
 
-// NavScopes says "技能范围"
+// NavScopes says "Skill 范围"
 // in the language the app shows.
 //
 // 侧边栏列表给辅助功能读的名字
 func NavScopes() string { return In(i18n.Locale()).NavScopes() }
 
-// NavScopes says "技能范围"
+// NavScopes says "Skill 范围"
 // in the language of msgs.
 //
 // 侧边栏列表给辅助功能读的名字
@@ -544,13 +544,13 @@ func (msgs Messages) ProjectsDialogAdd() string {
 	return Catalog.Format(msgs.locale, "projectsDialogAdd", nil)
 }
 
-// ProjectsDialogMessage says "选择项目目录。会检查其中 .claude/skills、.agents/skills 等目录里的技能。"
+// ProjectsDialogMessage says "选择项目目录。会检查其中 .claude/skills、.agents/skills 等目录里的 Skill。"
 // in the language the app shows.
 //
 // 添加项目的文件夹面板里的说明
 func ProjectsDialogMessage() string { return In(i18n.Locale()).ProjectsDialogMessage() }
 
-// ProjectsDialogMessage says "选择项目目录。会检查其中 .claude/skills、.agents/skills 等目录里的技能。"
+// ProjectsDialogMessage says "选择项目目录。会检查其中 .claude/skills、.agents/skills 等目录里的 Skill。"
 // in the language of msgs.
 //
 // 添加项目的文件夹面板里的说明
@@ -892,13 +892,13 @@ func (msgs Messages) UsageNoRecord() string {
 	return Catalog.Format(msgs.locale, "usageNoRecord", nil)
 }
 
-// UsageAgentsCantRead says "只有 {agents} 留有调用记录，它们都读不到这个技能。"
+// UsageAgentsCantRead says "只有 {agents} 留有调用记录，它们都读不到这个 Skill。"
 // in the language the app shows.
 //
 // usage.go:78
 func UsageAgentsCantRead(agents string) string { return In(i18n.Locale()).UsageAgentsCantRead(agents) }
 
-// UsageAgentsCantRead says "只有 {agents} 留有调用记录，它们都读不到这个技能。"
+// UsageAgentsCantRead says "只有 {agents} 留有调用记录，它们都读不到这个 Skill。"
 // in the language of msgs.
 //
 // usage.go:78
@@ -980,13 +980,13 @@ func (msgs Messages) UsageCallsUnit() string {
 	return Catalog.Format(msgs.locale, "usageCallsUnit", nil)
 }
 
-// UsageProjectSkillsUsed says "项目里的技能另有 {n} 个用过，不计入库内。"
+// UsageProjectSkillsUsed says "项目里的 Skill 另有 {n} 个用过，不计入库内。"
 // in the language the app shows.
 //
 // usage_page.go:165
 func UsageProjectSkillsUsed(n int) string { return In(i18n.Locale()).UsageProjectSkillsUsed(n) }
 
-// UsageProjectSkillsUsed says "项目里的技能另有 {n} 个用过，不计入库内。"
+// UsageProjectSkillsUsed says "项目里的 Skill 另有 {n} 个用过，不计入库内。"
 // in the language of msgs.
 //
 // usage_page.go:165
@@ -1176,13 +1176,13 @@ func (msgs Messages) UsageUnused() string {
 	return Catalog.Format(msgs.locale, "usageUnused", nil)
 }
 
-// UsageLibrarySkills says "库内技能"
+// UsageLibrarySkills says "库内 Skill"
 // in the language the app shows.
 //
 // usage_page.go:383
 func UsageLibrarySkills() string { return In(i18n.Locale()).UsageLibrarySkills() }
 
-// UsageLibrarySkills says "库内技能"
+// UsageLibrarySkills says "库内 Skill"
 // in the language of msgs.
 //
 // usage_page.go:383
@@ -1204,13 +1204,13 @@ func (msgs Messages) UsageUsedSection() string {
 	return Catalog.Format(msgs.locale, "usageUsedSection", nil)
 }
 
-// UsageNoCallsYet says "还没有调用过技能"
+// UsageNoCallsYet says "还没有调用过 Skill"
 // in the language the app shows.
 //
 // usage_page.go:525
 func UsageNoCallsYet() string { return In(i18n.Locale()).UsageNoCallsYet() }
 
-// UsageNoCallsYet says "还没有调用过技能"
+// UsageNoCallsYet says "还没有调用过 Skill"
 // in the language of msgs.
 //
 // usage_page.go:525
@@ -1358,13 +1358,13 @@ func (msgs Messages) OpenInReader() string {
 	return Catalog.Format(msgs.locale, "openInReader", nil)
 }
 
-// FilesUnreadable says "读不到这个技能的文件"
+// FilesUnreadable says "读不到这个 Skill 的文件"
 // in the language the app shows.
 //
 // usage_page.go:998
 func FilesUnreadable() string { return In(i18n.Locale()).FilesUnreadable() }
 
-// FilesUnreadable says "读不到这个技能的文件"
+// FilesUnreadable says "读不到这个 Skill 的文件"
 // in the language of msgs.
 //
 // usage_page.go:998
@@ -1714,13 +1714,13 @@ func (msgs Messages) UpdateStateUnreadable(err string) string {
 	return Catalog.Format(msgs.locale, "updateStateUnreadable", map[string]any{"err": err})
 }
 
-// UpdateLocalUnreadable says "无法读取本机技能：{err}"
+// UpdateLocalUnreadable says "无法读取本机 Skill：{err}"
 // in the language the app shows.
 //
 // 更新检查：本机那份读不了
 func UpdateLocalUnreadable(err string) string { return In(i18n.Locale()).UpdateLocalUnreadable(err) }
 
-// UpdateLocalUnreadable says "无法读取本机技能：{err}"
+// UpdateLocalUnreadable says "无法读取本机 Skill：{err}"
 // in the language of msgs.
 //
 // 更新检查：本机那份读不了
@@ -1918,13 +1918,13 @@ func (msgs Messages) OriginBuiltin(agent string) string {
 	return Catalog.Format(msgs.locale, "originBuiltin", map[string]any{"agent": agent})
 }
 
-// OriginProject says "项目 {project} 里的技能"
+// OriginProject says "项目 {project} 里的 Skill"
 // in the language the app shows.
 //
 // 技能来源说明：项目里的
 func OriginProject(project string) string { return In(i18n.Locale()).OriginProject(project) }
 
-// OriginProject says "项目 {project} 里的技能"
+// OriginProject says "项目 {project} 里的 Skill"
 // in the language of msgs.
 //
 // 技能来源说明：项目里的
@@ -2052,13 +2052,13 @@ func (msgs Messages) ImportUnreadableFiles(err string) string {
 	return Catalog.Format(msgs.locale, "importUnreadableFiles", map[string]any{"err": err})
 }
 
-// ImportLinkOutside says "包含指向技能目录以外的链接：{path}"
+// ImportLinkOutside says "包含指向 Skill 目录以外的链接：{path}"
 // in the language the app shows.
 //
 // 添加技能：技能的问题
 func ImportLinkOutside(path string) string { return In(i18n.Locale()).ImportLinkOutside(path) }
 
-// ImportLinkOutside says "包含指向技能目录以外的链接：{path}"
+// ImportLinkOutside says "包含指向 Skill 目录以外的链接：{path}"
 // in the language of msgs.
 //
 // 添加技能：技能的问题
@@ -2372,13 +2372,13 @@ func (msgs Messages) ImportReadFailed(err string) string {
 	return Catalog.Format(msgs.locale, "importReadFailed", map[string]any{"err": err})
 }
 
-// ImportNameHasSpaces says "名称里有空格。技能名只能用小写字母、数字和连字符"
+// ImportNameHasSpaces says "名称里有空格。Skill 名只能用小写字母、数字和连字符"
 // in the language the app shows.
 //
 // 添加技能：技能名不合规
 func ImportNameHasSpaces() string { return In(i18n.Locale()).ImportNameHasSpaces() }
 
-// ImportNameHasSpaces says "名称里有空格。技能名只能用小写字母、数字和连字符"
+// ImportNameHasSpaces says "名称里有空格。Skill 名只能用小写字母、数字和连字符"
 // in the language of msgs.
 //
 // 添加技能：技能名不合规
@@ -2386,13 +2386,13 @@ func (msgs Messages) ImportNameHasSpaces() string {
 	return Catalog.Format(msgs.locale, "importNameHasSpaces", nil)
 }
 
-// ImportNameHasUppercase says "名称里有大写字母。技能名只能用小写字母、数字和连字符"
+// ImportNameHasUppercase says "名称里有大写字母。Skill 名只能用小写字母、数字和连字符"
 // in the language the app shows.
 //
 // 添加技能：技能名不合规
 func ImportNameHasUppercase() string { return In(i18n.Locale()).ImportNameHasUppercase() }
 
-// ImportNameHasUppercase says "名称里有大写字母。技能名只能用小写字母、数字和连字符"
+// ImportNameHasUppercase says "名称里有大写字母。Skill 名只能用小写字母、数字和连字符"
 // in the language of msgs.
 //
 // 添加技能：技能名不合规
@@ -2400,7 +2400,7 @@ func (msgs Messages) ImportNameHasUppercase() string {
 	return Catalog.Format(msgs.locale, "importNameHasUppercase", nil)
 }
 
-// ImportNameHasSpacesAndUppercase says "名称里有空格和大写字母。技能名只能用小写字母、数字和连字符"
+// ImportNameHasSpacesAndUppercase says "名称里有空格和大写字母。Skill 名只能用小写字母、数字和连字符"
 // in the language the app shows.
 //
 // 添加技能：技能名不合规
@@ -2408,7 +2408,7 @@ func ImportNameHasSpacesAndUppercase() string {
 	return In(i18n.Locale()).ImportNameHasSpacesAndUppercase()
 }
 
-// ImportNameHasSpacesAndUppercase says "名称里有空格和大写字母。技能名只能用小写字母、数字和连字符"
+// ImportNameHasSpacesAndUppercase says "名称里有空格和大写字母。Skill 名只能用小写字母、数字和连字符"
 // in the language of msgs.
 //
 // 添加技能：技能名不合规
@@ -2416,13 +2416,13 @@ func (msgs Messages) ImportNameHasSpacesAndUppercase() string {
 	return Catalog.Format(msgs.locale, "importNameHasSpacesAndUppercase", nil)
 }
 
-// ImportDuplicateName says "同一来源里有两个叫 {name} 的技能"
+// ImportDuplicateName says "同一来源里有两个叫 {name} 的 Skill"
 // in the language the app shows.
 //
 // 添加技能：同名
 func ImportDuplicateName(name string) string { return In(i18n.Locale()).ImportDuplicateName(name) }
 
-// ImportDuplicateName says "同一来源里有两个叫 {name} 的技能"
+// ImportDuplicateName says "同一来源里有两个叫 {name} 的 Skill"
 // in the language of msgs.
 //
 // 添加技能：同名
@@ -2430,13 +2430,13 @@ func (msgs Messages) ImportDuplicateName(name string) string {
 	return Catalog.Format(msgs.locale, "importDuplicateName", map[string]any{"name": name})
 }
 
-// ImportNotAtRoot says "{host} 的技能不在网站根目录。"
+// ImportNotAtRoot says "{host} 的 Skill 不在网站根目录。"
 // in the language the app shows.
 //
 // 添加技能：网站来源猜的地址不对
 func ImportNotAtRoot(host string) string { return In(i18n.Locale()).ImportNotAtRoot(host) }
 
-// ImportNotAtRoot says "{host} 的技能不在网站根目录。"
+// ImportNotAtRoot says "{host} 的 Skill 不在网站根目录。"
 // in the language of msgs.
 //
 // 添加技能：网站来源猜的地址不对
@@ -2514,13 +2514,13 @@ func (msgs Messages) ActionAddTo(agent string) string {
 	return Catalog.Format(msgs.locale, "actionAddTo", map[string]any{"agent": agent})
 }
 
-// CollectTitle says "把 {name} 收进我的技能？"
+// CollectTitle says "把 {name} 收进我的 Skill？"
 // in the language the app shows.
 //
 // 把项目技能收进技能库的确认框标题
 func CollectTitle(name string) string { return In(i18n.Locale()).CollectTitle(name) }
 
-// CollectTitle says "把 {name} 收进我的技能？"
+// CollectTitle says "把 {name} 收进我的 Skill？"
 // in the language of msgs.
 //
 // 把项目技能收进技能库的确认框标题
@@ -2698,13 +2698,13 @@ func (msgs Messages) UpdateChooseOldVersionAction() string {
 	return Catalog.Format(msgs.locale, "updateChooseOldVersionAction", nil)
 }
 
-// UpdateStagingDifferentDisk says "这个位置不支持安全更新：暂存与技能不在同一磁盘"
+// UpdateStagingDifferentDisk says "这个位置不支持安全更新：暂存与 Skill 不在同一磁盘"
 // in the language the app shows.
 //
 // 更新暂存目录与技能不在同一磁盘时显示。
 func UpdateStagingDifferentDisk() string { return In(i18n.Locale()).UpdateStagingDifferentDisk() }
 
-// UpdateStagingDifferentDisk says "这个位置不支持安全更新：暂存与技能不在同一磁盘"
+// UpdateStagingDifferentDisk says "这个位置不支持安全更新：暂存与 Skill 不在同一磁盘"
 // in the language of msgs.
 //
 // 更新暂存目录与技能不在同一磁盘时显示。
@@ -2756,13 +2756,13 @@ func (msgs Messages) LibrarySkillErrorPrefix(name string) string {
 	return Catalog.Format(msgs.locale, "librarySkillErrorPrefix", map[string]any{"name": name})
 }
 
-// CollectRequiresGlobalLink says "只有被全局链接的项目技能能收进技能库"
+// CollectRequiresGlobalLink says "只有被全局链接的项目 Skill 能收进 Skill 库"
 // in the language the app shows.
 //
 // 收进技能库时技能不符合全局链接条件。
 func CollectRequiresGlobalLink() string { return In(i18n.Locale()).CollectRequiresGlobalLink() }
 
-// CollectRequiresGlobalLink says "只有被全局链接的项目技能能收进技能库"
+// CollectRequiresGlobalLink says "只有被全局链接的项目 Skill 能收进 Skill 库"
 // in the language of msgs.
 //
 // 收进技能库时技能不符合全局链接条件。
@@ -2770,13 +2770,13 @@ func (msgs Messages) CollectRequiresGlobalLink() string {
 	return Catalog.Format(msgs.locale, "collectRequiresGlobalLink", nil)
 }
 
-// CollectSampleUnavailable says "示例数据不能收进技能库"
+// CollectSampleUnavailable says "示例数据不能收进 Skill 库"
 // in the language the app shows.
 //
 // 尝试将示例技能收进技能库时显示。
 func CollectSampleUnavailable() string { return In(i18n.Locale()).CollectSampleUnavailable() }
 
-// CollectSampleUnavailable says "示例数据不能收进技能库"
+// CollectSampleUnavailable says "示例数据不能收进 Skill 库"
 // in the language of msgs.
 //
 // 尝试将示例技能收进技能库时显示。
@@ -2784,13 +2784,13 @@ func (msgs Messages) CollectSampleUnavailable() string {
 	return Catalog.Format(msgs.locale, "collectSampleUnavailable", nil)
 }
 
-// CollectNameExists says "技能库里已经有 {name}，没有覆盖它"
+// CollectNameExists says "Skill 库里已经有 {name}，没有覆盖它"
 // in the language the app shows.
 //
 // 收进技能库时同名技能已存在。
 func CollectNameExists(name string) string { return In(i18n.Locale()).CollectNameExists(name) }
 
-// CollectNameExists says "技能库里已经有 {name}，没有覆盖它"
+// CollectNameExists says "Skill 库里已经有 {name}，没有覆盖它"
 // in the language of msgs.
 //
 // 收进技能库时同名技能已存在。
@@ -2814,13 +2814,13 @@ func (msgs Messages) CollectLinkRenameFailed(p string, tmp string) string {
 	return Catalog.Format(msgs.locale, "collectLinkRenameFailed", map[string]any{"p": p, "tmp": tmp})
 }
 
-// CollectionToggleIndividually says "集合不能整体启停，请逐个技能操作"
+// CollectionToggleIndividually says "集合不能整体启停，请逐个 Skill 操作"
 // in the language the app shows.
 //
 // 尝试整体启停集合时显示。
 func CollectionToggleIndividually() string { return In(i18n.Locale()).CollectionToggleIndividually() }
 
-// CollectionToggleIndividually says "集合不能整体启停，请逐个技能操作"
+// CollectionToggleIndividually says "集合不能整体启停，请逐个 Skill 操作"
 // in the language of msgs.
 //
 // 尝试整体启停集合时显示。
@@ -2842,7 +2842,7 @@ func (msgs Messages) CopiesNothingToMerge() string {
 	return Catalog.Format(msgs.locale, "copiesNothingToMerge", nil)
 }
 
-// CopiesGroupedSkillProtected says "技能库里的 {name} 在一组技能里，这里不替换它"
+// CopiesGroupedSkillProtected says "Skill 库里的 {name} 在一组 Skill 里，这里不替换它"
 // in the language the app shows.
 //
 // 收成一份时目标技能属于集合。
@@ -2850,7 +2850,7 @@ func CopiesGroupedSkillProtected(name string) string {
 	return In(i18n.Locale()).CopiesGroupedSkillProtected(name)
 }
 
-// CopiesGroupedSkillProtected says "技能库里的 {name} 在一组技能里，这里不替换它"
+// CopiesGroupedSkillProtected says "Skill 库里的 {name} 在一组 Skill 里，这里不替换它"
 // in the language of msgs.
 //
 // 收成一份时目标技能属于集合。
@@ -3216,13 +3216,13 @@ func (msgs Messages) ImportUnknownAgentId(id string) string {
 	return Catalog.Format(msgs.locale, "importUnknownAgentId", map[string]any{"id": id})
 }
 
-// ImportSkillNotFound says "找不到这个技能"
+// ImportSkillNotFound says "找不到这个 Skill"
 // in the language the app shows.
 //
 // 添加技能时找不到目标技能。
 func ImportSkillNotFound() string { return In(i18n.Locale()).ImportSkillNotFound() }
 
-// ImportSkillNotFound says "找不到这个技能"
+// ImportSkillNotFound says "找不到这个 Skill"
 // in the language of msgs.
 //
 // 添加技能时找不到目标技能。
@@ -3362,13 +3362,13 @@ func (msgs Messages) ImportExtractedArchiveTooLarge() string {
 	return Catalog.Format(msgs.locale, "importExtractedArchiveTooLarge", nil)
 }
 
-// ImportDropFolderOrZip says "拖入技能文件夹，或打包好的 .zip"
+// ImportDropFolderOrZip says "拖入 Skill 文件夹，或打包好的 .zip"
 // in the language the app shows.
 //
 // 本地导入时提示支持的拖入内容。
 func ImportDropFolderOrZip() string { return In(i18n.Locale()).ImportDropFolderOrZip() }
 
-// ImportDropFolderOrZip says "拖入技能文件夹，或打包好的 .zip"
+// ImportDropFolderOrZip says "拖入 Skill 文件夹，或打包好的 .zip"
 // in the language of msgs.
 //
 // 本地导入时提示支持的拖入内容。
@@ -3390,7 +3390,7 @@ func (msgs Messages) ImportDroppedContent() string {
 	return Catalog.Format(msgs.locale, "importDroppedContent", nil)
 }
 
-// ImportFoldersNotSkills says "里面有 {count} 个文件夹（{p1}），都不是技能"
+// ImportFoldersNotSkills says "里面有 {count} 个文件夹（{p1}），都不是 Skill"
 // in the language the app shows.
 //
 // 导入目录中仅发现不含技能的文件夹。
@@ -3398,7 +3398,7 @@ func ImportFoldersNotSkills(count int, p1 string) string {
 	return In(i18n.Locale()).ImportFoldersNotSkills(count, p1)
 }
 
-// ImportFoldersNotSkills says "里面有 {count} 个文件夹（{p1}），都不是技能"
+// ImportFoldersNotSkills says "里面有 {count} 个文件夹（{p1}），都不是 Skill"
 // in the language of msgs.
 //
 // 导入目录中仅发现不含技能的文件夹。
@@ -3406,13 +3406,13 @@ func (msgs Messages) ImportFoldersNotSkills(count int, p1 string) string {
 	return Catalog.Format(msgs.locale, "importFoldersNotSkills", map[string]any{"count": count, "p1": p1})
 }
 
-// ImportUseSubdirectoryOrZip says "粘贴技能所在子目录的链接，或下载 zip 拖进来"
+// ImportUseSubdirectoryOrZip says "粘贴 Skill 所在子目录的链接，或下载 zip 拖进来"
 // in the language the app shows.
 //
 // 远程目录过大时提示缩小范围或使用压缩包。
 func ImportUseSubdirectoryOrZip() string { return In(i18n.Locale()).ImportUseSubdirectoryOrZip() }
 
-// ImportUseSubdirectoryOrZip says "粘贴技能所在子目录的链接，或下载 zip 拖进来"
+// ImportUseSubdirectoryOrZip says "粘贴 Skill 所在子目录的链接，或下载 zip 拖进来"
 // in the language of msgs.
 //
 // 远程目录过大时提示缩小范围或使用压缩包。
@@ -3420,13 +3420,13 @@ func (msgs Messages) ImportUseSubdirectoryOrZip() string {
 	return Catalog.Format(msgs.locale, "importUseSubdirectoryOrZip", nil)
 }
 
-// ImportSkillFolderHint says "技能是一个带 SKILL.md 的文件夹；如果在子目录里，可以直接粘贴那个子目录的链接"
+// ImportSkillFolderHint says "Skill 是一个带 SKILL.md 的文件夹；如果在子目录里，可以直接粘贴那个子目录的链接"
 // in the language the app shows.
 //
 // 远程来源没有技能时解释技能文件结构。
 func ImportSkillFolderHint() string { return In(i18n.Locale()).ImportSkillFolderHint() }
 
-// ImportSkillFolderHint says "技能是一个带 SKILL.md 的文件夹；如果在子目录里，可以直接粘贴那个子目录的链接"
+// ImportSkillFolderHint says "Skill 是一个带 SKILL.md 的文件夹；如果在子目录里，可以直接粘贴那个子目录的链接"
 // in the language of msgs.
 //
 // 远程来源没有技能时解释技能文件结构。
@@ -3574,13 +3574,13 @@ func (msgs Messages) ImportNameTooLong() string {
 	return Catalog.Format(msgs.locale, "importNameTooLong", nil)
 }
 
-// ImportNameInvalidCharacters says "名称里有不能用的字符。技能名只能用小写字母、数字和连字符"
+// ImportNameInvalidCharacters says "名称里有不能用的字符。Skill 名只能用小写字母、数字和连字符"
 // in the language the app shows.
 //
 // 导入技能名称包含不支持的字符。
 func ImportNameInvalidCharacters() string { return In(i18n.Locale()).ImportNameInvalidCharacters() }
 
-// ImportNameInvalidCharacters says "名称里有不能用的字符。技能名只能用小写字母、数字和连字符"
+// ImportNameInvalidCharacters says "名称里有不能用的字符。Skill 名只能用小写字母、数字和连字符"
 // in the language of msgs.
 //
 // 导入技能名称包含不支持的字符。
@@ -3588,7 +3588,7 @@ func (msgs Messages) ImportNameInvalidCharacters() string {
 	return Catalog.Format(msgs.locale, "importNameInvalidCharacters", nil)
 }
 
-// ImportFileCountExceeded says "这个技能有 {count} 个文件，超过上限"
+// ImportFileCountExceeded says "这个 Skill 有 {count} 个文件，超过上限"
 // in the language the app shows.
 //
 // 导入技能的文件数量超过上限。
@@ -3596,7 +3596,7 @@ func ImportFileCountExceeded(count int) string {
 	return In(i18n.Locale()).ImportFileCountExceeded(count)
 }
 
-// ImportFileCountExceeded says "这个技能有 {count} 个文件，超过上限"
+// ImportFileCountExceeded says "这个 Skill 有 {count} 个文件，超过上限"
 // in the language of msgs.
 //
 // 导入技能的文件数量超过上限。
@@ -3604,13 +3604,13 @@ func (msgs Messages) ImportFileCountExceeded(count int) string {
 	return Catalog.Format(msgs.locale, "importFileCountExceeded", map[string]any{"count": count})
 }
 
-// ImportSkillSizeExceeded says "这个技能有 {p0}，超过 20 MB 的上限"
+// ImportSkillSizeExceeded says "这个 Skill 有 {p0}，超过 20 MB 的上限"
 // in the language the app shows.
 //
 // 导入技能的总大小超过上限。
 func ImportSkillSizeExceeded(p0 string) string { return In(i18n.Locale()).ImportSkillSizeExceeded(p0) }
 
-// ImportSkillSizeExceeded says "这个技能有 {p0}，超过 20 MB 的上限"
+// ImportSkillSizeExceeded says "这个 Skill 有 {p0}，超过 20 MB 的上限"
 // in the language of msgs.
 //
 // 导入技能的总大小超过上限。
@@ -3648,13 +3648,13 @@ func (msgs Messages) ImportEmptySnapshot() string {
 	return Catalog.Format(msgs.locale, "importEmptySnapshot", nil)
 }
 
-// ImportNotSkillSource says "这个地址不是技能源。"
+// ImportNotSkillSource says "这个地址不是 Skill 源。"
 // in the language the app shows.
 //
 // 网站导入时地址不是可识别的技能源。
 func ImportNotSkillSource() string { return In(i18n.Locale()).ImportNotSkillSource() }
 
-// ImportNotSkillSource says "这个地址不是技能源。"
+// ImportNotSkillSource says "这个地址不是 Skill 源。"
 // in the language of msgs.
 //
 // 网站导入时地址不是可识别的技能源。
@@ -3704,13 +3704,13 @@ func (msgs Messages) ImportReadAgain() string {
 	return Catalog.Format(msgs.locale, "importReadAgain", nil)
 }
 
-// ImportWebsiteNoPublicSkills says "这个网站没有公开的技能。"
+// ImportWebsiteNoPublicSkills says "这个网站没有公开的 Skill。"
 // in the language the app shows.
 //
 // 网站导入没有发现公开技能。
 func ImportWebsiteNoPublicSkills() string { return In(i18n.Locale()).ImportWebsiteNoPublicSkills() }
 
-// ImportWebsiteNoPublicSkills says "这个网站没有公开的技能。"
+// ImportWebsiteNoPublicSkills says "这个网站没有公开的 Skill。"
 // in the language of msgs.
 //
 // 网站导入没有发现公开技能。
@@ -3734,7 +3734,7 @@ func (msgs Messages) ImportWebsiteFileHttpError(f string, code int) string {
 	return Catalog.Format(msgs.locale, "importWebsiteFileHttpError", map[string]any{"f": f, "code": code})
 }
 
-// ImportWebsiteSkillHttpError says "网站上取不到这个技能（HTTP {code}）"
+// ImportWebsiteSkillHttpError says "网站上取不到这个 Skill（HTTP {code}）"
 // in the language the app shows.
 //
 // 从网站读取技能时遇到 HTTP 错误。
@@ -3742,7 +3742,7 @@ func ImportWebsiteSkillHttpError(code int) string {
 	return In(i18n.Locale()).ImportWebsiteSkillHttpError(code)
 }
 
-// ImportWebsiteSkillHttpError says "网站上取不到这个技能（HTTP {code}）"
+// ImportWebsiteSkillHttpError says "网站上取不到这个 Skill（HTTP {code}）"
 // in the language of msgs.
 //
 // 从网站读取技能时遇到 HTTP 错误。
@@ -3892,7 +3892,7 @@ func (msgs Messages) IssueMissingDescription() string {
 	return Catalog.Format(msgs.locale, "issueMissingDescription", nil)
 }
 
-// IssueGloballyLinkedProjectSkills says "项目技能被全局链接"
+// IssueGloballyLinkedProjectSkills says "项目 Skill 被全局链接"
 // in the language the app shows.
 //
 // 整理页面中被全局链接的项目技能分类。
@@ -3900,7 +3900,7 @@ func IssueGloballyLinkedProjectSkills() string {
 	return In(i18n.Locale()).IssueGloballyLinkedProjectSkills()
 }
 
-// IssueGloballyLinkedProjectSkills says "项目技能被全局链接"
+// IssueGloballyLinkedProjectSkills says "项目 Skill 被全局链接"
 // in the language of msgs.
 //
 // 整理页面中被全局链接的项目技能分类。
@@ -3908,7 +3908,7 @@ func (msgs Messages) IssueGloballyLinkedProjectSkills() string {
 	return Catalog.Format(msgs.locale, "issueGloballyLinkedProjectSkills", nil)
 }
 
-// IssueDeletedSkillInstallRecords says "已删除技能的安装记录"
+// IssueDeletedSkillInstallRecords says "已删除 Skill 的安装记录"
 // in the language the app shows.
 //
 // 整理页面中已删除技能的残留安装记录分类。
@@ -3916,7 +3916,7 @@ func IssueDeletedSkillInstallRecords() string {
 	return In(i18n.Locale()).IssueDeletedSkillInstallRecords()
 }
 
-// IssueDeletedSkillInstallRecords says "已删除技能的安装记录"
+// IssueDeletedSkillInstallRecords says "已删除 Skill 的安装记录"
 // in the language of msgs.
 //
 // 整理页面中已删除技能的残留安装记录分类。
@@ -3924,7 +3924,7 @@ func (msgs Messages) IssueDeletedSkillInstallRecords() string {
 	return Catalog.Format(msgs.locale, "issueDeletedSkillInstallRecords", nil)
 }
 
-// IssueLibrarySkillMissing says "技能库里没有 {name}"
+// IssueLibrarySkillMissing says "Skill 库里没有 {name}"
 // in the language the app shows.
 //
 // 整理技能时技能库没有对应技能。
@@ -3932,7 +3932,7 @@ func IssueLibrarySkillMissing(name string) string {
 	return In(i18n.Locale()).IssueLibrarySkillMissing(name)
 }
 
-// IssueLibrarySkillMissing says "技能库里没有 {name}"
+// IssueLibrarySkillMissing says "Skill 库里没有 {name}"
 // in the language of msgs.
 //
 // 整理技能时技能库没有对应技能。
@@ -4012,13 +4012,13 @@ func (msgs Messages) LibraryPluginInstall() string {
 	return Catalog.Format(msgs.locale, "libraryPluginInstall", nil)
 }
 
-// LibraryMySkills says "我的技能"
+// LibraryMySkills says "我的 Skill"
 // in the language the app shows.
 //
 // 技能来源说明或列表分组显示我的技能。
 func LibraryMySkills() string { return In(i18n.Locale()).LibraryMySkills() }
 
-// LibraryMySkills says "我的技能"
+// LibraryMySkills says "我的 Skill"
 // in the language of msgs.
 //
 // 技能来源说明或列表分组显示我的技能。
@@ -4026,13 +4026,13 @@ func (msgs Messages) LibraryMySkills() string {
 	return Catalog.Format(msgs.locale, "libraryMySkills", nil)
 }
 
-// LibraryBuiltinSkills says "内置技能"
+// LibraryBuiltinSkills says "内置 Skill"
 // in the language the app shows.
 //
 // 技能列表分组显示内置技能。
 func LibraryBuiltinSkills() string { return In(i18n.Locale()).LibraryBuiltinSkills() }
 
-// LibraryBuiltinSkills says "内置技能"
+// LibraryBuiltinSkills says "内置 Skill"
 // in the language of msgs.
 //
 // 技能列表分组显示内置技能。
@@ -4040,13 +4040,13 @@ func (msgs Messages) LibraryBuiltinSkills() string {
 	return Catalog.Format(msgs.locale, "libraryBuiltinSkills", nil)
 }
 
-// LibraryProjectSkills says "项目技能"
+// LibraryProjectSkills says "项目 Skill"
 // in the language the app shows.
 //
 // 技能列表分组显示项目技能。
 func LibraryProjectSkills() string { return In(i18n.Locale()).LibraryProjectSkills() }
 
-// LibraryProjectSkills says "项目技能"
+// LibraryProjectSkills says "项目 Skill"
 // in the language of msgs.
 //
 // 技能列表分组显示项目技能。
@@ -4054,13 +4054,13 @@ func (msgs Messages) LibraryProjectSkills() string {
 	return Catalog.Format(msgs.locale, "libraryProjectSkills", nil)
 }
 
-// LibraryAllSkills says "全部技能"
+// LibraryAllSkills says "全部 Skill"
 // in the language the app shows.
 //
 // 技能列表分组显示全部技能。
 func LibraryAllSkills() string { return In(i18n.Locale()).LibraryAllSkills() }
 
-// LibraryAllSkills says "全部技能"
+// LibraryAllSkills says "全部 Skill"
 // in the language of msgs.
 //
 // 技能列表分组显示全部技能。
@@ -4068,13 +4068,13 @@ func (msgs Messages) LibraryAllSkills() string {
 	return Catalog.Format(msgs.locale, "libraryAllSkills", nil)
 }
 
-// LibraryReadOnlyToggle says "内置和项目技能不能在这里启用或停用"
+// LibraryReadOnlyToggle says "内置和项目 Skill 不能在这里启用或停用"
 // in the language the app shows.
 //
 // 用户尝试启停只读来源技能时显示。
 func LibraryReadOnlyToggle() string { return In(i18n.Locale()).LibraryReadOnlyToggle() }
 
-// LibraryReadOnlyToggle says "内置和项目技能不能在这里启用或停用"
+// LibraryReadOnlyToggle says "内置和项目 Skill 不能在这里启用或停用"
 // in the language of msgs.
 //
 // 用户尝试启停只读来源技能时显示。
@@ -4168,13 +4168,13 @@ func (msgs Messages) NativeDisabledMustBeNameArray() string {
 	return Catalog.Format(msgs.locale, "nativeDisabledMustBeNameArray", nil)
 }
 
-// NativeMissingFrontmatterName says "SKILL.md 缺少 frontmatter name，无法确定技能 ID"
+// NativeMissingFrontmatterName says "SKILL.md 缺少 frontmatter name，无法确定 Skill ID"
 // in the language the app shows.
 //
 // 读取技能原生 ID 时缺少 frontmatter 名称。
 func NativeMissingFrontmatterName() string { return In(i18n.Locale()).NativeMissingFrontmatterName() }
 
-// NativeMissingFrontmatterName says "SKILL.md 缺少 frontmatter name，无法确定技能 ID"
+// NativeMissingFrontmatterName says "SKILL.md 缺少 frontmatter name，无法确定 Skill ID"
 // in the language of msgs.
 //
 // 读取技能原生 ID 时缺少 frontmatter 名称。
@@ -4270,7 +4270,7 @@ func (msgs Messages) NativeCliStillAvailable() string {
 	return Catalog.Format(msgs.locale, "nativeCliStillAvailable", nil)
 }
 
-// NativeDisabledByExistingConfig says "此技能由用户原有的 skills.config 停用，请在 Codex 配置中调整"
+// NativeDisabledByExistingConfig says "此 Skill 由用户原有的 skills.config 停用，请在 Codex 配置中调整"
 // in the language the app shows.
 //
 // 技能被用户已有 Codex 规则停用而不能直接覆盖。
@@ -4278,7 +4278,7 @@ func NativeDisabledByExistingConfig() string {
 	return In(i18n.Locale()).NativeDisabledByExistingConfig()
 }
 
-// NativeDisabledByExistingConfig says "此技能由用户原有的 skills.config 停用，请在 Codex 配置中调整"
+// NativeDisabledByExistingConfig says "此 Skill 由用户原有的 skills.config 停用，请在 Codex 配置中调整"
 // in the language of msgs.
 //
 // 技能被用户已有 Codex 规则停用而不能直接覆盖。
@@ -4300,14 +4300,14 @@ func (msgs Messages) NativeToggleOverridden() string {
 	return Catalog.Format(msgs.locale, "nativeToggleOverridden", nil)
 }
 
-// NativeZCodeSkillsOff says "ZCode 设置里关闭了全部技能，要先在 ZCode 里打开技能功能。"
+// NativeZCodeSkillsOff says "ZCode 设置里关闭了全部 Skill，要先在 ZCode 里打开 Skill 功能。"
 // in the language the app shows.
 //
 // ZCode 的 features.skill 或 skills.enabled 是
 // false：单个开关不会生效
 func NativeZCodeSkillsOff() string { return In(i18n.Locale()).NativeZCodeSkillsOff() }
 
-// NativeZCodeSkillsOff says "ZCode 设置里关闭了全部技能，要先在 ZCode 里打开技能功能。"
+// NativeZCodeSkillsOff says "ZCode 设置里关闭了全部 Skill，要先在 ZCode 里打开 Skill 功能。"
 // in the language of msgs.
 //
 // ZCode 的 features.skill 或 skills.enabled 是
@@ -4722,7 +4722,7 @@ func (msgs Messages) ScanAgentDirectoryMissing(name string, p1 string) string {
 	return Catalog.Format(msgs.locale, "scanAgentDirectoryMissing", map[string]any{"name": name, "p1": p1})
 }
 
-// ScanAgentSkillExists says "{name} 的技能目录里已经有一个 {name2}，没有覆盖它"
+// ScanAgentSkillExists says "{name} 的 Skill 目录里已经有一个 {name2}，没有覆盖它"
 // in the language the app shows.
 //
 // 为 Agent 建链接时技能目录已有同名项。
@@ -4730,7 +4730,7 @@ func ScanAgentSkillExists(name string, name2 string) string {
 	return In(i18n.Locale()).ScanAgentSkillExists(name, name2)
 }
 
-// ScanAgentSkillExists says "{name} 的技能目录里已经有一个 {name2}，没有覆盖它"
+// ScanAgentSkillExists says "{name} 的 Skill 目录里已经有一个 {name2}，没有覆盖它"
 // in the language of msgs.
 //
 // 为 Agent 建链接时技能目录已有同名项。
@@ -4770,7 +4770,7 @@ func (msgs Messages) ScanRealDirectoryCannotUnlink(p0 string, name string) strin
 	return Catalog.Format(msgs.locale, "scanRealDirectoryCannotUnlink", map[string]any{"p0": p0, "name": name})
 }
 
-// SettingsSampleSkillDirectoryUnavailable says "示例数据不能添加技能目录"
+// SettingsSampleSkillDirectoryUnavailable says "示例数据不能添加 Skill 目录"
 // in the language the app shows.
 //
 // 示例模式尝试添加技能目录时显示。
@@ -4778,7 +4778,7 @@ func SettingsSampleSkillDirectoryUnavailable() string {
 	return In(i18n.Locale()).SettingsSampleSkillDirectoryUnavailable()
 }
 
-// SettingsSampleSkillDirectoryUnavailable says "示例数据不能添加技能目录"
+// SettingsSampleSkillDirectoryUnavailable says "示例数据不能添加 Skill 目录"
 // in the language of msgs.
 //
 // 示例模式尝试添加技能目录时显示。
@@ -4802,7 +4802,7 @@ func (msgs Messages) SettingsSharedDirectoryAlreadyAdded(p0 string) string {
 	return Catalog.Format(msgs.locale, "settingsSharedDirectoryAlreadyAdded", map[string]any{"p0": p0})
 }
 
-// SettingsAgentDirectoryAlreadyAdded says "{p0} 是 {name} 的技能目录，已经在列表里了"
+// SettingsAgentDirectoryAlreadyAdded says "{p0} 是 {name} 的 Skill 目录，已经在列表里了"
 // in the language the app shows.
 //
 // 添加自定义技能目录时路径已属于 Agent 的技能目录。
@@ -4810,7 +4810,7 @@ func SettingsAgentDirectoryAlreadyAdded(p0 string, name string) string {
 	return In(i18n.Locale()).SettingsAgentDirectoryAlreadyAdded(p0, name)
 }
 
-// SettingsAgentDirectoryAlreadyAdded says "{p0} 是 {name} 的技能目录，已经在列表里了"
+// SettingsAgentDirectoryAlreadyAdded says "{p0} 是 {name} 的 Skill 目录，已经在列表里了"
 // in the language of msgs.
 //
 // 添加自定义技能目录时路径已属于 Agent 的技能目录。
@@ -4922,13 +4922,13 @@ func (msgs Messages) UpdateNotChecked() string {
 	return Catalog.Format(msgs.locale, "updateNotChecked", nil)
 }
 
-// UpdateMissingFromLibrary says "技能库中找不到，其他位置有同名技能；装回技能库后才能更新"
+// UpdateMissingFromLibrary says "Skill 库中找不到，其他位置有同名 Skill；装回 Skill 库后才能更新"
 // in the language the app shows.
 //
 // 更新检查发现技能仅存在于技能库以外的位置。
 func UpdateMissingFromLibrary() string { return In(i18n.Locale()).UpdateMissingFromLibrary() }
 
-// UpdateMissingFromLibrary says "技能库中找不到，其他位置有同名技能；装回技能库后才能更新"
+// UpdateMissingFromLibrary says "Skill 库中找不到，其他位置有同名 Skill；装回 Skill 库后才能更新"
 // in the language of msgs.
 //
 // 更新检查发现技能仅存在于技能库以外的位置。
@@ -5022,7 +5022,7 @@ func (msgs Messages) UpdateIndependentCopiesNeedMerge() string {
 	return Catalog.Format(msgs.locale, "updateIndependentCopiesNeedMerge", nil)
 }
 
-// UpdateInstallSourcePathMissing says "安装记录中的来源或技能路径不完整"
+// UpdateInstallSourcePathMissing says "安装记录中的来源或 Skill 路径不完整"
 // in the language the app shows.
 //
 // 更新检查发现安装来源或技能路径不完整。
@@ -5030,7 +5030,7 @@ func UpdateInstallSourcePathMissing() string {
 	return In(i18n.Locale()).UpdateInstallSourcePathMissing()
 }
 
-// UpdateInstallSourcePathMissing says "安装记录中的来源或技能路径不完整"
+// UpdateInstallSourcePathMissing says "安装记录中的来源或 Skill 路径不完整"
 // in the language of msgs.
 //
 // 更新检查发现安装来源或技能路径不完整。
@@ -5038,13 +5038,13 @@ func (msgs Messages) UpdateInstallSourcePathMissing() string {
 	return Catalog.Format(msgs.locale, "updateInstallSourcePathMissing", nil)
 }
 
-// UpdateUpstreamSkillRemoved says "上游仓库已移除该技能"
+// UpdateUpstreamSkillRemoved says "上游仓库已移除该 Skill"
 // in the language the app shows.
 //
 // 更新检查发现上游技能被删除。
 func UpdateUpstreamSkillRemoved() string { return In(i18n.Locale()).UpdateUpstreamSkillRemoved() }
 
-// UpdateUpstreamSkillRemoved says "上游仓库已移除该技能"
+// UpdateUpstreamSkillRemoved says "上游仓库已移除该 Skill"
 // in the language of msgs.
 //
 // 更新检查发现上游技能被删除。
@@ -5052,13 +5052,13 @@ func (msgs Messages) UpdateUpstreamSkillRemoved() string {
 	return Catalog.Format(msgs.locale, "updateUpstreamSkillRemoved", nil)
 }
 
-// UpdateUpstreamPathChanged says "上游技能已换路径，不能直接更新"
+// UpdateUpstreamPathChanged says "上游 Skill 已换路径，不能直接更新"
 // in the language the app shows.
 //
 // 更新检查发现上游技能路径改变。
 func UpdateUpstreamPathChanged() string { return In(i18n.Locale()).UpdateUpstreamPathChanged() }
 
-// UpdateUpstreamPathChanged says "上游技能已换路径，不能直接更新"
+// UpdateUpstreamPathChanged says "上游 Skill 已换路径，不能直接更新"
 // in the language of msgs.
 //
 // 更新检查发现上游技能路径改变。
@@ -5066,13 +5066,13 @@ func (msgs Messages) UpdateUpstreamPathChanged() string {
 	return Catalog.Format(msgs.locale, "updateUpstreamPathChanged", nil)
 }
 
-// UpdateUpstreamNameAmbiguous says "上游有多个同名技能，无法确认"
+// UpdateUpstreamNameAmbiguous says "上游有多个同名 Skill，无法确认"
 // in the language the app shows.
 //
 // 更新检查发现上游有多个同名技能。
 func UpdateUpstreamNameAmbiguous() string { return In(i18n.Locale()).UpdateUpstreamNameAmbiguous() }
 
-// UpdateUpstreamNameAmbiguous says "上游有多个同名技能，无法确认"
+// UpdateUpstreamNameAmbiguous says "上游有多个同名 Skill，无法确认"
 // in the language of msgs.
 //
 // 更新检查发现上游有多个同名技能。
@@ -5178,13 +5178,13 @@ func (msgs Messages) UpdateRepositoryTreeTruncated() string {
 	return Catalog.Format(msgs.locale, "updateRepositoryTreeTruncated", nil)
 }
 
-// UpdateTooManyFiles says "技能文件超过 2000 个"
+// UpdateTooManyFiles says "Skill 文件超过 2000 个"
 // in the language the app shows.
 //
 // 更新检查发现技能文件数量超过上限。
 func UpdateTooManyFiles() string { return In(i18n.Locale()).UpdateTooManyFiles() }
 
-// UpdateTooManyFiles says "技能文件超过 2000 个"
+// UpdateTooManyFiles says "Skill 文件超过 2000 个"
 // in the language of msgs.
 //
 // 更新检查发现技能文件数量超过上限。
@@ -5236,13 +5236,13 @@ func (msgs Messages) UpdateSingleFileTooLarge() string {
 	return Catalog.Format(msgs.locale, "updateSingleFileTooLarge", nil)
 }
 
-// UpdateSkillTooLarge says "技能超过 100 MB"
+// UpdateSkillTooLarge says "Skill 超过 100 MB"
 // in the language the app shows.
 //
 // 更新检查发现技能总大小超过上限。
 func UpdateSkillTooLarge() string { return In(i18n.Locale()).UpdateSkillTooLarge() }
 
-// UpdateSkillTooLarge says "技能超过 100 MB"
+// UpdateSkillTooLarge says "Skill 超过 100 MB"
 // in the language of msgs.
 //
 // 更新检查发现技能总大小超过上限。
@@ -5412,7 +5412,7 @@ func (msgs Messages) ImportAlsoReads(agents string, dir string) string {
 	return Catalog.Format(msgs.locale, "importAlsoReads", map[string]any{"agents": agents, "dir": dir})
 }
 
-// ImportPlaceAgentsShared says "文件放一份在 {dir}，{others} 通过链接读同一份，改一处都生效。不放进技能库，其他 Agent…"
+// ImportPlaceAgentsShared says "文件放一份在 {dir}，{others} 通过链接读同一份，改一处都生效。不放进 Skill 库，其他 Agen…"
 // in the language the app shows.
 //
 // 「装到」选了几个 Agent 时的说明
@@ -5420,7 +5420,7 @@ func ImportPlaceAgentsShared(dir string, others string) string {
 	return In(i18n.Locale()).ImportPlaceAgentsShared(dir, others)
 }
 
-// ImportPlaceAgentsShared says "文件放一份在 {dir}，{others} 通过链接读同一份，改一处都生效。不放进技能库，其他 Agent…"
+// ImportPlaceAgentsShared says "文件放一份在 {dir}，{others} 通过链接读同一份，改一处都生效。不放进 Skill 库，其他 Agen…"
 // in the language of msgs.
 //
 // 「装到」选了几个 Agent 时的说明
@@ -5428,7 +5428,7 @@ func (msgs Messages) ImportPlaceAgentsShared(dir string, others string) string {
 	return Catalog.Format(msgs.locale, "importPlaceAgentsShared", map[string]any{"dir": dir, "others": others})
 }
 
-// ImportPlaceAgentOnly says "文件放在 {dir}，只有 {agent} 和读这个目录的 Agent 能读到。不放进技能库，其他 Agent …"
+// ImportPlaceAgentOnly says "文件放在 {dir}，只有 {agent} 和读这个目录的 Agent 能读到。不放进 Skill 库，其他 Agent …"
 // in the language the app shows.
 //
 // 「装到」只选了一个 Agent 时的说明
@@ -5436,7 +5436,7 @@ func ImportPlaceAgentOnly(dir string, agent string) string {
 	return In(i18n.Locale()).ImportPlaceAgentOnly(dir, agent)
 }
 
-// ImportPlaceAgentOnly says "文件放在 {dir}，只有 {agent} 和读这个目录的 Agent 能读到。不放进技能库，其他 Agent …"
+// ImportPlaceAgentOnly says "文件放在 {dir}，只有 {agent} 和读这个目录的 Agent 能读到。不放进 Skill 库，其他 Agent …"
 // in the language of msgs.
 //
 // 「装到」只选了一个 Agent 时的说明
@@ -5532,13 +5532,13 @@ func (msgs Messages) ImportConflictExisting(place string, name string) string {
 	return Catalog.Format(msgs.locale, "importConflictExisting", map[string]any{"place": place, "name": name})
 }
 
-// ImportSameExisting says "{place}里已经有这个技能，内容完全一样。"
+// ImportSameExisting says "{place}里已经有这个 Skill，内容完全一样。"
 // in the language the app shows.
 //
 // 预览：目标位置已有一模一样的
 func ImportSameExisting(place string) string { return In(i18n.Locale()).ImportSameExisting(place) }
 
-// ImportSameExisting says "{place}里已经有这个技能，内容完全一样。"
+// ImportSameExisting says "{place}里已经有这个 Skill，内容完全一样。"
 // in the language of msgs.
 //
 // 预览：目标位置已有一模一样的
@@ -5590,13 +5590,13 @@ func (msgs Messages) ImportSourceGitHub(repo string, commit string) string {
 	return Catalog.Format(msgs.locale, "importSourceGitHub", map[string]any{"repo": repo, "commit": commit})
 }
 
-// ImportAgentSkillsDir says "{agent} 的技能目录"
+// ImportAgentSkillsDir says "{agent} 的 Skill 目录"
 // in the language the app shows.
 //
 // 放在哪：某个 Agent 的技能目录
 func ImportAgentSkillsDir(agent string) string { return In(i18n.Locale()).ImportAgentSkillsDir(agent) }
 
-// ImportAgentSkillsDir says "{agent} 的技能目录"
+// ImportAgentSkillsDir says "{agent} 的 Skill 目录"
 // in the language of msgs.
 //
 // 放在哪：某个 Agent 的技能目录
@@ -5604,13 +5604,13 @@ func (msgs Messages) ImportAgentSkillsDir(agent string) string {
 	return Catalog.Format(msgs.locale, "importAgentSkillsDir", map[string]any{"agent": agent})
 }
 
-// InspectorAlwaysOnTip says "{agent} 读得到这个技能，但没有可以在这里修改的启用设置，所以一直开着"
+// InspectorAlwaysOnTip says "{agent} 读得到这个 Skill，但没有可以在这里修改的启用设置，所以一直开着"
 // in the language the app shows.
 //
 // 详情栏「始终启用」的提示
 func InspectorAlwaysOnTip(agent string) string { return In(i18n.Locale()).InspectorAlwaysOnTip(agent) }
 
-// InspectorAlwaysOnTip says "{agent} 读得到这个技能，但没有可以在这里修改的启用设置，所以一直开着"
+// InspectorAlwaysOnTip says "{agent} 读得到这个 Skill，但没有可以在这里修改的启用设置，所以一直开着"
 // in the language of msgs.
 //
 // 详情栏「始终启用」的提示
@@ -5618,7 +5618,7 @@ func (msgs Messages) InspectorAlwaysOnTip(agent string) string {
 	return Catalog.Format(msgs.locale, "inspectorAlwaysOnTip", map[string]any{"agent": agent})
 }
 
-// InspectorRemoveLinkTip says "删除在 {agent} 技能目录里建的链接"
+// InspectorRemoveLinkTip says "删除在 {agent} Skill 目录里建的链接"
 // in the language the app shows.
 //
 // 详情栏「移除」按钮的提示
@@ -5626,7 +5626,7 @@ func InspectorRemoveLinkTip(agent string) string {
 	return In(i18n.Locale()).InspectorRemoveLinkTip(agent)
 }
 
-// InspectorRemoveLinkTip says "删除在 {agent} 技能目录里建的链接"
+// InspectorRemoveLinkTip says "删除在 {agent} Skill 目录里建的链接"
 // in the language of msgs.
 //
 // 详情栏「移除」按钮的提示
@@ -5706,7 +5706,7 @@ func (msgs Messages) InspectorWhenIn(project string) string {
 	return Catalog.Format(msgs.locale, "inspectorWhenIn", map[string]any{"project": project})
 }
 
-// InspectorPluginWithAgent says "插件里的技能随 {agent} 一起生效，这里不能停用。"
+// InspectorPluginWithAgent says "插件里的 Skill 随 {agent} 一起生效，这里不能停用。"
 // in the language the app shows.
 //
 // 详情栏：插件技能不能停用
@@ -5714,7 +5714,7 @@ func InspectorPluginWithAgent(agent string) string {
 	return In(i18n.Locale()).InspectorPluginWithAgent(agent)
 }
 
-// InspectorPluginWithAgent says "插件里的技能随 {agent} 一起生效，这里不能停用。"
+// InspectorPluginWithAgent says "插件里的 Skill 随 {agent} 一起生效，这里不能停用。"
 // in the language of msgs.
 //
 // 详情栏：插件技能不能停用
@@ -5722,7 +5722,7 @@ func (msgs Messages) InspectorPluginWithAgent(agent string) string {
 	return Catalog.Format(msgs.locale, "inspectorPluginWithAgent", map[string]any{"agent": agent})
 }
 
-// InspectorBuiltinWithAgent says "内置技能随 {agent} 一起生效，这里不能停用。"
+// InspectorBuiltinWithAgent says "内置 Skill 随 {agent} 一起生效，这里不能停用。"
 // in the language the app shows.
 //
 // 详情栏：内置技能不能停用
@@ -5730,7 +5730,7 @@ func InspectorBuiltinWithAgent(agent string) string {
 	return In(i18n.Locale()).InspectorBuiltinWithAgent(agent)
 }
 
-// InspectorBuiltinWithAgent says "内置技能随 {agent} 一起生效，这里不能停用。"
+// InspectorBuiltinWithAgent says "内置 Skill 随 {agent} 一起生效，这里不能停用。"
 // in the language of msgs.
 //
 // 详情栏：内置技能不能停用
@@ -5932,13 +5932,13 @@ func (msgs Messages) CommonOpenFailedPrefix() string {
 	return Catalog.Format(msgs.locale, "commonOpenFailedPrefix", nil)
 }
 
-// BatchSelectSkillsToDelete says "选择要删除的技能"
+// BatchSelectSkillsToDelete says "选择要删除的 Skill"
 // in the language the app shows.
 //
 // 批量删除模式的选择栏和分组选择操作显示的文案。
 func BatchSelectSkillsToDelete() string { return In(i18n.Locale()).BatchSelectSkillsToDelete() }
 
-// BatchSelectSkillsToDelete says "选择要删除的技能"
+// BatchSelectSkillsToDelete says "选择要删除的 Skill"
 // in the language of msgs.
 //
 // 批量删除模式的选择栏和分组选择操作显示的文案。
@@ -6030,7 +6030,7 @@ func (msgs Messages) BatchExitShortcut() string {
 	return Catalog.Format(msgs.locale, "batchExitShortcut", nil)
 }
 
-// BatchSelectionSummary says "含 {sets} 个集合，共 {count} 个技能"
+// BatchSelectionSummary says "含 {sets} 个集合，共 {count} 个 Skill"
 // in the language the app shows.
 //
 // 批量删除模式的选择栏和分组选择操作显示的文案。
@@ -6038,7 +6038,7 @@ func BatchSelectionSummary(sets int, count int) string {
 	return In(i18n.Locale()).BatchSelectionSummary(sets, count)
 }
 
-// BatchSelectionSummary says "含 {sets} 个集合，共 {count} 个技能"
+// BatchSelectionSummary says "含 {sets} 个集合，共 {count} 个 Skill"
 // in the language of msgs.
 //
 // 批量删除模式的选择栏和分组选择操作显示的文案。
@@ -6088,13 +6088,13 @@ func (msgs Messages) BatchDeselectGroup() string {
 	return Catalog.Format(msgs.locale, "batchDeselectGroup", nil)
 }
 
-// BatchReadOnlyCannotDelete says "只读的技能不能在这里删"
+// BatchReadOnlyCannotDelete says "只读的 Skill 不能在这里删"
 // in the language the app shows.
 //
 // 对只读技能发起删除时显示的文案。
 func BatchReadOnlyCannotDelete() string { return In(i18n.Locale()).BatchReadOnlyCannotDelete() }
 
-// BatchReadOnlyCannotDelete says "只读的技能不能在这里删"
+// BatchReadOnlyCannotDelete says "只读的 Skill 不能在这里删"
 // in the language of msgs.
 //
 // 对只读技能发起删除时显示的文案。
@@ -6102,7 +6102,7 @@ func (msgs Messages) BatchReadOnlyCannotDelete() string {
 	return Catalog.Format(msgs.locale, "batchReadOnlyCannotDelete", nil)
 }
 
-// BrowseSkillsAndAgents says "{count} 个技能，分布在 {count2} 个 Agent"
+// BrowseSkillsAndAgents says "{count} 个 Skill，分布在 {count2} 个 Agent"
 // in the language the app shows.
 //
 // 技能浏览页顶部的技能与 Agent 数量概要显示的文案。
@@ -6110,7 +6110,7 @@ func BrowseSkillsAndAgents(count int, count2 int) string {
 	return In(i18n.Locale()).BrowseSkillsAndAgents(count, count2)
 }
 
-// BrowseSkillsAndAgents says "{count} 个技能，分布在 {count2} 个 Agent"
+// BrowseSkillsAndAgents says "{count} 个 Skill，分布在 {count2} 个 Agent"
 // in the language of msgs.
 //
 // 技能浏览页顶部的技能与 Agent 数量概要显示的文案。
@@ -6160,13 +6160,13 @@ func (msgs Messages) BatchActions() string {
 	return Catalog.Format(msgs.locale, "batchActions", nil)
 }
 
-// ActionAddSkills says "添加技能"
+// ActionAddSkills says "添加 Skill"
 // in the language the app shows.
 //
 // 技能浏览页工具栏的批量操作、添加技能和视图切换显示的文案。
 func ActionAddSkills() string { return In(i18n.Locale()).ActionAddSkills() }
 
-// ActionAddSkills says "添加技能"
+// ActionAddSkills says "添加 Skill"
 // in the language of msgs.
 //
 // 技能浏览页工具栏的批量操作、添加技能和视图切换显示的文案。
@@ -6280,13 +6280,13 @@ func (msgs Messages) CommonReadOnly() string {
 	return Catalog.Format(msgs.locale, "commonReadOnly", nil)
 }
 
-// CommonNoSkills says "没有技能"
+// CommonNoSkills says "没有 Skill"
 // in the language the app shows.
 //
 // 浏览列表没有技能时的空状态显示的文案。
 func CommonNoSkills() string { return In(i18n.Locale()).CommonNoSkills() }
 
-// CommonNoSkills says "没有技能"
+// CommonNoSkills says "没有 Skill"
 // in the language of msgs.
 //
 // 浏览列表没有技能时的空状态显示的文案。
@@ -6336,13 +6336,13 @@ func (msgs Messages) CommonNotEnabled() string {
 	return Catalog.Format(msgs.locale, "commonNotEnabled", nil)
 }
 
-// BrowseBoardDescription says "看板按 Agent 排列你自己的技能。"
+// BrowseBoardDescription says "看板按 Agent 排列你自己的 Skill。"
 // in the language the app shows.
 //
 // 看板的说明与添加技能空状态显示的文案。
 func BrowseBoardDescription() string { return In(i18n.Locale()).BrowseBoardDescription() }
 
-// BrowseBoardDescription says "看板按 Agent 排列你自己的技能。"
+// BrowseBoardDescription says "看板按 Agent 排列你自己的 Skill。"
 // in the language of msgs.
 //
 // 看板的说明与添加技能空状态显示的文案。
@@ -6350,13 +6350,13 @@ func (msgs Messages) BrowseBoardDescription() string {
 	return Catalog.Format(msgs.locale, "browseBoardDescription", nil)
 }
 
-// BrowseAllSkillsAdded says "所有技能都已添加"
+// BrowseAllSkillsAdded says "所有 Skill 都已添加"
 // in the language the app shows.
 //
 // 看板的说明与添加技能空状态显示的文案。
 func BrowseAllSkillsAdded() string { return In(i18n.Locale()).BrowseAllSkillsAdded() }
 
-// BrowseAllSkillsAdded says "所有技能都已添加"
+// BrowseAllSkillsAdded says "所有 Skill 都已添加"
 // in the language of msgs.
 //
 // 看板的说明与添加技能空状态显示的文案。
@@ -6364,13 +6364,13 @@ func (msgs Messages) BrowseAllSkillsAdded() string {
 	return Catalog.Format(msgs.locale, "browseAllSkillsAdded", nil)
 }
 
-// BrowseNoOutsideShared says "没有通用之外的技能"
+// BrowseNoOutsideShared says "没有通用之外的 Skill"
 // in the language the app shows.
 //
 // 看板的说明与添加技能空状态显示的文案。
 func BrowseNoOutsideShared() string { return In(i18n.Locale()).BrowseNoOutsideShared() }
 
-// BrowseNoOutsideShared says "没有通用之外的技能"
+// BrowseNoOutsideShared says "没有通用之外的 Skill"
 // in the language of msgs.
 //
 // 看板的说明与添加技能空状态显示的文案。
@@ -6378,13 +6378,13 @@ func (msgs Messages) BrowseNoOutsideShared() string {
 	return Catalog.Format(msgs.locale, "browseNoOutsideShared", nil)
 }
 
-// BrowseAddMoreSkills says "添加更多技能"
+// BrowseAddMoreSkills says "添加更多 Skill"
 // in the language the app shows.
 //
 // 看板的说明与添加技能空状态显示的文案。
 func BrowseAddMoreSkills() string { return In(i18n.Locale()).BrowseAddMoreSkills() }
 
-// BrowseAddMoreSkills says "添加更多技能"
+// BrowseAddMoreSkills says "添加更多 Skill"
 // in the language of msgs.
 //
 // 看板的说明与添加技能空状态显示的文案。
@@ -6490,13 +6490,13 @@ func (msgs Messages) CollectKeepLinksHint() string {
 	return Catalog.Format(msgs.locale, "collectKeepLinksHint", nil)
 }
 
-// CollectIntoMySkills says "收进我的技能"
+// CollectIntoMySkills says "收进我的 Skill"
 // in the language the app shows.
 //
 // 收进项目技能的确认对话框中，解释复制与保留链接的选择显示的文案。
 func CollectIntoMySkills() string { return In(i18n.Locale()).CollectIntoMySkills() }
 
-// CollectIntoMySkills says "收进我的技能"
+// CollectIntoMySkills says "收进我的 Skill"
 // in the language of msgs.
 //
 // 收进项目技能的确认对话框中，解释复制与保留链接的选择显示的文案。
@@ -6520,13 +6520,13 @@ func (msgs Messages) CollectCopyDescription(p0 string, count int, project string
 	return Catalog.Format(msgs.locale, "collectCopyDescription", map[string]any{"p0": p0, "count": count, "project": project})
 }
 
-// CollectCopiesIndependent says "…"
+// CollectCopiesIndependent says "收进后是两份：之后在项目里的修改不会同步过来。项目里还在维护的 Skill…"
 // in the language the app shows.
 //
 // 收进项目技能的确认对话框中，解释复制与保留链接的选择显示的文案。
 func CollectCopiesIndependent() string { return In(i18n.Locale()).CollectCopiesIndependent() }
 
-// CollectCopiesIndependent says "…"
+// CollectCopiesIndependent says "收进后是两份：之后在项目里的修改不会同步过来。项目里还在维护的 Skill…"
 // in the language of msgs.
 //
 // 收进项目技能的确认对话框中，解释复制与保留链接的选择显示的文案。
@@ -6534,13 +6534,13 @@ func (msgs Messages) CollectCopiesIndependent() string {
 	return Catalog.Format(msgs.locale, "collectCopiesIndependent", nil)
 }
 
-// CollectAdditionalReaders says "技能库会被直接读到，收进后这些 Agent 也会读到它："
+// CollectAdditionalReaders says "Skill 库会被直接读到，收进后这些 Agent 也会读到它："
 // in the language the app shows.
 //
 // 收进项目技能的确认对话框中，解释复制与保留链接的选择显示的文案。
 func CollectAdditionalReaders() string { return In(i18n.Locale()).CollectAdditionalReaders() }
 
-// CollectAdditionalReaders says "技能库会被直接读到，收进后这些 Agent 也会读到它："
+// CollectAdditionalReaders says "Skill 库会被直接读到，收进后这些 Agent 也会读到它："
 // in the language of msgs.
 //
 // 收进项目技能的确认对话框中，解释复制与保留链接的选择显示的文案。
@@ -6576,13 +6576,13 @@ func (msgs Messages) ActionCancel() string {
 	return Catalog.Format(msgs.locale, "actionCancel", nil)
 }
 
-// CollectionCopiesNeedMerging says "集合里的技能都有同名副本，先去「整理」合并"
+// CollectionCopiesNeedMerging says "集合里的 Skill 都有同名副本，先去「整理」合并"
 // in the language the app shows.
 //
 // 集合里的技能都有同名副本而不能直接删除时显示的文案。
 func CollectionCopiesNeedMerging() string { return In(i18n.Locale()).CollectionCopiesNeedMerging() }
 
-// CollectionCopiesNeedMerging says "集合里的技能都有同名副本，先去「整理」合并"
+// CollectionCopiesNeedMerging says "集合里的 Skill 都有同名副本，先去「整理」合并"
 // in the language of msgs.
 //
 // 集合里的技能都有同名副本而不能直接删除时显示的文案。
@@ -6604,7 +6604,7 @@ func (msgs Messages) ActionBackShortcut() string {
 	return Catalog.Format(msgs.locale, "actionBackShortcut", nil)
 }
 
-// CollectionVisibleSkills says "显示 {shown} / {count} 个技能"
+// CollectionVisibleSkills says "显示 {shown} / {count} 个 Skill"
 // in the language the app shows.
 //
 // 打开集合后顶部的返回按钮和技能数概要显示的文案。
@@ -6612,7 +6612,7 @@ func CollectionVisibleSkills(shown int, count int) string {
 	return In(i18n.Locale()).CollectionVisibleSkills(shown, count)
 }
 
-// CollectionVisibleSkills says "显示 {shown} / {count} 个技能"
+// CollectionVisibleSkills says "显示 {shown} / {count} 个 Skill"
 // in the language of msgs.
 //
 // 打开集合后顶部的返回按钮和技能数概要显示的文案。
@@ -6620,13 +6620,13 @@ func (msgs Messages) CollectionVisibleSkills(shown int, count int) string {
 	return Catalog.Format(msgs.locale, "collectionVisibleSkills", map[string]any{"shown": shown, "count": count})
 }
 
-// CollectionDependents says "{n} 个技能依赖它"
+// CollectionDependents says "{n} 个 Skill 依赖它"
 // in the language the app shows.
 //
 // 集合详情中说明读取范围、来源与逐个启停的区域显示的文案。
 func CollectionDependents(n int) string { return In(i18n.Locale()).CollectionDependents(n) }
 
-// CollectionDependents says "{n} 个技能依赖它"
+// CollectionDependents says "{n} 个 Skill 依赖它"
 // in the language of msgs.
 //
 // 集合详情中说明读取范围、来源与逐个启停的区域显示的文案。
@@ -6762,13 +6762,13 @@ func (msgs Messages) CollectionEnabledCount(p0 int, count int) string {
 	return Catalog.Format(msgs.locale, "collectionEnabledCount", map[string]any{"p0": p0, "count": count})
 }
 
-// CollectionToggleEachSkill says "集合里的技能请逐个启停。"
+// CollectionToggleEachSkill says "集合里的 Skill 请逐个启停。"
 // in the language the app shows.
 //
 // 集合详情中说明读取范围、来源与逐个启停的区域显示的文案。
 func CollectionToggleEachSkill() string { return In(i18n.Locale()).CollectionToggleEachSkill() }
 
-// CollectionToggleEachSkill says "集合里的技能请逐个启停。"
+// CollectionToggleEachSkill says "集合里的 Skill 请逐个启停。"
 // in the language of msgs.
 //
 // 集合详情中说明读取范围、来源与逐个启停的区域显示的文案。
@@ -6988,13 +6988,13 @@ func (msgs Messages) CompareKeepVersion() string {
 	return Catalog.Format(msgs.locale, "compareKeepVersion", nil)
 }
 
-// CommonSharedLibrary says "通用技能库"
+// CommonSharedLibrary says "通用 Skill 库"
 // in the language the app shows.
 //
 // 副本版本卡片的保留动作与内容比较状态显示的文案。
 func CommonSharedLibrary() string { return In(i18n.Locale()).CommonSharedLibrary() }
 
-// CommonSharedLibrary says "通用技能库"
+// CommonSharedLibrary says "通用 Skill 库"
 // in the language of msgs.
 //
 // 副本版本卡片的保留动作与内容比较状态显示的文案。
@@ -7226,13 +7226,13 @@ func (msgs Messages) CommonNoDescription() string {
 	return Catalog.Format(msgs.locale, "commonNoDescription", nil)
 }
 
-// BrowseNoFilterMatches says "没有符合筛选条件的技能"
+// BrowseNoFilterMatches says "没有符合筛选条件的 Skill"
 // in the language the app shows.
 //
 // 技能卡片没有简介、筛选无结果或展开操作菜单时显示的文案。
 func BrowseNoFilterMatches() string { return In(i18n.Locale()).BrowseNoFilterMatches() }
 
-// BrowseNoFilterMatches says "没有符合筛选条件的技能"
+// BrowseNoFilterMatches says "没有符合筛选条件的 Skill"
 // in the language of msgs.
 //
 // 技能卡片没有简介、筛选无结果或展开操作菜单时显示的文案。
@@ -7254,13 +7254,13 @@ func (msgs Messages) ActionMore() string {
 	return Catalog.Format(msgs.locale, "actionMore", nil)
 }
 
-// DeleteMovedToTrash says "已把 {count} 个技能移到废纸篓"
+// DeleteMovedToTrash says "已把 {count} 个 Skill 移到废纸篓"
 // in the language the app shows.
 //
 // 技能移到废纸篓后显示的结果提示条显示的文案。
 func DeleteMovedToTrash(count int) string { return In(i18n.Locale()).DeleteMovedToTrash(count) }
 
-// DeleteMovedToTrash says "已把 {count} 个技能移到废纸篓"
+// DeleteMovedToTrash says "已把 {count} 个 Skill 移到废纸篓"
 // in the language of msgs.
 //
 // 技能移到废纸篓后显示的结果提示条显示的文案。
@@ -7296,13 +7296,13 @@ func (msgs Messages) ActionOpenInEditor() string {
 	return Catalog.Format(msgs.locale, "actionOpenInEditor", nil)
 }
 
-// ActionDeleteSkillEllipsis says "删除技能…"
+// ActionDeleteSkillEllipsis says "删除 Skill…"
 // in the language the app shows.
 //
 // 技能的预览、打开与删除操作菜单显示的文案。
 func ActionDeleteSkillEllipsis() string { return In(i18n.Locale()).ActionDeleteSkillEllipsis() }
 
-// ActionDeleteSkillEllipsis says "删除技能…"
+// ActionDeleteSkillEllipsis says "删除 Skill…"
 // in the language of msgs.
 //
 // 技能的预览、打开与删除操作菜单显示的文案。
@@ -7324,13 +7324,13 @@ func (msgs Messages) ActionPreview() string {
 	return Catalog.Format(msgs.locale, "actionPreview", nil)
 }
 
-// DeleteConfirmCount says "删除 {count} 个技能？"
+// DeleteConfirmCount says "删除 {count} 个 Skill？"
 // in the language the app shows.
 //
 // 确认批量删除时的对话框标题显示的文案。
 func DeleteConfirmCount(count int) string { return In(i18n.Locale()).DeleteConfirmCount(count) }
 
-// DeleteConfirmCount says "删除 {count} 个技能？"
+// DeleteConfirmCount says "删除 {count} 个 Skill？"
 // in the language of msgs.
 //
 // 确认批量删除时的对话框标题显示的文案。
@@ -7552,13 +7552,13 @@ func (msgs Messages) ImportRead() string {
 	return Catalog.Format(msgs.locale, "importRead", nil)
 }
 
-// ImportChooseFolderMessage says "选择技能文件夹或 .zip。文件夹里有 SKILL.md 就算一个技能。"
+// ImportChooseFolderMessage says "选择 Skill 文件夹或 .zip。文件夹里有 SKILL.md 就算一个 Skill。"
 // in the language the app shows.
 //
 // 从电脑添加技能时打开的文件或文件夹选择面板显示的文案。
 func ImportChooseFolderMessage() string { return In(i18n.Locale()).ImportChooseFolderMessage() }
 
-// ImportChooseFolderMessage says "选择技能文件夹或 .zip。文件夹里有 SKILL.md 就算一个技能。"
+// ImportChooseFolderMessage says "选择 Skill 文件夹或 .zip。文件夹里有 SKILL.md 就算一个 Skill。"
 // in the language of msgs.
 //
 // 从电脑添加技能时打开的文件或文件夹选择面板显示的文案。
@@ -7566,13 +7566,13 @@ func (msgs Messages) ImportChooseFolderMessage() string {
 	return Catalog.Format(msgs.locale, "importChooseFolderMessage", nil)
 }
 
-// ImportFolderOrZip says "技能文件夹或 zip"
+// ImportFolderOrZip says "Skill 文件夹或 zip"
 // in the language the app shows.
 //
 // 从电脑添加技能时打开的文件或文件夹选择面板显示的文案。
 func ImportFolderOrZip() string { return In(i18n.Locale()).ImportFolderOrZip() }
 
-// ImportFolderOrZip says "技能文件夹或 zip"
+// ImportFolderOrZip says "Skill 文件夹或 zip"
 // in the language of msgs.
 //
 // 从电脑添加技能时打开的文件或文件夹选择面板显示的文案。
@@ -7664,13 +7664,13 @@ func (msgs Messages) ImportMetadata() string {
 	return Catalog.Format(msgs.locale, "importMetadata", nil)
 }
 
-// ImportCommandsAllowed says "Agent 用这个技能时可以直接运行这些命令"
+// ImportCommandsAllowed says "Agent 用这个 Skill 时可以直接运行这些命令"
 // in the language the app shows.
 //
 // 添加技能预览中展示允许运行的命令和可执行文件时显示的文案。
 func ImportCommandsAllowed() string { return In(i18n.Locale()).ImportCommandsAllowed() }
 
-// ImportCommandsAllowed says "Agent 用这个技能时可以直接运行这些命令"
+// ImportCommandsAllowed says "Agent 用这个 Skill 时可以直接运行这些命令"
 // in the language of msgs.
 //
 // 添加技能预览中展示允许运行的命令和可执行文件时显示的文案。
@@ -7678,13 +7678,13 @@ func (msgs Messages) ImportCommandsAllowed() string {
 	return Catalog.Format(msgs.locale, "importCommandsAllowed", nil)
 }
 
-// ImportCommandsNotRunHere says "本应用不会运行它们；Agent 使用这个技能时可能会运行。"
+// ImportCommandsNotRunHere says "本应用不会运行它们；Agent 使用这个 Skill 时可能会运行。"
 // in the language the app shows.
 //
 // 添加技能预览中展示允许运行的命令和可执行文件时显示的文案。
 func ImportCommandsNotRunHere() string { return In(i18n.Locale()).ImportCommandsNotRunHere() }
 
-// ImportCommandsNotRunHere says "本应用不会运行它们；Agent 使用这个技能时可能会运行。"
+// ImportCommandsNotRunHere says "本应用不会运行它们；Agent 使用这个 Skill 时可能会运行。"
 // in the language of msgs.
 //
 // 添加技能预览中展示允许运行的命令和可执行文件时显示的文案。
@@ -7750,13 +7750,13 @@ func (msgs Messages) ImportFromLink() string {
 	return Catalog.Format(msgs.locale, "importFromLink", nil)
 }
 
-// ImportReviewBeforeAdding says "读取后会先列出其中的技能和安全审计，确认后才添加。"
+// ImportReviewBeforeAdding says "读取后会先列出其中的 Skill 和安全审计，确认后才添加。"
 // in the language the app shows.
 //
 // 添加技能页尚未选择来源时的链接与本机文件入口显示的文案。
 func ImportReviewBeforeAdding() string { return In(i18n.Locale()).ImportReviewBeforeAdding() }
 
-// ImportReviewBeforeAdding says "读取后会先列出其中的技能和安全审计，确认后才添加。"
+// ImportReviewBeforeAdding says "读取后会先列出其中的 Skill 和安全审计，确认后才添加。"
 // in the language of msgs.
 //
 // 添加技能页尚未选择来源时的链接与本机文件入口显示的文案。
@@ -7876,13 +7876,13 @@ func (msgs Messages) ImportClipboardWebsite() string {
 	return Catalog.Format(msgs.locale, "importClipboardWebsite", nil)
 }
 
-// ImportClipboardSkill says "剪贴板里有技能"
+// ImportClipboardSkill says "剪贴板里有 Skill"
 // in the language the app shows.
 //
 // 剪贴板包含可识别的仓库、网站或技能地址时显示的文案。
 func ImportClipboardSkill() string { return In(i18n.Locale()).ImportClipboardSkill() }
 
-// ImportClipboardSkill says "剪贴板里有技能"
+// ImportClipboardSkill says "剪贴板里有 Skill"
 // in the language of msgs.
 //
 // 剪贴板包含可识别的仓库、网站或技能地址时显示的文案。
@@ -7932,13 +7932,13 @@ func (msgs Messages) ActionOpenSettings() string {
 	return Catalog.Format(msgs.locale, "actionOpenSettings", nil)
 }
 
-// ImportSkillsFound says "已找到 {n} 个技能"
+// ImportSkillsFound says "已找到 {n} 个 Skill"
 // in the language the app shows.
 //
 // 添加技能的读取进度与连接设置提示区显示的文案。
 func ImportSkillsFound(n int) string { return In(i18n.Locale()).ImportSkillsFound(n) }
 
-// ImportSkillsFound says "已找到 {n} 个技能"
+// ImportSkillsFound says "已找到 {n} 个 Skill"
 // in the language of msgs.
 //
 // 添加技能的读取进度与连接设置提示区显示的文案。
@@ -8072,13 +8072,13 @@ func (msgs Messages) CommonLocal() string {
 	return Catalog.Format(msgs.locale, "commonLocal", nil)
 }
 
-// CommonSkillCount says "{count} 个技能"
+// CommonSkillCount says "{count} 个 Skill"
 // in the language the app shows.
 //
 // 确认待添加技能与展示添加进度、结果时显示的文案。
 func CommonSkillCount(count int) string { return In(i18n.Locale()).CommonSkillCount(count) }
 
-// CommonSkillCount says "{count} 个技能"
+// CommonSkillCount says "{count} 个 Skill"
 // in the language of msgs.
 //
 // 确认待添加技能与展示添加进度、结果时显示的文案。
@@ -8086,13 +8086,13 @@ func (msgs Messages) CommonSkillCount(count int) string {
 	return Catalog.Format(msgs.locale, "commonSkillCount", map[string]any{"count": count})
 }
 
-// ImportSkillsAdded says "已添加 {added} 个技能"
+// ImportSkillsAdded says "已添加 {added} 个 Skill"
 // in the language the app shows.
 //
 // 确认待添加技能与展示添加进度、结果时显示的文案。
 func ImportSkillsAdded(added int) string { return In(i18n.Locale()).ImportSkillsAdded(added) }
 
-// ImportSkillsAdded says "已添加 {added} 个技能"
+// ImportSkillsAdded says "已添加 {added} 个 Skill"
 // in the language of msgs.
 //
 // 确认待添加技能与展示添加进度、结果时显示的文案。
@@ -8130,13 +8130,13 @@ func (msgs Messages) ImportContinueAdding() string {
 	return Catalog.Format(msgs.locale, "importContinueAdding", nil)
 }
 
-// ImportViewInMySkills says "在「我的技能」中查看"
+// ImportViewInMySkills says "在「我的 Skill」中查看"
 // in the language the app shows.
 //
 // 确认待添加技能与展示添加进度、结果时显示的文案。
 func ImportViewInMySkills() string { return In(i18n.Locale()).ImportViewInMySkills() }
 
-// ImportViewInMySkills says "在「我的技能」中查看"
+// ImportViewInMySkills says "在「我的 Skill」中查看"
 // in the language of msgs.
 //
 // 确认待添加技能与展示添加进度、结果时显示的文案。
@@ -8158,13 +8158,13 @@ func (msgs Messages) ImportInstallTo() string {
 	return Catalog.Format(msgs.locale, "importInstallTo", nil)
 }
 
-// ImportAddSkillCount says "添加 {n} 个技能"
+// ImportAddSkillCount says "添加 {n} 个 Skill"
 // in the language the app shows.
 //
 // 确认待添加技能与展示添加进度、结果时显示的文案。
 func ImportAddSkillCount(n int) string { return In(i18n.Locale()).ImportAddSkillCount(n) }
 
-// ImportAddSkillCount says "添加 {n} 个技能"
+// ImportAddSkillCount says "添加 {n} 个 Skill"
 // in the language of msgs.
 //
 // 确认待添加技能与展示添加进度、结果时显示的文案。
@@ -8200,7 +8200,7 @@ func (msgs Messages) ImportChooseAtLeastOneAgent() string {
 	return Catalog.Format(msgs.locale, "importChooseAtLeastOneAgent", nil)
 }
 
-// ImportSelectedStillDownloading says "勾选的技能还在下载，下载完才能添加"
+// ImportSelectedStillDownloading says "勾选的 Skill 还在下载，下载完才能添加"
 // in the language the app shows.
 //
 // 确认待添加技能与展示添加进度、结果时显示的文案。
@@ -8208,7 +8208,7 @@ func ImportSelectedStillDownloading() string {
 	return In(i18n.Locale()).ImportSelectedStillDownloading()
 }
 
-// ImportSelectedStillDownloading says "勾选的技能还在下载，下载完才能添加"
+// ImportSelectedStillDownloading says "勾选的 Skill 还在下载，下载完才能添加"
 // in the language of msgs.
 //
 // 确认待添加技能与展示添加进度、结果时显示的文案。
@@ -8216,14 +8216,14 @@ func (msgs Messages) ImportSelectedStillDownloading() string {
 	return Catalog.Format(msgs.locale, "importSelectedStillDownloading", nil)
 }
 
-// ImportSharedLibraryTarget says "技能库（通用）"
+// ImportSharedLibraryTarget says "Skill 库（通用）"
 // in the language the app shows.
 //
 // 添加技能页选择技能库或指定 Agent
 // 为安装目标时显示的文案。
 func ImportSharedLibraryTarget() string { return In(i18n.Locale()).ImportSharedLibraryTarget() }
 
-// ImportSharedLibraryTarget says "技能库（通用）"
+// ImportSharedLibraryTarget says "Skill 库（通用）"
 // in the language of msgs.
 //
 // 添加技能页选择技能库或指定 Agent
@@ -8264,14 +8264,14 @@ func (msgs Messages) ImportSelectedAgentsEllipsis() string {
 	return Catalog.Format(msgs.locale, "importSelectedAgentsEllipsis", nil)
 }
 
-// ImportAgentDirectoryHint says "只放进你选的 Agent 自己的技能目录"
+// ImportAgentDirectoryHint says "只放进你选的 Agent 自己的 Skill 目录"
 // in the language the app shows.
 //
 // 添加技能页选择技能库或指定 Agent
 // 为安装目标时显示的文案。
 func ImportAgentDirectoryHint() string { return In(i18n.Locale()).ImportAgentDirectoryHint() }
 
-// ImportAgentDirectoryHint says "只放进你选的 Agent 自己的技能目录"
+// ImportAgentDirectoryHint says "只放进你选的 Agent 自己的 Skill 目录"
 // in the language of msgs.
 //
 // 添加技能页选择技能库或指定 Agent
@@ -8328,14 +8328,14 @@ func (msgs Messages) ImportChooseAgents() string {
 	return Catalog.Format(msgs.locale, "importChooseAgents", nil)
 }
 
-// ImportDirectLibraryReaders says "直接读技能库的"
+// ImportDirectLibraryReaders says "直接读 Skill 库的"
 // in the language the app shows.
 //
 // 添加技能页展开“谁会读到”的 Agent
 // 选择区时显示的文案。
 func ImportDirectLibraryReaders() string { return In(i18n.Locale()).ImportDirectLibraryReaders() }
 
-// ImportDirectLibraryReaders says "直接读技能库的"
+// ImportDirectLibraryReaders says "直接读 Skill 库的"
 // in the language of msgs.
 //
 // 添加技能页展开“谁会读到”的 Agent
@@ -8394,14 +8394,14 @@ func (msgs Messages) ImportCreateLinks() string {
 	return Catalog.Format(msgs.locale, "importCreateLinks", nil)
 }
 
-// ImportAgentChoiceScope says "只作用于这次添加的技能。装好后，可以在详情栏里对某个 Agent 停用。"
+// ImportAgentChoiceScope says "只作用于这次添加的 Skill。装好后，可以在详情栏里对某个 Agent 停用。"
 // in the language the app shows.
 //
 // 添加技能页展开“谁会读到”的 Agent
 // 选择区时显示的文案。
 func ImportAgentChoiceScope() string { return In(i18n.Locale()).ImportAgentChoiceScope() }
 
-// ImportAgentChoiceScope says "只作用于这次添加的技能。装好后，可以在详情栏里对某个 Agent 停用。"
+// ImportAgentChoiceScope says "只作用于这次添加的 Skill。装好后，可以在详情栏里对某个 Agent 停用。"
 // in the language of msgs.
 //
 // 添加技能页展开“谁会读到”的 Agent
@@ -8598,7 +8598,7 @@ func (msgs Messages) CommonShowAllTotal(p0 int) string {
 	return Catalog.Format(msgs.locale, "commonShowAllTotal", map[string]any{"p0": p0})
 }
 
-// ImportRepositoryHasMore says "只读了指定的技能，仓库里还有 {hidden} 个"
+// ImportRepositoryHasMore says "只读了指定的 Skill，仓库里还有 {hidden} 个"
 // in the language the app shows.
 //
 // 待添加技能列表显示数量、选择范围和隐藏项时显示的文案。
@@ -8606,7 +8606,7 @@ func ImportRepositoryHasMore(hidden int) string {
 	return In(i18n.Locale()).ImportRepositoryHasMore(hidden)
 }
 
-// ImportRepositoryHasMore says "只读了指定的技能，仓库里还有 {hidden} 个"
+// ImportRepositoryHasMore says "只读了指定的 Skill，仓库里还有 {hidden} 个"
 // in the language of msgs.
 //
 // 待添加技能列表显示数量、选择范围和隐藏项时显示的文案。
@@ -8656,13 +8656,13 @@ func (msgs Messages) ImportHasExecutables(count int) string {
 	return Catalog.Format(msgs.locale, "importHasExecutables", map[string]any{"count": count})
 }
 
-// ImportLibraryNameConflict says "技能库里已有同名的，内容不一致"
+// ImportLibraryNameConflict says "Skill 库里已有同名的，内容不一致"
 // in the language the app shows.
 //
 // 技能缺少简介、有可执行文件或发生同名冲突时显示的文案。
 func ImportLibraryNameConflict() string { return In(i18n.Locale()).ImportLibraryNameConflict() }
 
-// ImportLibraryNameConflict says "技能库里已有同名的，内容不一致"
+// ImportLibraryNameConflict says "Skill 库里已有同名的，内容不一致"
 // in the language of msgs.
 //
 // 技能缺少简介、有可执行文件或发生同名冲突时显示的文案。
@@ -8854,13 +8854,13 @@ func (msgs Messages) ImportDropReviewFirst() string {
 	return Catalog.Format(msgs.locale, "importDropReviewFirst", nil)
 }
 
-// ImportSelectSkillToPreview says "选一个技能看看内容"
+// ImportSelectSkillToPreview says "选一个 Skill 看看内容"
 // in the language the app shows.
 //
 // 添加技能右侧预览尚未选择技能或仍在下载文件时显示的文案。
 func ImportSelectSkillToPreview() string { return In(i18n.Locale()).ImportSelectSkillToPreview() }
 
-// ImportSelectSkillToPreview says "选一个技能看看内容"
+// ImportSelectSkillToPreview says "选一个 Skill 看看内容"
 // in the language of msgs.
 //
 // 添加技能右侧预览尚未选择技能或仍在下载文件时显示的文案。
@@ -8868,13 +8868,13 @@ func (msgs Messages) ImportSelectSkillToPreview() string {
 	return Catalog.Format(msgs.locale, "importSelectSkillToPreview", nil)
 }
 
-// ImportDownloadingOtherFiles says "正在下载这个技能的其他文件…"
+// ImportDownloadingOtherFiles says "正在下载这个 Skill 的其他文件…"
 // in the language the app shows.
 //
 // 添加技能右侧预览尚未选择技能或仍在下载文件时显示的文案。
 func ImportDownloadingOtherFiles() string { return In(i18n.Locale()).ImportDownloadingOtherFiles() }
 
-// ImportDownloadingOtherFiles says "正在下载这个技能的其他文件…"
+// ImportDownloadingOtherFiles says "正在下载这个 Skill 的其他文件…"
 // in the language of msgs.
 //
 // 添加技能右侧预览尚未选择技能或仍在下载文件时显示的文案。
@@ -9100,13 +9100,13 @@ func (msgs Messages) ImportUnsupportedSource() string {
 	return Catalog.Format(msgs.locale, "importUnsupportedSource", nil)
 }
 
-// ImportSupportedSourcesHint says "可以粘贴 GitHub 公开仓库或网站的地址，也可以把技能文件夹、zip 拖进来"
+// ImportSupportedSourcesHint says "可以粘贴 GitHub 公开仓库或网站的地址，也可以把 Skill 文件夹、zip 拖进来"
 // in the language the app shows.
 //
 // 读取添加来源失败或使用示例数据时显示的文案。
 func ImportSupportedSourcesHint() string { return In(i18n.Locale()).ImportSupportedSourcesHint() }
 
-// ImportSupportedSourcesHint says "可以粘贴 GitHub 公开仓库或网站的地址，也可以把技能文件夹、zip 拖进来"
+// ImportSupportedSourcesHint says "可以粘贴 GitHub 公开仓库或网站的地址，也可以把 Skill 文件夹、zip 拖进来"
 // in the language of msgs.
 //
 // 读取添加来源失败或使用示例数据时显示的文案。
@@ -9128,13 +9128,13 @@ func (msgs Messages) ImportSampleNoNetwork() string {
 	return Catalog.Format(msgs.locale, "importSampleNoNetwork", nil)
 }
 
-// ImportSampleCannotAdd says "示例数据不能添加技能。"
+// ImportSampleCannotAdd says "示例数据不能添加 Skill。"
 // in the language the app shows.
 //
 // 读取添加来源失败或使用示例数据时显示的文案。
 func ImportSampleCannotAdd() string { return In(i18n.Locale()).ImportSampleCannotAdd() }
 
-// ImportSampleCannotAdd says "示例数据不能添加技能。"
+// ImportSampleCannotAdd says "示例数据不能添加 Skill。"
 // in the language of msgs.
 //
 // 读取添加来源失败或使用示例数据时显示的文案。
@@ -9156,7 +9156,7 @@ func (msgs Messages) ImportLocalSourceCount(count int) string {
 	return Catalog.Format(msgs.locale, "importLocalSourceCount", map[string]any{"count": count})
 }
 
-// ImportAddedNames says "已添加 {added} 个技能：{p1}"
+// ImportAddedNames says "已添加 {added} 个 Skill：{p1}"
 // in the language the app shows.
 //
 // 一批技能添加操作结束后的结果提示显示的文案。
@@ -9164,7 +9164,7 @@ func ImportAddedNames(added int, p1 string) string {
 	return In(i18n.Locale()).ImportAddedNames(added, p1)
 }
 
-// ImportAddedNames says "已添加 {added} 个技能：{p1}"
+// ImportAddedNames says "已添加 {added} 个 Skill：{p1}"
 // in the language of msgs.
 //
 // 一批技能添加操作结束后的结果提示显示的文案。
@@ -9172,7 +9172,7 @@ func (msgs Messages) ImportAddedNames(added int, p1 string) string {
 	return Catalog.Format(msgs.locale, "importAddedNames", map[string]any{"added": added, "p1": p1})
 }
 
-// ImportFailedSkillCount says "{failed} 个技能没有添加"
+// ImportFailedSkillCount says "{failed} 个 Skill 没有添加"
 // in the language the app shows.
 //
 // 一批技能添加操作结束后的结果提示显示的文案。
@@ -9180,7 +9180,7 @@ func ImportFailedSkillCount(failed int) string {
 	return In(i18n.Locale()).ImportFailedSkillCount(failed)
 }
 
-// ImportFailedSkillCount says "{failed} 个技能没有添加"
+// ImportFailedSkillCount says "{failed} 个 Skill 没有添加"
 // in the language of msgs.
 //
 // 一批技能添加操作结束后的结果提示显示的文案。
@@ -9504,13 +9504,13 @@ func (msgs Messages) InspectorGlobalScope() string {
 	return Catalog.Format(msgs.locale, "inspectorGlobalScope", nil)
 }
 
-// InspectorProjectNoToggle says "项目技能跟着项目走，这里不提供开关。"
+// InspectorProjectNoToggle says "项目 Skill 跟着项目走，这里不提供开关。"
 // in the language the app shows.
 //
 // 项目技能详情中解释全局链接及不可切换的读取范围时显示的文案。
 func InspectorProjectNoToggle() string { return In(i18n.Locale()).InspectorProjectNoToggle() }
 
-// InspectorProjectNoToggle says "项目技能跟着项目走，这里不提供开关。"
+// InspectorProjectNoToggle says "项目 Skill 跟着项目走，这里不提供开关。"
 // in the language of msgs.
 //
 // 项目技能详情中解释全局链接及不可切换的读取范围时显示的文案。
@@ -9518,13 +9518,13 @@ func (msgs Messages) InspectorProjectNoToggle() string {
 	return Catalog.Format(msgs.locale, "inspectorProjectNoToggle", nil)
 }
 
-// MergeSkillResult says "{n} 个技能已收成一份：{p1}"
+// MergeSkillResult says "{n} 个 Skill 已收成一份：{p1}"
 // in the language the app shows.
 //
 // 合并副本进行中、完成或留下未处理副本时显示的文案。
 func MergeSkillResult(n int, p1 string) string { return In(i18n.Locale()).MergeSkillResult(n, p1) }
 
-// MergeSkillResult says "{n} 个技能已收成一份：{p1}"
+// MergeSkillResult says "{n} 个 Skill 已收成一份：{p1}"
 // in the language of msgs.
 //
 // 合并副本进行中、完成或留下未处理副本时显示的文案。
@@ -9658,13 +9658,13 @@ func (msgs Messages) CommonRecent() string {
 	return Catalog.Format(msgs.locale, "commonRecent", nil)
 }
 
-// CommonSkills says "技能"
+// CommonSkills says "Skill"
 // in the language the app shows.
 //
 // 命令面板列出导航、最近项目、技能和来源时显示的文案。
 func CommonSkills() string { return In(i18n.Locale()).CommonSkills() }
 
-// CommonSkills says "技能"
+// CommonSkills says "Skill"
 // in the language of msgs.
 //
 // 命令面板列出导航、最近项目、技能和来源时显示的文案。
@@ -9728,13 +9728,13 @@ func (msgs Messages) CommonHoursAgo(p0 int) string {
 	return Catalog.Format(msgs.locale, "commonHoursAgo", map[string]any{"p0": p0})
 }
 
-// PaletteSearchSkills says "搜索技能"
+// PaletteSearchSkills says "搜索 Skill"
 // in the language the app shows.
 //
 // 命令面板的搜索入口和选中技能操作显示的文案。
 func PaletteSearchSkills() string { return In(i18n.Locale()).PaletteSearchSkills() }
 
-// PaletteSearchSkills says "搜索技能"
+// PaletteSearchSkills says "搜索 Skill"
 // in the language of msgs.
 //
 // 命令面板的搜索入口和选中技能操作显示的文案。
@@ -9756,14 +9756,14 @@ func (msgs Messages) ActionShowInList() string {
 	return Catalog.Format(msgs.locale, "actionShowInList", nil)
 }
 
-// ProjectGlobalLinksHint says "{n} 个技能被全局链接，点击查看"
+// ProjectGlobalLinksHint says "{n} 个 Skill 被全局链接，点击查看"
 // in the language the app shows.
 //
 // 项目技能页的概要、空状态与读取 Agent
 // 分组显示的文案。
 func ProjectGlobalLinksHint(n int) string { return In(i18n.Locale()).ProjectGlobalLinksHint(n) }
 
-// ProjectGlobalLinksHint says "{n} 个技能被全局链接，点击查看"
+// ProjectGlobalLinksHint says "{n} 个 Skill 被全局链接，点击查看"
 // in the language of msgs.
 //
 // 项目技能页的概要、空状态与读取 Agent
@@ -9772,14 +9772,14 @@ func (msgs Messages) ProjectGlobalLinksHint(n int) string {
 	return Catalog.Format(msgs.locale, "projectGlobalLinksHint", map[string]any{"n": n})
 }
 
-// ProjectNoSkills says "这个项目里没有技能"
+// ProjectNoSkills says "这个项目里没有 Skill"
 // in the language the app shows.
 //
 // 项目技能页的概要、空状态与读取 Agent
 // 分组显示的文案。
 func ProjectNoSkills() string { return In(i18n.Locale()).ProjectNoSkills() }
 
-// ProjectNoSkills says "这个项目里没有技能"
+// ProjectNoSkills says "这个项目里没有 Skill"
 // in the language of msgs.
 //
 // 项目技能页的概要、空状态与读取 Agent
@@ -9788,14 +9788,14 @@ func (msgs Messages) ProjectNoSkills() string {
 	return Catalog.Format(msgs.locale, "projectNoSkills", nil)
 }
 
-// ProjectSkills says "项目技能"
+// ProjectSkills says "项目 Skill"
 // in the language the app shows.
 //
 // 项目技能页的概要、空状态与读取 Agent
 // 分组显示的文案。
 func ProjectSkills() string { return In(i18n.Locale()).ProjectSkills() }
 
-// ProjectSkills says "项目技能"
+// ProjectSkills says "项目 Skill"
 // in the language of msgs.
 //
 // 项目技能页的概要、空状态与读取 Agent
@@ -9820,7 +9820,7 @@ func (msgs Messages) ProjectReadersHint() string {
 	return Catalog.Format(msgs.locale, "projectReadersHint", nil)
 }
 
-// ProjectLinkedSkills says "{count} 个技能被全局链接到 {name}"
+// ProjectLinkedSkills says "{count} 个 Skill 被全局链接到 {name}"
 // in the language the app shows.
 //
 // 项目技能被全局链接时的说明与处理对话框显示的文案。
@@ -9828,7 +9828,7 @@ func ProjectLinkedSkills(count int, name string) string {
 	return In(i18n.Locale()).ProjectLinkedSkills(count, name)
 }
 
-// ProjectLinkedSkills says "{count} 个技能被全局链接到 {name}"
+// ProjectLinkedSkills says "{count} 个 Skill 被全局链接到 {name}"
 // in the language of msgs.
 //
 // 项目技能被全局链接时的说明与处理对话框显示的文案。
@@ -9836,7 +9836,7 @@ func (msgs Messages) ProjectLinkedSkills(count int, name string) string {
 	return Catalog.Format(msgs.locale, "projectLinkedSkills", map[string]any{"count": count, "name": name})
 }
 
-// ProjectGlobalLinksDescription says "{p0} 的全局技能目录里有链接指向这些技能，所以在任何项目里都会被读到。{name} …"
+// ProjectGlobalLinksDescription says "{p0} 的全局 Skill 目录里有链接指向这些 Skill，所以在任何项目里都会被读到。{name} …"
 // in the language the app shows.
 //
 // 项目技能被全局链接时的说明与处理对话框显示的文案。
@@ -9844,7 +9844,7 @@ func ProjectGlobalLinksDescription(p0 string, name string) string {
 	return In(i18n.Locale()).ProjectGlobalLinksDescription(p0, name)
 }
 
-// ProjectGlobalLinksDescription says "{p0} 的全局技能目录里有链接指向这些技能，所以在任何项目里都会被读到。{name} …"
+// ProjectGlobalLinksDescription says "{p0} 的全局 Skill 目录里有链接指向这些 Skill，所以在任何项目里都会被读到。{name} …"
 // in the language of msgs.
 //
 // 项目技能被全局链接时的说明与处理对话框显示的文案。
@@ -9852,7 +9852,7 @@ func (msgs Messages) ProjectGlobalLinksDescription(p0 string, name string) strin
 	return Catalog.Format(msgs.locale, "projectGlobalLinksDescription", map[string]any{"p0": p0, "name": name})
 }
 
-// ProjectLinkChoices says "「保持链接」表示这 {links} …"
+// ProjectLinkChoices says "「保持链接」表示这 {links} 个链接是有意建的，不再提醒；「收进我的 Skill…"
 // in the language the app shows.
 //
 // 项目技能被全局链接时的说明与处理对话框显示的文案。
@@ -9860,7 +9860,7 @@ func ProjectLinkChoices(links int, p1 string) string {
 	return In(i18n.Locale()).ProjectLinkChoices(links, p1)
 }
 
-// ProjectLinkChoices says "「保持链接」表示这 {links} …"
+// ProjectLinkChoices says "「保持链接」表示这 {links} 个链接是有意建的，不再提醒；「收进我的 Skill…"
 // in the language of msgs.
 //
 // 项目技能被全局链接时的说明与处理对话框显示的文案。
@@ -9910,13 +9910,13 @@ func (msgs Messages) ReaderManage() string {
 	return Catalog.Format(msgs.locale, "readerManage", nil)
 }
 
-// ReaderFilesUnreadable says "读不到这个技能的文件。"
+// ReaderFilesUnreadable says "读不到这个 Skill 的文件。"
 // in the language the app shows.
 //
 // 打开阅读视图后顶部启用信息和文件读取提示显示的文案。
 func ReaderFilesUnreadable() string { return In(i18n.Locale()).ReaderFilesUnreadable() }
 
-// ReaderFilesUnreadable says "读不到这个技能的文件。"
+// ReaderFilesUnreadable says "读不到这个 Skill 的文件。"
 // in the language of msgs.
 //
 // 打开阅读视图后顶部启用信息和文件读取提示显示的文案。
@@ -9938,13 +9938,13 @@ func (msgs Messages) SettingsCheckLinks() string {
 	return Catalog.Format(msgs.locale, "settingsCheckLinks", nil)
 }
 
-// SettingsCheckLinksHint says "检查并重新连接各 Agent 中失效的技能软链接"
+// SettingsCheckLinksHint says "检查并重新连接各 Agent 中失效的 Skill 软链接"
 // in the language the app shows.
 //
 // 设置中显示技能库位置和检查链接操作时显示的文案。
 func SettingsCheckLinksHint() string { return In(i18n.Locale()).SettingsCheckLinksHint() }
 
-// SettingsCheckLinksHint says "检查并重新连接各 Agent 中失效的技能软链接"
+// SettingsCheckLinksHint says "检查并重新连接各 Agent 中失效的 Skill 软链接"
 // in the language of msgs.
 //
 // 设置中显示技能库位置和检查链接操作时显示的文案。
@@ -10088,14 +10088,14 @@ func (msgs Messages) SettingsRemoveDirectoryHint() string {
 	return Catalog.Format(msgs.locale, "settingsRemoveDirectoryHint", nil)
 }
 
-// CommonSkillTotal says "{p0} 个技能"
+// CommonSkillTotal says "{p0} 个 Skill"
 // in the language the app shows.
 //
 // 设置的 Agent 管理列表展示、隐藏或移除 Agent
 // 时显示的文案。
 func CommonSkillTotal(p0 int) string { return In(i18n.Locale()).CommonSkillTotal(p0) }
 
-// CommonSkillTotal says "{p0} 个技能"
+// CommonSkillTotal says "{p0} 个 Skill"
 // in the language of msgs.
 //
 // 设置的 Agent 管理列表展示、隐藏或移除 Agent
@@ -10182,7 +10182,7 @@ func (msgs Messages) SettingsAgentNotFound() string {
 	return Catalog.Format(msgs.locale, "settingsAgentNotFound", nil)
 }
 
-// SettingsAddSkillDirectoryEllipsis says "手动添加技能目录…"
+// SettingsAddSkillDirectoryEllipsis says "手动添加 Skill 目录…"
 // in the language the app shows.
 //
 // 设置中重新检测 Agent
@@ -10191,7 +10191,7 @@ func SettingsAddSkillDirectoryEllipsis() string {
 	return In(i18n.Locale()).SettingsAddSkillDirectoryEllipsis()
 }
 
-// SettingsAddSkillDirectoryEllipsis says "手动添加技能目录…"
+// SettingsAddSkillDirectoryEllipsis says "手动添加 Skill 目录…"
 // in the language of msgs.
 //
 // 设置中重新检测 Agent
@@ -10200,7 +10200,7 @@ func (msgs Messages) SettingsAddSkillDirectoryEllipsis() string {
 	return Catalog.Format(msgs.locale, "settingsAddSkillDirectoryEllipsis", nil)
 }
 
-// SettingsSampleCannotAddDirectory says "示例数据不能添加技能目录"
+// SettingsSampleCannotAddDirectory says "示例数据不能添加 Skill 目录"
 // in the language the app shows.
 //
 // 设置中重新检测 Agent
@@ -10209,7 +10209,7 @@ func SettingsSampleCannotAddDirectory() string {
 	return In(i18n.Locale()).SettingsSampleCannotAddDirectory()
 }
 
-// SettingsSampleCannotAddDirectory says "示例数据不能添加技能目录"
+// SettingsSampleCannotAddDirectory says "示例数据不能添加 Skill 目录"
 // in the language of msgs.
 //
 // 设置中重新检测 Agent
@@ -10218,14 +10218,14 @@ func (msgs Messages) SettingsSampleCannotAddDirectory() string {
 	return Catalog.Format(msgs.locale, "settingsSampleCannotAddDirectory", nil)
 }
 
-// SettingsAddSkillDirectory says "添加技能目录"
+// SettingsAddSkillDirectory says "添加 Skill 目录"
 // in the language the app shows.
 //
 // 设置中重新检测 Agent
 // 或手动添加技能目录时显示的文案。
 func SettingsAddSkillDirectory() string { return In(i18n.Locale()).SettingsAddSkillDirectory() }
 
-// SettingsAddSkillDirectory says "添加技能目录"
+// SettingsAddSkillDirectory says "添加 Skill 目录"
 // in the language of msgs.
 //
 // 设置中重新检测 Agent
@@ -10234,14 +10234,14 @@ func (msgs Messages) SettingsAddSkillDirectory() string {
 	return Catalog.Format(msgs.locale, "settingsAddSkillDirectory", nil)
 }
 
-// SettingsChooseSkillDirectory says "选择包含技能的目录（每个子目录需含 SKILL.md）。"
+// SettingsChooseSkillDirectory says "选择包含 Skill 的目录（每个子目录需含 SKILL.md）。"
 // in the language the app shows.
 //
 // 设置中重新检测 Agent
 // 或手动添加技能目录时显示的文案。
 func SettingsChooseSkillDirectory() string { return In(i18n.Locale()).SettingsChooseSkillDirectory() }
 
-// SettingsChooseSkillDirectory says "选择包含技能的目录（每个子目录需含 SKILL.md）。"
+// SettingsChooseSkillDirectory says "选择包含 Skill 的目录（每个子目录需含 SKILL.md）。"
 // in the language of msgs.
 //
 // 设置中重新检测 Agent
@@ -10418,13 +10418,13 @@ func (msgs Messages) SettingsFolderMissing() string {
 	return Catalog.Format(msgs.locale, "settingsFolderMissing", nil)
 }
 
-// SettingsFolderNoSkills says "没有技能，不会显示"
+// SettingsFolderNoSkills says "没有 Skill，不会显示"
 // in the language the app shows.
 //
 // 设置中管理手动添加的项目文件夹时显示的文案。
 func SettingsFolderNoSkills() string { return In(i18n.Locale()).SettingsFolderNoSkills() }
 
-// SettingsFolderNoSkills says "没有技能，不会显示"
+// SettingsFolderNoSkills says "没有 Skill，不会显示"
 // in the language of msgs.
 //
 // 设置中管理手动添加的项目文件夹时显示的文案。
@@ -10524,7 +10524,7 @@ func (msgs Messages) SettingsProjectDirectories() string {
 	return Catalog.Format(msgs.locale, "settingsProjectDirectories", nil)
 }
 
-// SettingsProjectDirectoriesHint says "仅在项目根目录下匹配以下技能目录："
+// SettingsProjectDirectoriesHint says "仅在项目根目录下匹配以下 Skill 目录："
 // in the language the app shows.
 //
 // 设置中配置项目 worktree
@@ -10533,7 +10533,7 @@ func SettingsProjectDirectoriesHint() string {
 	return In(i18n.Locale()).SettingsProjectDirectoriesHint()
 }
 
-// SettingsProjectDirectoriesHint says "仅在项目根目录下匹配以下技能目录："
+// SettingsProjectDirectoriesHint says "仅在项目根目录下匹配以下 Skill 目录："
 // in the language of msgs.
 //
 // 设置中配置项目 worktree
@@ -10976,13 +10976,13 @@ func (msgs Messages) TidyCondition() string {
 	return Catalog.Format(msgs.locale, "tidyCondition", nil)
 }
 
-// TidyLibraryNameExists says "技能库有同名的"
+// TidyLibraryNameExists says "Skill 库有同名的"
 // in the language the app shows.
 //
 // 整理页失效链接表中展示原因与修复动作时显示的文案。
 func TidyLibraryNameExists() string { return In(i18n.Locale()).TidyLibraryNameExists() }
 
-// TidyLibraryNameExists says "技能库有同名的"
+// TidyLibraryNameExists says "Skill 库有同名的"
 // in the language of msgs.
 //
 // 整理页失效链接表中展示原因与修复动作时显示的文案。
@@ -10990,13 +10990,13 @@ func (msgs Messages) TidyLibraryNameExists() string {
 	return Catalog.Format(msgs.locale, "tidyLibraryNameExists", nil)
 }
 
-// TidySkillGone says "技能已经不在了"
+// TidySkillGone says "Skill 已经不在了"
 // in the language the app shows.
 //
 // 整理页失效链接表中展示原因与修复动作时显示的文案。
 func TidySkillGone() string { return In(i18n.Locale()).TidySkillGone() }
 
-// TidySkillGone says "技能已经不在了"
+// TidySkillGone says "Skill 已经不在了"
 // in the language of msgs.
 //
 // 整理页失效链接表中展示原因与修复动作时显示的文案。
@@ -11286,7 +11286,7 @@ func (msgs Messages) UpdateCheckingRepositories(done int, total int) string {
 	return Catalog.Format(msgs.locale, "updateCheckingRepositories", map[string]any{"done": done, "total": total})
 }
 
-// UpdateUpdatingSkills says "正在更新 {done}/{total} 个技能"
+// UpdateUpdatingSkills says "正在更新 {done}/{total} 个 Skill"
 // in the language the app shows.
 //
 // 后台检查仓库、更新技能或下载文件期间的进度区显示的文案。
@@ -11294,7 +11294,7 @@ func UpdateUpdatingSkills(done int, total int) string {
 	return In(i18n.Locale()).UpdateUpdatingSkills(done, total)
 }
 
-// UpdateUpdatingSkills says "正在更新 {done}/{total} 个技能"
+// UpdateUpdatingSkills says "正在更新 {done}/{total} 个 Skill"
 // in the language of msgs.
 //
 // 后台检查仓库、更新技能或下载文件期间的进度区显示的文案。
@@ -11346,13 +11346,13 @@ func (msgs Messages) UpdateNotCheckedYet() string {
 	return Catalog.Format(msgs.locale, "updateNotCheckedYet", nil)
 }
 
-// UpdateCheckDescription says "检查技能库里从 GitHub 安装的技能有没有新版本"
+// UpdateCheckDescription says "检查 Skill 库里从 GitHub 安装的 Skill 有没有新版本"
 // in the language the app shows.
 //
 // 更新页首次进入或列表为空时显示的文案。
 func UpdateCheckDescription() string { return In(i18n.Locale()).UpdateCheckDescription() }
 
-// UpdateCheckDescription says "检查技能库里从 GitHub 安装的技能有没有新版本"
+// UpdateCheckDescription says "检查 Skill 库里从 GitHub 安装的 Skill 有没有新版本"
 // in the language of msgs.
 //
 // 更新页首次进入或列表为空时显示的文案。
@@ -11360,13 +11360,13 @@ func (msgs Messages) UpdateCheckDescription() string {
 	return Catalog.Format(msgs.locale, "updateCheckDescription", nil)
 }
 
-// UpdateNoSkillsHere says "这里暂时没有技能"
+// UpdateNoSkillsHere says "这里暂时没有 Skill"
 // in the language the app shows.
 //
 // 更新页首次进入或列表为空时显示的文案。
 func UpdateNoSkillsHere() string { return In(i18n.Locale()).UpdateNoSkillsHere() }
 
-// UpdateNoSkillsHere says "这里暂时没有技能"
+// UpdateNoSkillsHere says "这里暂时没有 Skill"
 // in the language of msgs.
 //
 // 更新页首次进入或列表为空时显示的文案。
@@ -11374,13 +11374,13 @@ func (msgs Messages) UpdateNoSkillsHere() string {
 	return Catalog.Format(msgs.locale, "updateNoSkillsHere", nil)
 }
 
-// UpdateReadyCount says "{n} 个技能可立即更新"
+// UpdateReadyCount says "{n} 个 Skill 可立即更新"
 // in the language the app shows.
 //
 // 更新页准备批量更新并说明影响范围时显示的文案。
 func UpdateReadyCount(n int) string { return In(i18n.Locale()).UpdateReadyCount(n) }
 
-// UpdateReadyCount says "{n} 个技能可立即更新"
+// UpdateReadyCount says "{n} 个 Skill 可立即更新"
 // in the language of msgs.
 //
 // 更新页准备批量更新并说明影响范围时显示的文案。
@@ -11388,13 +11388,13 @@ func (msgs Messages) UpdateReadyCount(n int) string {
 	return Catalog.Format(msgs.locale, "updateReadyCount", map[string]any{"n": n})
 }
 
-// UpdateReplaceDirectoriesHint says "将用上游最新版本替换对应技能目录"
+// UpdateReplaceDirectoriesHint says "将用上游最新版本替换对应 Skill 目录"
 // in the language the app shows.
 //
 // 更新页准备批量更新并说明影响范围时显示的文案。
 func UpdateReplaceDirectoriesHint() string { return In(i18n.Locale()).UpdateReplaceDirectoriesHint() }
 
-// UpdateReplaceDirectoriesHint says "将用上游最新版本替换对应技能目录"
+// UpdateReplaceDirectoriesHint says "将用上游最新版本替换对应 Skill 目录"
 // in the language of msgs.
 //
 // 更新页准备批量更新并说明影响范围时显示的文案。
@@ -11402,13 +11402,13 @@ func (msgs Messages) UpdateReplaceDirectoriesHint() string {
 	return Catalog.Format(msgs.locale, "updateReplaceDirectoriesHint", nil)
 }
 
-// UpdateSelectedCount says "更新这 {n} 个技能"
+// UpdateSelectedCount says "更新这 {n} 个 Skill"
 // in the language the app shows.
 //
 // 更新页准备批量更新并说明影响范围时显示的文案。
 func UpdateSelectedCount(n int) string { return In(i18n.Locale()).UpdateSelectedCount(n) }
 
-// UpdateSelectedCount says "更新这 {n} 个技能"
+// UpdateSelectedCount says "更新这 {n} 个 Skill"
 // in the language of msgs.
 //
 // 更新页准备批量更新并说明影响范围时显示的文案。
@@ -11416,13 +11416,13 @@ func (msgs Messages) UpdateSelectedCount(n int) string {
 	return Catalog.Format(msgs.locale, "updateSelectedCount", map[string]any{"n": n})
 }
 
-// UpdateConfirmationExcluded says "需确认的技能不包含在内"
+// UpdateConfirmationExcluded says "需确认的 Skill 不包含在内"
 // in the language the app shows.
 //
 // 更新页准备批量更新并说明影响范围时显示的文案。
 func UpdateConfirmationExcluded() string { return In(i18n.Locale()).UpdateConfirmationExcluded() }
 
-// UpdateConfirmationExcluded says "需确认的技能不包含在内"
+// UpdateConfirmationExcluded says "需确认的 Skill 不包含在内"
 // in the language of msgs.
 //
 // 更新页准备批量更新并说明影响范围时显示的文案。
@@ -11486,13 +11486,13 @@ func (msgs Messages) UpdateRecheckIncomplete() string {
 	return Catalog.Format(msgs.locale, "updateRecheckIncomplete", nil)
 }
 
-// UpdateNoSupportedSkills says "没有可由本应用检查的技能"
+// UpdateNoSupportedSkills says "没有可由本应用检查的 Skill"
 // in the language the app shows.
 //
 // 更新检查未完成、没有可检查技能或没有新版本时显示的文案。
 func UpdateNoSupportedSkills() string { return In(i18n.Locale()).UpdateNoSupportedSkills() }
 
-// UpdateNoSupportedSkills says "没有可由本应用检查的技能"
+// UpdateNoSupportedSkills says "没有可由本应用检查的 Skill"
 // in the language of msgs.
 //
 // 更新检查未完成、没有可检查技能或没有新版本时显示的文案。
@@ -11500,13 +11500,13 @@ func (msgs Messages) UpdateNoSupportedSkills() string {
 	return Catalog.Format(msgs.locale, "updateNoSupportedSkills", nil)
 }
 
-// UpdateSupportedSkillsHint says "能检查的是从 GitHub 安装、有安装记录的技能"
+// UpdateSupportedSkillsHint says "能检查的是从 GitHub 安装、有安装记录的 Skill"
 // in the language the app shows.
 //
 // 更新检查未完成、没有可检查技能或没有新版本时显示的文案。
 func UpdateSupportedSkillsHint() string { return In(i18n.Locale()).UpdateSupportedSkillsHint() }
 
-// UpdateSupportedSkillsHint says "能检查的是从 GitHub 安装、有安装记录的技能"
+// UpdateSupportedSkillsHint says "能检查的是从 GitHub 安装、有安装记录的 Skill"
 // in the language of msgs.
 //
 // 更新检查未完成、没有可检查技能或没有新版本时显示的文案。
@@ -11514,13 +11514,13 @@ func (msgs Messages) UpdateSupportedSkillsHint() string {
 	return Catalog.Format(msgs.locale, "updateSupportedSkillsHint", nil)
 }
 
-// UpdateNothingToUpdate says "目前没有需要更新的技能"
+// UpdateNothingToUpdate says "目前没有需要更新的 Skill"
 // in the language the app shows.
 //
 // 更新检查未完成、没有可检查技能或没有新版本时显示的文案。
 func UpdateNothingToUpdate() string { return In(i18n.Locale()).UpdateNothingToUpdate() }
 
-// UpdateNothingToUpdate says "目前没有需要更新的技能"
+// UpdateNothingToUpdate says "目前没有需要更新的 Skill"
 // in the language of msgs.
 //
 // 更新检查未完成、没有可检查技能或没有新版本时显示的文案。
@@ -11826,13 +11826,13 @@ func (msgs Messages) UpdateKeepLocalStopChecking() string {
 	return Catalog.Format(msgs.locale, "updateKeepLocalStopChecking", nil)
 }
 
-// ActionDeleteSkill says "删除技能"
+// ActionDeleteSkill says "删除 Skill"
 // in the language the app shows.
 //
 // 更新列表的差异查看、忽略恢复、命令复制等操作菜单显示的文案。
 func ActionDeleteSkill() string { return In(i18n.Locale()).ActionDeleteSkill() }
 
-// ActionDeleteSkill says "删除技能"
+// ActionDeleteSkill says "删除 Skill"
 // in the language of msgs.
 //
 // 更新列表的差异查看、忽略恢复、命令复制等操作菜单显示的文案。
@@ -12010,13 +12010,13 @@ func (msgs Messages) UpdateUnknownBaseline() string {
 	return Catalog.Format(msgs.locale, "updateUnknownBaseline", nil)
 }
 
-// UpdateRemindOnChange says "该技能上游内容再变化时会重新提醒"
+// UpdateRemindOnChange says "该 Skill 上游内容再变化时会重新提醒"
 // in the language the app shows.
 //
 // 更新差异页选择保留本机或替换上游版本时显示的文案。
 func UpdateRemindOnChange() string { return In(i18n.Locale()).UpdateRemindOnChange() }
 
-// UpdateRemindOnChange says "该技能上游内容再变化时会重新提醒"
+// UpdateRemindOnChange says "该 Skill 上游内容再变化时会重新提醒"
 // in the language of msgs.
 //
 // 更新差异页选择保留本机或替换上游版本时显示的文案。
@@ -12082,13 +12082,13 @@ func (msgs Messages) UpdateUpstreamVersion() string {
 	return Catalog.Format(msgs.locale, "updateUpstreamVersion", nil)
 }
 
-// UpdateReadOnlyCannotReplace says "只读技能，不能在此覆盖更新"
+// UpdateReadOnlyCannotReplace says "只读 Skill，不能在此覆盖更新"
 // in the language the app shows.
 //
 // 更新差异页选择保留本机或替换上游版本时显示的文案。
 func UpdateReadOnlyCannotReplace() string { return In(i18n.Locale()).UpdateReadOnlyCannotReplace() }
 
-// UpdateReadOnlyCannotReplace says "只读技能，不能在此覆盖更新"
+// UpdateReadOnlyCannotReplace says "只读 Skill，不能在此覆盖更新"
 // in the language of msgs.
 //
 // 更新差异页选择保留本机或替换上游版本时显示的文案。
@@ -12470,7 +12470,7 @@ func (msgs Messages) UpdateFailedCount(failed int) string {
 	return Catalog.Format(msgs.locale, "updateFailedCount", map[string]any{"failed": failed})
 }
 
-// UpdateSkillsCompleted says "已更新 {updated} 个技能。"
+// UpdateSkillsCompleted says "已更新 {updated} 个 Skill。"
 // in the language the app shows.
 //
 // 单个或批量技能更新结束后的结果与错误提示显示的文案。
@@ -12478,7 +12478,7 @@ func UpdateSkillsCompleted(updated int) string {
 	return In(i18n.Locale()).UpdateSkillsCompleted(updated)
 }
 
-// UpdateSkillsCompleted says "已更新 {updated} 个技能。"
+// UpdateSkillsCompleted says "已更新 {updated} 个 Skill。"
 // in the language of msgs.
 //
 // 单个或批量技能更新结束后的结果与错误提示显示的文案。
@@ -12972,7 +12972,7 @@ func (msgs Messages) SettingsLinksFixed(count int) string {
 	return Catalog.Format(msgs.locale, "settingsLinksFixed", map[string]any{"count": count})
 }
 
-// SettingsLinksBroken says "，{count} 个在技能库中无同名技能，未作改动：{names}"
+// SettingsLinksBroken says "，{count} 个在 Skill 库中无同名 Skill，未作改动：{names}"
 // in the language the app shows.
 //
 // 接在「检查了 N 个链接」后面
@@ -12980,7 +12980,7 @@ func SettingsLinksBroken(count int, names string) string {
 	return In(i18n.Locale()).SettingsLinksBroken(count, names)
 }
 
-// SettingsLinksBroken says "，{count} 个在技能库中无同名技能，未作改动：{names}"
+// SettingsLinksBroken says "，{count} 个在 Skill 库中无同名 Skill，未作改动：{names}"
 // in the language of msgs.
 //
 // 接在「检查了 N 个链接」后面
@@ -13048,13 +13048,13 @@ func (msgs Messages) SettingsDiscoverSummary(total int, emph string) string {
 	return Catalog.Format(msgs.locale, "settingsDiscoverSummary", map[string]any{"total": total, "emph": emph})
 }
 
-// SettingsWithSkills says "{n} 个有技能"
+// SettingsWithSkills says "{n} 个有 Skill"
 // in the language the app shows.
 //
 // 设置 › 项目：加粗的那段
 func SettingsWithSkills(n int) string { return In(i18n.Locale()).SettingsWithSkills(n) }
 
-// SettingsWithSkills says "{n} 个有技能"
+// SettingsWithSkills says "{n} 个有 Skill"
 // in the language of msgs.
 //
 // 设置 › 项目：加粗的那段
@@ -13148,13 +13148,13 @@ func (msgs Messages) TidyCheckedAt(time_ string) string {
 	return Catalog.Format(msgs.locale, "tidyCheckedAt", map[string]any{"time": time_})
 }
 
-// TidyNoteExtraLinks says "这些 Agent 从技能库和自己的目录各读到一次。删掉自己目录里的，照样能用。"
+// TidyNoteExtraLinks says "这些 Agent 从 Skill 库和自己的目录各读到一次。删掉自己目录里的，照样能用。"
 // in the language the app shows.
 //
 // 整理：多余链接的说明
 func TidyNoteExtraLinks() string { return In(i18n.Locale()).TidyNoteExtraLinks() }
 
-// TidyNoteExtraLinks says "这些 Agent 从技能库和自己的目录各读到一次。删掉自己目录里的，照样能用。"
+// TidyNoteExtraLinks says "这些 Agent 从 Skill 库和自己的目录各读到一次。删掉自己目录里的，照样能用。"
 // in the language of msgs.
 //
 // 整理：多余链接的说明
@@ -13190,13 +13190,13 @@ func (msgs Messages) TidyNoteGlobalLinked() string {
 	return Catalog.Format(msgs.locale, "tidyNoteGlobalLinked", nil)
 }
 
-// TidyNoteStaleRecords says "…"
+// TidyNoteStaleRecords says "这些 Skill …"
 // in the language the app shows.
 //
 // 整理：残留安装记录的说明
 func TidyNoteStaleRecords() string { return In(i18n.Locale()).TidyNoteStaleRecords() }
 
-// TidyNoteStaleRecords says "…"
+// TidyNoteStaleRecords says "这些 Skill …"
 // in the language of msgs.
 //
 // 整理：残留安装记录的说明
@@ -13320,13 +13320,13 @@ func (msgs Messages) IssueIncompleteSkills() string {
 	return Catalog.Format(msgs.locale, "issueIncompleteSkills", nil)
 }
 
-// TidyNoteIncomplete says "SKILL.md 里提到的东西不在了。Agent 照样会用这个技能，做到那一步时找不到。"
+// TidyNoteIncomplete says "SKILL.md 里提到的东西不在了。Agent 照样会用这个 Skill，做到那一步时找不到。"
 // in the language the app shows.
 //
 // 整理：文件不完整的说明
 func TidyNoteIncomplete() string { return In(i18n.Locale()).TidyNoteIncomplete() }
 
-// TidyNoteIncomplete says "SKILL.md 里提到的东西不在了。Agent 照样会用这个技能，做到那一步时找不到。"
+// TidyNoteIncomplete says "SKILL.md 里提到的东西不在了。Agent 照样会用这个 Skill，做到那一步时找不到。"
 // in the language of msgs.
 //
 // 整理：文件不完整的说明
@@ -13364,13 +13364,13 @@ func (msgs Messages) DefectMissingFile(path string) string {
 	return Catalog.Format(msgs.locale, "defectMissingFile", map[string]any{"path": path})
 }
 
-// DefectMissingSkill says "要用的技能 {name} 没装"
+// DefectMissingSkill says "要用的 Skill {name} 没装"
 // in the language the app shows.
 //
 // 技能文件不完整：链到旁边的另一个技能，那个技能没装
 func DefectMissingSkill(name string) string { return In(i18n.Locale()).DefectMissingSkill(name) }
 
-// DefectMissingSkill says "要用的技能 {name} 没装"
+// DefectMissingSkill says "要用的 Skill {name} 没装"
 // in the language of msgs.
 //
 // 技能文件不完整：链到旁边的另一个技能，那个技能没装
@@ -13422,13 +13422,13 @@ func (msgs Messages) DefectNoName() string {
 	return Catalog.Format(msgs.locale, "defectNoName", nil)
 }
 
-// CollectBreaksWarning says "这些引用指向技能目录外，复制到技能库后会找不到："
+// CollectBreaksWarning says "这些引用指向 Skill 目录外，复制到 Skill 库后会找不到："
 // in the language the app shows.
 //
 // 收进我的技能的确认框：列出复制后会断的引用
 func CollectBreaksWarning() string { return In(i18n.Locale()).CollectBreaksWarning() }
 
-// CollectBreaksWarning says "这些引用指向技能目录外，复制到技能库后会找不到："
+// CollectBreaksWarning says "这些引用指向 Skill 目录外，复制到 Skill 库后会找不到："
 // in the language of msgs.
 //
 // 收进我的技能的确认框：列出复制后会断的引用
@@ -13478,13 +13478,13 @@ func (msgs Messages) WelcomeTitle(app string) string {
 	return Catalog.Format(msgs.locale, "welcomeTitle", map[string]any{"app": app})
 }
 
-// WelcomeScattered says "技能散落在各个 Agent 里"
+// WelcomeScattered says "Skill 散落在各个 Agent 里"
 // in the language the app shows.
 //
 // 首次启动的开场动画：第二幕：演示用的技能卡片一堆堆落下后，底部的标题（不写数量：卡片是演示的，和本机数据对不上）
 func WelcomeScattered() string { return In(i18n.Locale()).WelcomeScattered() }
 
-// WelcomeScattered says "技能散落在各个 Agent 里"
+// WelcomeScattered says "Skill 散落在各个 Agent 里"
 // in the language of msgs.
 //
 // 首次启动的开场动画：第二幕：演示用的技能卡片一堆堆落下后，底部的标题（不写数量：卡片是演示的，和本机数据对不上）
@@ -13832,13 +13832,13 @@ func (msgs Messages) MenuSettings() string {
 	return Catalog.Format(msgs.locale, "menuSettings", nil)
 }
 
-// BrowseNoSkillsYetBody says "从 GitHub、网站或 Mac 上的文件夹添加技能。"
+// BrowseNoSkillsYetBody says "从 GitHub、网站或 Mac 上的文件夹添加 Skill。"
 // in the language the app shows.
 //
 // 「我的技能」空状态标题下面的说明，下面有「添加技能」按钮
 func BrowseNoSkillsYetBody() string { return In(i18n.Locale()).BrowseNoSkillsYetBody() }
 
-// BrowseNoSkillsYetBody says "从 GitHub、网站或 Mac 上的文件夹添加技能。"
+// BrowseNoSkillsYetBody says "从 GitHub、网站或 Mac 上的文件夹添加 Skill。"
 // in the language of msgs.
 //
 // 「我的技能」空状态标题下面的说明，下面有「添加技能」按钮
@@ -13878,13 +13878,13 @@ func (msgs Messages) BrowseNoSearchResults(query string) string {
 	return Catalog.Format(msgs.locale, "browseNoSearchResults", map[string]any{"query": query})
 }
 
-// BrowseNoSkillsYetTitle says "还没有技能"
+// BrowseNoSkillsYetTitle says "还没有 Skill"
 // in the language the app shows.
 //
 // 「我的技能」「全部技能」一个技能都没有时，空状态的标题
 func BrowseNoSkillsYetTitle() string { return In(i18n.Locale()).BrowseNoSkillsYetTitle() }
 
-// BrowseNoSkillsYetTitle says "还没有技能"
+// BrowseNoSkillsYetTitle says "还没有 Skill"
 // in the language of msgs.
 //
 // 「我的技能」「全部技能」一个技能都没有时，空状态的标题
@@ -13892,7 +13892,7 @@ func (msgs Messages) BrowseNoSkillsYetTitle() string {
 	return Catalog.Format(msgs.locale, "browseNoSkillsYetTitle", nil)
 }
 
-// ImportReplaceOwnCopy says "{agent} 的目录里有自己的一份（{path}…"
+// ImportReplaceOwnCopy says "{agent} 的目录里有自己的一份（{path}，不是链接），替换不会动它。先在「我的 Skill…"
 // in the language the app shows.
 //
 // 同名冲突卡片：链接位置上是 Agent
@@ -13901,7 +13901,7 @@ func ImportReplaceOwnCopy(agent string, path string) string {
 	return In(i18n.Locale()).ImportReplaceOwnCopy(agent, path)
 }
 
-// ImportReplaceOwnCopy says "{agent} 的目录里有自己的一份（{path}…"
+// ImportReplaceOwnCopy says "{agent} 的目录里有自己的一份（{path}，不是链接），替换不会动它。先在「我的 Skill…"
 // in the language of msgs.
 //
 // 同名冲突卡片：链接位置上是 Agent
@@ -13910,13 +13910,13 @@ func (msgs Messages) ImportReplaceOwnCopy(agent string, path string) string {
 	return Catalog.Format(msgs.locale, "importReplaceOwnCopy", map[string]any{"agent": agent, "path": path})
 }
 
-// ImportReplaceMacOnly says "目前只有 macOS 能替换已有的技能"
+// ImportReplaceMacOnly says "目前只有 macOS 能替换已有的 Skill"
 // in the language the app shows.
 //
 // 同名冲突卡片：这个系统上不能替换
 func ImportReplaceMacOnly() string { return In(i18n.Locale()).ImportReplaceMacOnly() }
 
-// ImportReplaceMacOnly says "目前只有 macOS 能替换已有的技能"
+// ImportReplaceMacOnly says "目前只有 macOS 能替换已有的 Skill"
 // in the language of msgs.
 //
 // 同名冲突卡片：这个系统上不能替换
@@ -14054,13 +14054,13 @@ func (msgs Messages) ImportAddAndReplaceCount(add int, replace int) string {
 	return Catalog.Format(msgs.locale, "importAddAndReplaceCount", map[string]any{"add": add, "replace": replace})
 }
 
-// ImportReplaceSkillCount says "替换 {n} 个技能"
+// ImportReplaceSkillCount says "替换 {n} 个 Skill"
 // in the language the app shows.
 //
 // 选择页右上角按钮：勾上的都是替换
 func ImportReplaceSkillCount(n int) string { return In(i18n.Locale()).ImportReplaceSkillCount(n) }
 
-// ImportReplaceSkillCount says "替换 {n} 个技能"
+// ImportReplaceSkillCount says "替换 {n} 个 Skill"
 // in the language of msgs.
 //
 // 选择页右上角按钮：勾上的都是替换
@@ -14082,7 +14082,7 @@ func (msgs Messages) ImportReplacedAt(place string) string {
 	return Catalog.Format(msgs.locale, "importReplacedAt", map[string]any{"place": place})
 }
 
-// ImportAddedReplacedNames says "已添加 {added} 个技能（替换了 {replaced} 个，旧版在废纸篓）：{p1}"
+// ImportAddedReplacedNames says "已添加 {added} 个 Skill（替换了 {replaced} 个，旧版在废纸篓）：{p1}"
 // in the language the app shows.
 //
 // 一批技能添加结束后的结果提示：其中有替换的
@@ -14090,7 +14090,7 @@ func ImportAddedReplacedNames(added int, replaced int, p1 string) string {
 	return In(i18n.Locale()).ImportAddedReplacedNames(added, replaced, p1)
 }
 
-// ImportAddedReplacedNames says "已添加 {added} 个技能（替换了 {replaced} 个，旧版在废纸篓）：{p1}"
+// ImportAddedReplacedNames says "已添加 {added} 个 Skill（替换了 {replaced} 个，旧版在废纸篓）：{p1}"
 // in the language of msgs.
 //
 // 一批技能添加结束后的结果提示：其中有替换的
@@ -14250,13 +14250,13 @@ func (msgs Messages) TidyProjectOnly(name string) string {
 	return Catalog.Format(msgs.locale, "tidyProjectOnly", map[string]any{"name": name})
 }
 
-// TidyCollected says "{name} 已收进我的技能。"
+// TidyCollected says "{name} 已收进我的 Skill。"
 // in the language the app shows.
 //
 // 整理操作进度或完成结果。
 func TidyCollected(name string) string { return In(i18n.Locale()).TidyCollected(name) }
 
-// TidyCollected says "{name} 已收进我的技能。"
+// TidyCollected says "{name} 已收进我的 Skill。"
 // in the language of msgs.
 //
 // 整理操作进度或完成结果。
@@ -14492,13 +14492,13 @@ func (msgs Messages) SupportDiagnostics() string {
 	return Catalog.Format(msgs.locale, "supportDiagnostics", nil)
 }
 
-// SupportDiagnosticsHint says "版本、Agent 检测结果和最近的错误，不含技能内容和账号信息"
+// SupportDiagnosticsHint says "版本、Agent 检测结果和最近的错误，不含 Skill 内容和账号信息"
 // in the language the app shows.
 //
 // 设置 › 支持与诊断：诊断信息一行的说明
 func SupportDiagnosticsHint() string { return In(i18n.Locale()).SupportDiagnosticsHint() }
 
-// SupportDiagnosticsHint says "版本、Agent 检测结果和最近的错误，不含技能内容和账号信息"
+// SupportDiagnosticsHint says "版本、Agent 检测结果和最近的错误，不含 Skill 内容和账号信息"
 // in the language of msgs.
 //
 // 设置 › 支持与诊断：诊断信息一行的说明
@@ -15932,13 +15932,13 @@ func (msgs Messages) SecLastResult() string {
 	return Catalog.Format(msgs.locale, "secLastResult", nil)
 }
 
-// SecWholeSkill says "整个技能"
+// SecWholeSkill says "整个 Skill"
 // in the language the app shows.
 //
 // 本地安全检查：覆盖缺口不针对某个文件时的位置
 func SecWholeSkill() string { return In(i18n.Locale()).SecWholeSkill() }
 
-// SecWholeSkill says "整个技能"
+// SecWholeSkill says "整个 Skill"
 // in the language of msgs.
 //
 // 本地安全检查：覆盖缺口不针对某个文件时的位置
@@ -16282,13 +16282,13 @@ func (msgs Messages) TidyNoteSecurityWarning() string {
 	return Catalog.Format(msgs.locale, "tidyNoteSecurityWarning", nil)
 }
 
-// TidyNoteSecurityUnfinished says "这些技能没能完整检查，结果不能当作没有风险。"
+// TidyNoteSecurityUnfinished says "这些 Skill 没能完整检查，结果不能当作没有风险。"
 // in the language the app shows.
 //
 // 整理页「安全检查未完成」的说明
 func TidyNoteSecurityUnfinished() string { return In(i18n.Locale()).TidyNoteSecurityUnfinished() }
 
-// TidyNoteSecurityUnfinished says "这些技能没能完整检查，结果不能当作没有风险。"
+// TidyNoteSecurityUnfinished says "这些 Skill 没能完整检查，结果不能当作没有风险。"
 // in the language of msgs.
 //
 // 整理页「安全检查未完成」的说明
@@ -16408,13 +16408,13 @@ func (msgs Messages) SecTagUnchecked() string {
 	return Catalog.Format(msgs.locale, "secTagUnchecked", nil)
 }
 
-// SecAddConfirmTitle says "{count} 个技能有高风险或没检查完"
+// SecAddConfirmTitle says "{count} 个 Skill 有高风险或没检查完"
 // in the language the app shows.
 //
 // 本地安全检查：添加前的确认弹窗标题
 func SecAddConfirmTitle(count int) string { return In(i18n.Locale()).SecAddConfirmTitle(count) }
 
-// SecAddConfirmTitle says "{count} 个技能有高风险或没检查完"
+// SecAddConfirmTitle says "{count} 个 Skill 有高风险或没检查完"
 // in the language of msgs.
 //
 // 本地安全检查：添加前的确认弹窗标题
@@ -16786,7 +16786,7 @@ func (msgs Messages) ImportViewInProject(project string) string {
 	return Catalog.Format(msgs.locale, "importViewInProject", map[string]any{"project": project})
 }
 
-// ImportProjectSourceLocal says "来源记为 {path}，项目里的技能暂不参与更新。"
+// ImportProjectSourceLocal says "来源记为 {path}，项目里的 Skill 暂不参与更新。"
 // in the language the app shows.
 //
 // 添加到项目后（本地来源）详情栏状态块的来源说明
@@ -16794,7 +16794,7 @@ func ImportProjectSourceLocal(path string) string {
 	return In(i18n.Locale()).ImportProjectSourceLocal(path)
 }
 
-// ImportProjectSourceLocal says "来源记为 {path}，项目里的技能暂不参与更新。"
+// ImportProjectSourceLocal says "来源记为 {path}，项目里的 Skill 暂不参与更新。"
 // in the language of msgs.
 //
 // 添加到项目后（本地来源）详情栏状态块的来源说明
@@ -16802,7 +16802,7 @@ func (msgs Messages) ImportProjectSourceLocal(path string) string {
 	return Catalog.Format(msgs.locale, "importProjectSourceLocal", map[string]any{"path": path})
 }
 
-// ImportProjectSourceWebsite says "来源记为 {site}，项目里的技能暂不参与更新。"
+// ImportProjectSourceWebsite says "来源记为 {site}，项目里的 Skill 暂不参与更新。"
 // in the language the app shows.
 //
 // 添加到项目后（网站来源）详情栏状态块的来源说明
@@ -16810,7 +16810,7 @@ func ImportProjectSourceWebsite(site string) string {
 	return In(i18n.Locale()).ImportProjectSourceWebsite(site)
 }
 
-// ImportProjectSourceWebsite says "来源记为 {site}，项目里的技能暂不参与更新。"
+// ImportProjectSourceWebsite says "来源记为 {site}，项目里的 Skill 暂不参与更新。"
 // in the language of msgs.
 //
 // 添加到项目后（网站来源）详情栏状态块的来源说明
@@ -16818,7 +16818,7 @@ func (msgs Messages) ImportProjectSourceWebsite(site string) string {
 	return Catalog.Format(msgs.locale, "importProjectSourceWebsite", map[string]any{"site": site})
 }
 
-// ImportProjectSourceGitHub says "来源记为 {repo}（{commit}），项目里的技能暂不参与更新。"
+// ImportProjectSourceGitHub says "来源记为 {repo}（{commit}），项目里的 Skill 暂不参与更新。"
 // in the language the app shows.
 //
 // 添加到项目后（GitHub 来源）详情栏状态块的来源说明
@@ -16826,7 +16826,7 @@ func ImportProjectSourceGitHub(repo string, commit string) string {
 	return In(i18n.Locale()).ImportProjectSourceGitHub(repo, commit)
 }
 
-// ImportProjectSourceGitHub says "来源记为 {repo}（{commit}），项目里的技能暂不参与更新。"
+// ImportProjectSourceGitHub says "来源记为 {repo}（{commit}），项目里的 Skill 暂不参与更新。"
 // in the language of msgs.
 //
 // 添加到项目后（GitHub 来源）详情栏状态块的来源说明
@@ -16866,7 +16866,7 @@ func (msgs Messages) ImportProjectSymlinkPermission() string {
 	return Catalog.Format(msgs.locale, "importProjectSymlinkPermission", nil)
 }
 
-// ImportProjectDirectoryOutside says "{dir} 指向项目外，请选择项目内的技能目录。"
+// ImportProjectDirectoryOutside says "{dir} 指向项目外，请选择项目内的 Skill 目录。"
 // in the language the app shows.
 //
 // 项目技能目录指向项目外时的提示
@@ -16874,7 +16874,7 @@ func ImportProjectDirectoryOutside(dir string) string {
 	return In(i18n.Locale()).ImportProjectDirectoryOutside(dir)
 }
 
-// ImportProjectDirectoryOutside says "{dir} 指向项目外，请选择项目内的技能目录。"
+// ImportProjectDirectoryOutside says "{dir} 指向项目外，请选择项目内的 Skill 目录。"
 // in the language of msgs.
 //
 // 项目技能目录指向项目外时的提示
@@ -16882,13 +16882,13 @@ func (msgs Messages) ImportProjectDirectoryOutside(dir string) string {
 	return Catalog.Format(msgs.locale, "importProjectDirectoryOutside", map[string]any{"dir": dir})
 }
 
-// DeleteProjectLocationChanged says "项目技能的位置已变化，请重新扫描后再删除。"
+// DeleteProjectLocationChanged says "项目 Skill 的位置已变化，请重新扫描后再删除。"
 // in the language the app shows.
 //
 // 项目技能的实际路径与扫描记录不一致时取消删除
 func DeleteProjectLocationChanged() string { return In(i18n.Locale()).DeleteProjectLocationChanged() }
 
-// DeleteProjectLocationChanged says "项目技能的位置已变化，请重新扫描后再删除。"
+// DeleteProjectLocationChanged says "项目 Skill 的位置已变化，请重新扫描后再删除。"
 // in the language of msgs.
 //
 // 项目技能的实际路径与扫描记录不一致时取消删除
@@ -17076,21 +17076,21 @@ func (msgs Messages) GitUncommittedCount(n int) string {
 	return Catalog.Format(msgs.locale, "gitUncommittedCount", map[string]any{"n": n})
 }
 
-// GitUncommittedButton says "查看 {n} 个未提交的技能"
+// GitUncommittedButton says "查看 {n} 个未提交的 Skill"
 // in the language the app shows.
 func GitUncommittedButton(n int) string { return In(i18n.Locale()).GitUncommittedButton(n) }
 
-// GitUncommittedButton says "查看 {n} 个未提交的技能"
+// GitUncommittedButton says "查看 {n} 个未提交的 Skill"
 // in the language of msgs.
 func (msgs Messages) GitUncommittedButton(n int) string {
 	return Catalog.Format(msgs.locale, "gitUncommittedButton", map[string]any{"n": n})
 }
 
-// GitUncommittedMore says "另外 {n} 个技能也没提交"
+// GitUncommittedMore says "另外 {n} 个 Skill 也没提交"
 // in the language the app shows.
 func GitUncommittedMore(n int) string { return In(i18n.Locale()).GitUncommittedMore(n) }
 
-// GitUncommittedMore says "另外 {n} 个技能也没提交"
+// GitUncommittedMore says "另外 {n} 个 Skill 也没提交"
 // in the language of msgs.
 func (msgs Messages) GitUncommittedMore(n int) string {
 	return Catalog.Format(msgs.locale, "gitUncommittedMore", map[string]any{"n": n})
@@ -17126,13 +17126,13 @@ func (msgs Messages) GitRowModified(name string) string {
 	return Catalog.Format(msgs.locale, "gitRowModified", map[string]any{"name": name})
 }
 
-// DeleteBodyOutsideShort says "原件位于技能目录之外，会整个移到废纸篓。"
+// DeleteBodyOutsideShort says "原件位于 Skill 目录之外，会整个移到废纸篓。"
 // in the language the app shows.
 //
 // 单技能删除确认框正文：原件在技能目录之外（路径已在下方文件列表展示）
 func DeleteBodyOutsideShort() string { return In(i18n.Locale()).DeleteBodyOutsideShort() }
 
-// DeleteBodyOutsideShort says "原件位于技能目录之外，会整个移到废纸篓。"
+// DeleteBodyOutsideShort says "原件位于 Skill 目录之外，会整个移到废纸篓。"
 // in the language of msgs.
 //
 // 单技能删除确认框正文：原件在技能目录之外（路径已在下方文件列表展示）
@@ -17210,13 +17210,13 @@ func (msgs Messages) DeleteRoleOutsideOriginal() string {
 	return Catalog.Format(msgs.locale, "deleteRoleOutsideOriginal", nil)
 }
 
-// DeleteOutsideHint says "原件在技能目录之外，请确认这不是仍在使用的文件夹"
+// DeleteOutsideHint says "原件在 Skill 目录之外，请确认这不是仍在使用的文件夹"
 // in the language the app shows.
 //
 // 单技能删除确认框：原件路径下方的目录外风险提示
 func DeleteOutsideHint() string { return In(i18n.Locale()).DeleteOutsideHint() }
 
-// DeleteOutsideHint says "原件在技能目录之外，请确认这不是仍在使用的文件夹"
+// DeleteOutsideHint says "原件在 Skill 目录之外，请确认这不是仍在使用的文件夹"
 // in the language of msgs.
 //
 // 单技能删除确认框：原件路径下方的目录外风险提示
@@ -17256,13 +17256,13 @@ func (msgs Messages) DeleteGlobalLinkWarning(agents string) string {
 	return Catalog.Format(msgs.locale, "deleteGlobalLinkWarning", map[string]any{"agents": agents})
 }
 
-// DeleteBatchSkillsHeading says "将移到废纸篓的技能"
+// DeleteBatchSkillsHeading says "将移到废纸篓的 Skill"
 // in the language the app shows.
 //
 // 批量删除确认框：技能与路径列表的分组标题
 func DeleteBatchSkillsHeading() string { return In(i18n.Locale()).DeleteBatchSkillsHeading() }
 
-// DeleteBatchSkillsHeading says "将移到废纸篓的技能"
+// DeleteBatchSkillsHeading says "将移到废纸篓的 Skill"
 // in the language of msgs.
 //
 // 批量删除确认框：技能与路径列表的分组标题
@@ -17332,7 +17332,7 @@ func (msgs Messages) DeleteBodyBatchWithLinks(count int) string {
 	return Catalog.Format(msgs.locale, "deleteBodyBatchWithLinks", map[string]any{"count": count})
 }
 
-// DeleteBodyOutsideWithLinks says "{count, plural, other {原件位于技能目录之外，会整个移到废纸篓，指向它的 {count} …"
+// DeleteBodyOutsideWithLinks says "{count, plural, other {原件位于 Skill 目录之外，会整个移到废纸篓，指向它的 {count} …"
 // in the language the app shows.
 //
 // 单技能删除确认框正文：原件在技能目录之外，并删除指向它的链接
@@ -17340,7 +17340,7 @@ func DeleteBodyOutsideWithLinks(count int) string {
 	return In(i18n.Locale()).DeleteBodyOutsideWithLinks(count)
 }
 
-// DeleteBodyOutsideWithLinks says "{count, plural, other {原件位于技能目录之外，会整个移到废纸篓，指向它的 {count} …"
+// DeleteBodyOutsideWithLinks says "{count, plural, other {原件位于 Skill 目录之外，会整个移到废纸篓，指向它的 {count} …"
 // in the language of msgs.
 //
 // 单技能删除确认框正文：原件在技能目录之外，并删除指向它的链接
@@ -17390,7 +17390,7 @@ func (msgs Messages) ImportSourceClawHub(repo string) string {
 	return Catalog.Format(msgs.locale, "importSourceClawHub", map[string]any{"repo": repo})
 }
 
-// ImportProjectSourceClawHub says "来源记为 ClawHub：{repo}，项目技能暂不参与更新。"
+// ImportProjectSourceClawHub says "来源记为 ClawHub：{repo}，项目 Skill 暂不参与更新。"
 // in the language the app shows.
 //
 // 添加技能到项目完成后说明来源
@@ -17398,7 +17398,7 @@ func ImportProjectSourceClawHub(repo string) string {
 	return In(i18n.Locale()).ImportProjectSourceClawHub(repo)
 }
 
-// ImportProjectSourceClawHub says "来源记为 ClawHub：{repo}，项目技能暂不参与更新。"
+// ImportProjectSourceClawHub says "来源记为 ClawHub：{repo}，项目 Skill 暂不参与更新。"
 // in the language of msgs.
 //
 // 添加技能到项目完成后说明来源
@@ -17434,13 +17434,13 @@ func (msgs Messages) MarketTitle() string {
 	return Catalog.Format(msgs.locale, "marketTitle", nil)
 }
 
-// MarketSearchPlaceholder says "搜索技能，或粘贴链接、owner/repo、npx 命令"
+// MarketSearchPlaceholder says "搜索 Skill，或粘贴链接、owner/repo、npx 命令"
 // in the language the app shows.
 //
 // 云市场顶部搜索与粘贴框占位提示
 func MarketSearchPlaceholder() string { return In(i18n.Locale()).MarketSearchPlaceholder() }
 
-// MarketSearchPlaceholder says "搜索技能，或粘贴链接、owner/repo、npx 命令"
+// MarketSearchPlaceholder says "搜索 Skill，或粘贴链接、owner/repo、npx 命令"
 // in the language of msgs.
 //
 // 云市场顶部搜索与粘贴框占位提示
@@ -17798,13 +17798,13 @@ func (msgs Messages) MarketCategoryOther() string {
 	return Catalog.Format(msgs.locale, "marketCategoryOther", nil)
 }
 
-// MarketTopicIntro says "{count} 个技能，由 skills.sh 编辑整理"
+// MarketTopicIntro says "{count} 个 Skill，由 skills.sh 编辑整理"
 // in the language the app shows.
 //
 // 专题页顶部数量说明
 func MarketTopicIntro(count int) string { return In(i18n.Locale()).MarketTopicIntro(count) }
 
-// MarketTopicIntro says "{count} 个技能，由 skills.sh 编辑整理"
+// MarketTopicIntro says "{count} 个 Skill，由 skills.sh 编辑整理"
 // in the language of msgs.
 //
 // 专题页顶部数量说明
@@ -18148,13 +18148,13 @@ func (msgs Messages) MarketLinkKindGitHub() string {
 	return Catalog.Format(msgs.locale, "marketLinkKindGitHub", nil)
 }
 
-// MarketLinkKindSkillsSh says "skills.sh 上的技能"
+// MarketLinkKindSkillsSh says "skills.sh 上的 Skill"
 // in the language the app shows.
 //
 // 粘贴链接状态：来源类型说明
 func MarketLinkKindSkillsSh() string { return In(i18n.Locale()).MarketLinkKindSkillsSh() }
 
-// MarketLinkKindSkillsSh says "skills.sh 上的技能"
+// MarketLinkKindSkillsSh says "skills.sh 上的 Skill"
 // in the language of msgs.
 //
 // 粘贴链接状态：来源类型说明
@@ -18162,13 +18162,13 @@ func (msgs Messages) MarketLinkKindSkillsSh() string {
 	return Catalog.Format(msgs.locale, "marketLinkKindSkillsSh", nil)
 }
 
-// MarketLinkKindClawHub says "ClawHub 上的技能"
+// MarketLinkKindClawHub says "ClawHub 上的 Skill"
 // in the language the app shows.
 //
 // 粘贴链接状态：来源类型说明
 func MarketLinkKindClawHub() string { return In(i18n.Locale()).MarketLinkKindClawHub() }
 
-// MarketLinkKindClawHub says "ClawHub 上的技能"
+// MarketLinkKindClawHub says "ClawHub 上的 Skill"
 // in the language of msgs.
 //
 // 粘贴链接状态：来源类型说明
@@ -18176,13 +18176,13 @@ func (msgs Messages) MarketLinkKindClawHub() string {
 	return Catalog.Format(msgs.locale, "marketLinkKindClawHub", nil)
 }
 
-// MarketLinkKindWebsite says "网站发布的技能"
+// MarketLinkKindWebsite says "网站发布的 Skill"
 // in the language the app shows.
 //
 // 粘贴链接状态：来源类型说明
 func MarketLinkKindWebsite() string { return In(i18n.Locale()).MarketLinkKindWebsite() }
 
-// MarketLinkKindWebsite says "网站发布的技能"
+// MarketLinkKindWebsite says "网站发布的 Skill"
 // in the language of msgs.
 //
 // 粘贴链接状态：来源类型说明
@@ -18190,13 +18190,13 @@ func (msgs Messages) MarketLinkKindWebsite() string {
 	return Catalog.Format(msgs.locale, "marketLinkKindWebsite", nil)
 }
 
-// MarketLoading says "正在载入 {source} 的技能…"
+// MarketLoading says "正在载入 {source} 的 Skill…"
 // in the language the app shows.
 //
 // 首次无缓存加载市场列表
 func MarketLoading(source string) string { return In(i18n.Locale()).MarketLoading(source) }
 
-// MarketLoading says "正在载入 {source} 的技能…"
+// MarketLoading says "正在载入 {source} 的 Skill…"
 // in the language of msgs.
 //
 // 首次无缓存加载市场列表
@@ -18204,13 +18204,13 @@ func (msgs Messages) MarketLoading(source string) string {
 	return Catalog.Format(msgs.locale, "marketLoading", map[string]any{"source": source})
 }
 
-// MarketLoadFailed says "没能载入 {source} 的技能，请检查网络后重试。"
+// MarketLoadFailed says "没能载入 {source} 的 Skill，请检查网络后重试。"
 // in the language the app shows.
 //
 // 无缓存时加载市场列表失败
 func MarketLoadFailed(source string) string { return In(i18n.Locale()).MarketLoadFailed(source) }
 
-// MarketLoadFailed says "没能载入 {source} 的技能，请检查网络后重试。"
+// MarketLoadFailed says "没能载入 {source} 的 Skill，请检查网络后重试。"
 // in the language of msgs.
 //
 // 无缓存时加载市场列表失败
@@ -18248,13 +18248,13 @@ func (msgs Messages) MarketSourceUnavailable(source string) string {
 	return Catalog.Format(msgs.locale, "marketSourceUnavailable", map[string]any{"source": source})
 }
 
-// MarketNoResults says "没有找到与「{query}」相关的技能。"
+// MarketNoResults says "没有找到与「{query}」相关的 Skill。"
 // in the language the app shows.
 //
 // 搜索两侧都无匹配结果
 func MarketNoResults(query string) string { return In(i18n.Locale()).MarketNoResults(query) }
 
-// MarketNoResults says "没有找到与「{query}」相关的技能。"
+// MarketNoResults says "没有找到与「{query}」相关的 Skill。"
 // in the language of msgs.
 //
 // 搜索两侧都无匹配结果
@@ -18262,13 +18262,13 @@ func (msgs Messages) MarketNoResults(query string) string {
 	return Catalog.Format(msgs.locale, "marketNoResults", map[string]any{"query": query})
 }
 
-// MarketEmptyFilter says "这里暂时没有技能。"
+// MarketEmptyFilter says "这里暂时没有 Skill。"
 // in the language the app shows.
 //
 // 某个分类或专题下没有技能
 func MarketEmptyFilter() string { return In(i18n.Locale()).MarketEmptyFilter() }
 
-// MarketEmptyFilter says "这里暂时没有技能。"
+// MarketEmptyFilter says "这里暂时没有 Skill。"
 // in the language of msgs.
 //
 // 某个分类或专题下没有技能
@@ -18302,4 +18302,18 @@ func MarketGroupCategories() string { return In(i18n.Locale()).MarketGroupCatego
 // 云市场标签栏：ClawHub 分类这一组前面的小标题
 func (msgs Messages) MarketGroupCategories() string {
 	return Catalog.Format(msgs.locale, "marketGroupCategories", nil)
+}
+
+// DeleteImpactReadsLibrary says "读的是 Skill 库，原件移走后就没有了"
+// in the language the app shows.
+//
+// 删除确认框：这个 Agent 读的就是 Skill 库里的原件
+func DeleteImpactReadsLibrary() string { return In(i18n.Locale()).DeleteImpactReadsLibrary() }
+
+// DeleteImpactReadsLibrary says "读的是 Skill 库，原件移走后就没有了"
+// in the language of msgs.
+//
+// 删除确认框：这个 Agent 读的就是 Skill 库里的原件
+func (msgs Messages) DeleteImpactReadsLibrary() string {
+	return Catalog.Format(msgs.locale, "deleteImpactReadsLibrary", nil)
 }

@@ -41,7 +41,7 @@ func usageHome(t *testing.T) string {
 		tool("2026-10-06T08:00:00Z", filepath.Join(proj, "src"), "notes-sync"),
 	)
 	write(h(".codex/sessions/2026/10/07/s.jsonl"),
-		`{"timestamp":"2026-10-07T08:00:00Z","type":"session_meta","payload":{"cwd":"`+jsonStr(proj)+`","instructions":"技能清单 ~/.agents/skills/spark/SKILL.md"}}`,
+		`{"timestamp":"2026-10-07T08:00:00Z","type":"session_meta","payload":{"cwd":"`+jsonStr(proj)+`","instructions":"Skill 清单 ~/.agents/skills/spark/SKILL.md"}}`,
 		`{"timestamp":"2026-10-07T08:00:01Z","type":"response_item","payload":{"type":"message","role":"developer","content":"`+jsonStr(h(".agents/skills/spark/SKILL.md"))+`"}}`,
 		`{"timestamp":"2026-10-07T08:01:00Z","type":"response_item","payload":{"type":"custom_tool_call","name":"exec","input":"tools.exec_command({cmd:\"cat `+jsonStr(h(".agents/skills/test-first/SKILL.md"))+`\"})"}}`,
 		`{"timestamp":"2026-10-07T08:02:00Z","type":"response_item","payload":{"type":"custom_tool_call","name":"exec","input":"cat ~/.agents/skills/test-first/SKILL.md && ls ~/.agents/skills/*/SKILL.md"}}`,
@@ -66,7 +66,7 @@ func TestUsageCountsSkillCallsFromSessionLogs(t *testing.T) {
 		t.Errorf("上次调用 = %s，应为 10-07", got)
 	}
 	if n := l.Usage(l.ByID("builtin:" + filepath.Join(home, ".claude/plugins/cache/m/pua/1.0/skills/pua"))).Count; n != 1 {
-		t.Errorf("「插件:技能」应记在内置技能上，得到 %d", n)
+		t.Errorf("「插件:Skill」应记在内置 Skill 上，得到 %d", n)
 	}
 	var docs *Skill
 	for _, s := range l.Skills {
@@ -75,7 +75,7 @@ func TestUsageCountsSkillCallsFromSessionLogs(t *testing.T) {
 		}
 	}
 	if n := l.Usage(docs).Count; n != 1 {
-		t.Errorf("在项目里调用的应记在项目技能上，得到 %d", n)
+		t.Errorf("在项目里调用的应记在项目 Skill 上，得到 %d", n)
 	}
 	if got := l.UsageSince().UTC().Format("01-02"); got != "10-01" {
 		t.Errorf("统计从 %s 起，应为 10-01", got)
@@ -102,7 +102,7 @@ func TestUnusedListsOnlySkillsWhoseUsageIsKnown(t *testing.T) {
 		t.Errorf("没用过 = %q，应只有 spark", got)
 	}
 	if l.UsageTracked(l.Get("test-first-old")) {
-		t.Error("只被没有记录的 Agent 读到的技能，用没用过不知道")
+		t.Error("只被没有记录的 Agent 读到的 Skill，用没用过不知道")
 	}
 }
 

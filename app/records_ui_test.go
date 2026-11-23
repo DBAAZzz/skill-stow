@@ -12,10 +12,10 @@ func TestUserClearsRecordsOfDeletedSkillsFromTidy(t *testing.T) {
 	must(t, tt.Click("整理"))
 
 	// When 打开「已删除技能的安装记录」
-	must(t, tt.Click("已删除技能的安装记录"))
+	must(t, tt.Click("已删除 Skill 的安装记录"))
 
 	// Then 一行一个来源，写明技能和数量，能清除
-	for _, want := range []string{"这些技能已从本地删除，但安装清单里还留着记录；不清理的话，下次更新可能会把它们重新装回来。",
+	for _, want := range []string{"这些 Skill 已从本地删除，但安装清单里还留着记录；不清理的话，下次更新可能会把它们重新装回来。",
 		"dontbesilent2025/dbskill", "dbs、dbs-action、dbs-ai-check 等 32 个", "8 月 20 日", "清除记录", "全部清除"} {
 		if !tt.HasText(want) {
 			t.Errorf("缺少 %q：%q", want, tt.Texts())
@@ -44,7 +44,7 @@ func TestClearingAllRecordsShowsProgressUntilItIsDone(t *testing.T) {
 	var work func(post func(func()))
 	a.bg = func(w func(post func(func()))) { work = w }
 	must(t, tt.Click("整理"))
-	must(t, tt.Click("已删除技能的安装记录"))
+	must(t, tt.Click("已删除 Skill 的安装记录"))
 	before := a.issueTotal(new(a.lib.Problems()))
 
 	// When 点「全部清除」
@@ -72,7 +72,7 @@ func TestClearingAllRecordsShowsProgressUntilItIsDone(t *testing.T) {
 	if a.tidy.work != nil || !tt.HasText("已清理 34 条失效的安装记录。") {
 		t.Errorf("清完应显示结果行：%q", tt.Texts())
 	}
-	if tt.HasText("已删除技能的安装记录") {
+	if tt.HasText("已删除 Skill 的安装记录") {
 		t.Errorf("清完后这一类应消失：%q", tt.Texts())
 	}
 	if got := a.issueTotal(new(a.lib.Problems())); got != before-2 {

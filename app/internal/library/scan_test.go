@@ -46,7 +46,7 @@ func fakeHome(t *testing.T) string {
 	}
 
 	// Claude Code 的插件
-	skill(h(".claude/plugins/cache/m/pua/1.0/skills/pua"), "插件技能")
+	skill(h(".claude/plugins/cache/m/pua/1.0/skills/pua"), "插件 Skill")
 	must(t, os.WriteFile(h(".claude/plugins/installed_plugins.json"),
 		[]byte(`{"plugins":{"pua@m":[{"installPath":"`+jsonStr(h(".claude/plugins/cache/m/pua/1.0"))+`"}]}}`), 0o644))
 
@@ -128,7 +128,7 @@ func TestAntigravityIsFoundByEitherHomeAndReadsBuiltinSkills(t *testing.T) {
 			}
 			s := l.Get("automation")
 			if s == nil || s.Source != Builtin || s.Provider != "antigravity" {
-				t.Fatalf("自带技能应算 Antigravity 的内置：%+v", s)
+				t.Fatalf("自带 Skill 应算 Antigravity 的内置：%+v", s)
 			}
 		})
 	}
@@ -199,13 +199,13 @@ func TestScan(t *testing.T) {
 		t.Errorf("test-first 副本 %d，应为 2（CodeBuddy 和 Codex 各一份）", tf.Copies)
 	}
 	if tf.Dir != filepath.Join(home, ".agents/skills/test-first") || tf.Description != "先写测试" {
-		t.Errorf("test-first 应以技能库那份为准：%s %q", tf.Dir, tf.Description)
+		t.Errorf("test-first 应以 Skill 库那份为准：%s %q", tf.Dir, tf.Description)
 	}
 	if s := l.ByID("mine:spark"); s == nil || s.Description != "想法和需求 先聊清楚" || s.Links["cursor"] == "" {
 		t.Errorf("spark：%+v", s)
 	}
 	if s := l.ByID("mine:test-first-old"); s == nil || !slices.Equal(s.Enabled, []string{"cursor"}) {
-		t.Errorf("只在 Cursor 目录里的技能也是我的，启用于 Cursor：%+v", s)
+		t.Errorf("只在 Cursor 目录里的 Skill 也是我的，启用于 Cursor：%+v", s)
 	}
 	if len(l.Broken) != 1 || !strings.HasSuffix(l.Broken[0], "broken") {
 		t.Errorf("坏链接：%v", l.Broken)
@@ -224,7 +224,7 @@ func TestScan(t *testing.T) {
 		t.Errorf("插件装的：%v", plugged)
 	}
 	if len(project) != 1 || project[0].Name != "notes-sync" || project[0].Project != "storefront" {
-		t.Fatalf("项目里同一份技能只算一个：%v", project)
+		t.Fatalf("项目里同一份 Skill 只算一个：%v", project)
 	}
 	// 链到 ~/.claude/skills：Claude Code 读，Cursor 也读
 	if !slices.Equal(project[0].Enabled, []string{"claude-code", "cursor"}) {
@@ -241,10 +241,10 @@ func TestScan(t *testing.T) {
 		rels = append(rels, d.Rel)
 	}
 	if !slices.Equal(rels, []string{".claude/skills", ".agents/skills"}) {
-		t.Errorf("项目里的技能目录：%v", rels)
+		t.Errorf("项目里的 Skill 目录：%v", rels)
 	}
 	if l.Get("notes-sync").Source != Project {
-		t.Error("全局链接的项目技能不应算成我的")
+		t.Error("全局链接的项目 Skill 不应算成我的")
 	}
 }
 
@@ -265,7 +265,7 @@ func TestAddBuildsLinksAndNativeDisableKeepsThem(t *testing.T) {
 		t.Fatalf("应建相对链接，得到 %q", target)
 	}
 	if real, err := realPath(at); err != nil || real != filepath.Join(home, ".agents/skills/test-first") {
-		t.Fatalf("链接应指向技能库，得到 %q %v", real, err)
+		t.Fatalf("链接应指向 Skill 库，得到 %q %v", real, err)
 	}
 	if !tf.EnabledIn("workbuddy") {
 		t.Error("启用后状态没更新")
@@ -276,7 +276,7 @@ func TestAddBuildsLinksAndNativeDisableKeepsThem(t *testing.T) {
 		t.Error("原生停用必须保留链接")
 	}
 	if _, err := os.Stat(filepath.Join(home, ".agents/skills/test-first/SKILL.md")); err != nil {
-		t.Error("停用不能动技能本身")
+		t.Error("停用不能动 Skill 本身")
 	}
 
 	// Cursor 的原生停用尚未适配。
@@ -306,7 +306,7 @@ func TestManualProjects(t *testing.T) {
 	must(t, Scan(home).AddProjects([]string{empty, stock}))
 	l := Scan(home)
 	if l.Project(empty) != nil {
-		t.Error("没有技能的项目不在侧边栏列出")
+		t.Error("没有 Skill 的项目不在侧边栏列出")
 	}
 	var dirs []string
 	for _, p := range l.ManualProjects() {
@@ -399,7 +399,7 @@ func TestCustomAgentDir(t *testing.T) {
 	}
 	must(t, l.AddToAgent(l.ByID("mine:spark"), id))
 	if _, err := os.Lstat(filepath.Join(dir, "spark")); err != nil {
-		t.Error("可以在手动添加的目录里启用技能")
+		t.Error("可以在手动添加的目录里启用 Skill")
 	}
 	must(t, l.RemoveAgentDir(id))
 	if slices.ContainsFunc(Scan(home).Agents, func(a Agent) bool { return a.ID == id }) {
@@ -500,7 +500,7 @@ func TestSharedAndTidy(t *testing.T) {
 		t.Error("多余的链接应删掉")
 	}
 	if _, err := os.Stat(filepath.Join(home, ".agents/skills/spark/SKILL.md")); err != nil {
-		t.Error("技能本身不能动")
+		t.Error("Skill 本身不能动")
 	}
 	if len(spark.Redundant()) != 0 || !spark.EnabledIn("cursor") || spark.Via["cursor"] != l.Root {
 		t.Errorf("清理后 Cursor 仍经通用目录读到：Redundant %v Via %v", spark.Redundant(), spark.Via)

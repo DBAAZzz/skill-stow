@@ -12,7 +12,7 @@
   "@settingsLanguageSystem": {
     "description": "界面语言选择器：跟着系统的语言"
   },
-  "busyRetryLater": "这个技能正在处理，请稍后再试",
+  "busyRetryLater": "这个 Skill 正在处理，请稍后再试",
   "@busyRetryLater": {
     "description": "同一个技能正在被另一个操作处理"
   },
@@ -24,7 +24,7 @@
   "@updateUnsupportedFiles": {
     "description": "更新：新版本里有不支持的文件类型"
   },
-  "updateSkillRenamed": "技能名称已改变或无法确认，不能直接更新",
+  "updateSkillRenamed": "Skill 名称已改变或无法确认，不能直接更新",
   "@updateSkillRenamed": {
     "description": "更新：来源里技能改了名"
   },
@@ -36,11 +36,11 @@
   "@deleteUndoExpired": {
     "description": "删除：撤销时那份已经清掉了"
   },
-  "deleteReadOnly": "内置和插件技能不能删除",
+  "deleteReadOnly": "内置和插件 Skill 不能删除",
   "@deleteReadOnly": {
     "description": "删除：只读技能"
   },
-  "importPending": "这个技能还没下载完",
+  "importPending": "这个 Skill 还没下载完",
   "@importPending": {
     "description": "添加技能：还在补齐文件"
   },
@@ -97,7 +97,7 @@
   "@navTidy": {
     "description": "侧边栏：整理页（合并副本、修问题）"
   },
-  "navLibrary": "技能库",
+  "navLibrary": "Skill 库",
   "@navLibrary": {
     "description": "侧边栏分组标题"
   },
@@ -109,7 +109,7 @@
   "@navBuiltin": {
     "description": "侧边栏：Agent 自带的技能"
   },
-  "navScopes": "技能范围",
+  "navScopes": "Skill 范围",
   "@navScopes": {
     "description": "侧边栏列表给辅助功能读的名字"
   },
@@ -162,7 +162,7 @@
   "@projectsDialogAdd": {
     "description": "添加项目的文件夹面板的确认按钮"
   },
-  "projectsDialogMessage": "选择项目目录。会检查其中 .claude/skills、.agents/skills 等目录里的技能。",
+  "projectsDialogMessage": "选择项目目录。会检查其中 .claude/skills、.agents/skills 等目录里的 Skill。",
   "@projectsDialogMessage": {
     "description": "添加项目的文件夹面板里的说明"
   },
@@ -392,7 +392,7 @@
     "description": "usage.go:77",
     "placeholders": {}
   },
-  "usageAgentsCantRead": "只有 {agents} 留有调用记录，它们都读不到这个技能。",
+  "usageAgentsCantRead": "只有 {agents} 留有调用记录，它们都读不到这个 Skill。",
   "@usageAgentsCantRead": {
     "description": "usage.go:78",
     "placeholders": {
@@ -441,7 +441,7 @@
     "description": "usage_page.go:135",
     "placeholders": {}
   },
-  "usageProjectSkillsUsed": "项目里的技能另有 {n} 个用过，不计入库内。",
+  "usageProjectSkillsUsed": "项目里的 Skill 另有 {n} 个用过，不计入库内。",
   "@usageProjectSkillsUsed": {
     "description": "usage_page.go:165",
     "placeholders": {
@@ -515,7 +515,7 @@
     "description": "usage_page.go:379",
     "placeholders": {}
   },
-  "usageLibrarySkills": "库内技能",
+  "usageLibrarySkills": "库内 Skill",
   "@usageLibrarySkills": {
     "description": "usage_page.go:383",
     "placeholders": {}
@@ -525,7 +525,7 @@
     "description": "usage_page.go:522",
     "placeholders": {}
   },
-  "usageNoCallsYet": "还没有调用过技能",
+  "usageNoCallsYet": "还没有调用过 Skill",
   "@usageNoCallsYet": {
     "description": "usage_page.go:525",
     "placeholders": {}
@@ -584,7 +584,7 @@
     "description": "usage_page.go:950",
     "placeholders": {}
   },
-  "filesUnreadable": "读不到这个技能的文件",
+  "filesUnreadable": "读不到这个 Skill 的文件",
   "@filesUnreadable": {
     "description": "usage_page.go:998",
     "placeholders": {}
@@ -725,7 +725,7 @@
       }
     }
   },
-  "updateLocalUnreadable": "无法读取本机技能：{err}",
+  "updateLocalUnreadable": "无法读取本机 Skill：{err}",
   "@updateLocalUnreadable": {
     "description": "更新检查：本机那份读不了",
     "placeholders": {
@@ -861,7 +861,7 @@
       }
     }
   },
-  "originProject": "项目 {project} 里的技能",
+  "originProject": "项目 {project} 里的 Skill",
   "@originProject": {
     "description": "技能来源说明：项目里的",
     "placeholders": {
@@ -951,7 +951,7 @@
       }
     }
   },
-  "importLinkOutside": "包含指向技能目录以外的链接：{path}",
+  "importLinkOutside": "包含指向 Skill 目录以外的链接：{path}",
   "@importLinkOutside": {
     "description": "添加技能：技能的问题",
     "placeholders": {
@@ -1147,19 +1147,19 @@
       }
     }
   },
-  "importNameHasSpaces": "名称里有空格。技能名只能用小写字母、数字和连字符",
+  "importNameHasSpaces": "名称里有空格。Skill 名只能用小写字母、数字和连字符",
   "@importNameHasSpaces": {
     "description": "添加技能：技能名不合规"
   },
-  "importNameHasUppercase": "名称里有大写字母。技能名只能用小写字母、数字和连字符",
+  "importNameHasUppercase": "名称里有大写字母。Skill 名只能用小写字母、数字和连字符",
   "@importNameHasUppercase": {
     "description": "添加技能：技能名不合规"
   },
-  "importNameHasSpacesAndUppercase": "名称里有空格和大写字母。技能名只能用小写字母、数字和连字符",
+  "importNameHasSpacesAndUppercase": "名称里有空格和大写字母。Skill 名只能用小写字母、数字和连字符",
   "@importNameHasSpacesAndUppercase": {
     "description": "添加技能：技能名不合规"
   },
-  "importDuplicateName": "同一来源里有两个叫 {name} 的技能",
+  "importDuplicateName": "同一来源里有两个叫 {name} 的 Skill",
   "@importDuplicateName": {
     "description": "添加技能：同名",
     "placeholders": {
@@ -1168,7 +1168,7 @@
       }
     }
   },
-  "importNotAtRoot": "{host} 的技能不在网站根目录。",
+  "importNotAtRoot": "{host} 的 Skill 不在网站根目录。",
   "@importNotAtRoot": {
     "description": "添加技能：网站来源猜的地址不对",
     "placeholders": {
@@ -1222,7 +1222,7 @@
       }
     }
   },
-  "collectTitle": "把 {name} 收进我的技能？",
+  "collectTitle": "把 {name} 收进我的 Skill？",
   "@collectTitle": {
     "description": "把项目技能收进技能库的确认框标题",
     "placeholders": {
@@ -1323,7 +1323,7 @@
     "description": "更新前尚未选择旧版本处理方式时显示。",
     "placeholders": {}
   },
-  "updateStagingDifferentDisk": "这个位置不支持安全更新：暂存与技能不在同一磁盘",
+  "updateStagingDifferentDisk": "这个位置不支持安全更新：暂存与 Skill 不在同一磁盘",
   "@updateStagingDifferentDisk": {
     "description": "更新暂存目录与技能不在同一磁盘时显示。",
     "placeholders": {}
@@ -1347,17 +1347,17 @@
       }
     }
   },
-  "collectRequiresGlobalLink": "只有被全局链接的项目技能能收进技能库",
+  "collectRequiresGlobalLink": "只有被全局链接的项目 Skill 能收进 Skill 库",
   "@collectRequiresGlobalLink": {
     "description": "收进技能库时技能不符合全局链接条件。",
     "placeholders": {}
   },
-  "collectSampleUnavailable": "示例数据不能收进技能库",
+  "collectSampleUnavailable": "示例数据不能收进 Skill 库",
   "@collectSampleUnavailable": {
     "description": "尝试将示例技能收进技能库时显示。",
     "placeholders": {}
   },
-  "collectNameExists": "技能库里已经有 {name}，没有覆盖它",
+  "collectNameExists": "Skill 库里已经有 {name}，没有覆盖它",
   "@collectNameExists": {
     "description": "收进技能库时同名技能已存在。",
     "placeholders": {
@@ -1378,7 +1378,7 @@
       }
     }
   },
-  "collectionToggleIndividually": "集合不能整体启停，请逐个技能操作",
+  "collectionToggleIndividually": "集合不能整体启停，请逐个 Skill 操作",
   "@collectionToggleIndividually": {
     "description": "尝试整体启停集合时显示。",
     "placeholders": {}
@@ -1388,7 +1388,7 @@
     "description": "收成一份时没有可合并副本。",
     "placeholders": {}
   },
-  "copiesGroupedSkillProtected": "技能库里的 {name} 在一组技能里，这里不替换它",
+  "copiesGroupedSkillProtected": "Skill 库里的 {name} 在一组 Skill 里，这里不替换它",
   "@copiesGroupedSkillProtected": {
     "description": "收成一份时目标技能属于集合。",
     "placeholders": {
@@ -1557,7 +1557,7 @@
       }
     }
   },
-  "importSkillNotFound": "找不到这个技能",
+  "importSkillNotFound": "找不到这个 Skill",
   "@importSkillNotFound": {
     "description": "添加技能时找不到目标技能。",
     "placeholders": {}
@@ -1619,7 +1619,7 @@
     "description": "导入压缩包解压后大小超过上限。",
     "placeholders": {}
   },
-  "importDropFolderOrZip": "拖入技能文件夹，或打包好的 .zip",
+  "importDropFolderOrZip": "拖入 Skill 文件夹，或打包好的 .zip",
   "@importDropFolderOrZip": {
     "description": "本地导入时提示支持的拖入内容。",
     "placeholders": {}
@@ -1629,7 +1629,7 @@
     "description": "本地导入时没有可用文件名的内容称呼。",
     "placeholders": {}
   },
-  "importFoldersNotSkills": "里面有 {count} 个文件夹（{p1}），都不是技能",
+  "importFoldersNotSkills": "里面有 {count} 个文件夹（{p1}），都不是 Skill",
   "@importFoldersNotSkills": {
     "description": "导入目录中仅发现不含技能的文件夹。",
     "placeholders": {
@@ -1641,12 +1641,12 @@
       }
     }
   },
-  "importUseSubdirectoryOrZip": "粘贴技能所在子目录的链接，或下载 zip 拖进来",
+  "importUseSubdirectoryOrZip": "粘贴 Skill 所在子目录的链接，或下载 zip 拖进来",
   "@importUseSubdirectoryOrZip": {
     "description": "远程目录过大时提示缩小范围或使用压缩包。",
     "placeholders": {}
   },
-  "importSkillFolderHint": "技能是一个带 SKILL.md 的文件夹；如果在子目录里，可以直接粘贴那个子目录的链接",
+  "importSkillFolderHint": "Skill 是一个带 SKILL.md 的文件夹；如果在子目录里，可以直接粘贴那个子目录的链接",
   "@importSkillFolderHint": {
     "description": "远程来源没有技能时解释技能文件结构。",
     "placeholders": {}
@@ -1701,12 +1701,12 @@
     "description": "导入技能的名称超过长度限制。",
     "placeholders": {}
   },
-  "importNameInvalidCharacters": "名称里有不能用的字符。技能名只能用小写字母、数字和连字符",
+  "importNameInvalidCharacters": "名称里有不能用的字符。Skill 名只能用小写字母、数字和连字符",
   "@importNameInvalidCharacters": {
     "description": "导入技能名称包含不支持的字符。",
     "placeholders": {}
   },
-  "importFileCountExceeded": "这个技能有 {count} 个文件，超过上限",
+  "importFileCountExceeded": "这个 Skill 有 {count} 个文件，超过上限",
   "@importFileCountExceeded": {
     "description": "导入技能的文件数量超过上限。",
     "placeholders": {
@@ -1715,7 +1715,7 @@
       }
     }
   },
-  "importSkillSizeExceeded": "这个技能有 {p0}，超过 20 MB 的上限",
+  "importSkillSizeExceeded": "这个 Skill 有 {p0}，超过 20 MB 的上限",
   "@importSkillSizeExceeded": {
     "description": "导入技能的总大小超过上限。",
     "placeholders": {
@@ -1734,7 +1734,7 @@
     "description": "远程下载得到空快照。",
     "placeholders": {}
   },
-  "importNotSkillSource": "这个地址不是技能源。",
+  "importNotSkillSource": "这个地址不是 Skill 源。",
   "@importNotSkillSource": {
     "description": "网站导入时地址不是可识别的技能源。",
     "placeholders": {}
@@ -1754,7 +1754,7 @@
     "description": "网站导入内容不完整时建议重新读取。",
     "placeholders": {}
   },
-  "importWebsiteNoPublicSkills": "这个网站没有公开的技能。",
+  "importWebsiteNoPublicSkills": "这个网站没有公开的 Skill。",
   "@importWebsiteNoPublicSkills": {
     "description": "网站导入没有发现公开技能。",
     "placeholders": {}
@@ -1771,7 +1771,7 @@
       }
     }
   },
-  "importWebsiteSkillHttpError": "网站上取不到这个技能（HTTP {code}）",
+  "importWebsiteSkillHttpError": "网站上取不到这个 Skill（HTTP {code}）",
   "@importWebsiteSkillHttpError": {
     "description": "从网站读取技能时遇到 HTTP 错误。",
     "placeholders": {
@@ -1830,17 +1830,17 @@
     "description": "整理页面中缺少简介的问题分类。",
     "placeholders": {}
   },
-  "issueGloballyLinkedProjectSkills": "项目技能被全局链接",
+  "issueGloballyLinkedProjectSkills": "项目 Skill 被全局链接",
   "@issueGloballyLinkedProjectSkills": {
     "description": "整理页面中被全局链接的项目技能分类。",
     "placeholders": {}
   },
-  "issueDeletedSkillInstallRecords": "已删除技能的安装记录",
+  "issueDeletedSkillInstallRecords": "已删除 Skill 的安装记录",
   "@issueDeletedSkillInstallRecords": {
     "description": "整理页面中已删除技能的残留安装记录分类。",
     "placeholders": {}
   },
-  "issueLibrarySkillMissing": "技能库里没有 {name}",
+  "issueLibrarySkillMissing": "Skill 库里没有 {name}",
   "@issueLibrarySkillMissing": {
     "description": "整理技能时技能库没有对应技能。",
     "placeholders": {
@@ -1882,27 +1882,27 @@
     "description": "技能来源类型显示插件安装。",
     "placeholders": {}
   },
-  "libraryMySkills": "我的技能",
+  "libraryMySkills": "我的 Skill",
   "@libraryMySkills": {
     "description": "技能来源说明或列表分组显示我的技能。",
     "placeholders": {}
   },
-  "libraryBuiltinSkills": "内置技能",
+  "libraryBuiltinSkills": "内置 Skill",
   "@libraryBuiltinSkills": {
     "description": "技能列表分组显示内置技能。",
     "placeholders": {}
   },
-  "libraryProjectSkills": "项目技能",
+  "libraryProjectSkills": "项目 Skill",
   "@libraryProjectSkills": {
     "description": "技能列表分组显示项目技能。",
     "placeholders": {}
   },
-  "libraryAllSkills": "全部技能",
+  "libraryAllSkills": "全部 Skill",
   "@libraryAllSkills": {
     "description": "技能列表分组显示全部技能。",
     "placeholders": {}
   },
-  "libraryReadOnlyToggle": "内置和项目技能不能在这里启用或停用",
+  "libraryReadOnlyToggle": "内置和项目 Skill 不能在这里启用或停用",
   "@libraryReadOnlyToggle": {
     "description": "用户尝试启停只读来源技能时显示。",
     "placeholders": {}
@@ -1941,7 +1941,7 @@
     "description": "读取原生启停配置时 disabled 字段类型错误。",
     "placeholders": {}
   },
-  "nativeMissingFrontmatterName": "SKILL.md 缺少 frontmatter name，无法确定技能 ID",
+  "nativeMissingFrontmatterName": "SKILL.md 缺少 frontmatter name，无法确定 Skill ID",
   "@nativeMissingFrontmatterName": {
     "description": "读取技能原生 ID 时缺少 frontmatter 名称。",
     "placeholders": {}
@@ -1976,7 +1976,7 @@
     "description": "停用后说明命令行仍可调用技能。",
     "placeholders": {}
   },
-  "nativeDisabledByExistingConfig": "此技能由用户原有的 skills.config 停用，请在 Codex 配置中调整",
+  "nativeDisabledByExistingConfig": "此 Skill 由用户原有的 skills.config 停用，请在 Codex 配置中调整",
   "@nativeDisabledByExistingConfig": {
     "description": "技能被用户已有 Codex 规则停用而不能直接覆盖。",
     "placeholders": {}
@@ -1986,7 +1986,7 @@
     "description": "原生启停被其他配置规则覆盖。",
     "placeholders": {}
   },
-  "nativeZCodeSkillsOff": "ZCode 设置里关闭了全部技能，要先在 ZCode 里打开技能功能。",
+  "nativeZCodeSkillsOff": "ZCode 设置里关闭了全部 Skill，要先在 ZCode 里打开 Skill 功能。",
   "@nativeZCodeSkillsOff": {
     "description": "ZCode 的 features.skill 或 skills.enabled 是 false：单个开关不会生效",
     "placeholders": {}
@@ -2169,7 +2169,7 @@
       }
     }
   },
-  "scanAgentSkillExists": "{name} 的技能目录里已经有一个 {name2}，没有覆盖它",
+  "scanAgentSkillExists": "{name} 的 Skill 目录里已经有一个 {name2}，没有覆盖它",
   "@scanAgentSkillExists": {
     "description": "为 Agent 建链接时技能目录已有同名项。",
     "placeholders": {
@@ -2202,7 +2202,7 @@
       }
     }
   },
-  "settingsSampleSkillDirectoryUnavailable": "示例数据不能添加技能目录",
+  "settingsSampleSkillDirectoryUnavailable": "示例数据不能添加 Skill 目录",
   "@settingsSampleSkillDirectoryUnavailable": {
     "description": "示例模式尝试添加技能目录时显示。",
     "placeholders": {}
@@ -2216,7 +2216,7 @@
       }
     }
   },
-  "settingsAgentDirectoryAlreadyAdded": "{p0} 是 {name} 的技能目录，已经在列表里了",
+  "settingsAgentDirectoryAlreadyAdded": "{p0} 是 {name} 的 Skill 目录，已经在列表里了",
   "@settingsAgentDirectoryAlreadyAdded": {
     "description": "添加自定义技能目录时路径已属于 Agent 的技能目录。",
     "placeholders": {
@@ -2263,7 +2263,7 @@
     "description": "更新列表显示尚未检查的状态。",
     "placeholders": {}
   },
-  "updateMissingFromLibrary": "技能库中找不到，其他位置有同名技能；装回技能库后才能更新",
+  "updateMissingFromLibrary": "Skill 库中找不到，其他位置有同名 Skill；装回 Skill 库后才能更新",
   "@updateMissingFromLibrary": {
     "description": "更新检查发现技能仅存在于技能库以外的位置。",
     "placeholders": {}
@@ -2298,22 +2298,22 @@
     "description": "更新前发现独立副本需要先收成一份。",
     "placeholders": {}
   },
-  "updateInstallSourcePathMissing": "安装记录中的来源或技能路径不完整",
+  "updateInstallSourcePathMissing": "安装记录中的来源或 Skill 路径不完整",
   "@updateInstallSourcePathMissing": {
     "description": "更新检查发现安装来源或技能路径不完整。",
     "placeholders": {}
   },
-  "updateUpstreamSkillRemoved": "上游仓库已移除该技能",
+  "updateUpstreamSkillRemoved": "上游仓库已移除该 Skill",
   "@updateUpstreamSkillRemoved": {
     "description": "更新检查发现上游技能被删除。",
     "placeholders": {}
   },
-  "updateUpstreamPathChanged": "上游技能已换路径，不能直接更新",
+  "updateUpstreamPathChanged": "上游 Skill 已换路径，不能直接更新",
   "@updateUpstreamPathChanged": {
     "description": "更新检查发现上游技能路径改变。",
     "placeholders": {}
   },
-  "updateUpstreamNameAmbiguous": "上游有多个同名技能，无法确认",
+  "updateUpstreamNameAmbiguous": "上游有多个同名 Skill，无法确认",
   "@updateUpstreamNameAmbiguous": {
     "description": "更新检查发现上游有多个同名技能。",
     "placeholders": {}
@@ -2353,7 +2353,7 @@
     "description": "更新下载前检查发现仓库目录树不完整。",
     "placeholders": {}
   },
-  "updateTooManyFiles": "技能文件超过 2000 个",
+  "updateTooManyFiles": "Skill 文件超过 2000 个",
   "@updateTooManyFiles": {
     "description": "更新检查发现技能文件数量超过上限。",
     "placeholders": {}
@@ -2373,7 +2373,7 @@
     "description": "更新检查发现单个文件大小超过上限。",
     "placeholders": {}
   },
-  "updateSkillTooLarge": "技能超过 100 MB",
+  "updateSkillTooLarge": "Skill 超过 100 MB",
   "@updateSkillTooLarge": {
     "description": "更新检查发现技能总大小超过上限。",
     "placeholders": {}
@@ -2486,7 +2486,7 @@
       }
     }
   },
-  "importPlaceAgentsShared": "文件放一份在 {dir}，{others} 通过链接读同一份，改一处都生效。不放进技能库，其他 Agent 读不到。",
+  "importPlaceAgentsShared": "文件放一份在 {dir}，{others} 通过链接读同一份，改一处都生效。不放进 Skill 库，其他 Agent 读不到。",
   "@importPlaceAgentsShared": {
     "description": "「装到」选了几个 Agent 时的说明",
     "placeholders": {
@@ -2498,7 +2498,7 @@
       }
     }
   },
-  "importPlaceAgentOnly": "文件放在 {dir}，只有 {agent} 和读这个目录的 Agent 能读到。不放进技能库，其他 Agent 读不到。",
+  "importPlaceAgentOnly": "文件放在 {dir}，只有 {agent} 和读这个目录的 Agent 能读到。不放进 Skill 库，其他 Agent 读不到。",
   "@importPlaceAgentOnly": {
     "description": "「装到」只选了一个 Agent 时的说明",
     "placeholders": {
@@ -2570,7 +2570,7 @@
       }
     }
   },
-  "importSameExisting": "{place}里已经有这个技能，内容完全一样。",
+  "importSameExisting": "{place}里已经有这个 Skill，内容完全一样。",
   "@importSameExisting": {
     "description": "预览：目标位置已有一模一样的",
     "placeholders": {
@@ -2609,7 +2609,7 @@
       }
     }
   },
-  "importAgentSkillsDir": "{agent} 的技能目录",
+  "importAgentSkillsDir": "{agent} 的 Skill 目录",
   "@importAgentSkillsDir": {
     "description": "放在哪：某个 Agent 的技能目录",
     "placeholders": {
@@ -2618,7 +2618,7 @@
       }
     }
   },
-  "inspectorAlwaysOnTip": "{agent} 读得到这个技能，但没有可以在这里修改的启用设置，所以一直开着",
+  "inspectorAlwaysOnTip": "{agent} 读得到这个 Skill，但没有可以在这里修改的启用设置，所以一直开着",
   "@inspectorAlwaysOnTip": {
     "description": "详情栏「始终启用」的提示",
     "placeholders": {
@@ -2627,7 +2627,7 @@
       }
     }
   },
-  "inspectorRemoveLinkTip": "删除在 {agent} 技能目录里建的链接",
+  "inspectorRemoveLinkTip": "删除在 {agent} Skill 目录里建的链接",
   "@inspectorRemoveLinkTip": {
     "description": "详情栏「移除」按钮的提示",
     "placeholders": {
@@ -2681,7 +2681,7 @@
       }
     }
   },
-  "inspectorPluginWithAgent": "插件里的技能随 {agent} 一起生效，这里不能停用。",
+  "inspectorPluginWithAgent": "插件里的 Skill 随 {agent} 一起生效，这里不能停用。",
   "@inspectorPluginWithAgent": {
     "description": "详情栏：插件技能不能停用",
     "placeholders": {
@@ -2690,7 +2690,7 @@
       }
     }
   },
-  "inspectorBuiltinWithAgent": "内置技能随 {agent} 一起生效，这里不能停用。",
+  "inspectorBuiltinWithAgent": "内置 Skill 随 {agent} 一起生效，这里不能停用。",
   "@inspectorBuiltinWithAgent": {
     "description": "详情栏：内置技能不能停用",
     "placeholders": {
@@ -2818,7 +2818,7 @@
     "description": "从应用打开编辑器失败时输出到标准错误的前缀。",
     "placeholders": {}
   },
-  "batchSelectSkillsToDelete": "选择要删除的技能",
+  "batchSelectSkillsToDelete": "选择要删除的 Skill",
   "@batchSelectSkillsToDelete": {
     "description": "批量删除模式的选择栏和分组选择操作显示的文案。",
     "placeholders": {}
@@ -2857,7 +2857,7 @@
     "description": "批量删除模式的选择栏和分组选择操作显示的文案。",
     "placeholders": {}
   },
-  "batchSelectionSummary": "含 {sets} 个集合，共 {count} 个技能",
+  "batchSelectionSummary": "含 {sets} 个集合，共 {count} 个 Skill",
   "@batchSelectionSummary": {
     "description": "批量删除模式的选择栏和分组选择操作显示的文案。",
     "placeholders": {
@@ -2888,12 +2888,12 @@
     "description": "批量删除模式的选择栏和分组选择操作显示的文案。",
     "placeholders": {}
   },
-  "batchReadOnlyCannotDelete": "只读的技能不能在这里删",
+  "batchReadOnlyCannotDelete": "只读的 Skill 不能在这里删",
   "@batchReadOnlyCannotDelete": {
     "description": "对只读技能发起删除时显示的文案。",
     "placeholders": {}
   },
-  "browseSkillsAndAgents": "{count} 个技能，分布在 {count2} 个 Agent",
+  "browseSkillsAndAgents": "{count} 个 Skill，分布在 {count2} 个 Agent",
   "@browseSkillsAndAgents": {
     "description": "技能浏览页顶部的技能与 Agent 数量概要显示的文案。",
     "placeholders": {
@@ -2924,7 +2924,7 @@
     "description": "技能浏览页工具栏的批量操作、添加技能和视图切换显示的文案。",
     "placeholders": {}
   },
-  "actionAddSkills": "添加技能",
+  "actionAddSkills": "添加 Skill",
   "@actionAddSkills": {
     "description": "技能浏览页工具栏的批量操作、添加技能和视图切换显示的文案。",
     "placeholders": {}
@@ -2964,7 +2964,7 @@
     "description": "看板中区分通用目录和 Agent 自有目录的分组显示的文案。",
     "placeholders": {}
   },
-  "commonNoSkills": "没有技能",
+  "commonNoSkills": "没有 Skill",
   "@commonNoSkills": {
     "description": "浏览列表没有技能时的空状态显示的文案。",
     "placeholders": {}
@@ -2984,22 +2984,22 @@
     "description": "技能卡片与阅读视图显示启用状态时显示的文案。",
     "placeholders": {}
   },
-  "browseBoardDescription": "看板按 Agent 排列你自己的技能。",
+  "browseBoardDescription": "看板按 Agent 排列你自己的 Skill。",
   "@browseBoardDescription": {
     "description": "看板的说明与添加技能空状态显示的文案。",
     "placeholders": {}
   },
-  "browseAllSkillsAdded": "所有技能都已添加",
+  "browseAllSkillsAdded": "所有 Skill 都已添加",
   "@browseAllSkillsAdded": {
     "description": "看板的说明与添加技能空状态显示的文案。",
     "placeholders": {}
   },
-  "browseNoOutsideShared": "没有通用之外的技能",
+  "browseNoOutsideShared": "没有通用之外的 Skill",
   "@browseNoOutsideShared": {
     "description": "看板的说明与添加技能空状态显示的文案。",
     "placeholders": {}
   },
-  "browseAddMoreSkills": "添加更多技能",
+  "browseAddMoreSkills": "添加更多 Skill",
   "@browseAddMoreSkills": {
     "description": "看板的说明与添加技能空状态显示的文案。",
     "placeholders": {}
@@ -3039,7 +3039,7 @@
     "description": "收进项目技能的确认对话框中，解释复制与保留链接的选择显示的文案。",
     "placeholders": {}
   },
-  "collectIntoMySkills": "收进我的技能",
+  "collectIntoMySkills": "收进我的 Skill",
   "@collectIntoMySkills": {
     "description": "收进项目技能的确认对话框中，解释复制与保留链接的选择显示的文案。",
     "placeholders": {}
@@ -3059,12 +3059,12 @@
       }
     }
   },
-  "collectCopiesIndependent": "收进后是两份：之后在项目里的修改不会同步过来。项目里还在维护的技能，建议用「保持链接」。",
+  "collectCopiesIndependent": "收进后是两份：之后在项目里的修改不会同步过来。项目里还在维护的 Skill，建议用「保持链接」。",
   "@collectCopiesIndependent": {
     "description": "收进项目技能的确认对话框中，解释复制与保留链接的选择显示的文案。",
     "placeholders": {}
   },
-  "collectAdditionalReaders": "技能库会被直接读到，收进后这些 Agent 也会读到它：",
+  "collectAdditionalReaders": "Skill 库会被直接读到，收进后这些 Agent 也会读到它：",
   "@collectAdditionalReaders": {
     "description": "收进项目技能的确认对话框中，解释复制与保留链接的选择显示的文案。",
     "placeholders": {}
@@ -3079,7 +3079,7 @@
     "description": "收进项目技能的确认对话框中，解释复制与保留链接的选择显示的文案。",
     "placeholders": {}
   },
-  "collectionCopiesNeedMerging": "集合里的技能都有同名副本，先去「整理」合并",
+  "collectionCopiesNeedMerging": "集合里的 Skill 都有同名副本，先去「整理」合并",
   "@collectionCopiesNeedMerging": {
     "description": "集合里的技能都有同名副本而不能直接删除时显示的文案。",
     "placeholders": {}
@@ -3089,7 +3089,7 @@
     "description": "打开集合后顶部的返回按钮和技能数概要显示的文案。",
     "placeholders": {}
   },
-  "collectionVisibleSkills": "显示 {shown} / {count} 个技能",
+  "collectionVisibleSkills": "显示 {shown} / {count} 个 Skill",
   "@collectionVisibleSkills": {
     "description": "打开集合后顶部的返回按钮和技能数概要显示的文案。",
     "placeholders": {
@@ -3101,7 +3101,7 @@
       }
     }
   },
-  "collectionDependents": "{n} 个技能依赖它",
+  "collectionDependents": "{n} 个 Skill 依赖它",
   "@collectionDependents": {
     "description": "集合详情中说明读取范围、来源与逐个启停的区域显示的文案。",
     "placeholders": {
@@ -3166,7 +3166,7 @@
       }
     }
   },
-  "collectionToggleEachSkill": "集合里的技能请逐个启停。",
+  "collectionToggleEachSkill": "集合里的 Skill 请逐个启停。",
   "@collectionToggleEachSkill": {
     "description": "集合详情中说明读取范围、来源与逐个启停的区域显示的文案。",
     "placeholders": {}
@@ -3261,7 +3261,7 @@
     "description": "副本版本卡片的保留动作与内容比较状态显示的文案。",
     "placeholders": {}
   },
-  "commonSharedLibrary": "通用技能库",
+  "commonSharedLibrary": "通用 Skill 库",
   "@commonSharedLibrary": {
     "description": "副本版本卡片的保留动作与内容比较状态显示的文案。",
     "placeholders": {}
@@ -3350,7 +3350,7 @@
     "description": "技能卡片没有简介、筛选无结果或展开操作菜单时显示的文案。",
     "placeholders": {}
   },
-  "browseNoFilterMatches": "没有符合筛选条件的技能",
+  "browseNoFilterMatches": "没有符合筛选条件的 Skill",
   "@browseNoFilterMatches": {
     "description": "技能卡片没有简介、筛选无结果或展开操作菜单时显示的文案。",
     "placeholders": {}
@@ -3360,7 +3360,7 @@
     "description": "技能卡片没有简介、筛选无结果或展开操作菜单时显示的文案。",
     "placeholders": {}
   },
-  "deleteMovedToTrash": "已把 {count} 个技能移到废纸篓",
+  "deleteMovedToTrash": "已把 {count} 个 Skill 移到废纸篓",
   "@deleteMovedToTrash": {
     "description": "技能移到废纸篓后显示的结果提示条显示的文案。",
     "placeholders": {
@@ -3379,7 +3379,7 @@
     "description": "技能的预览、打开与删除操作菜单显示的文案。",
     "placeholders": {}
   },
-  "actionDeleteSkillEllipsis": "删除技能…",
+  "actionDeleteSkillEllipsis": "删除 Skill…",
   "@actionDeleteSkillEllipsis": {
     "description": "技能的预览、打开与删除操作菜单显示的文案。",
     "placeholders": {}
@@ -3389,7 +3389,7 @@
     "description": "技能的预览、打开与删除操作菜单显示的文案。",
     "placeholders": {}
   },
-  "deleteConfirmCount": "删除 {count} 个技能？",
+  "deleteConfirmCount": "删除 {count} 个 Skill？",
   "@deleteConfirmCount": {
     "description": "确认批量删除时的对话框标题显示的文案。",
     "placeholders": {
@@ -3495,12 +3495,12 @@
     "description": "从电脑添加技能时打开的文件或文件夹选择面板显示的文案。",
     "placeholders": {}
   },
-  "importChooseFolderMessage": "选择技能文件夹或 .zip。文件夹里有 SKILL.md 就算一个技能。",
+  "importChooseFolderMessage": "选择 Skill 文件夹或 .zip。文件夹里有 SKILL.md 就算一个 Skill。",
   "@importChooseFolderMessage": {
     "description": "从电脑添加技能时打开的文件或文件夹选择面板显示的文案。",
     "placeholders": {}
   },
-  "importFolderOrZip": "技能文件夹或 zip",
+  "importFolderOrZip": "Skill 文件夹或 zip",
   "@importFolderOrZip": {
     "description": "从电脑添加技能时打开的文件或文件夹选择面板显示的文案。",
     "placeholders": {}
@@ -3535,12 +3535,12 @@
     "description": "添加技能预览的原文模式与文件权限分组显示的文案。",
     "placeholders": {}
   },
-  "importCommandsAllowed": "Agent 用这个技能时可以直接运行这些命令",
+  "importCommandsAllowed": "Agent 用这个 Skill 时可以直接运行这些命令",
   "@importCommandsAllowed": {
     "description": "添加技能预览中展示允许运行的命令和可执行文件时显示的文案。",
     "placeholders": {}
   },
-  "importCommandsNotRunHere": "本应用不会运行它们；Agent 使用这个技能时可能会运行。",
+  "importCommandsNotRunHere": "本应用不会运行它们；Agent 使用这个 Skill 时可能会运行。",
   "@importCommandsNotRunHere": {
     "description": "添加技能预览中展示允许运行的命令和可执行文件时显示的文案。",
     "placeholders": {}
@@ -3569,7 +3569,7 @@
     "description": "添加技能页尚未选择来源时的链接与本机文件入口显示的文案。",
     "placeholders": {}
   },
-  "importReviewBeforeAdding": "读取后会先列出其中的技能和安全审计，确认后才添加。",
+  "importReviewBeforeAdding": "读取后会先列出其中的 Skill 和安全审计，确认后才添加。",
   "@importReviewBeforeAdding": {
     "description": "添加技能页尚未选择来源时的链接与本机文件入口显示的文案。",
     "placeholders": {}
@@ -3614,7 +3614,7 @@
     "description": "剪贴板包含可识别的仓库、网站或技能地址时显示的文案。",
     "placeholders": {}
   },
-  "importClipboardSkill": "剪贴板里有技能",
+  "importClipboardSkill": "剪贴板里有 Skill",
   "@importClipboardSkill": {
     "description": "剪贴板包含可识别的仓库、网站或技能地址时显示的文案。",
     "placeholders": {}
@@ -3634,7 +3634,7 @@
     "description": "添加技能的读取进度与连接设置提示区显示的文案。",
     "placeholders": {}
   },
-  "importSkillsFound": "已找到 {n} 个技能",
+  "importSkillsFound": "已找到 {n} 个 Skill",
   "@importSkillsFound": {
     "description": "添加技能的读取进度与连接设置提示区显示的文案。",
     "placeholders": {
@@ -3688,7 +3688,7 @@
     "description": "读取来源后展示仓库分支、网站或本机来源详情时显示的文案。",
     "placeholders": {}
   },
-  "commonSkillCount": "{count} 个技能",
+  "commonSkillCount": "{count} 个 Skill",
   "@commonSkillCount": {
     "description": "确认待添加技能与展示添加进度、结果时显示的文案。",
     "placeholders": {
@@ -3697,7 +3697,7 @@
       }
     }
   },
-  "importSkillsAdded": "已添加 {added} 个技能",
+  "importSkillsAdded": "已添加 {added} 个 Skill",
   "@importSkillsAdded": {
     "description": "确认待添加技能与展示添加进度、结果时显示的文案。",
     "placeholders": {
@@ -3723,7 +3723,7 @@
     "description": "确认待添加技能与展示添加进度、结果时显示的文案。",
     "placeholders": {}
   },
-  "importViewInMySkills": "在「我的技能」中查看",
+  "importViewInMySkills": "在「我的 Skill」中查看",
   "@importViewInMySkills": {
     "description": "确认待添加技能与展示添加进度、结果时显示的文案。",
     "placeholders": {}
@@ -3733,7 +3733,7 @@
     "description": "确认待添加技能与展示添加进度、结果时显示的文案。",
     "placeholders": {}
   },
-  "importAddSkillCount": "添加 {n} 个技能",
+  "importAddSkillCount": "添加 {n} 个 Skill",
   "@importAddSkillCount": {
     "description": "确认待添加技能与展示添加进度、结果时显示的文案。",
     "placeholders": {
@@ -3752,12 +3752,12 @@
     "description": "确认待添加技能与展示添加进度、结果时显示的文案。",
     "placeholders": {}
   },
-  "importSelectedStillDownloading": "勾选的技能还在下载，下载完才能添加",
+  "importSelectedStillDownloading": "勾选的 Skill 还在下载，下载完才能添加",
   "@importSelectedStillDownloading": {
     "description": "确认待添加技能与展示添加进度、结果时显示的文案。",
     "placeholders": {}
   },
-  "importSharedLibraryTarget": "技能库（通用）",
+  "importSharedLibraryTarget": "Skill 库（通用）",
   "@importSharedLibraryTarget": {
     "description": "添加技能页选择技能库或指定 Agent 为安装目标时显示的文案。",
     "placeholders": {}
@@ -3772,7 +3772,7 @@
     "description": "添加技能页选择技能库或指定 Agent 为安装目标时显示的文案。",
     "placeholders": {}
   },
-  "importAgentDirectoryHint": "只放进你选的 Agent 自己的技能目录",
+  "importAgentDirectoryHint": "只放进你选的 Agent 自己的 Skill 目录",
   "@importAgentDirectoryHint": {
     "description": "添加技能页选择技能库或指定 Agent 为安装目标时显示的文案。",
     "placeholders": {}
@@ -3796,7 +3796,7 @@
     "description": "添加技能页展开“谁会读到”的 Agent 选择区时显示的文案。",
     "placeholders": {}
   },
-  "importDirectLibraryReaders": "直接读技能库的",
+  "importDirectLibraryReaders": "直接读 Skill 库的",
   "@importDirectLibraryReaders": {
     "description": "添加技能页展开“谁会读到”的 Agent 选择区时显示的文案。",
     "placeholders": {}
@@ -3816,7 +3816,7 @@
     "description": "添加技能页展开“谁会读到”的 Agent 选择区时显示的文案。",
     "placeholders": {}
   },
-  "importAgentChoiceScope": "只作用于这次添加的技能。装好后，可以在详情栏里对某个 Agent 停用。",
+  "importAgentChoiceScope": "只作用于这次添加的 Skill。装好后，可以在详情栏里对某个 Agent 停用。",
   "@importAgentChoiceScope": {
     "description": "添加技能页展开“谁会读到”的 Agent 选择区时显示的文案。",
     "placeholders": {}
@@ -3890,7 +3890,7 @@
       }
     }
   },
-  "importRepositoryHasMore": "只读了指定的技能，仓库里还有 {hidden} 个",
+  "importRepositoryHasMore": "只读了指定的 Skill，仓库里还有 {hidden} 个",
   "@importRepositoryHasMore": {
     "description": "待添加技能列表显示数量、选择范围和隐藏项时显示的文案。",
     "placeholders": {
@@ -3922,7 +3922,7 @@
       }
     }
   },
-  "importLibraryNameConflict": "技能库里已有同名的，内容不一致",
+  "importLibraryNameConflict": "Skill 库里已有同名的，内容不一致",
   "@importLibraryNameConflict": {
     "description": "技能缺少简介、有可执行文件或发生同名冲突时显示的文案。",
     "placeholders": {}
@@ -3996,12 +3996,12 @@
     "description": "拖动本机技能文件到窗口上方时显示的文案。",
     "placeholders": {}
   },
-  "importSelectSkillToPreview": "选一个技能看看内容",
+  "importSelectSkillToPreview": "选一个 Skill 看看内容",
   "@importSelectSkillToPreview": {
     "description": "添加技能右侧预览尚未选择技能或仍在下载文件时显示的文案。",
     "placeholders": {}
   },
-  "importDownloadingOtherFiles": "正在下载这个技能的其他文件…",
+  "importDownloadingOtherFiles": "正在下载这个 Skill 的其他文件…",
   "@importDownloadingOtherFiles": {
     "description": "添加技能右侧预览尚未选择技能或仍在下载文件时显示的文案。",
     "placeholders": {}
@@ -4108,7 +4108,7 @@
     "description": "读取添加来源失败或使用示例数据时显示的文案。",
     "placeholders": {}
   },
-  "importSupportedSourcesHint": "可以粘贴 GitHub 公开仓库或网站的地址，也可以把技能文件夹、zip 拖进来",
+  "importSupportedSourcesHint": "可以粘贴 GitHub 公开仓库或网站的地址，也可以把 Skill 文件夹、zip 拖进来",
   "@importSupportedSourcesHint": {
     "description": "读取添加来源失败或使用示例数据时显示的文案。",
     "placeholders": {}
@@ -4118,7 +4118,7 @@
     "description": "读取添加来源失败或使用示例数据时显示的文案。",
     "placeholders": {}
   },
-  "importSampleCannotAdd": "示例数据不能添加技能。",
+  "importSampleCannotAdd": "示例数据不能添加 Skill。",
   "@importSampleCannotAdd": {
     "description": "读取添加来源失败或使用示例数据时显示的文案。",
     "placeholders": {}
@@ -4132,7 +4132,7 @@
       }
     }
   },
-  "importAddedNames": "已添加 {added} 个技能：{p1}",
+  "importAddedNames": "已添加 {added} 个 Skill：{p1}",
   "@importAddedNames": {
     "description": "一批技能添加操作结束后的结果提示显示的文案。",
     "placeholders": {
@@ -4144,7 +4144,7 @@
       }
     }
   },
-  "importFailedSkillCount": "{failed} 个技能没有添加",
+  "importFailedSkillCount": "{failed} 个 Skill 没有添加",
   "@importFailedSkillCount": {
     "description": "一批技能添加操作结束后的结果提示显示的文案。",
     "placeholders": {
@@ -4290,12 +4290,12 @@
     "description": "项目技能详情中解释全局链接及不可切换的读取范围时显示的文案。",
     "placeholders": {}
   },
-  "inspectorProjectNoToggle": "项目技能跟着项目走，这里不提供开关。",
+  "inspectorProjectNoToggle": "项目 Skill 跟着项目走，这里不提供开关。",
   "@inspectorProjectNoToggle": {
     "description": "项目技能详情中解释全局链接及不可切换的读取范围时显示的文案。",
     "placeholders": {}
   },
-  "mergeSkillResult": "{n} 个技能已收成一份：{p1}",
+  "mergeSkillResult": "{n} 个 Skill 已收成一份：{p1}",
   "@mergeSkillResult": {
     "description": "合并副本进行中、完成或留下未处理副本时显示的文案。",
     "placeholders": {
@@ -4356,7 +4356,7 @@
     "description": "命令面板列出导航、最近项目、技能和来源时显示的文案。",
     "placeholders": {}
   },
-  "commonSkills": "技能",
+  "commonSkills": "Skill",
   "@commonSkills": {
     "description": "命令面板列出导航、最近项目、技能和来源时显示的文案。",
     "placeholders": {}
@@ -4389,7 +4389,7 @@
       }
     }
   },
-  "paletteSearchSkills": "搜索技能",
+  "paletteSearchSkills": "搜索 Skill",
   "@paletteSearchSkills": {
     "description": "命令面板的搜索入口和选中技能操作显示的文案。",
     "placeholders": {}
@@ -4399,7 +4399,7 @@
     "description": "命令面板的搜索入口和选中技能操作显示的文案。",
     "placeholders": {}
   },
-  "projectGlobalLinksHint": "{n} 个技能被全局链接，点击查看",
+  "projectGlobalLinksHint": "{n} 个 Skill 被全局链接，点击查看",
   "@projectGlobalLinksHint": {
     "description": "项目技能页的概要、空状态与读取 Agent 分组显示的文案。",
     "placeholders": {
@@ -4408,12 +4408,12 @@
       }
     }
   },
-  "projectNoSkills": "这个项目里没有技能",
+  "projectNoSkills": "这个项目里没有 Skill",
   "@projectNoSkills": {
     "description": "项目技能页的概要、空状态与读取 Agent 分组显示的文案。",
     "placeholders": {}
   },
-  "projectSkills": "项目技能",
+  "projectSkills": "项目 Skill",
   "@projectSkills": {
     "description": "项目技能页的概要、空状态与读取 Agent 分组显示的文案。",
     "placeholders": {}
@@ -4423,7 +4423,7 @@
     "description": "项目技能页的概要、空状态与读取 Agent 分组显示的文案。",
     "placeholders": {}
   },
-  "projectLinkedSkills": "{count} 个技能被全局链接到 {name}",
+  "projectLinkedSkills": "{count} 个 Skill 被全局链接到 {name}",
   "@projectLinkedSkills": {
     "description": "项目技能被全局链接时的说明与处理对话框显示的文案。",
     "placeholders": {
@@ -4435,7 +4435,7 @@
       }
     }
   },
-  "projectGlobalLinksDescription": "{p0} 的全局技能目录里有链接指向这些技能，所以在任何项目里都会被读到。{name} 删掉或改名后，这些链接都会失效。",
+  "projectGlobalLinksDescription": "{p0} 的全局 Skill 目录里有链接指向这些 Skill，所以在任何项目里都会被读到。{name} 删掉或改名后，这些链接都会失效。",
   "@projectGlobalLinksDescription": {
     "description": "项目技能被全局链接时的说明与处理对话框显示的文案。",
     "placeholders": {
@@ -4447,7 +4447,7 @@
       }
     }
   },
-  "projectLinkChoices": "「保持链接」表示这 {links} 个链接是有意建的，不再提醒；「收进我的技能」复制一份到技能库 {p1}，链接改指向那份，项目里的原件不动。",
+  "projectLinkChoices": "「保持链接」表示这 {links} 个链接是有意建的，不再提醒；「收进我的 Skill」复制一份到 Skill 库 {p1}，链接改指向那份，项目里的原件不动。",
   "@projectLinkChoices": {
     "description": "项目技能被全局链接时的说明与处理对话框显示的文案。",
     "placeholders": {
@@ -4474,7 +4474,7 @@
     "description": "打开阅读视图后顶部启用信息和文件读取提示显示的文案。",
     "placeholders": {}
   },
-  "readerFilesUnreadable": "读不到这个技能的文件。",
+  "readerFilesUnreadable": "读不到这个 Skill 的文件。",
   "@readerFilesUnreadable": {
     "description": "打开阅读视图后顶部启用信息和文件读取提示显示的文案。",
     "placeholders": {}
@@ -4484,7 +4484,7 @@
     "description": "设置中显示技能库位置和检查链接操作时显示的文案。",
     "placeholders": {}
   },
-  "settingsCheckLinksHint": "检查并重新连接各 Agent 中失效的技能软链接",
+  "settingsCheckLinksHint": "检查并重新连接各 Agent 中失效的 Skill 软链接",
   "@settingsCheckLinksHint": {
     "description": "设置中显示技能库位置和检查链接操作时显示的文案。",
     "placeholders": {}
@@ -4538,7 +4538,7 @@
     "description": "设置的 Agent 管理列表展示、隐藏或移除 Agent 时显示的文案。",
     "placeholders": {}
   },
-  "commonSkillTotal": "{p0} 个技能",
+  "commonSkillTotal": "{p0} 个 Skill",
   "@commonSkillTotal": {
     "description": "设置的 Agent 管理列表展示、隐藏或移除 Agent 时显示的文案。",
     "placeholders": {
@@ -4576,22 +4576,22 @@
     "description": "设置中重新检测 Agent 或手动添加技能目录时显示的文案。",
     "placeholders": {}
   },
-  "settingsAddSkillDirectoryEllipsis": "手动添加技能目录…",
+  "settingsAddSkillDirectoryEllipsis": "手动添加 Skill 目录…",
   "@settingsAddSkillDirectoryEllipsis": {
     "description": "设置中重新检测 Agent 或手动添加技能目录时显示的文案。",
     "placeholders": {}
   },
-  "settingsSampleCannotAddDirectory": "示例数据不能添加技能目录",
+  "settingsSampleCannotAddDirectory": "示例数据不能添加 Skill 目录",
   "@settingsSampleCannotAddDirectory": {
     "description": "设置中重新检测 Agent 或手动添加技能目录时显示的文案。",
     "placeholders": {}
   },
-  "settingsAddSkillDirectory": "添加技能目录",
+  "settingsAddSkillDirectory": "添加 Skill 目录",
   "@settingsAddSkillDirectory": {
     "description": "设置中重新检测 Agent 或手动添加技能目录时显示的文案。",
     "placeholders": {}
   },
-  "settingsChooseSkillDirectory": "选择包含技能的目录（每个子目录需含 SKILL.md）。",
+  "settingsChooseSkillDirectory": "选择包含 Skill 的目录（每个子目录需含 SKILL.md）。",
   "@settingsChooseSkillDirectory": {
     "description": "设置中重新检测 Agent 或手动添加技能目录时显示的文案。",
     "placeholders": {}
@@ -4660,7 +4660,7 @@
     "description": "设置中管理手动添加的项目文件夹时显示的文案。",
     "placeholders": {}
   },
-  "settingsFolderNoSkills": "没有技能，不会显示",
+  "settingsFolderNoSkills": "没有 Skill，不会显示",
   "@settingsFolderNoSkills": {
     "description": "设置中管理手动添加的项目文件夹时显示的文案。",
     "placeholders": {}
@@ -4695,7 +4695,7 @@
     "description": "设置中配置项目 worktree 显示和固定检查目录时显示的文案。",
     "placeholders": {}
   },
-  "settingsProjectDirectoriesHint": "仅在项目根目录下匹配以下技能目录：",
+  "settingsProjectDirectoriesHint": "仅在项目根目录下匹配以下 Skill 目录：",
   "@settingsProjectDirectoriesHint": {
     "description": "设置中配置项目 worktree 显示和固定检查目录时显示的文案。",
     "placeholders": {}
@@ -4879,12 +4879,12 @@
     "description": "整理页失效链接表中展示原因与修复动作时显示的文案。",
     "placeholders": {}
   },
-  "tidyLibraryNameExists": "技能库有同名的",
+  "tidyLibraryNameExists": "Skill 库有同名的",
   "@tidyLibraryNameExists": {
     "description": "整理页失效链接表中展示原因与修复动作时显示的文案。",
     "placeholders": {}
   },
-  "tidySkillGone": "技能已经不在了",
+  "tidySkillGone": "Skill 已经不在了",
   "@tidySkillGone": {
     "description": "整理页失效链接表中展示原因与修复动作时显示的文案。",
     "placeholders": {}
@@ -5008,7 +5008,7 @@
       }
     }
   },
-  "updateUpdatingSkills": "正在更新 {done}/{total} 个技能",
+  "updateUpdatingSkills": "正在更新 {done}/{total} 个 Skill",
   "@updateUpdatingSkills": {
     "description": "后台检查仓库、更新技能或下载文件期间的进度区显示的文案。",
     "placeholders": {
@@ -5042,17 +5042,17 @@
     "description": "更新页首次进入或列表为空时显示的文案。",
     "placeholders": {}
   },
-  "updateCheckDescription": "检查技能库里从 GitHub 安装的技能有没有新版本",
+  "updateCheckDescription": "检查 Skill 库里从 GitHub 安装的 Skill 有没有新版本",
   "@updateCheckDescription": {
     "description": "更新页首次进入或列表为空时显示的文案。",
     "placeholders": {}
   },
-  "updateNoSkillsHere": "这里暂时没有技能",
+  "updateNoSkillsHere": "这里暂时没有 Skill",
   "@updateNoSkillsHere": {
     "description": "更新页首次进入或列表为空时显示的文案。",
     "placeholders": {}
   },
-  "updateReadyCount": "{n} 个技能可立即更新",
+  "updateReadyCount": "{n} 个 Skill 可立即更新",
   "@updateReadyCount": {
     "description": "更新页准备批量更新并说明影响范围时显示的文案。",
     "placeholders": {
@@ -5061,12 +5061,12 @@
       }
     }
   },
-  "updateReplaceDirectoriesHint": "将用上游最新版本替换对应技能目录",
+  "updateReplaceDirectoriesHint": "将用上游最新版本替换对应 Skill 目录",
   "@updateReplaceDirectoriesHint": {
     "description": "更新页准备批量更新并说明影响范围时显示的文案。",
     "placeholders": {}
   },
-  "updateSelectedCount": "更新这 {n} 个技能",
+  "updateSelectedCount": "更新这 {n} 个 Skill",
   "@updateSelectedCount": {
     "description": "更新页准备批量更新并说明影响范围时显示的文案。",
     "placeholders": {
@@ -5075,7 +5075,7 @@
       }
     }
   },
-  "updateConfirmationExcluded": "需确认的技能不包含在内",
+  "updateConfirmationExcluded": "需确认的 Skill 不包含在内",
   "@updateConfirmationExcluded": {
     "description": "更新页准备批量更新并说明影响范围时显示的文案。",
     "placeholders": {}
@@ -5100,17 +5100,17 @@
     "description": "更新检查未完成、没有可检查技能或没有新版本时显示的文案。",
     "placeholders": {}
   },
-  "updateNoSupportedSkills": "没有可由本应用检查的技能",
+  "updateNoSupportedSkills": "没有可由本应用检查的 Skill",
   "@updateNoSupportedSkills": {
     "description": "更新检查未完成、没有可检查技能或没有新版本时显示的文案。",
     "placeholders": {}
   },
-  "updateSupportedSkillsHint": "能检查的是从 GitHub 安装、有安装记录的技能",
+  "updateSupportedSkillsHint": "能检查的是从 GitHub 安装、有安装记录的 Skill",
   "@updateSupportedSkillsHint": {
     "description": "更新检查未完成、没有可检查技能或没有新版本时显示的文案。",
     "placeholders": {}
   },
-  "updateNothingToUpdate": "目前没有需要更新的技能",
+  "updateNothingToUpdate": "目前没有需要更新的 Skill",
   "@updateNothingToUpdate": {
     "description": "更新检查未完成、没有可检查技能或没有新版本时显示的文案。",
     "placeholders": {}
@@ -5235,7 +5235,7 @@
     "description": "更新列表的差异查看、忽略恢复、命令复制等操作菜单显示的文案。",
     "placeholders": {}
   },
-  "actionDeleteSkill": "删除技能",
+  "actionDeleteSkill": "删除 Skill",
   "@actionDeleteSkill": {
     "description": "更新列表的差异查看、忽略恢复、命令复制等操作菜单显示的文案。",
     "placeholders": {}
@@ -5308,7 +5308,7 @@
     "description": "打开更新差异对比后显示文件数和本机修改状态时显示的文案。",
     "placeholders": {}
   },
-  "updateRemindOnChange": "该技能上游内容再变化时会重新提醒",
+  "updateRemindOnChange": "该 Skill 上游内容再变化时会重新提醒",
   "@updateRemindOnChange": {
     "description": "更新差异页选择保留本机或替换上游版本时显示的文案。",
     "placeholders": {}
@@ -5337,7 +5337,7 @@
     "description": "更新差异页选择保留本机或替换上游版本时显示的文案。",
     "placeholders": {}
   },
-  "updateReadOnlyCannotReplace": "只读技能，不能在此覆盖更新",
+  "updateReadOnlyCannotReplace": "只读 Skill，不能在此覆盖更新",
   "@updateReadOnlyCannotReplace": {
     "description": "更新差异页选择保留本机或替换上游版本时显示的文案。",
     "placeholders": {}
@@ -5495,7 +5495,7 @@
       }
     }
   },
-  "updateSkillsCompleted": "已更新 {updated} 个技能。",
+  "updateSkillsCompleted": "已更新 {updated} 个 Skill。",
   "@updateSkillsCompleted": {
     "description": "单个或批量技能更新结束后的结果与错误提示显示的文案。",
     "placeholders": {
@@ -5762,7 +5762,7 @@
       }
     }
   },
-  "settingsLinksBroken": "，{count} 个在技能库中无同名技能，未作改动：{names}",
+  "settingsLinksBroken": "，{count} 个在 Skill 库中无同名 Skill，未作改动：{names}",
   "@settingsLinksBroken": {
     "description": "接在「检查了 N 个链接」后面",
     "placeholders": {
@@ -5813,7 +5813,7 @@
       }
     }
   },
-  "settingsWithSkills": "{n} 个有技能",
+  "settingsWithSkills": "{n} 个有 Skill",
   "@settingsWithSkills": {
     "description": "设置 › 项目：加粗的那段",
     "placeholders": {
@@ -5874,7 +5874,7 @@
       }
     }
   },
-  "tidyNoteExtraLinks": "这些 Agent 从技能库和自己的目录各读到一次。删掉自己目录里的，照样能用。",
+  "tidyNoteExtraLinks": "这些 Agent 从 Skill 库和自己的目录各读到一次。删掉自己目录里的，照样能用。",
   "@tidyNoteExtraLinks": {
     "description": "整理：多余链接的说明"
   },
@@ -5886,7 +5886,7 @@
   "@tidyNoteGlobalLinked": {
     "description": "整理：全局链接到项目的说明"
   },
-  "tidyNoteStaleRecords": "这些技能已从本地删除，但安装清单里还留着记录；不清理的话，下次更新可能会把它们重新装回来。",
+  "tidyNoteStaleRecords": "这些 Skill 已从本地删除，但安装清单里还留着记录；不清理的话，下次更新可能会把它们重新装回来。",
   "@tidyNoteStaleRecords": {
     "description": "整理：残留安装记录的说明"
   },
@@ -5958,7 +5958,7 @@
   "@issueIncompleteSkills": {
     "description": "整理：技能里提到的文件不在了这一类问题的名称"
   },
-  "tidyNoteIncomplete": "SKILL.md 里提到的东西不在了。Agent 照样会用这个技能，做到那一步时找不到。",
+  "tidyNoteIncomplete": "SKILL.md 里提到的东西不在了。Agent 照样会用这个 Skill，做到那一步时找不到。",
   "@tidyNoteIncomplete": {
     "description": "整理：文件不完整的说明"
   },
@@ -5980,7 +5980,7 @@
       }
     }
   },
-  "defectMissingSkill": "要用的技能 {name} 没装",
+  "defectMissingSkill": "要用的 Skill {name} 没装",
   "@defectMissingSkill": {
     "description": "技能文件不完整：链到旁边的另一个技能，那个技能没装",
     "placeholders": {
@@ -6006,7 +6006,7 @@
   "@defectNoName": {
     "description": "技能文件不完整：frontmatter 里没有 name"
   },
-  "collectBreaksWarning": "这些引用指向技能目录外，复制到技能库后会找不到：",
+  "collectBreaksWarning": "这些引用指向 Skill 目录外，复制到 Skill 库后会找不到：",
   "@collectBreaksWarning": {
     "description": "收进我的技能的确认框：列出复制后会断的引用"
   },
@@ -6027,7 +6027,7 @@
       }
     }
   },
-  "welcomeScattered": "技能散落在各个 Agent 里",
+  "welcomeScattered": "Skill 散落在各个 Agent 里",
   "@welcomeScattered": {
     "description": "首次启动的开场动画：第二幕：演示用的技能卡片一堆堆落下后，底部的标题（不写数量：卡片是演示的，和本机数据对不上）"
   },
@@ -6145,7 +6145,7 @@
       }
     }
   },
-  "browseNoSkillsYetBody": "从 GitHub、网站或 Mac 上的文件夹添加技能。",
+  "browseNoSkillsYetBody": "从 GitHub、网站或 Mac 上的文件夹添加 Skill。",
   "@browseNoSkillsYetTitle": {
     "description": "「我的技能」「全部技能」一个技能都没有时，空状态的标题"
   },
@@ -6157,8 +6157,8 @@
   "@browseNoSearchResultsHint": {
     "description": "浏览页搜索没有结果时，标题下面的说明"
   },
-  "browseNoSkillsYetTitle": "还没有技能",
-  "importReplaceOwnCopy": "{agent} 的目录里有自己的一份（{path}，不是链接），替换不会动它。先在「我的技能」里收成一份再来。",
+  "browseNoSkillsYetTitle": "还没有 Skill",
+  "importReplaceOwnCopy": "{agent} 的目录里有自己的一份（{path}，不是链接），替换不会动它。先在「我的 Skill」里收成一份再来。",
   "@importReplaceOwnCopy": {
     "description": "同名冲突卡片：链接位置上是 Agent 自己的目录，不能替换",
     "placeholders": {
@@ -6170,7 +6170,7 @@
       }
     }
   },
-  "importReplaceMacOnly": "目前只有 macOS 能替换已有的技能",
+  "importReplaceMacOnly": "目前只有 macOS 能替换已有的 Skill",
   "@importReplaceMacOnly": {
     "description": "同名冲突卡片：这个系统上不能替换",
     "placeholders": {}
@@ -6226,7 +6226,7 @@
       }
     }
   },
-  "importReplaceSkillCount": "替换 {n} 个技能",
+  "importReplaceSkillCount": "替换 {n} 个 Skill",
   "@importReplaceSkillCount": {
     "description": "选择页右上角按钮：勾上的都是替换",
     "placeholders": {
@@ -6244,7 +6244,7 @@
       }
     }
   },
-  "importAddedReplacedNames": "已添加 {added} 个技能（替换了 {replaced} 个，旧版在废纸篓）：{p1}",
+  "importAddedReplacedNames": "已添加 {added} 个 Skill（替换了 {replaced} 个，旧版在废纸篓）：{p1}",
   "@importAddedReplacedNames": {
     "description": "一批技能添加结束后的结果提示：其中有替换的",
     "placeholders": {
@@ -6379,7 +6379,7 @@
       }
     }
   },
-  "tidyCollected": "{name} 已收进我的技能。",
+  "tidyCollected": "{name} 已收进我的 Skill。",
   "@tidyProcessing": {
     "description": "整理操作进度或完成结果。",
     "placeholders": {}
@@ -6460,7 +6460,7 @@
   "@supportDiagnostics": {
     "description": "设置 › 支持与诊断：诊断信息一行的标题，也是预览弹窗的标题"
   },
-  "supportDiagnosticsHint": "版本、Agent 检测结果和最近的错误，不含技能内容和账号信息",
+  "supportDiagnosticsHint": "版本、Agent 检测结果和最近的错误，不含 Skill 内容和账号信息",
   "@supportDiagnosticsHint": {
     "description": "设置 › 支持与诊断：诊断信息一行的说明"
   },
@@ -6920,7 +6920,7 @@
   "@secLastResult": {
     "description": "本地安全检查：重新检查期间，旧结果的标注"
   },
-  "secWholeSkill": "整个技能",
+  "secWholeSkill": "整个 Skill",
   "@secWholeSkill": {
     "description": "本地安全检查：覆盖缺口不针对某个文件时的位置"
   },
@@ -7020,7 +7020,7 @@
   "@tidyNoteSecurityWarning": {
     "description": "整理页「安全警告」的说明"
   },
-  "tidyNoteSecurityUnfinished": "这些技能没能完整检查，结果不能当作没有风险。",
+  "tidyNoteSecurityUnfinished": "这些 Skill 没能完整检查，结果不能当作没有风险。",
   "@tidyNoteSecurityUnfinished": {
     "description": "整理页「安全检查未完成」的说明"
   },
@@ -7074,7 +7074,7 @@
   "@secTagUnchecked": {
     "description": "本地安全检查：添加技能列表：检查失败或不完整"
   },
-  "secAddConfirmTitle": "{count} 个技能有高风险或没检查完",
+  "secAddConfirmTitle": "{count} 个 Skill 有高风险或没检查完",
   "@secAddConfirmTitle": {
     "description": "本地安全检查：添加前的确认弹窗标题",
     "placeholders": {
@@ -7267,7 +7267,7 @@
       }
     }
   },
-  "importProjectSourceLocal": "来源记为 {path}，项目里的技能暂不参与更新。",
+  "importProjectSourceLocal": "来源记为 {path}，项目里的 Skill 暂不参与更新。",
   "@importProjectSourceLocal": {
     "description": "添加到项目后（本地来源）详情栏状态块的来源说明",
     "placeholders": {
@@ -7276,7 +7276,7 @@
       }
     }
   },
-  "importProjectSourceWebsite": "来源记为 {site}，项目里的技能暂不参与更新。",
+  "importProjectSourceWebsite": "来源记为 {site}，项目里的 Skill 暂不参与更新。",
   "@importProjectSourceWebsite": {
     "description": "添加到项目后（网站来源）详情栏状态块的来源说明",
     "placeholders": {
@@ -7285,7 +7285,7 @@
       }
     }
   },
-  "importProjectSourceGitHub": "来源记为 {repo}（{commit}），项目里的技能暂不参与更新。",
+  "importProjectSourceGitHub": "来源记为 {repo}（{commit}），项目里的 Skill 暂不参与更新。",
   "@importProjectSourceGitHub": {
     "description": "添加到项目后（GitHub 来源）详情栏状态块的来源说明",
     "placeholders": {
@@ -7313,7 +7313,7 @@
   "@importProjectSymlinkPermission": {
     "description": "Windows 上没有权限建符号链接时添加到项目失败的提示"
   },
-  "importProjectDirectoryOutside": "{dir} 指向项目外，请选择项目内的技能目录。",
+  "importProjectDirectoryOutside": "{dir} 指向项目外，请选择项目内的 Skill 目录。",
   "@importProjectDirectoryOutside": {
     "description": "项目技能目录指向项目外时的提示",
     "placeholders": {
@@ -7322,7 +7322,7 @@
       }
     }
   },
-  "deleteProjectLocationChanged": "项目技能的位置已变化，请重新扫描后再删除。",
+  "deleteProjectLocationChanged": "项目 Skill 的位置已变化，请重新扫描后再删除。",
   "@deleteProjectLocationChanged": {
     "description": "项目技能的实际路径与扫描记录不一致时取消删除"
   },
@@ -7398,7 +7398,7 @@
       }
     }
   },
-  "gitUncommittedButton": "查看 {n} 个未提交的技能",
+  "gitUncommittedButton": "查看 {n} 个未提交的 Skill",
   "@gitUncommittedButton": {
     "placeholders": {
       "n": {
@@ -7406,7 +7406,7 @@
       }
     }
   },
-  "gitUncommittedMore": "另外 {n} 个技能也没提交",
+  "gitUncommittedMore": "另外 {n} 个 Skill 也没提交",
   "@gitUncommittedMore": {
     "placeholders": {
       "n": {
@@ -7438,7 +7438,7 @@
       }
     }
   },
-  "deleteBodyOutsideShort": "原件位于技能目录之外，会整个移到废纸篓。",
+  "deleteBodyOutsideShort": "原件位于 Skill 目录之外，会整个移到废纸篓。",
   "@deleteBodyOutsideShort": {
     "description": "单技能删除确认框正文：原件在技能目录之外（路径已在下方文件列表展示）"
   },
@@ -7462,7 +7462,7 @@
   "@deleteRoleOutsideOriginal": {
     "description": "批量删除确认框：原件位于技能目录之外时的橙色标记"
   },
-  "deleteOutsideHint": "原件在技能目录之外，请确认这不是仍在使用的文件夹",
+  "deleteOutsideHint": "原件在 Skill 目录之外，请确认这不是仍在使用的文件夹",
   "@deleteOutsideHint": {
     "description": "单技能删除确认框：原件路径下方的目录外风险提示"
   },
@@ -7484,7 +7484,7 @@
       }
     }
   },
-  "deleteBatchSkillsHeading": "将移到废纸篓的技能",
+  "deleteBatchSkillsHeading": "将移到废纸篓的 Skill",
   "@deleteBatchSkillsHeading": {
     "description": "批量删除确认框：技能与路径列表的分组标题"
   },
@@ -7524,7 +7524,7 @@
       }
     }
   },
-  "deleteBodyOutsideWithLinks": "{count, plural, other {原件位于技能目录之外，会整个移到废纸篓，指向它的 {count} 个链接一并删除。}}",
+  "deleteBodyOutsideWithLinks": "{count, plural, other {原件位于 Skill 目录之外，会整个移到废纸篓，指向它的 {count} 个链接一并删除。}}",
   "@deleteBodyOutsideWithLinks": {
     "description": "单技能删除确认框正文：原件在技能目录之外，并删除指向它的链接",
     "placeholders": {
@@ -7550,7 +7550,7 @@
       }
     }
   },
-  "importProjectSourceClawHub": "来源记为 ClawHub：{repo}，项目技能暂不参与更新。",
+  "importProjectSourceClawHub": "来源记为 ClawHub：{repo}，项目 Skill 暂不参与更新。",
   "@importProjectSourceClawHub": {
     "description": "添加技能到项目完成后说明来源",
     "placeholders": {
@@ -7567,7 +7567,7 @@
   "@marketTitle": {
     "description": "侧边栏首项及云市场页面标题"
   },
-  "marketSearchPlaceholder": "搜索技能，或粘贴链接、owner/repo、npx 命令",
+  "marketSearchPlaceholder": "搜索 Skill，或粘贴链接、owner/repo、npx 命令",
   "@marketSearchPlaceholder": {
     "description": "云市场顶部搜索与粘贴框占位提示"
   },
@@ -7671,7 +7671,7 @@
   "@marketCategoryOther": {
     "description": "ClawHub 分类：other"
   },
-  "marketTopicIntro": "{count} 个技能，由 skills.sh 编辑整理",
+  "marketTopicIntro": "{count} 个 Skill，由 skills.sh 编辑整理",
   "@marketTopicIntro": {
     "description": "专题页顶部数量说明",
     "placeholders": {
@@ -7781,19 +7781,19 @@
   "@marketLinkKindGitHub": {
     "description": "粘贴链接状态：来源类型说明"
   },
-  "marketLinkKindSkillsSh": "skills.sh 上的技能",
+  "marketLinkKindSkillsSh": "skills.sh 上的 Skill",
   "@marketLinkKindSkillsSh": {
     "description": "粘贴链接状态：来源类型说明"
   },
-  "marketLinkKindClawHub": "ClawHub 上的技能",
+  "marketLinkKindClawHub": "ClawHub 上的 Skill",
   "@marketLinkKindClawHub": {
     "description": "粘贴链接状态：来源类型说明"
   },
-  "marketLinkKindWebsite": "网站发布的技能",
+  "marketLinkKindWebsite": "网站发布的 Skill",
   "@marketLinkKindWebsite": {
     "description": "粘贴链接状态：来源类型说明"
   },
-  "marketLoading": "正在载入 {source} 的技能…",
+  "marketLoading": "正在载入 {source} 的 Skill…",
   "@marketLoading": {
     "description": "首次无缓存加载市场列表",
     "placeholders": {
@@ -7802,7 +7802,7 @@
       }
     }
   },
-  "marketLoadFailed": "没能载入 {source} 的技能，请检查网络后重试。",
+  "marketLoadFailed": "没能载入 {source} 的 Skill，请检查网络后重试。",
   "@marketLoadFailed": {
     "description": "无缓存时加载市场列表失败",
     "placeholders": {
@@ -7824,7 +7824,7 @@
       }
     }
   },
-  "marketNoResults": "没有找到与「{query}」相关的技能。",
+  "marketNoResults": "没有找到与「{query}」相关的 Skill。",
   "@marketNoResults": {
     "description": "搜索两侧都无匹配结果",
     "placeholders": {
@@ -7833,7 +7833,7 @@
       }
     }
   },
-  "marketEmptyFilter": "这里暂时没有技能。",
+  "marketEmptyFilter": "这里暂时没有 Skill。",
   "@marketEmptyFilter": {
     "description": "某个分类或专题下没有技能"
   },
@@ -7844,5 +7844,9 @@
   "marketGroupCategories": "分类",
   "@marketGroupCategories": {
     "description": "云市场标签栏：ClawHub 分类这一组前面的小标题"
+  },
+  "deleteImpactReadsLibrary": "读的是 Skill 库，原件移走后就没有了",
+  "@deleteImpactReadsLibrary": {
+    "description": "删除确认框：这个 Agent 读的就是 Skill 库里的原件"
   }
 }

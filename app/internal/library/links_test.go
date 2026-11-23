@@ -77,7 +77,7 @@ func TestTidyNeverRemovesTheSkillLibraryEntryForAgentsWhoseOwnDirIsTheLibrary(t 
 
 	// Then 它不是多余的链接，整理里不列
 	if len(foo.Redundant()) != 0 || len(l.Problems().Extra) != 0 {
-		t.Fatalf("技能库里那一项被当成了多余的链接：%v", foo.Redundant())
+		t.Fatalf("Skill 库里那一项被当成了多余的链接：%v", foo.Redundant())
 	}
 	// When 清理，或者单独停用 Cline
 	must(t, l.Tidy(foo))
@@ -86,7 +86,7 @@ func TestTidyNeverRemovesTheSkillLibraryEntryForAgentsWhoseOwnDirIsTheLibrary(t 
 	}
 	// Then 技能库里那一项还在，读技能库的都还读到
 	if _, err := os.Lstat(h(".agents/skills/foo")); err != nil {
-		t.Fatalf("技能库里的技能被删了：%v", err)
+		t.Fatalf("Skill 库里的 Skill 被删了：%v", err)
 	}
 	if !slices.Equal(foo.Enabled, []string{"cursor", "cline"}) || foo.Via["cline"] == "" {
 		t.Errorf("Enabled %v Via %v", foo.Enabled, foo.Via)

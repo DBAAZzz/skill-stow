@@ -28,7 +28,7 @@ func askToDelete(t *testing.T, tt *ui.Tester, name string) {
 	must(t, tt.Click(name))
 	tt.Advance(paneDuration) // 详情栏滑进来
 	clickMenuButton(t, tt, "更多操作")
-	clickMenuItem(t, tt, "删除技能…")
+	clickMenuItem(t, tt, "删除 Skill…")
 	tt.Frame()
 }
 
@@ -59,7 +59,7 @@ func TestUserSeesWhichAgentsLoseTheSkillBeforeDeleting(t *testing.T) {
 			t.Errorf("确认框缺少 %q：%q", want, tt.Texts())
 		}
 	}
-	for _, forbid := range []string{"同上", "读的是技能库，原件移走后就没有了"} {
+	for _, forbid := range []string{"同上", "读的是 Skill 库，原件移走后就没有了"} {
 		if tt.HasText(forbid) {
 			t.Errorf("确认框不应再出现旧的冗长提示 %q：%q", forbid, tt.Texts())
 		}
@@ -88,7 +88,7 @@ func TestUserCanBringADeletedSkillBackFromTheToast(t *testing.T) {
 		t.Errorf("应出现提示条：%q", tt.Texts())
 	}
 	if a.selected == nil {
-		t.Error("选中应移到下一个技能")
+		t.Error("选中应移到下一个 Skill")
 	}
 
 	// When 点提示条上的「撤销」
@@ -180,17 +180,17 @@ func TestBuiltinSkillsOfferNoWayToDelete(t *testing.T) {
 	}
 	must(t, tt.RightClick("skill-creator"))
 	if !tt.HasText("打开") {
-		t.Fatalf("内置技能右键菜单应打开：%q", tt.Texts())
+		t.Fatalf("内置 Skill 右键菜单应打开：%q", tt.Texts())
 	}
-	if tt.HasText("删除技能…") {
-		t.Error("内置技能的右键菜单不应有删除")
+	if tt.HasText("删除 Skill…") {
+		t.Error("内置 Skill 的右键菜单不应有删除")
 	}
 	tt.Key(0, ui.KeyEscape)
 	must(t, tt.Click("skill-creator"))
 
 	// Then 详情栏也没有「…」菜单
 	if _, ok := tt.Find("更多操作"); ok {
-		t.Error("内置技能的详情栏不应有「…」菜单")
+		t.Error("内置 Skill 的详情栏不应有「…」菜单")
 	}
 }
 
@@ -200,7 +200,7 @@ func TestDeletingASkillWithCopiesLeadsToComparingFirst(t *testing.T) {
 
 	// When 右键它选「删除技能…」
 	must(t, tt.RightClick("test-first"))
-	clickMenuItem(t, tt, "删除技能…")
+	clickMenuItem(t, tt, "删除 Skill…")
 	tt.Frame()
 
 	// Then 提示先去对比，不给删
@@ -237,7 +237,7 @@ func TestUserDeletesSeveralUnusedSkillsAndUndoesThemAtOnce(t *testing.T) {
 
 	// When 点「删除…」并确认
 	must(t, tt.Click("删除…"))
-	if !tt.HasText("删除 2 个技能？") {
+	if !tt.HasText("删除 2 个 Skill？") {
 		t.Fatalf("应弹出批量确认框：%q", tt.Texts())
 	}
 	must(t, tt.Click("移到废纸篓"))
@@ -270,7 +270,7 @@ func TestBuiltinUnusedSkillsCannotBeSelectedForDeletion(t *testing.T) {
 
 	// Then 回到我的那一页去勾，内置的 skill-creator 不在可勾的列表里
 	if !tt.HasText("已选 0 个") || !tt.HasText("git-flow") || tt.HasText("skill-creator") {
-		t.Errorf("批量删除只勾我的技能：%q", tt.Texts())
+		t.Errorf("批量删除只勾我的 Skill：%q", tt.Texts())
 	}
 }
 
@@ -290,7 +290,7 @@ func TestUserReachesBulkDeleteWithoutScrollingInADefaultWindow(t *testing.T) {
 		t.Fatalf("应勾上 git-flow：%q", tt.Texts())
 	}
 	must(t, tt.Click("删除…"))
-	if !tt.HasText("删除 git-flow？") && !tt.HasText("删除 1 个技能？") {
+	if !tt.HasText("删除 git-flow？") && !tt.HasText("删除 1 个 Skill？") {
 		t.Errorf("应弹出确认框：%q", tt.Texts())
 	}
 }
@@ -321,9 +321,9 @@ func TestBatchDeleteConfirmShowsEachSkillPathAndAffectedAgents(t *testing.T) {
 
 	// Then 确认框列出每个技能的原件路径、附加链接数和受影响 Agent 汇总
 	for _, want := range []string{
-		"删除 3 个技能？",
+		"删除 3 个 Skill？",
 		"原件会移到废纸篓，指向它们的 1 个链接一并删除。",
-		"将移到废纸篓的技能",
+		"将移到废纸篓的 Skill",
 		"~/.claude/skills/git-flow",
 		"~/.claude/skills/dataviz",
 		"~/.agents/skills/design-lab",
@@ -347,7 +347,7 @@ func TestDeleteConfirmHighlightsGlobalProjectLinkAndOutsideOriginal(t *testing.T
 		}
 	}
 	if projSkill == nil {
-		t.Fatal("未找到示例项目技能 release-checklist")
+		t.Fatal("未找到示例项目 Skill release-checklist")
 	}
 
 	// When 发起删除
@@ -362,7 +362,7 @@ func TestDeleteConfirmHighlightsGlobalProjectLinkAndOutsideOriginal(t *testing.T
 		"删掉全局链接后，Claude Code 在任何项目里都读不到它。",
 	} {
 		if !tt.HasText(want) {
-			t.Errorf("项目技能确认框缺少 %q：%q", want, tt.Texts())
+			t.Errorf("项目 Skill 确认框缺少 %q：%q", want, tt.Texts())
 		}
 	}
 
@@ -377,9 +377,9 @@ func TestDeleteConfirmHighlightsGlobalProjectLinkAndOutsideOriginal(t *testing.T
 
 	// Then 原件路径下方出现目录外风险提示
 	for _, want := range []string{
-		"原件位于技能目录之外，会整个移到废纸篓。",
+		"原件位于 Skill 目录之外，会整个移到废纸篓。",
 		"/tmp/outside-skills/design-lab",
-		"原件在技能目录之外，请确认这不是仍在使用的文件夹",
+		"原件在 Skill 目录之外，请确认这不是仍在使用的文件夹",
 	} {
 		if !tt.HasText(want) {
 			t.Errorf("外部原件确认框缺少 %q：%q", want, tt.Texts())

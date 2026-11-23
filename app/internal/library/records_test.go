@@ -154,7 +154,7 @@ func TestABrokenRecordFileShowsNoStaleRecordsAndTheRestStillWorks(t *testing.T) 
 		t.Errorf("坏掉的记录：%+v", p.Stale)
 	}
 	if l.Get("vite") == nil {
-		t.Error("其他技能照常")
+		t.Error("其他 Skill 照常")
 	}
 }
 

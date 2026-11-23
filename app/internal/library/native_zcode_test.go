@@ -49,7 +49,7 @@ func TestZCodeSkillIsOnByDefaultAndTogglesByRealSkillPath(t *testing.T) {
 	s := l.Get("kami")
 	st := s.State("zcode")
 	if !st.Discoverable || !st.Enabled || st.Kind != StateEnabled || !st.Controllable() {
-		t.Fatalf("ZCode 读得到又没被停用的技能应是可拨的已启用：%+v", st)
+		t.Fatalf("ZCode 读得到又没被停用的 Skill 应是可拨的已启用：%+v", st)
 	}
 
 	must(t, l.Enable(s, "zcode", false))
@@ -64,7 +64,7 @@ func TestZCodeSkillIsOnByDefaultAndTogglesByRealSkillPath(t *testing.T) {
 		t.Fatal("停用不该动软链接")
 	}
 	if s.State("zcode").Kind == StateRestart {
-		t.Fatal("ZCode 每次列技能都重读配置，不需要重启")
+		t.Fatal("ZCode 每次列 Skill 都重读配置，不需要重启")
 	}
 
 	l = Scan(home)
@@ -86,7 +86,7 @@ func TestZCodeSkillIsOnByDefaultAndTogglesByRealSkillPath(t *testing.T) {
 	}
 	after, _ := os.ReadFile(h(".claude/skills/kami/SKILL.md"))
 	if string(before) != string(after) {
-		t.Fatal("技能文件被改了")
+		t.Fatal("Skill 文件被改了")
 	}
 }
 
@@ -123,7 +123,7 @@ func TestZCodeHonoursDisablesWrittenByZCodeUnderAnyAliasPath(t *testing.T) {
 			l := Scan(home)
 			s := l.Get("kami")
 			if st := s.State("zcode"); st.Enabled || st.Kind != StateDisabled {
-				t.Fatalf("ZCode 里关掉的技能应显示已停用：%+v", st)
+				t.Fatalf("ZCode 里关掉的 Skill 应显示已停用：%+v", st)
 			}
 			must(t, l.Enable(s, "zcode", true))
 			l = Scan(home)
@@ -211,7 +211,7 @@ func TestZCodeMasterSwitchOffBlocksSingleToggle(t *testing.T) {
 		s := l.Get("kami")
 		st := s.State("zcode")
 		if st.Enabled || st.Kind != StateDisabled || st.Controllable() || st.Message == "" {
-			t.Errorf("%s 关了全部技能：不能报启用，也不能单独拨：%+v", cfg, st)
+			t.Errorf("%s 关了全部 Skill：不能报启用，也不能单独拨：%+v", cfg, st)
 		}
 		if l.Enable(s, "zcode", true) == nil {
 			t.Errorf("%s 总开关关着时单独开启应失败", cfg)
@@ -309,7 +309,7 @@ func TestZCodeReadsTheSharedLibraryOnce(t *testing.T) {
 	}
 	must(t, l.Enable(both, "zcode", false))
 	if Scan(home).Get("both").EnabledIn("zcode") {
-		t.Fatal("经两条路径读到的同一份技能应一起停用")
+		t.Fatal("经两条路径读到的同一份 Skill 应一起停用")
 	}
 }
 
@@ -321,13 +321,13 @@ func TestZCodeProjectSkillStateIncludesUserAndProjectConfig(t *testing.T) {
 	l := Scan(home)
 	s := projectSkill(t, l, "deploy")
 	if st, ok := l.ProjectAgentState(s, "zcode"); !ok || st.Kind != StateEnabled || !st.Enabled {
-		t.Fatalf("项目技能默认在 ZCode 里启用：%+v %v", st, ok)
+		t.Fatalf("项目 Skill 默认在 ZCode 里启用：%+v %v", st, ok)
 	}
 	key := filepath.Join(dir, ".zcode/skills/deploy/SKILL.md")
 	writeZCodeConfig(t, h, `{"skills":{"`+jsonStr(key)+`":{"enable":false}}}`)
 	l = Scan(home)
 	if st, _ := l.ProjectAgentState(projectSkill(t, l, "deploy"), "zcode"); st.Enabled || st.Kind != StateDisabled {
-		t.Fatalf("在 ZCode 里关掉的项目技能不能当成已启用：%+v", st)
+		t.Fatalf("在 ZCode 里关掉的项目 Skill 不能当成已启用：%+v", st)
 	}
 	must(t, os.WriteFile(filepath.Join(dir, "zcode.json"), []byte(`{"skills":{"`+jsonStr(key)+`":{"enable":true}}}`), 0o600))
 	l = Scan(home)
@@ -429,7 +429,7 @@ func projectSkill(t *testing.T, l *Library, name string) *Skill {
 			return s
 		}
 	}
-	t.Fatalf("没有项目技能 %s", name)
+	t.Fatalf("没有项目 Skill %s", name)
 	return nil
 }
 
@@ -452,6 +452,6 @@ func TestDeletingASkillClearsOwnZCodeDisableEvenWhenAllSkillsAreOff(t *testing.T
 		t.Fatalf("删除时清理自己写的停用项不该被总开关挡住：%v", err)
 	}
 	if _, ok := zcodeEntries(t, h)[key]; ok {
-		t.Fatalf("删掉的技能留下了停用项：%s", must2(os.ReadFile(zcodeConfigFile(h))))
+		t.Fatalf("删掉的 Skill 留下了停用项：%s", must2(os.ReadFile(zcodeConfigFile(h))))
 	}
 }

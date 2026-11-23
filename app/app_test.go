@@ -43,13 +43,13 @@ func doubleClick(t *testing.T, tt *ui.Tester, text string) {
 
 func TestDefaultIsMineAsCards(t *testing.T) {
 	_, tt := newTester(t)
-	for _, want := range []string{"我的技能", "卡片", "test-first"} {
+	for _, want := range []string{"我的 Skill", "卡片", "test-first"} {
 		if !tt.HasText(want) {
 			t.Errorf("缺少 %q", want)
 		}
 	}
 	if tt.HasText("skill-creator") {
-		t.Error("默认是我的，不列内置技能")
+		t.Error("默认是我的，不列内置 Skill")
 	}
 	if tt.HasText("单独启用") {
 		t.Error("没选中时不应出现详情栏")
@@ -111,23 +111,23 @@ func TestBoardShowsSharedSkillsOnlyInSharedColumn(t *testing.T) {
 	a, tt := newTester(t)
 	a.mode = viewBoard
 	tt.Frame()
-	for _, want := range []string{"通用", "Claude Code", "Codex", "已停用", "未启用", "添加更多技能"} {
+	for _, want := range []string{"通用", "Claude Code", "Codex", "已停用", "未启用", "添加更多 Skill"} {
 		if !tt.HasText(want) {
 			t.Errorf("看板缺少 %q", want)
 		}
 	}
 	if tt.HasText("skill-creator") {
-		t.Error("看板只排我的技能")
+		t.Error("看板只排我的 Skill")
 	}
 	// 每张卡片的名称同时出现在可访问标签和正文中。
 	if n := countText(tt, "code-review"); n != 2 {
-		t.Errorf("通用技能应只显示一张卡片，实际有 %d 个名称标签", n)
+		t.Errorf("通用 Skill 应只显示一张卡片，实际有 %d 个名称标签", n)
 	}
 	if n := countText(tt, "log-analysis"); n != 4 {
-		t.Errorf("通用之外的技能应保留两张 Agent 卡片，实际有 %d 个名称标签", n)
+		t.Errorf("通用之外的 Skill 应保留两张 Agent 卡片，实际有 %d 个名称标签", n)
 	}
 	if _, ok := tt.Find("Claude Code 中 code-review 的操作"); ok {
-		t.Error("通用技能不应出现在 Agent 列中")
+		t.Error("通用 Skill 不应出现在 Agent 列中")
 	}
 }
 
@@ -176,8 +176,8 @@ func TestInspectorTidiesRedundantLinks(t *testing.T) {
 
 func TestTidy(t *testing.T) {
 	a, tt := newTester(t)
-	if tt.HasText("全部技能") || tt.HasText("需要处理") || a.scope != string(library.ScopeMine) {
-		t.Errorf("侧边栏不再有全部技能、需要处理，默认选中我的：%q", a.scope)
+	if tt.HasText("全部 Skill") || tt.HasText("需要处理") || a.scope != string(library.ScopeMine) {
+		t.Errorf("侧边栏不再有全部 Skill、需要处理，默认选中我的：%q", a.scope)
 	}
 	if err := tt.Click("整理"); err != nil {
 		t.Fatal(err)
@@ -190,7 +190,7 @@ func TestTidy(t *testing.T) {
 	}
 	p := a.lib.Problems()
 	total := a.issueTotal(&p)
-	for _, want := range []string{fmt.Sprintf("%d 个问题", total), "高风险", "安全警告", "内容相同的副本", "内容不同的副本", "重复的链接", "断掉的链接", "没写简介", "项目技能被全局链接", "全部收成一份", "brainstorming"} {
+	for _, want := range []string{fmt.Sprintf("%d 个问题", total), "高风险", "安全警告", "内容相同的副本", "内容不同的副本", "重复的链接", "断掉的链接", "没写简介", "项目 Skill 被全局链接", "全部收成一份", "brainstorming"} {
 		if _, ok := tt.Access(want); !ok && !tt.HasText(want) {
 			t.Errorf("整理页缺少 %q：%q", want, tt.Texts())
 		}
@@ -297,7 +297,7 @@ func TestIncompleteSkillIsShownInTidyAndInspector(t *testing.T) {
 	a.tidy.kind = library.Incomplete
 	tt.Frame()
 	if !tt.HasText("文件不完整") || !tt.HasText("缺 references/lint-rules.md") {
-		t.Fatalf("整理页应列出文件不完整的技能：%q", tt.Texts())
+		t.Fatalf("整理页应列出文件不完整的 Skill：%q", tt.Texts())
 	}
 	a.scope = string(library.ScopeMine)
 	a.selected = a.lib.Get("test-first")
@@ -374,7 +374,7 @@ func TestProjectPageAndInspector(t *testing.T) {
 	if p := a.project(); p == nil || p.Name != "storefront" {
 		t.Fatalf("scope = %q", a.scope)
 	}
-	for _, want := range []string{"项目技能", "2 个技能", "添加技能", "release-checklist", "全局链接"} {
+	for _, want := range []string{"项目 Skill", "2 个 Skill", "添加 Skill", "release-checklist", "全局链接"} {
 		if !tt.HasText(want) {
 			t.Errorf("项目页缺少 %q：%q", want, tt.Texts())
 		}
@@ -392,12 +392,12 @@ func TestProjectPageAndInspector(t *testing.T) {
 		}
 	}
 	if tt.HasText("单独启用") || tt.HasText("启用于") {
-		t.Error("项目技能不应有开关")
+		t.Error("项目 Skill 不应有开关")
 	}
 	if err := tt.Click("查看…"); err != nil {
 		t.Fatal(err)
 	}
-	if !a.linkedOpen || !tt.HasText("1 个技能被全局链接到 storefront") {
+	if !a.linkedOpen || !tt.HasText("1 个 Skill 被全局链接到 storefront") {
 		t.Errorf("「查看…」应打开全局链接弹窗：%q", tt.Texts())
 	}
 	if err := tt.Click("暂不处理"); err != nil {
@@ -463,7 +463,7 @@ func TestSettingsWindow(t *testing.T) {
 	}
 	// 设置是单独的窗口，用自己的 Tester
 	st := newUITester(a.settingsView, settingsWidth, settingsHeight)
-	for _, want := range []string{"技能库", "~/.agents/skills", "20 个技能", "在 Finder 中显示", "检查并修复", "主题", "浅色", "跟随系统", "语言"} {
+	for _, want := range []string{"Skill 库", "~/.agents/skills", "20 个 Skill", "在 Finder 中显示", "检查并修复", "主题", "浅色", "跟随系统", "语言"} {
 		if !st.HasText(want) {
 			t.Errorf("通用缺少 %q：%q", want, st.Texts())
 		}
@@ -486,7 +486,7 @@ func TestSettingsWindow(t *testing.T) {
 		t.Fatal(err)
 	}
 	st.Frame()
-	for _, want := range []string{"本机装了 7 个 Agent", "在界面里显示", "~/.workbuddy/skills", "刚刚检测", "手动添加技能目录…"} {
+	for _, want := range []string{"本机装了 7 个 Agent", "在界面里显示", "~/.workbuddy/skills", "刚刚检测", "手动添加 Skill 目录…"} {
 		if !st.HasText(want) {
 			t.Errorf("Agent 管理缺少 %q：%q", want, st.Texts())
 		}
@@ -502,7 +502,7 @@ func TestSettingsWindow(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, want := range []string{"自动发现", "77 个项目", "合并去重后 212 个项目，其中", "手动添加的文件夹", "v3-waterfall",
-		"没有技能，不会显示", "git worktree 合并到主仓库显示"} {
+		"没有 Skill，不会显示", "git worktree 合并到主仓库显示"} {
 		if !st.HasText(want) {
 			t.Errorf("项目缺少 %q：%q", want, st.Texts())
 		}
@@ -567,7 +567,7 @@ func TestCollections(t *testing.T) {
 		}
 	}
 	if countText(tt, "lark-doc") != 0 {
-		t.Error("集合里的技能应收进叠卡")
+		t.Error("集合里的 Skill 应收进叠卡")
 	}
 
 	// 选中：详情栏是整组的开关
@@ -593,11 +593,11 @@ func TestCollections(t *testing.T) {
 
 	// 打开：只列集合里的技能，依赖多的标出来；Esc 回来，集合仍选中
 	doubleClick(t, tt, "open.feishu.cn")
-	if a.inColl == nil || countText(tt, "lark-doc") == 0 || !tt.HasText("6 个技能") || !tt.HasText("都在通用里") || !tt.HasText("2 个技能依赖它") {
+	if a.inColl == nil || countText(tt, "lark-doc") == 0 || !tt.HasText("6 个 Skill") || !tt.HasText("都在通用里") || !tt.HasText("2 个 Skill 依赖它") {
 		t.Fatalf("双击应打开集合：%q", tt.Texts())
 	}
 	if tt.HasText("test-first") {
-		t.Error("打开的集合里只有它的技能")
+		t.Error("打开的集合里只有它的 Skill")
 	}
 	tt.Key(0, ui.KeyEscape)
 	if a.inColl != nil || a.coll == nil || a.coll.Name != "open.feishu.cn" {
@@ -609,7 +609,7 @@ func TestCollections(t *testing.T) {
 	a.mode = viewCards
 	tt.Frame()
 	if countText(tt, "lark-doc") == 0 || countText(tt, "lark-calendar") != 0 {
-		t.Errorf("搜索时应直接列出技能：%q", tt.Texts())
+		t.Errorf("搜索时应直接列出 Skill：%q", tt.Texts())
 	}
 }
 

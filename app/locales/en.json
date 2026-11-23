@@ -365,6 +365,7 @@
   "deleteMovedOne": "Moved {name} to the Trash",
   "deleteTitleOne": "Delete {name}?",
   "deleteImpactReads": "Reads {where}, so it loses the skill too",
+  "deleteImpactReadsLibrary": "Reads Library, so it loses the skill too",
   "deleteLoses": "Loses {names}",
   "importPathsEtc": "{shown} ({count} in total)",
   "importPreviewCantOpen": "{path} can't be opened, so it isn't shown here.",

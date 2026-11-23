@@ -381,13 +381,13 @@ func (a *app) singleDeleteContent(c *ui.Context, s *library.Skill, target librar
 func (a *app) impactText(im library.Impact) string {
 	switch im.Kind {
 	case library.ImpactShared:
-		where := locales.NavLibrary()
-		if im.Dir == library.SharedDir {
-			where = locales.AgentsSharedDirectory()
-		} else if im.Dir != a.lib.Root {
-			where = a.lib.Display(im.Dir)
+		switch im.Dir {
+		case library.SharedDir:
+			return locales.DeleteImpactReads(locales.AgentsSharedDirectory())
+		case a.lib.Root:
+			return locales.DeleteImpactReadsLibrary()
 		}
-		return locales.DeleteImpactReads(where)
+		return locales.DeleteImpactReads(a.lib.Display(im.Dir))
 	case library.ImpactOriginal:
 		return locales.DeleteOriginalInDirectory()
 	}

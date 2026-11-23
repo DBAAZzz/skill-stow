@@ -194,7 +194,7 @@ func TestResultsSavedByOlderVersionsStillLoad(t *testing.T) {
 	checkNow(t, home, r)
 	editCheck(t, home, func(_, skill map[string]any) { skill["fail"] = "旧的文件问题" })
 	if it := itemNamed(t, Scan(home).Updates(), "vite"); it.State != UpdFailed || reason(it) != "旧的文件问题" {
-		t.Errorf("旧的技能失败：%s %q", it.State, reason(it))
+		t.Errorf("旧的 Skill 失败：%s %q", it.State, reason(it))
 	}
 	editCheck(t, home, func(_, skill map[string]any) {
 		delete(skill, "fail")

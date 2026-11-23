@@ -59,7 +59,7 @@ func TestLibraryWatchPlanCoversSkillsAgentsConfigsAndProjects(t *testing.T) {
 		}
 	}
 	if slices.Contains(plan.Dirs, filepath.Join(home, ".gemini/skills")) {
-		t.Errorf("指向技能库的软链目录不应重复占一个 watcher：%v", plan.Dirs)
+		t.Errorf("指向 Skill 库的软链目录不应重复占一个 watcher：%v", plan.Dirs)
 	}
 	if !slices.IsSorted(plan.Dirs) {
 		t.Errorf("Dirs 应有序：%v", plan.Dirs)
@@ -134,10 +134,10 @@ func TestLibraryWatchPlanFollowsExternalSymlinksOnlyForMineAndProject(t *testing
 		t.Errorf("Project 外部软链真实目录 %s 应被监听，Dirs=%v", wantProjReal, plan.Dirs)
 	}
 	if slices.Contains(plan.Dirs, wantInsideReal) {
-		t.Errorf("位于技能库树内的技能 %s 不应作为外部软链重复添加，Dirs=%v", wantInsideReal, plan.Dirs)
+		t.Errorf("位于 Skill 库树内的 Skill %s 不应作为外部软链重复添加，Dirs=%v", wantInsideReal, plan.Dirs)
 	}
 	if slices.Contains(plan.Dirs, wantPluginReal) {
-		t.Errorf("插件内部技能真实目录 %s 不应单独建 watcher，Dirs=%v", wantPluginReal, plan.Dirs)
+		t.Errorf("插件内部 Skill 真实目录 %s 不应单独建 watcher，Dirs=%v", wantPluginReal, plan.Dirs)
 	}
 }
 

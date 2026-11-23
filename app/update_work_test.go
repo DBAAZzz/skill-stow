@@ -345,7 +345,7 @@ func TestRunUpdatesBatchTotalFailureAndCancelUnderQueuedPost(t *testing.T) {
 	t.Run("batch canceled after partial progress reports updated count", func(t *testing.T) {
 		a := newApp(library.Scan(t.TempDir()))
 		a.finishUpdateWork(buildRunWorkResult(updateRunResult{updated: 2, failed: 0}, nil), true)
-		if shownKind(a, fromUpdate) != toastOK || shownText(a, fromUpdate) != "已更新 2 个技能。" {
+		if shownKind(a, fromUpdate) != toastOK || shownText(a, fromUpdate) != "已更新 2 个 Skill。" {
 			t.Fatalf("got kind=%v toast=%q", shownKind(a, fromUpdate), shownText(a, fromUpdate))
 		}
 	})
@@ -415,7 +415,7 @@ func TestConcurrentBackgroundWorkerAndUIPostDeliveryHasNoRaces(t *testing.T) {
 	if !released {
 		t.Fatal("UI did not observe item 1 completion while worker was running")
 	}
-	if a.upd.cancel != nil || shownKind(a, fromUpdate) != toastOK || shownText(a, fromUpdate) != "已更新 2 个技能。" {
+	if a.upd.cancel != nil || shownKind(a, fromUpdate) != toastOK || shownText(a, fromUpdate) != "已更新 2 个 Skill。" {
 		t.Fatalf("unexpected concurrent background result: cancel=%v kind=%v toast=%q", a.upd.cancel != nil, shownKind(a, fromUpdate), shownText(a, fromUpdate))
 	}
 }

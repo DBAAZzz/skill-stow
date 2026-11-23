@@ -161,7 +161,7 @@ func TestASkillMovedOutOfTheLibraryIsExplainedNotUpdated(t *testing.T) {
 	writeRecords(t, h, gh("kami", "tw93/kami", "SKILL.md", strings.Repeat("1", 40)), gh("dbs", "x/dbskill", "dbs/SKILL.md", strings.Repeat("2", 40)))
 	_, rep := checkNow(t, home, r)
 	it := itemNamed(t, rep, "kami")
-	if it.State != UpdMovedOut || !strings.Contains(it.Reason.String(), "技能库中找不到") {
+	if it.State != UpdMovedOut || !strings.Contains(it.Reason.String(), "Skill 库中找不到") {
 		t.Errorf("kami = %+v", it)
 	}
 	for _, it := range rep.Items {
@@ -178,7 +178,7 @@ func TestASkillRemovedUpstreamIsLeftAlone(t *testing.T) {
 	home, h, r, _ := viteHome(t)
 	r.publish(t, "antfu/skills", map[string]string{"skills/other/SKILL.md": skillMD("other", "")})
 	_, rep := checkNow(t, home, r)
-	if it := itemNamed(t, rep, "vite"); it.State != UpdRemoved || it.Reason.String() != "上游仓库已移除该技能" {
+	if it := itemNamed(t, rep, "vite"); it.State != UpdRemoved || it.Reason.String() != "上游仓库已移除该 Skill" {
 		t.Errorf("vite = %+v", it)
 	}
 	if _, err := os.Stat(h(".agents/skills/vite/SKILL.md")); err != nil {
@@ -377,7 +377,7 @@ func TestWebsiteSourcesAreGroupedWithACopyableCommand(t *testing.T) {
 		t.Errorf("gitlab = %+v", g)
 	}
 	if rep.Eligible != 0 {
-		t.Errorf("没有可由本应用检查的技能：%d", rep.Eligible)
+		t.Errorf("没有可由本应用检查的 Skill：%d", rep.Eligible)
 	}
 }
 

@@ -76,10 +76,10 @@ func TestGroupedPagesShareOneContentColumn(t *testing.T) {
 
 			ix0, ix1, _ := cardEdges(t, shot(imp), left)
 			if ix1-ix0 > ux1-ux0 {
-				t.Errorf("添加技能是表单页，内容栏不应比使用情况宽：%d > %d", ix1-ix0, ux1-ux0)
+				t.Errorf("添加 Skill 是表单页，内容栏不应比使用情况宽：%d > %d", ix1-ix0, ux1-ux0)
 			}
 			if d := (ix0 + ix1) - (ux0 + ux1); d < -1 || d > 1 {
-				t.Errorf("添加技能应与其它页居中在同一条轴上：添加 %d…%d，使用情况 %d…%d", ix0, ix1, ux0, ux1)
+				t.Errorf("添加 Skill 应与其它页居中在同一条轴上：添加 %d…%d，使用情况 %d…%d", ix0, ix1, ux0, ux1)
 			}
 		})
 	}
@@ -215,7 +215,7 @@ func TestNarrowUpdateRowsKeepNameAndTimeWhole(t *testing.T) {
 			useLocale(t, tt, "en")
 			tt.Advance(paneDuration)
 			if r, _ := tt.Find("vite"); r.W < fullName.W-0.5 {
-				t.Errorf("技能名被挤窄：%.1f，完整 %.1f", r.W, fullName.W)
+				t.Errorf("Skill 名被挤窄：%.1f，完整 %.1f", r.W, fullName.W)
 			}
 			if r, _ := tt.Find(when); r.W < fullTime.W-0.5 {
 				t.Errorf("提交时间被截断：%.1f，完整 %.1f", r.W, fullTime.W)

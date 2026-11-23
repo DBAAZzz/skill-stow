@@ -121,7 +121,7 @@ func TestReadingAGitHubRepoDownloadsEverySkillWhole(t *testing.T) {
 	b := readAntfu(t, home, f, "antfu/skills")
 
 	if got := batchNames(b); !slices.Equal(got, []string{"web-design-guidelines", "slidev", "vite", "vue"}) {
-		t.Fatalf("技能 = %v", got)
+		t.Fatalf("Skill = %v", got)
 	}
 	if b.Commit != commit {
 		t.Errorf("提交 = %s", b.Commit)
@@ -142,7 +142,7 @@ func TestReadingAGitHubRepoDownloadsEverySkillWhole(t *testing.T) {
 	}
 	notes := b.Skill("web-design-guidelines")
 	if !notes.MissingDescription() || notes.Problem != "" || notes.Folder != "notes" {
-		t.Errorf("缺简介的技能 = %+v", notes)
+		t.Errorf("缺简介的 Skill = %+v", notes)
 	}
 }
 
@@ -193,7 +193,7 @@ func TestAuditIsAttachedPerSkill(t *testing.T) {
 		t.Errorf("审计 = %+v / %+v", b.Skill("slidev").Audit, b.Skill("vite").Audit)
 	}
 	if !slices.Contains(asked, "vite") {
-		t.Errorf("审计应按技能名请求：%v", asked)
+		t.Errorf("审计应按 Skill 名请求：%v", asked)
 	}
 }
 
@@ -209,7 +209,7 @@ func TestANamedSkillIsTheOnlyOneRead(t *testing.T) {
 		t.Errorf("预选 = %v", got)
 	}
 	if !slices.Equal(f.snapCalls, []string{"slidev"}) {
-		t.Errorf("其他技能不应下载：%v", f.snapCalls)
+		t.Errorf("其他 Skill 不应下载：%v", f.snapCalls)
 	}
 	if !b.Source.IgnoredArgs {
 		t.Error("应提示命令里的其他参数不生效")
@@ -227,7 +227,7 @@ func TestShowingAllStillPreselectsTheNamedSkill(t *testing.T) {
 	must(t, err)
 	defer b.Discard()
 	if len(b.Skills) != 4 || b.Hidden != 0 || !slices.Equal(b.Preselected(), []string{"slidev"}) {
-		t.Errorf("技能 %v，预选 %v", batchNames(b), b.Preselected())
+		t.Errorf("Skill %v，预选 %v", batchNames(b), b.Preselected())
 	}
 }
 
@@ -238,7 +238,7 @@ func TestANameThatIsNotAFolderNameFallsBackToReadingAll(t *testing.T) {
 	f.publish(t, "antfu/skills", antfuSkills)
 	b := readAntfu(t, home, f, "antfu/skills@web-design-guidelines")
 	if len(b.Skills) != 4 || !slices.Equal(b.Preselected(), []string{"web-design-guidelines"}) {
-		t.Errorf("技能 %v，预选 %v", batchNames(b), b.Preselected())
+		t.Errorf("Skill %v，预选 %v", batchNames(b), b.Preselected())
 	}
 	if b2 := readAntfu(t, home, f, "skills.sh/antfu/skills/notes"); !slices.Equal(b2.Preselected(), []string{"web-design-guidelines"}) {
 		t.Errorf("按目录名也能预选：%v", b2.Preselected())
@@ -314,7 +314,7 @@ func TestAddingToTheLibraryWritesTheSameRecordAsNpx(t *testing.T) {
 		t.Fatalf("结果 = %+v", out)
 	}
 	if hash, _ := TreeHash(h(".agents/skills/vite")); hash != f.upstreamTree("antfu/skills", "skills/vite") {
-		t.Error("技能库里的内容应与 GitHub 一致")
+		t.Error("Skill 库里的内容应与 GitHub 一致")
 	}
 
 	var rec map[string]string
@@ -365,7 +365,7 @@ func TestARootSkillIsRecordedWithItsCommitLikeNpx(t *testing.T) {
 	var rec map[string]string
 	must(t, json.Unmarshal(lockSkills(t, h)["kami"], &rec))
 	if rec["skillPath"] != "SKILL.md" || rec["skillFolderHash"] != commit {
-		t.Errorf("根目录技能的记录 = %v", rec)
+		t.Errorf("根目录 Skill 的记录 = %v", rec)
 	}
 }
 
@@ -425,7 +425,7 @@ func TestASkillThatAppearsDuringPreviewIsSkippedAndTheRestAreAdded(t *testing.T)
 		t.Errorf("结果 = %+v", out)
 	}
 	if _, ok := lockSkills(t, h)["vue"]; ok {
-		t.Error("没添加的技能不能写记录")
+		t.Error("没添加的 Skill 不能写记录")
 	}
 }
 
@@ -451,7 +451,7 @@ func TestAgentModePutsFilesInTheFirstAgentAndLinksTheRest(t *testing.T) {
 		t.Errorf("Kiro 应通过链接读同一份：%v %v", real, err)
 	}
 	if exists(h(".agents/skills/slidev")) {
-		t.Error("技能库里不应有")
+		t.Error("Skill 库里不应有")
 	}
 	if exists(h(".agents/.skill-lock.json")) {
 		t.Error("指定 Agent 模式不写安装记录")
@@ -547,7 +547,7 @@ func TestABranchNameWithSlashesIsSplitOffTheFolder(t *testing.T) {
 
 	// Then 分支名整段认出，剩下的是子目录
 	if b.Source.Ref != "feature/x" || b.Source.Subpath != "skills/vite" || !slices.Equal(batchNames(b), []string{"vite"}) {
-		t.Errorf("ref=%q sub=%q 技能 %v", b.Source.Ref, b.Source.Subpath, batchNames(b))
+		t.Errorf("ref=%q sub=%q Skill %v", b.Source.Ref, b.Source.Subpath, batchNames(b))
 	}
 }
 
@@ -670,10 +670,10 @@ func TestLocalFoldersAreCopiedAndNeverRecordedForNpx(t *testing.T) {
 	must(t, err)
 	defer b.Discard()
 	if got := batchNames(b); !slices.Equal(got, []string{"inner", "release-notes"}) {
-		t.Errorf("技能 = %v", got)
+		t.Errorf("Skill = %v", got)
 	}
 	if !slices.Equal(b.NotSkills, []string{"docs"}) {
-		t.Errorf("不是技能的 = %v", b.NotSkills)
+		t.Errorf("不是 Skill 的 = %v", b.NotSkills)
 	}
 	out := Scan(home).AddImport(b, []string{"release-notes"}, ImportPlacement{Library: true}, nil)
 	if !out[0].Added || !exists(filepath.Join(src, "release-notes/SKILL.md")) {
@@ -726,7 +726,7 @@ func TestLinksThatStayInsideTheSkillAreKept(t *testing.T) {
 	must(t, err)
 	defer b.Discard()
 	if p := b.Skills[0].Problem; p != "" {
-		t.Errorf("技能里的链接应能添加：%q", p)
+		t.Errorf("Skill 里的链接应能添加：%q", p)
 	}
 }
 
@@ -783,7 +783,7 @@ func TestZipsAreUnpackedAndUnsafeOnesRejectedWhole(t *testing.T) {
 	must(t, err)
 	defer b.Discard()
 	if got := batchNames(b); !slices.Equal(got, []string{"slides"}) || b.Skills[0].RepoPath != filepath.Join(good, "slides") {
-		t.Errorf("zip 里的技能 = %v %s", got, b.Skills[0].RepoPath)
+		t.Errorf("zip 里的 Skill = %v %s", got, b.Skills[0].RepoPath)
 	}
 
 	evil := h("Downloads/evil.zip")
@@ -800,7 +800,7 @@ func TestZipsAreUnpackedAndUnsafeOnesRejectedWhole(t *testing.T) {
 	_, err = ReadLocalImport(home, []string{empty})
 	var ie *ImportError
 	if !errors.As(err, &ie) || ie.Msg != "skills-backup.zip 里没有 SKILL.md。" || !strings.Contains(ie.Hint, "2 个文件夹（docs、images）") {
-		t.Errorf("不是技能：%v", err)
+		t.Errorf("不是 Skill：%v", err)
 	}
 }
 
@@ -832,7 +832,7 @@ func TestGitHubStyleZipsAndNestedFoldersAreFound(t *testing.T) {
 	must(t, err)
 	defer b.Discard()
 	if got := batchNames(b); !slices.Equal(got, []string{"helper", "antfu", "vue"}) {
-		t.Fatalf("GitHub zip 技能 = %v", got)
+		t.Fatalf("GitHub zip Skill = %v", got)
 	}
 	if got := b.Skill("vue").RepoPath; got != filepath.Join(ghZip, "skills-main/skills/vue") {
 		t.Errorf("RepoPath = %q", got)

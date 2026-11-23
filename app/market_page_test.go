@@ -77,7 +77,7 @@ func TestMarketChipSwitchingAndTagPrecedence(t *testing.T) {
 	must(t, tt.Click("ClawHub"))
 	tt.Advance(segmentedSpring.Spring.Duration)
 	if !tt.HasText("skill-vetter") || !tt.HasText("下载") {
-		t.Fatalf("切到 ClawHub 后未显示技能或下载单位：%v", tt.Texts())
+		t.Fatalf("切到 ClawHub 后未显示 Skill 或下载单位：%v", tt.Texts())
 	}
 	must(t, tt.Click(locales.MarketCategorySecurity()))
 	if curView, curKey := a.currentMarketView(); curView != library.MarketViewCategory || curKey != "security" {
@@ -290,7 +290,7 @@ func TestMarketOfflineRetryAndEmptyCacheError(t *testing.T) {
 	fail.Store(false)
 	must(t, tt.Click(locales.MarketRetry()))
 	if !tt.HasText("find-skills") {
-		t.Fatalf("点重试恢复后应列出技能：%v", tt.Texts())
+		t.Fatalf("点重试恢复后应列出 Skill：%v", tt.Texts())
 	}
 }
 
