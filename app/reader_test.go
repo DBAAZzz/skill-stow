@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/png"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -141,4 +143,95 @@ func TestReaderShowsImageAndSwitchesCodeFilesInEditor(t *testing.T) {
 	if tt.HasText("没法直接显示") {
 		t.Fatalf("图片文件应直接预览，不应提示没法直接显示：%q", tt.Texts())
 	}
+}
+
+func TestReaderFollowsMarkdownFileLinks(t *testing.T) {
+	a, tt := newTester(t)
+	s := a.lib.Get("test-first")
+	s.Files = []library.File{
+		{Path: "SKILL.md", Content: "[Dispatch](references/dispatch.md#tasks)"},
+		{Path: "references/dispatch.md", Content: "# Tasks\n\nRead [Notes](../notes%20file.md)"},
+		{Path: "notes file.md", Content: "[Missing](missing.md) [Website](https://example.com)"},
+	}
+	a.open(s)
+	tt.Frame()
+	tt.Advance(time.Second)
+	tt.Frame()
+	clickLink(t, tt, "Dispatch")
+	if a.file != 1 || !tt.HasText("Tasks") {
+		t.Fatalf("file=%d texts=%q", a.file, tt.Texts())
+	}
+	must(t, tt.Click("Notes"))
+	if a.file != 2 || !tt.HasText("Missing") || a.md.Anchor != "" {
+		t.Fatal("nested documents should resolve links from their own directory")
+	}
+	var opened string
+	a.openURL = func(dest string) { opened = dest }
+	must(t, tt.Click("Missing"))
+	if a.file != 2 || opened != "" {
+		t.Fatal("missing files should leave the reader in place")
+	}
+	must(t, tt.Click("Website"))
+	if opened != "https://example.com" || a.file != 2 {
+		t.Fatal("web links should open externally")
+	}
+}
+
+func TestReaderLinkAnchorDoesNotPullBackAfterDocumentChanges(t *testing.T) {
+	a, tt := newTester(t)
+	s := a.lib.Get("test-first")
+	var filler strings.Builder
+	for i := range 80 {
+		fmt.Fprintf(&filler, "Paragraph %d\n\n", i)
+	}
+	s.Files = []library.File{
+		{Path: "SKILL.md", Content: "[Dispatch](references/dispatch.md#tasks)"},
+		{Path: "references/dispatch.md", Content: filler.String() + "# Tasks\n\n" + filler.String()},
+	}
+	a.open(s)
+	tt.Frame()
+	tt.Advance(time.Second)
+	tt.Frame()
+	visible := func() bool {
+		r, ok := tt.Find("Tasks")
+		return ok && r.Y >= 0 && r.Y+r.H <= 800
+	}
+
+	// Given 跟着带锚点的链接，滚到了 Tasks
+	clickLink(t, tt, "Dispatch")
+	tt.Advance(time.Second)
+	tt.Frame()
+	if a.file != 1 || !visible() {
+		t.Fatalf("following the link should scroll to Tasks: file=%d", a.file)
+	}
+	// And 用户自己滚回顶部
+	tt.Scroll(800, 400, 0, -100000)
+	tt.Advance(time.Second)
+	tt.Frame()
+	if visible() {
+		t.Fatal("scrolling up should move Tasks out of view")
+	}
+
+	// When 文档内容变了（如重新扫描读到新内容）
+	s.Files[1].Content = "Changed\n\n" + s.Files[1].Content
+	tt.Frame()
+	tt.Advance(time.Second)
+	tt.Frame()
+
+	// Then 不会又跳回 Tasks
+	if visible() {
+		t.Fatal("a changed document should not scroll back to the old link anchor")
+	}
+}
+
+// clickLink 点 Markdown 里的链接：链接文字是行内的一段，按文字找不到，按读屏角色找。
+func clickLink(t *testing.T, tt *ui.Tester, name string) {
+	t.Helper()
+	link, ok := tt.AccessByRole(ui.RoleLink, name)
+	if !ok {
+		t.Fatalf("missing %s link", name)
+	}
+	r := link.Bounds
+	tt.Press(r.X+r.W/2, r.Y+r.H/2)
+	tt.Release(r.X+r.W/2, r.Y+r.H/2)
 }

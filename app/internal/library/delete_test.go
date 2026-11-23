@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -427,5 +428,179 @@ func TestRealOutsideReportsPathsOutsideSkillDirs(t *testing.T) {
 	// Sample 数据没有 Real，不应误报为在外面
 	if _, ok := Sample().RealOutside(Sample().Get("test-first")); ok {
 		t.Error("sample skill without Real should not report outside")
+	}
+}
+
+func TestDeleteTargetReportsOriginalAndLinksOnDisk(t *testing.T) {
+	// Given 技能库里的 design-lab（Claude Code 有链接）、技能目录外的 ext-skill，
+	// 以及一个带全局链接的项目技能
+	home, h := deleteHome(t)
+	writeSkill(t, h("dev/ext-skill"), "outside")
+	mustLink(t, h("dev/ext-skill"), h(".agents/skills/ext-skill"))
+
+	proj := h("work/storefront")
+	writeSkill(t, filepath.Join(proj, ".claude/skills/release-check"), "project")
+	mustLink(t, filepath.Join(proj, ".claude/skills/release-check"), h(".claude/skills/release-check"))
+	must(t, Scan(home).AddProjects([]string{proj}))
+
+	l := Scan(home)
+
+	// When 取 design-lab 的删除目标
+	dt := l.DeleteTarget(l.Get("design-lab"))
+	// Then 原件在技能库，不在目录外，链接指向 .claude/skills/design-lab
+	if dt.Original != h(".agents/skills/design-lab") || dt.Outside {
+		t.Fatalf("design-lab original = %q outside=%v", dt.Original, dt.Outside)
+	}
+	if len(dt.Links) != 1 || dt.Links[0].Path != h(".claude/skills/design-lab") || dt.Links[0].Global {
+		t.Fatalf("design-lab links = %+v", dt.Links)
+	}
+
+	// When 取外部原件 ext-skill 的删除目标
+	ext := l.DeleteTarget(l.Get("ext-skill"))
+	// Then 标为目录外，并列出技能库里的链接
+	if ext.Original != h("dev/ext-skill") || !ext.Outside {
+		t.Fatalf("ext-skill original = %q outside=%v", ext.Original, ext.Outside)
+	}
+	if len(ext.Links) != 1 || ext.Links[0].Path != h(".agents/skills/ext-skill") {
+		t.Fatalf("ext-skill links = %+v", ext.Links)
+	}
+
+	// When 取带全局链接的项目技能的删除目标
+	var projSkill *Skill
+	for _, s := range l.Skills {
+		if s.Source == Project && s.Name == "release-check" {
+			projSkill = s
+			break
+		}
+	}
+	if projSkill == nil {
+		t.Fatal("未扫描到项目技能 release-check")
+	}
+	pt := l.DeleteTarget(projSkill)
+	if pt.Original != filepath.Join(proj, ".claude/skills/release-check") {
+		t.Fatalf("project original = %q", pt.Original)
+	}
+	if len(pt.Links) != 1 || pt.Links[0].Path != h(".claude/skills/release-check") || !pt.Links[0].Global {
+		t.Fatalf("project links = %+v", pt.Links)
+	}
+}
+
+func TestDeleteTargetReportsPathsInSampleLibrary(t *testing.T) {
+	l := Sample()
+
+	// 通用目录技能：原件在技能库，三个链接分别在 Claude Code、CodeBuddy、WorkBuddy
+	vue := l.DeleteTarget(l.Get("vue-best-practices"))
+	if vue.Original != "~/.agents/skills/vue-best-practices" || vue.Outside {
+		t.Fatalf("vue original = %q outside=%v", vue.Original, vue.Outside)
+	}
+	if len(vue.Links) != 3 {
+		t.Fatalf("vue links = %+v, want 3", vue.Links)
+	}
+
+	// 原件就在 Agent 目录里且无其他 Agent：0 个链接
+	gf := l.DeleteTarget(l.Get("git-flow"))
+	if gf.Original != "~/.claude/skills/git-flow" || len(gf.Links) != 0 {
+		t.Fatalf("git-flow target = %+v", gf)
+	}
+
+	// 项目技能带全局链接：标出 Global=true
+	var rc *Skill
+	for _, s := range l.Skills {
+		if s.Source == Project && s.Name == "release-checklist" {
+			rc = s
+			break
+		}
+	}
+	pt := l.DeleteTarget(rc)
+	if pt.Original != "~/code/storefront/.agents/skills/release-checklist" {
+		t.Fatalf("release-checklist original = %q", pt.Original)
+	}
+	if len(pt.Links) != 1 || pt.Links[0].Path != "~/.claude/skills/release-checklist" || !pt.Links[0].Global {
+		t.Fatalf("release-checklist links = %+v", pt.Links)
+	}
+}
+
+func TestProjectDeleteTargetWarnsWhenLinkPointsOutsideSkillFolders(t *testing.T) {
+	home, h := deleteHome(t)
+	project := h("work/storefront")
+	source := filepath.Join(project, "docs/team-handbook")
+	writeSkill(t, source, "shared handbook")
+	known := filepath.Join(project, ".claude/skills")
+	writeSkill(t, filepath.Join(known, "local"), "local skill")
+	mustLink(t, source, filepath.Join(known, "team-handbook"))
+	must(t, Scan(home).AddProjects([]string{project}))
+	l := Scan(home)
+	for _, tc := range []struct {
+		name, original string
+		outside        bool
+	}{
+		{"team-handbook", source, true},
+		{"local", filepath.Join(known, "local"), false},
+	} {
+		s := l.Get(tc.name)
+		if s == nil || s.Source != Project {
+			t.Fatalf("missing project skill %s", tc.name)
+		}
+		target := l.DeleteTarget(s)
+		if target.Outside != tc.outside || target.Original != tc.original {
+			t.Errorf("%s: original=%q outside=%v", tc.name, target.Original, target.Outside)
+		}
+	}
+}
+
+func TestDeleteConfirmedKeepsLinksTheDialogDidNotList(t *testing.T) {
+	// Given 确认框打开时 design-lab 还没有链接（列出的链接为空），
+	// 之后 Claude Code 目录里出现了指向它的链接
+	home, h := deleteHome(t)
+	l := Scan(home)
+	s := l.Get("design-lab")
+	target := l.DeleteTarget(s)
+	if len(target.Links) != 1 {
+		t.Fatalf("design-lab links = %+v, want the Claude Code link", target.Links)
+	}
+	target.Links = nil
+
+	// When 按确认框里的内容删除
+	d, err := l.DeleteConfirmed(target)
+	must(t, err)
+
+	// Then 原件移走，没列出的链接留着不动
+	if exists(h(".agents/skills/design-lab")) {
+		t.Error("the original should be moved to the Trash")
+	}
+	if !isLink(h(".claude/skills/design-lab")) {
+		t.Error("a link the dialog did not list should be left alone")
+	}
+
+	// And 撤销照样能放回原件
+	must(t, l.Undo(d))
+	if !exists(h(".agents/skills/design-lab")) {
+		t.Error("undo should put the original back")
+	}
+}
+
+func TestDeleteConfirmedRemovesTheListedLinks(t *testing.T) {
+	home, h := deleteHome(t)
+	l := Scan(home)
+	_, err := l.DeleteConfirmed(l.DeleteTarget(l.Get("design-lab")))
+	must(t, err)
+	if isLink(h(".claude/skills/design-lab")) {
+		t.Error("the listed link should be removed")
+	}
+}
+
+func TestSampleDeleteTargetKeepsAbsoluteAgentDirs(t *testing.T) {
+	l := Sample()
+	s := l.Get("git-flow")
+	id := customPrefix + "/opt/agent/skills"
+	l.custom = append(l.custom, Agent{ID: id, Name: "agent", Skills: "/opt/agent/skills"})
+	s.Enabled = append(slices.Clone(s.Enabled), id)
+	if len(s.Available) > 0 {
+		s.Available = append(slices.Clone(s.Available), id)
+	}
+	dt := l.DeleteTarget(s)
+	want := filepath.Join("/opt/agent/skills", "git-flow")
+	if !slices.ContainsFunc(dt.Links, func(ln DeleteLink) bool { return ln.Path == want }) {
+		t.Fatalf("links = %+v, want %s", dt.Links, want)
 	}
 }

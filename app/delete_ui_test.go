@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/egoist/mygo/ui"
+
+	"skillmanager/internal/library"
 )
 
 // hover 把指针移到 text 上。
@@ -37,10 +39,29 @@ func TestUserSeesWhichAgentsLoseTheSkillBeforeDeleting(t *testing.T) {
 	// When 从详情栏的「…」菜单选「删除技能…」
 	askToDelete(t, tt, "vue-best-practices")
 
-	// Then 确认框按 Agent 写出谁会读不到它，按钮是「移到废纸篓」
-	for _, want := range []string{"删除 vue-best-practices？", "删掉它目录里的链接", "读的是技能库，原件移走后就没有了", "移到废纸篓", "取消"} {
+	// Then 确认框先列出原件路径和链接路径，再紧凑列出受影响的 Agent，去掉「同上」和逐行扫描说明
+	for _, want := range []string{
+		"删除 vue-best-practices？",
+		"原件会移到废纸篓，指向它的 3 个链接一并删除。",
+		"涉及的文件",
+		"~/.agents/skills/vue-best-practices",
+		"~/.claude/skills/vue-best-practices",
+		"原件",
+		"链接",
+		"以下 5 个 Agent 将无法使用",
+		"Claude Code",
+		"Codex",
+		"Cursor",
+		"移到废纸篓",
+		"取消",
+	} {
 		if !tt.HasText(want) {
 			t.Errorf("确认框缺少 %q：%q", want, tt.Texts())
+		}
+	}
+	for _, forbid := range []string{"同上", "读的是技能库，原件移走后就没有了"} {
+		if tt.HasText(forbid) {
+			t.Errorf("确认框不应再出现旧的冗长提示 %q：%q", forbid, tt.Texts())
 		}
 	}
 
@@ -98,8 +119,8 @@ func TestUserUndoesTheLastDeletionWithCmdZ(t *testing.T) {
 }
 
 func TestHoveringMyCardOffersPreviewRevealAndDelete(t *testing.T) {
-	// Given 浏览我的技能
-	_, tt := newTester(t)
+	// Given 浏览我的技能，未选中任何卡片
+	a, tt := newTester(t)
 
 	// When 指针停在 vue-best-practices 的卡片上
 	hover(t, tt, "vue-best-practices")
@@ -113,10 +134,37 @@ func TestHoveringMyCardOffersPreviewRevealAndDelete(t *testing.T) {
 
 	// When 点「删除」
 	must(t, tt.Click("删除"))
+	tt.Advance(paneDuration)
 
-	// Then 弹出确认框
+	// Then 弹出确认框，且不选中卡片、不唤起右侧详情抽屉
 	if !tt.HasText("删除 vue-best-practices？") {
 		t.Errorf("应弹出确认框：%q", tt.Texts())
+	}
+	if a.selected != nil {
+		t.Errorf("点悬停的「删除」不应选中卡片或唤起详情栏：selected = %q", a.selected.Name)
+	}
+}
+
+func TestClickingHoverDeleteKeepsExistingSelectionUnchanged(t *testing.T) {
+	// Given 已选中 brainstorming（详情栏显示它）
+	a, tt := newTester(t)
+	must(t, tt.Click("brainstorming"))
+	tt.Advance(paneDuration)
+	if a.selected == nil || a.selected.Name != "brainstorming" {
+		t.Fatalf("应先选中 brainstorming，实际 selected = %v", a.selected)
+	}
+
+	// When 指针停在另一张卡片 vue-best-practices 上并点「删除」
+	hover(t, tt, "vue-best-practices")
+	must(t, tt.Click("删除"))
+	tt.Advance(paneDuration)
+
+	// Then 弹出 vue-best-practices 的删除确认框，原选中项保持 brainstorming 不变
+	if !tt.HasText("删除 vue-best-practices？") {
+		t.Errorf("应弹出确认框：%q", tt.Texts())
+	}
+	if a.selected == nil || a.selected.Name != "brainstorming" {
+		t.Errorf("点另一张卡片的「删除」不应改变原选中项：selected = %v", a.selected)
 	}
 }
 
@@ -263,6 +311,82 @@ func TestUserLeavesBulkDeleteWithEscape(t *testing.T) {
 	}
 }
 
+func TestBatchDeleteConfirmShowsEachSkillPathAndAffectedAgents(t *testing.T) {
+	// Given 准备批量删除 git-flow、dataviz、design-lab
+	a, tt := newTester(t)
+
+	// When 发起批量删除
+	a.requestDelete(a.lib.Get("git-flow"), a.lib.Get("dataviz"), a.lib.Get("design-lab"))
+	tt.Frame()
+
+	// Then 确认框列出每个技能的原件路径、附加链接数和受影响 Agent 汇总
+	for _, want := range []string{
+		"删除 3 个技能？",
+		"原件会移到废纸篓，指向它们的 1 个链接一并删除。",
+		"将移到废纸篓的技能",
+		"~/.claude/skills/git-flow",
+		"~/.claude/skills/dataviz",
+		"~/.agents/skills/design-lab",
+		"另有 1 个链接",
+		"以下 4 个 Agent 将受影响",
+	} {
+		if !tt.HasText(want) {
+			t.Errorf("批量删除确认框缺少 %q：%q", want, tt.Texts())
+		}
+	}
+}
+
+func TestDeleteConfirmHighlightsGlobalProjectLinkAndOutsideOriginal(t *testing.T) {
+	// Given 一个带全局链接的项目技能 release-checklist
+	a, tt := newTester(t)
+	var projSkill *library.Skill
+	for _, s := range a.lib.Skills {
+		if s.Source == library.Project && s.Name == "release-checklist" {
+			projSkill = s
+			break
+		}
+	}
+	if projSkill == nil {
+		t.Fatal("未找到示例项目技能 release-checklist")
+	}
+
+	// When 发起删除
+	a.requestDelete(projSkill)
+	tt.Frame()
+
+	// Then 确认框列出项目原件路径和全局链接路径，并给出全局影响说明
+	for _, want := range []string{
+		"~/code/storefront/.agents/skills/release-checklist",
+		"~/.claude/skills/release-checklist",
+		"全局链接",
+		"删掉全局链接后，Claude Code 在任何项目里都读不到它。",
+	} {
+		if !tt.HasText(want) {
+			t.Errorf("项目技能确认框缺少 %q：%q", want, tt.Texts())
+		}
+	}
+
+	// Given 一个原件在技能目录之外的技能
+	s := a.lib.Get("design-lab")
+	s.Real = "/tmp/outside-skills/design-lab"
+	a.lib.Home = "/Users/someone"
+
+	// When 发起删除
+	a.requestDelete(s)
+	tt.Frame()
+
+	// Then 原件路径下方出现目录外风险提示
+	for _, want := range []string{
+		"原件位于技能目录之外，会整个移到废纸篓。",
+		"/tmp/outside-skills/design-lab",
+		"原件在技能目录之外，请确认这不是仍在使用的文件夹",
+	} {
+		if !tt.HasText(want) {
+			t.Errorf("外部原件确认框缺少 %q：%q", want, tt.Texts())
+		}
+	}
+}
+
 // SNAPSHOT_DIR=… go test -run DeleteSnapshots 输出删除相关界面的截图。
 func TestDeleteSnapshots(t *testing.T) {
 	dir := os.Getenv("SNAPSHOT_DIR")
@@ -292,6 +416,20 @@ func TestDeleteSnapshots(t *testing.T) {
 			a.scope = scopeUsage
 			a.requestDelete(a.lib.Get("git-flow"), a.lib.Get("dataviz"), a.lib.Get("design-lab"))
 		},
+		"del-project": func(a *app, _ *ui.Tester) {
+			for _, s := range a.lib.Skills {
+				if s.Source == library.Project && s.Name == "release-checklist" {
+					a.requestDelete(s)
+					return
+				}
+			}
+		},
+		"del-outside": func(a *app, _ *ui.Tester) {
+			s := a.lib.Get("design-lab")
+			s.Real = "/Users/someone/Documents/my-skills/design-lab"
+			a.lib.Home = "/Users/someone"
+			a.requestDelete(s)
+		},
 	} {
 		a, tt := newTester(t)
 		tt.SetScale(2)
@@ -300,5 +438,38 @@ func TestDeleteSnapshots(t *testing.T) {
 		tt.Frame()
 		tt.Advance(paneDuration)
 		writePNG(t, filepath.Join(dir, name+".png"), tt)
+	}
+}
+
+func TestDeleteDialogRefreshesLinkPreviewWhenReopened(t *testing.T) {
+	home := t.TempDir()
+	source := filepath.Join(home, ".agents", "skills", "handbook")
+	must(t, os.MkdirAll(source, 0755))
+	must(t, os.WriteFile(filepath.Join(source, "SKILL.md"), []byte("# Handbook"), 0644))
+	dir := filepath.Join(home, ".claude", "skills")
+	must(t, os.MkdirAll(dir, 0755))
+	link := filepath.Join(dir, "handbook")
+	must(t, os.Symlink(source, link))
+	a := newApp(library.Scan(home))
+	s := a.lib.Get("handbook")
+	if s == nil {
+		t.Fatal("missing handbook")
+	}
+	tt := newUITester(a.view, 1280, 800)
+	a.requestDelete(s)
+	tt.Frame()
+	if !tt.HasText(a.lib.Display(link)) {
+		t.Fatal("expected the linked path in the preview")
+	}
+	must(t, os.Remove(link))
+	tt.Frame()
+	if !tt.HasText(a.lib.Display(link)) {
+		t.Fatal("redrawing changed the open preview")
+	}
+	must(t, tt.Click("取消"))
+	a.requestDelete(s)
+	tt.Frame()
+	if tt.HasText(a.lib.Display(link)) {
+		t.Fatal("reopened preview contains a removed link")
 	}
 }

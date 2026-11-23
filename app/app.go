@@ -73,10 +73,12 @@ type app struct {
 	pinDir      float32                     // 顶部标题栏上次换组的方向：1 往下滚，-1 往上滚
 	hist        history                     // 页面栈：后退、前进（history.go）
 
-	readerRaw       bool
-	readerEditor    *editor.State
-	readerEditorKey string
-	readerImages    map[string]ui.ImageSource
+	revealReaderFile bool
+	readerAnchor     string // 阅读页下一次渲染文档时滚到的标题，只用一次
+	readerRaw        bool
+	readerEditor     *editor.State
+	readerEditorKey  string
+	readerImages     map[string]ui.ImageSource
 
 	sideBar      ui.Handle            // 侧边栏，查它有没有焦点
 	projectsOpen bool                 // 侧边栏「项目」展开
@@ -331,6 +333,8 @@ func (a *app) open(s *library.Skill) {
 func (a *app) showReader(s *library.Skill) {
 	a.lib.LoadFiles(s)
 	a.reading, a.file = s, 0
+	a.readerAnchor = ""
+	a.revealReaderFile = false
 	a.readerRaw, a.readerEditor, a.readerEditorKey, a.readerImages = false, nil, "", nil
 	a.readerIn = true
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/url"
 	"path"
 	"path/filepath"
 	"slices"
@@ -140,8 +141,11 @@ func (a *app) fileList(c *ui.Context, s *library.Skill, fresh bool) {
 					AlignItems(ui.Center).Label(f.Path)
 				selectableRow(row, i == a.file, colInkSelected)
 				if row.Clicked() {
-					a.file = i
-					a.readerRaw, a.readerEditor, a.readerEditorKey = false, nil, ""
+					a.selectReaderFile(i)
+				}
+				if i == a.file && a.revealReaderFile {
+					row.ScrollIntoView()
+					a.revealReaderFile = false
 				}
 				row.Children(func() {
 					ui.Icon(c, iconDoc).Size(14, 14).TextColor(colTextMuted).Shrink(0)
@@ -154,6 +158,35 @@ func (a *app) fileList(c *ui.Context, s *library.Skill, fresh bool) {
 			}
 		})
 	})
+}
+
+func (a *app) selectReaderFile(index int) {
+	a.file = index
+	a.readerRaw, a.readerEditor, a.readerEditorKey = false, nil, ""
+	a.readerAnchor = ""
+}
+
+func (a *app) openReaderLink(s *library.Skill, from, dest string) {
+	if ui.SafeToOpen(dest) {
+		a.openExternalURL(dest)
+		return
+	}
+	u, err := url.Parse(dest)
+	if err != nil || u.IsAbs() || u.Host != "" || strings.HasPrefix(dest, "//") || path.IsAbs(u.Path) {
+		return
+	}
+	if u.Path != "" {
+		target := path.Join(path.Dir(from), u.Path)
+		index := slices.IndexFunc(s.Files, func(f library.File) bool { return f.Path == target })
+		if index < 0 {
+			return
+		}
+		a.selectReaderFile(index)
+		a.revealReaderFile = true
+	}
+	if u.Fragment != "" {
+		a.readerAnchor = u.Fragment
+	}
 }
 
 func indent(dir string) float32 {
@@ -268,6 +301,7 @@ func (a *app) readerBody(c *ui.Context, s *library.Skill, f library.File, fresh 
 // document 渲染 Markdown 文件：SKILL.md 的 name / description 做成页头，其余原样渲染。
 func (a *app) document(c *ui.Context, s *library.Skill, f library.File, fresh bool) {
 	a.md.Theme = readerMarkdownTheme(c)
+	a.md.OnLink = func(dest string) { a.openReaderLink(s, f.Path, dest) }
 	if strings.EqualFold(f.Path, "SKILL.md") {
 		md := library.ParseSkillMD(f.Content)
 		name := md.Name
@@ -285,11 +319,19 @@ func (a *app) document(c *ui.Context, s *library.Skill, f library.File, fresh bo
 		})
 		fadeIn(ui.Column(c).Gap(16), fresh, 260*time.Millisecond).Children(func() {
 			ui.Divider(c)
-			markdown.View(c, md.Body, &a.md)
+			a.markdownView(c, md.Body)
 		})
 		return
 	}
-	fadeIn(ui.Column(c).Gap(16), fresh, 220*time.Millisecond).Children(func() { markdown.View(c, f.Content, &a.md) })
+	fadeIn(ui.Column(c).Gap(16), fresh, 220*time.Millisecond).Children(func() { a.markdownView(c, f.Content) })
+}
+
+// markdownView 渲染阅读页的 Markdown。点链接要去的标题只交给这一次渲染：
+// markdown.View 在文档变了且 Anchor 不空时会再滚过去，留着它的话，切原文视图
+// 或重新扫描后又会跳回那个标题。
+func (a *app) markdownView(c *ui.Context, src string) {
+	a.md.Anchor, a.readerAnchor = a.readerAnchor, ""
+	markdown.View(c, src, &a.md)
 }
 
 // readerMarkdownTheme 是阅读页的 Markdown 主题：框架默认的配色与代码高亮，
