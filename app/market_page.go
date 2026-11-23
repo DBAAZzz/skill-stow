@@ -831,8 +831,11 @@ func (a *app) marketHandleNavigation(c *ui.Context, mode marketMode) {
 
 func (a *app) marketMainWithPane(c *ui.Context, mode marketMode) {
 	a.marketHandleNavigation(c, mode)
+	// 先拍下本帧开头选中的条目，避免同一帧点击取消选中或点「查看并添加」后空指针解引用。
+	var sel library.MarketItem
 	pane := a.mkt.selected != nil
 	if pane {
+		sel = *a.mkt.selected
 		a.paneRoom = inspectorWidth + 1
 	}
 	ui.Row(c).Grow(1).MinHeight(0).AlignItems(ui.Stretch).Children(func() {
@@ -845,7 +848,6 @@ func (a *app) marketMainWithPane(c *ui.Context, mode marketMode) {
 			a.marketBrowseBody(c, pane)
 		})
 		if pane {
-			sel := *a.mkt.selected
 			ui.Row(c.Key("market-pane")).Shrink(0).AlignItems(ui.Stretch).Transition(paneTransition).Children(func() {
 				ui.Box(c).Width(1).Background(colBorderDefault)
 				a.marketPane(c, sel, mode == marketModeSearch)
@@ -987,29 +989,31 @@ func (a *app) marketSearchGroupSection(c *ui.Context, src library.MarketSource, 
 	if !expanded && len(items) > 4 {
 		shown = items[:4]
 	}
-	ui.Row(c).Height(34).Padding(0, 10, 6, 10).Gap(8).AlignItems(ui.End).Children(func() {
-		ui.Text(c, marketSourceName(src)).FontSize(12).FontWeight(600).TextColor(colTextBody).SingleLine()
-		ui.Text(c, unitHint).FontSize(12).TextColor(colTextMuted).SingleLine()
-		ui.Spacer(c)
-		if err == nil && len(items) > 4 {
-			btnLabel := locales.MarketShowAll()
-			if expanded {
-				btnLabel = locales.ShowLess()
-			}
-			if linkButton(c, btnLabel).Clicked() {
+	ui.Column(c.Key(string(src))).Children(func() {
+		ui.Row(c).Height(34).Padding(0, 10, 6, 10).Gap(8).AlignItems(ui.End).Children(func() {
+			ui.Text(c, marketSourceName(src)).FontSize(12).FontWeight(600).TextColor(colTextBody).SingleLine()
+			ui.Text(c, unitHint).FontSize(12).TextColor(colTextMuted).SingleLine()
+			ui.Spacer(c)
+			if err == nil && len(items) > 4 {
+				btnLabel := locales.MarketShowAll()
 				if expanded {
-					a.mkt.searchExpand = ""
-				} else {
-					a.mkt.searchExpand = src
+					btnLabel = locales.ShowLess()
+				}
+				if linkButton(c, btnLabel).Clicked() {
+					if expanded {
+						a.mkt.searchExpand = ""
+					} else {
+						a.mkt.searchExpand = src
+					}
 				}
 			}
+		})
+		if err != nil {
+			ui.Text(c, locales.MarketSourceUnavailable(marketSourceName(src))).FontSize(12.5).TextColor(colTextSecondary).Padding(8, 10)
+			return
 		}
+		a.marketItemsGrid(c, cols, shown, false, true)
 	})
-	if err != nil {
-		ui.Text(c, locales.MarketSourceUnavailable(marketSourceName(src))).FontSize(12.5).TextColor(colTextSecondary).Padding(8, 10)
-		return
-	}
-	a.marketItemsGrid(c, cols, shown, false, true)
 }
 
 func (a *app) marketItemsGrid(c *ui.Context, cols int, items []library.MarketItem, inTopic, isSearch bool) {
@@ -1152,7 +1156,11 @@ func (a *app) marketItemIcon(c *ui.Context, it library.MarketItem, size, radius,
 	} else if it.Owner != "" {
 		src = a.srcIcons["gh:"+it.Owner]
 	}
-	box := ui.Box(c).Size(size, size).Shrink(0).Radius(radius).Clip().Background(colBgLogo).Center()
+	bg := colBgControl
+	if src != nil {
+		bg = colBgLogo
+	}
+	box := ui.Box(c).Size(size, size).Shrink(0).Radius(radius).Clip().Background(bg).Center()
 	hairline(box, 0.16)
 	box.Children(func() {
 		if src != nil {

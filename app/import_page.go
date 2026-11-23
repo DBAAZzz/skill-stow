@@ -530,7 +530,7 @@ func (a *app) importSourceIcon(c *ui.Context, b *library.ImportBatch) {
 		if logoBox(a.srcIcons["clawhub.ai"]) {
 			return
 		}
-		box := ui.Box(c).Size(34, 34).Radius(8).Background(colBgLogo).Center().Shrink(0)
+		box := ui.Box(c).Size(34, 34).Radius(8).Background(colBgControl).Center().Shrink(0)
 		hairline(box, 0.16)
 		box.Children(func() { ui.Icon(c, iconClawHub).Size(18, 18).TextColor(colTextPrimary) })
 	default:

@@ -461,16 +461,16 @@ func (sampleMarketTransport) RoundTrip(req *http.Request) (*http.Response, error
 	u := req.URL
 	var body []byte
 	status := http.StatusOK
-	switch u.Path {
-	case "/market-extras.json":
+	switch {
+	case strings.HasSuffix(u.Path, "/market-extras.json"):
 		body, _ = json.Marshal(sampleMarketExtras())
-	case "/api/skills/all-time/0":
+	case u.Path == "/api/skills/all-time/0":
 		body, _ = json.Marshal(skillsShFeedPayload{Skills: sampleSkillsShAllTime, Total: 9905, HasMore: false, Page: 0})
-	case "/api/skills/trending/0":
+	case u.Path == "/api/skills/trending/0":
 		body, _ = json.Marshal(skillsShFeedPayload{Skills: sampleSkillsShTrending, Total: 9966, HasMore: false, Page: 0})
-	case "/api/skills/hot/0":
+	case u.Path == "/api/skills/hot/0":
 		body, _ = json.Marshal(skillsShFeedPayload{Skills: sampleSkillsShHot, Total: 4737, HasMore: false, Page: 0})
-	case "/api/search":
+	case u.Path == "/api/search":
 		q := strings.ToLower(strings.TrimSpace(u.Query().Get("q")))
 		var hits []skillsShSkill
 		for _, s := range sampleSkillsShSearchItems() {
@@ -481,7 +481,7 @@ func (sampleMarketTransport) RoundTrip(req *http.Request) (*http.Response, error
 		body, _ = json.Marshal(struct {
 			Skills []skillsShSkill `json:"skills"`
 		}{Skills: hits})
-	case "/api/v1/skills":
+	case u.Path == "/api/v1/skills":
 		cat := strings.TrimSpace(u.Query().Get("category"))
 		var hits []clawHubListItem
 		for _, it := range sampleClawHubItems {
@@ -490,7 +490,7 @@ func (sampleMarketTransport) RoundTrip(req *http.Request) (*http.Response, error
 			}
 		}
 		body, _ = json.Marshal(clawHubListPayload{Items: hits})
-	case "/api/v1/search":
+	case u.Path == "/api/v1/search":
 		q := strings.ToLower(strings.TrimSpace(u.Query().Get("q")))
 		var res []clawHubSearchResult
 		for _, it := range sampleClawHubSearchItems() {
