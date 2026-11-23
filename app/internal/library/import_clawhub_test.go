@@ -40,10 +40,10 @@ func clawHubZip(t *testing.T, files map[string]string) []byte {
 func TestClawHubSkillDownloadsZipAndRecordsClawHubLockEntry(t *testing.T) {
 	home, h := importHome(t)
 	payload := clawHubZip(t, map[string]string{
-		"SKILL.md":       "---\nname: pdf\ndescription: PDF tools\n---\n# pdf\n\nBody text\n",
+		"SKILL.md":        "---\nname: pdf\ndescription: PDF tools\n---\n# pdf\n\nBody text\n",
 		"scripts/run.sh*": "#!/bin/sh\necho ok\n",
-		"_meta.json":     `{"slug":"pdf","version":"0.1.0"}`,
-		"skill-card.md":  "## Description\nPDF tools\n",
+		"_meta.json":      `{"slug":"pdf","version":"0.1.0"}`,
+		"skill-card.md":   "## Description\nPDF tools\n",
 	})
 	var gotSlug, gotOwner string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -116,7 +116,7 @@ func TestClawHubSkillDownloadsZipAndRecordsClawHubLockEntry(t *testing.T) {
 func TestClawHubSkillWithUppercaseFrontmatterNameInstallsBySlug(t *testing.T) {
 	home, h := importHome(t)
 	payload := clawHubZip(t, map[string]string{
-		"SKILL.md":          "---\nname: SkillScan\ndescription: Security gate\n---\n# SkillScan\n",
+		"SKILL.md":           "---\nname: SkillScan\ndescription: Security gate\n---\n# SkillScan\n",
 		"scripts/scanner.py": "print('ok')\n",
 	})
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -290,7 +290,7 @@ func TestReadClawHubImportUsesDefaultClawHubEndpoint(t *testing.T) {
 	})}
 	src, err := ParseImportInput("https://clawhub.ai/awspace/skills/pdf")
 	must(t, err)
-	b, err := ReadClawHubImport(context.Background(), home, client, src, nil)
+	b, err := ReadClawHubImport(context.Background(), home, client, nil, src, nil)
 	must(t, err)
 	defer b.Discard()
 	if gotURL != "https://clawhub.ai/api/v1/download?ownerHandle=awspace&slug=pdf" {
@@ -298,5 +298,74 @@ func TestReadClawHubImportUsesDefaultClawHubEndpoint(t *testing.T) {
 	}
 	if b.Skill("pdf") == nil || b.Skill("pdf").Description != "PDF tools" {
 		t.Errorf("unexpected batch = %+v", b.Skills)
+	}
+}
+
+// clawHubHandoff 是 ClawHub 下载接口对「由公开 GitHub 仓库托管」的技能的回应：不给 zip，只给源仓库。
+func clawHubHandoff(repo, dir string) *http.Client {
+	body, _ := json.Marshal(map[string]string{
+		"sourceRef": "public-github", "repo": repo, "commit": "0123abc", "path": dir,
+		"contentHash": "h", "archiveUrl": "https://codeload.github.com/" + repo + "/tar.gz/0123abc",
+	})
+	return &http.Client{Transport: roundTripFunc(func(r *http.Request) (*http.Response, error) {
+		rec := httptest.NewRecorder()
+		rec.Header().Set("Content-Type", "application/json")
+		rec.Write(body)
+		return rec.Result(), nil
+	})}
+}
+
+func TestAddingAGitHubBackedClawHubSkillReadsItFromGitHubSoUpdatesFollowIt(t *testing.T) {
+	home, _ := importHome(t)
+	f := newFakeImport()
+	f.publish(t, "acme/tools", map[string]string{
+		"skills/pdf/SKILL.md":    "---\nname: pdf\ndescription: PDF tools\n---\n",
+		"skills/pdf/fill.py":     "print(1)\n",
+		"skills/sheets/SKILL.md": "---\nname: sheets\ndescription: Sheets\n---\n",
+	})
+	src, err := ParseImportInput("https://clawhub.ai/acme/skills/pdf")
+	must(t, err)
+
+	for _, dir := range []string{"skills/pdf", "/skills/pdf/", "skills/pdf/SKILL.md"} {
+		t.Run(dir, func(t *testing.T) {
+			// When ClawHub 回应这个技能在 GitHub 仓库 acme/tools 的 skills/pdf
+			b, err := ReadClawHubImport(context.Background(), home, clawHubHandoff("acme/tools", dir), f, src, nil)
+			must(t, err)
+			defer b.Discard()
+
+			// Then 改从 GitHub 读这一个技能，记成 GitHub 来源，「更新 Skill」才查得到它
+			if b.Source.Kind != ImportGitHub || b.Source.Repo != "acme/tools" || b.Source.Ref != "" {
+				t.Fatalf("来源 = %+v，应是 GitHub acme/tools 的默认分支", b.Source)
+			}
+			if got := batchNames(b); !slices.Equal(got, []string{"pdf"}) {
+				t.Fatalf("只应读 skills/pdf：%v", got)
+			}
+			rec := lockRecordFor(b, b.Skill("pdf"))
+			if rec.SourceType != "github" || rec.SkillPath != "skills/pdf/SKILL.md" || rec.Ref != "" {
+				t.Errorf("安装记录 = %+v，应是跟默认分支的 GitHub 记录", rec)
+			}
+		})
+	}
+}
+
+func TestAGitHubBackedClawHubSkillWithAnUnusableSourceIsRefused(t *testing.T) {
+	home, _ := importHome(t)
+	f := newFakeImport()
+	src, err := ParseImportInput("https://clawhub.ai/acme/skills/pdf")
+	must(t, err)
+	for _, c := range []struct{ repo, dir string }{
+		{"acme", "skills/pdf"},
+		{"../acme/tools", "skills/pdf"},
+		{"acme/tools", "../outside"},
+		{"acme/tools", "skills/../../outside"},
+	} {
+		_, err := ReadClawHubImport(context.Background(), home, clawHubHandoff(c.repo, c.dir), f, src, nil)
+		var ie *ImportError
+		if !errors.As(err, &ie) {
+			t.Errorf("repo=%q path=%q 应拒绝并给出说明，得到 %v", c.repo, c.dir, err)
+		}
+	}
+	if len(f.calls) != 0 {
+		t.Errorf("来源不可用时不应请求 GitHub：%v", f.calls)
 	}
 }

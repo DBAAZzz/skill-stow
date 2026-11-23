@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -33,13 +34,50 @@ type ClawHub struct {
 }
 
 // ReadClawHubImport downloads and validates a ClawHub skill package into staging.
-func ReadClawHubImport(ctx context.Context, home string, client *http.Client, src ImportSource, progress func(ImportProgress)) (*ImportBatch, error) {
+// A skill that ClawHub serves from a public GitHub repository is read from that
+// repository through gh instead, so it is recorded as a GitHub source and takes
+// part in skill updates; gh may be nil only when no such skill is expected.
+func ReadClawHubImport(ctx context.Context, home string, client *http.Client, gh ImportRemote, src ImportSource, progress func(ImportProgress)) (*ImportBatch, error) {
 	c := &ClawHub{
 		Base:    defaultClawHubBase,
 		Client:  client,
 		MaxWait: clawHubMaxWait,
 	}
-	return c.ReadImport(ctx, home, src, progress)
+	b, err := c.ReadImport(ctx, home, src, progress)
+	var backed *GitHubBackedSkill
+	if errors.As(err, &backed) && gh != nil {
+		return ReadGitHubImport(ctx, home, gh, backed.Source, progress)
+	}
+	return b, err
+}
+
+// GitHubBackedSkill is returned by ClawHub.ReadImport for a skill whose files
+// ClawHub does not host: Source is the GitHub source to read it from instead,
+// following the default branch so later updates come from GitHub.
+type GitHubBackedSkill struct{ Source ImportSource }
+
+func (e *GitHubBackedSkill) Error() string { return locales.ImportUnsupportedSource() }
+
+// githubBackedSource turns ClawHub's public-github handoff into a GitHub
+// source; ok is false when the repository or path cannot be used safely.
+func githubBackedSource(repo, dir string) (ImportSource, bool) {
+	owner, name, ok := strings.Cut(strings.Trim(repo, "/"), "/")
+	name = strings.TrimSuffix(name, ".git")
+	if !ok || !ghOwner.MatchString(owner) || !ghRepo.MatchString(name) || name == "." || name == ".." {
+		return ImportSource{}, false
+	}
+	sub := strings.Trim(dir, "/")
+	if strings.EqualFold(path.Base(sub), "SKILL.md") {
+		sub = path.Dir(sub)
+	}
+	switch sub = path.Clean(sub); {
+	case sub == ".":
+		sub = ""
+	case sub == ".." || strings.HasPrefix(sub, "../"):
+		return ImportSource{}, false
+	}
+	repo = owner + "/" + name
+	return ImportSource{Kind: ImportGitHub, Input: "https://github.com/" + repo, Repo: repo, Subpath: sub}, true
 }
 
 // ReadImport downloads a ClawHub skill archive via /api/v1/download?slug=&ownerHandle=,
@@ -79,8 +117,12 @@ func (c *ClawHub) ReadImport(ctx context.Context, home string, src ImportSource,
 			var handoff struct {
 				SourceRef string `json:"sourceRef"`
 				Repo      string `json:"repo"`
+				Path      string `json:"path"`
 			}
 			if json.Unmarshal(data, &handoff) == nil && handoff.SourceRef == "public-github" && handoff.Repo != "" {
+				if gh, ok := githubBackedSource(handoff.Repo, handoff.Path); ok {
+					return nil, &GitHubBackedSkill{Source: gh}
+				}
 				return nil, &ImportError{Msg: locales.ImportUnsupportedSource(), Hint: handoff.Repo}
 			}
 		}

@@ -219,7 +219,7 @@ func (a *app) readRemote(src library.ImportSource) {
 		case library.ImportWebsite:
 			return library.ReadWebsiteImport(ctx, l.Home, r.Web, src, progress)
 		case library.ImportClawHub:
-			return library.ReadClawHubImport(ctx, l.Home, r.Web, src, progress)
+			return library.ReadClawHubImport(ctx, l.Home, r.Web, r, src, progress)
 		default:
 			return library.ReadGitHubImport(ctx, l.Home, r, src, progress)
 		}
