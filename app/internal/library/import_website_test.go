@@ -105,7 +105,7 @@ func TestAWebsiteIndexIsReadFileByFile(t *testing.T) {
 	must(t, err)
 
 	if got := batchNames(b); !slices.Equal(got, []string{"lesson", "quiz"}) {
-		t.Fatalf("技能 = %v", got)
+		t.Fatalf("Skill = %v", got)
 	}
 	if b.Protocol != "0.1.0" || b.Site != "127.0.0.1" || b.BaseURL != site.srv.URL+"/docs" {
 		t.Errorf("来源 = %s %s %s", b.Protocol, b.Site, b.BaseURL)
@@ -198,10 +198,10 @@ func TestANamedWebsiteSkillIsTheOnlyOneRead(t *testing.T) {
 	b, err := readSite(t, home, src)
 	must(t, err)
 	if got := batchNames(b); !slices.Equal(got, []string{"quiz"}) || b.Hidden != 1 {
-		t.Fatalf("技能 = %v，隐藏 %d", got, b.Hidden)
+		t.Fatalf("Skill = %v，隐藏 %d", got, b.Hidden)
 	}
 	if slices.ContainsFunc(site.hits, func(p string) bool { return strings.Contains(p, "/lesson/") }) {
-		t.Errorf("没指名的技能不应下载：%v", site.hits)
+		t.Errorf("没指名的 Skill 不应下载：%v", site.hits)
 	}
 	src.All = true
 	all, err := readSite(t, home, src)
@@ -252,13 +252,13 @@ func TestAPageThatIsNotAnIndexIsNotASkillSource(t *testing.T) {
 	src, _ := ParseImportInput(site.srv.URL)
 	_, err := readSite(t, home, src)
 	var ie *ImportError
-	if !errors.As(err, &ie) || ie.Msg != "这个地址不是技能源。" || ie.Hint != "粘贴文档里给的完整安装命令" {
+	if !errors.As(err, &ie) || ie.Msg != "这个地址不是 Skill 源。" || ie.Hint != "粘贴文档里给的完整安装命令" {
 		t.Fatalf("err = %v", err)
 	}
 
 	src.Guessed = true
 	_, err = readSite(t, home, src)
-	if !errors.As(err, &ie) || !strings.HasSuffix(ie.Msg, " 的技能不在网站根目录。") || ie.Hint != "粘贴它文档里给的完整安装命令" {
+	if !errors.As(err, &ie) || !strings.HasSuffix(ie.Msg, " 的 Skill 不在网站根目录。") || ie.Hint != "粘贴它文档里给的完整安装命令" {
 		t.Fatalf("短名字 err = %v", err)
 	}
 }
@@ -304,7 +304,7 @@ func TestAMissingFileMeansTheSkillCannotBeAdded(t *testing.T) {
 		t.Errorf("缺文件 = %q", p)
 	}
 	if b.Skill("quiz").Problem != "" {
-		t.Error("其他技能不受影响")
+		t.Error("其他 Skill 不受影响")
 	}
 }
 

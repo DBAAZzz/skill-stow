@@ -87,7 +87,7 @@ func TestSystemLanguagePicksChineseEnglishOrFallsBackToEnglish(t *testing.T) {
 
 // i18nExempt 是不算界面文案的文件：里面的中文是数据，不是给人看的界面。
 var i18nExempt = map[string]string{
-	"internal/library/sample.go": "示例数据，模拟用户自己的技能名和简介",
+	"internal/library/sample.go": "示例数据，模拟用户自己的 Skill 名和简介",
 }
 
 // cjk 报告 s 里有没有要翻译的中文：汉字、中文标点、全角字符。

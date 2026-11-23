@@ -62,13 +62,13 @@ func TestBrowseFilterByAgentAndUnboundHidesNonMatchingSkills(t *testing.T) {
 
 	// Then 只保留 Claude Code 相关技能，其他 Agent 独占与未启用技能被过滤，被滤掉的选中态同步清空
 	if !tt.HasText("systematic-debugging") || !tt.HasText("test-first") {
-		t.Fatalf("应保留 Claude Code 技能：%q", tt.Texts())
+		t.Fatalf("应保留 Claude Code Skill：%q", tt.Texts())
 	}
 	if tt.HasText("tailwind-rules") || tt.HasText("spark") {
-		t.Fatalf("不应再显示 Cursor 独占或未启用技能：%q", tt.Texts())
+		t.Fatalf("不应再显示 Cursor 独占或未启用 Skill：%q", tt.Texts())
 	}
 	if a.selected != nil {
-		t.Fatalf("已选技能被过滤掉时应清空选中态，实际 = %v", a.selected.Name)
+		t.Fatalf("已选 Skill 被过滤掉时应清空选中态，实际 = %v", a.selected.Name)
 	}
 
 	// And 重新打开筛选菜单可以看到当前选中的 Agent 摘要
@@ -83,10 +83,10 @@ func TestBrowseFilterByAgentAndUnboundHidesNonMatchingSkills(t *testing.T) {
 
 	// Then 只显示未绑定到任何 Agent 的技能（如 spark），不包含已停用或已启用的技能
 	if !tt.HasText("spark") {
-		t.Fatalf("应显示未启用技能 spark：%q", tt.Texts())
+		t.Fatalf("应显示未启用 Skill spark：%q", tt.Texts())
 	}
 	if tt.HasText("systematic-debugging") || tt.HasText("git-flow") {
-		t.Fatalf("不应显示已绑定或已停用的技能：%q", tt.Texts())
+		t.Fatalf("不应显示已绑定或已停用的 Skill：%q", tt.Texts())
 	}
 }
 
@@ -109,17 +109,17 @@ func TestBrowseFilterByUpdatesUnusedAndDisabledCombinesAndClears(t *testing.T) {
 
 	// Then 仅展示有可用更新的技能
 	if !tt.HasText("vue-best-practices") {
-		t.Fatalf("应展示可更新技能 vue-best-practices：%q", tt.Texts())
+		t.Fatalf("应展示可更新 Skill vue-best-practices：%q", tt.Texts())
 	}
 	if tt.HasText("test-first") || tt.HasText("git-flow") {
-		t.Fatalf("不应展示无可用更新的技能：%q", tt.Texts())
+		t.Fatalf("不应展示无可用更新的 Skill：%q", tt.Texts())
 	}
 
 	// When 点「清除筛选」
 	openFilterMenu(t, tt)
 	clickMenuItem(t, tt, "清除筛选")
 	if !tt.HasText("test-first") || !tt.HasText("git-flow") {
-		t.Fatalf("清除筛选后应恢复所有技能：%q", tt.Texts())
+		t.Fatalf("清除筛选后应恢复所有 Skill：%q", tt.Texts())
 	}
 
 	// When 勾选「从没用过」
@@ -128,10 +128,10 @@ func TestBrowseFilterByUpdatesUnusedAndDisabledCombinesAndClears(t *testing.T) {
 
 	// Then 有已知调用记录且从未调用的技能保留，已知用过的技能隐藏
 	if !tt.HasText("systematic-debugging") {
-		t.Fatalf("应展示从没用过的技能 systematic-debugging：%q", tt.Texts())
+		t.Fatalf("应展示从没用过的 Skill systematic-debugging：%q", tt.Texts())
 	}
 	if tt.HasText("test-first") || tt.HasText("vue-best-practices") {
-		t.Fatalf("不应展示已调用过的技能：%q", tt.Texts())
+		t.Fatalf("不应展示已调用过的 Skill：%q", tt.Texts())
 	}
 
 	// When 叠加勾选「已停用」
@@ -143,7 +143,7 @@ func TestBrowseFilterByUpdatesUnusedAndDisabledCombinesAndClears(t *testing.T) {
 		t.Fatalf("应保留同时从没用过且已停用的 git-flow：%q", tt.Texts())
 	}
 	if tt.HasText("systematic-debugging") {
-		t.Fatalf("未停用的技能应被叠加条件排除：%q", tt.Texts())
+		t.Fatalf("未停用的 Skill 应被叠加条件排除：%q", tt.Texts())
 	}
 }
 
@@ -164,7 +164,7 @@ func TestBrowseFilterEmptyStateOffersClearAction(t *testing.T) {
 	clickMenuItem(t, tt, "已停用")
 
 	// Then 展示带「清除筛选」的空状态提示
-	if !tt.HasText("没有符合筛选条件的技能") || !tt.HasText("清除筛选") {
+	if !tt.HasText("没有符合筛选条件的 Skill") || !tt.HasText("清除筛选") {
 		t.Fatalf("筛选无结果时应提示空状态与清除筛选按钮：%q", tt.Texts())
 	}
 
@@ -173,7 +173,7 @@ func TestBrowseFilterEmptyStateOffersClearAction(t *testing.T) {
 
 	// Then 恢复正常技能列表
 	if !tt.HasText("test-first") || !tt.HasText("vue-best-practices") {
-		t.Fatalf("点击清除筛选后应恢复技能列表：%q", tt.Texts())
+		t.Fatalf("点击清除筛选后应恢复 Skill 列表：%q", tt.Texts())
 	}
 }
 
@@ -194,11 +194,11 @@ func TestBrowseFilterWorksInKanbanBoardMode(t *testing.T) {
 }
 
 func TestFrostedActionMenusOperateAcrossUpdateInspectorAndBoard(t *testing.T) {
-	// Scenario 1: 更新页面顶部「…」打开统一毛玻璃菜单并支持进入「技能更新设置…」
+	// Scenario 1: 更新页面顶部「…」打开统一毛玻璃菜单并支持进入「Skill 更新设置…」
 	a, tt := newTester(t)
-	must(t, tt.Click("技能更新"))
+	must(t, tt.Click("更新 Skill"))
 	clickMenuButton(t, tt, "更多更新操作")
-	for _, want := range []string{"已忽略的更新", "已停止检查", "其他检查结果", "技能更新设置…"} {
+	for _, want := range []string{"已忽略的更新", "已停止检查", "其他检查结果", "Skill 更新设置…"} {
 		if !tt.HasText(want) {
 			t.Fatalf("更新页「…」菜单缺少 %q：%q", want, tt.Texts())
 		}
@@ -208,7 +208,7 @@ func TestFrostedActionMenusOperateAcrossUpdateInspectorAndBoard(t *testing.T) {
 	// Scenario 2: 浏览页卡片右键打开同一套毛玻璃上下文菜单，选中卡片后详情栏「…」也可操作
 	must(t, tt.Click("我的"))
 	must(t, tt.RightClick("systematic-debugging"))
-	for _, want := range []string{"打开", "在 Finder 中显示", "在编辑器中打开", "删除技能…"} {
+	for _, want := range []string{"打开", "在 Finder 中显示", "在编辑器中打开", "删除 Skill…"} {
 		if !tt.HasText(want) {
 			t.Fatalf("右键菜单缺少 %q：%q", want, tt.Texts())
 		}
@@ -218,7 +218,7 @@ func TestFrostedActionMenusOperateAcrossUpdateInspectorAndBoard(t *testing.T) {
 	must(t, tt.Click("systematic-debugging"))
 	tt.Advance(paneDuration)
 	clickMenuButton(t, tt, "更多操作")
-	for _, want := range []string{"在 Finder 中显示", "在编辑器中打开", "删除技能…"} {
+	for _, want := range []string{"在 Finder 中显示", "在编辑器中打开", "删除 Skill…"} {
 		if !tt.HasText(want) {
 			t.Fatalf("详情栏「…」菜单缺少 %q：%q", want, tt.Texts())
 		}
@@ -323,7 +323,7 @@ func TestContextMenuAndInspectorHotkeysActOnMenuTarget(t *testing.T) {
 
 	// When 右键另一个可删除技能 systematic-debugging 并按下 ⌘⌫
 	must(t, tt.RightClick("systematic-debugging"))
-	if !tt.HasText("删除技能…") {
+	if !tt.HasText("删除 Skill…") {
 		t.Fatalf("应展开右键菜单：%q", tt.Texts())
 	}
 	tt.Key(ui.Cmd, ui.KeyBackspace)
@@ -332,7 +332,7 @@ func TestContextMenuAndInspectorHotkeysActOnMenuTarget(t *testing.T) {
 	if !a.del.confirmOpen || !tt.HasText("删除 systematic-debugging？") {
 		t.Fatalf("⌘⌫ 应作用于当前右键菜单目标 systematic-debugging，actual confirmOpen=%v texts=%q", a.del.confirmOpen, tt.Texts())
 	}
-	if tt.HasText("删除技能…") {
+	if tt.HasText("删除 Skill…") {
 		t.Fatalf("触发快捷键后右键菜单应关闭：%q", tt.Texts())
 	}
 	must(t, tt.Click("取消"))
@@ -347,7 +347,7 @@ func TestContextMenuAndInspectorHotkeysActOnMenuTarget(t *testing.T) {
 	if a.reading == nil || a.reading.Name != "systematic-debugging" {
 		t.Fatalf("右键菜单打开时按 Space 应打开 systematic-debugging，actual reading=%v", a.reading)
 	}
-	if tt.HasText("删除技能…") {
+	if tt.HasText("删除 Skill…") {
 		t.Fatalf("按 Space 打开后菜单应关闭：%q", tt.Texts())
 	}
 	tt.Key(0, ui.KeyEscape)
@@ -362,7 +362,7 @@ func TestContextMenuAndInspectorHotkeysActOnMenuTarget(t *testing.T) {
 
 	// Then 不应穿透菜单误删背景中选中的 vue-best-practices
 	if a.del.confirmOpen {
-		t.Fatalf("只读技能右键菜单打开时按 ⌘⌫ 不应触发背景选中项的删除：%q", tt.Texts())
+		t.Fatalf("只读 Skill 右键菜单打开时按 ⌘⌫ 不应触发背景选中项的删除：%q", tt.Texts())
 	}
 	a.query = ""
 	tt.Key(0, ui.KeyEscape)
@@ -377,7 +377,7 @@ func TestContextMenuAndInspectorHotkeysActOnMenuTarget(t *testing.T) {
 	if !a.del.confirmOpen || !tt.HasText("删除 vue-best-practices？") {
 		t.Fatalf("详情栏菜单打开时 ⌘⌫ 应打开删除确认框：%q", tt.Texts())
 	}
-	if tt.HasText("删除技能…") {
+	if tt.HasText("删除 Skill…") {
 		t.Fatalf("详情栏菜单在触发 ⌘⌫ 后应关闭：%q", tt.Texts())
 	}
 }
@@ -504,7 +504,7 @@ func TestFilterPrunesCollectionSelectionAndUpdatesCollectionCounts(t *testing.T)
 		t.Fatalf("筛选态集合卡片计数应体现实匹配 1/3 与工具栏一致：%q", tt.Texts())
 	}
 	if !hasTextRun(tt, "通用", "1", "1 个集合") {
-		t.Fatalf("筛选态分节计数应与匹配技能数一致，而非集合总数 3：%q", tt.Texts())
+		t.Fatalf("筛选态分节计数应与匹配 Skill 数一致，而非集合总数 3：%q", tt.Texts())
 	}
 
 	// When 异步更新报告取消 doc-coauthoring 的可更新状态（仅留集合外技能）
@@ -525,7 +525,7 @@ func TestFilterPrunesCollectionSelectionAndUpdatesCollectionCounts(t *testing.T)
 	a.upd.report.Items = append(a.upd.report.Items, library.UpdateItem{Name: "doc-coauthoring", State: library.UpdReady})
 	tt.Frame()
 	doubleClick(t, tt, "anthropics/skills")
-	if !tt.HasText("显示 1 / 3 个技能") || !tt.HasText("都在通用里") {
+	if !tt.HasText("显示 1 / 3 个 Skill") || !tt.HasText("都在通用里") {
 		t.Fatalf("打开集合页标题副文案应显示筛选匹配数与总数：%q", tt.Texts())
 	}
 	must(t, tt.Click("doc-coauthoring"))
@@ -646,7 +646,7 @@ func TestBrowseFilterIsIndependentPerScopeMineAndBuiltin(t *testing.T) {
 	clickMenuButton(t, tt, "筛选")
 	clickMenuItem(t, tt, "有可用更新")
 	if !tt.HasText("vue-best-practices") || tt.HasText("tailwind-rules") || tt.HasText("doc-coauthoring") {
-		t.Fatalf("「我的」筛选后应只显示匹配技能：%q", tt.Texts())
+		t.Fatalf("「我的」筛选后应只显示匹配 Skill：%q", tt.Texts())
 	}
 
 	// When 切换到「内置」页面
@@ -654,12 +654,12 @@ func TestBrowseFilterIsIndependentPerScopeMineAndBuiltin(t *testing.T) {
 	tt.Frame()
 
 	// Then 「内置」不应同步「我的」的筛选条件，也不能因「有可用更新」变成筛选空态
-	if tt.HasText("没有符合筛选条件的技能") {
+	if tt.HasText("没有符合筛选条件的 Skill") {
 		t.Fatalf("切换到「内置」不应继承「我的」筛选而变成空态：%q", tt.Texts())
 	}
 	for _, name := range []string{"skill-creator", "memory", "cloud-deploy"} {
 		if !tt.HasText(name) {
-			t.Fatalf("「内置」应显示全部内置技能，缺少 %s：%q", name, tt.Texts())
+			t.Fatalf("「内置」应显示全部内置 Skill，缺少 %s：%q", name, tt.Texts())
 		}
 	}
 	openFilterMenu(t, tt)
@@ -709,7 +709,7 @@ func TestBrowseFilterIsIndependentPerScopeMineAndBuiltin(t *testing.T) {
 	openFilterMenu(t, tt)
 	clickMenuItem(t, tt, "清除筛选")
 	if !tt.HasText("skill-creator") || !tt.HasText("memory") || !tt.HasText("cloud-deploy") {
-		t.Fatalf("清除「内置」筛选后应恢复显示全部内置技能：%q", tt.Texts())
+		t.Fatalf("清除「内置」筛选后应恢复显示全部内置 Skill：%q", tt.Texts())
 	}
 
 	// Then 「我的」的筛选依然保持独立存在

@@ -28,10 +28,10 @@ func TestCollectingProjectSkillCopiesIntoLibraryAndRepointsGlobalLinks(t *testin
 
 	// Then 技能库里有一份真实目录，全局链接改指向它，项目原件不动
 	if fi, err := os.Lstat(h(".agents/skills/notes-sync")); err != nil || !fi.IsDir() {
-		t.Fatalf("技能库里应有真实目录：%v", err)
+		t.Fatalf("Skill 库里应有真实目录：%v", err)
 	}
 	if real, _ := realPath(h(".claude/skills/notes-sync")); real != h(".agents/skills/notes-sync") {
-		t.Errorf("全局链接应指向技能库，实际 %s", real)
+		t.Errorf("全局链接应指向 Skill 库，实际 %s", real)
 	}
 	if _, err := os.Stat(h("code/storefront/.claude/skills/notes-sync/SKILL.md")); err != nil {
 		t.Error("项目里的原件不应动")
@@ -39,7 +39,7 @@ func TestCollectingProjectSkillCopiesIntoLibraryAndRepointsGlobalLinks(t *testin
 	l = Scan(home)
 	mine := l.Get("notes-sync")
 	if mine == nil || mine.Source != Mine {
-		t.Fatalf("应成为我的技能：%+v", mine)
+		t.Fatalf("应成为我的 Skill：%+v", mine)
 	}
 	for _, id := range readersBefore {
 		if !mine.DiscoveredIn(id) {
@@ -54,11 +54,11 @@ func TestCollectingProjectSkillCopiesIntoLibraryAndRepointsGlobalLinks(t *testin
 func TestCollectRefusesWhenLibraryHasSameName(t *testing.T) {
 	home := fakeHome(t)
 	h := func(p string) string { return filepath.Join(home, p) }
-	writeSkill(t, h(".agents/skills/notes-sync"), "技能库里已有的")
+	writeSkill(t, h(".agents/skills/notes-sync"), "Skill 库里已有的")
 	l := Scan(home)
 	s := stockDocs(t, l, h)
 	if err := l.Collect(s); err == nil {
-		t.Fatal("技能库已有同名项时应拒绝")
+		t.Fatal("Skill 库已有同名项时应拒绝")
 	}
 	if real, _ := realPath(h(".claude/skills/notes-sync")); real != h("code/storefront/.claude/skills/notes-sync") {
 		t.Errorf("拒绝时链接不应动，实际 %s", real)

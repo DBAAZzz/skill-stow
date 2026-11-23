@@ -54,7 +54,7 @@ func TestSetEnabled(t *testing.T) {
 	ro := l.Get("pdf")
 	ro.SetEnabled("cursor", true)
 	if ro.EnabledIn("cursor") {
-		t.Error("只读技能不能启用")
+		t.Error("只读 Skill 不能启用")
 	}
 }
 
@@ -69,14 +69,14 @@ func TestSampleShared(t *testing.T) {
 		t.Errorf("Separate = %v Copied = %v", l.Separate(s), s.Copied())
 	}
 	if err := l.Enable(s, "codex", false); err != nil || s.EnabledIn("codex") || !s.DiscoveredIn("codex") {
-		t.Errorf("通用技能可原生停用并保持可发现：%v", err)
+		t.Errorf("通用 Skill 可原生停用并保持可发现：%v", err)
 	}
 	if err := l.Tidy(s); err != nil || len(s.Redundant()) != 0 {
 		t.Errorf("Tidy 后不应再有多余链接：%v %v", err, s.Redundant())
 	}
 	other := l.Get("tailwind-rules")
 	if other.Shared || !slices.Equal(l.Separate(other), []string{"cursor"}) {
-		t.Errorf("不在通用目录的技能，Separate 就是 Enabled：%v", l.Separate(other))
+		t.Errorf("不在通用目录的 Skill，Separate 就是 Enabled：%v", l.Separate(other))
 	}
 }
 
@@ -97,13 +97,13 @@ func TestSampleCollections(t *testing.T) {
 		t.Errorf("Preview = %q", got)
 	}
 	if n := lark.DependedBy(l.Get("lark-meeting")); n != 2 {
-		t.Errorf("lark-meeting 被 %d 个技能依赖，应为 2", n)
+		t.Errorf("lark-meeting 被 %d 个 Skill 依赖，应为 2", n)
 	}
 	if n := lark.DependedBy(l.Get("lark-vc")); n != 0 {
 		t.Errorf("lark-vc 只被自己的简介提到，应为 0，得到 %d", n)
 	}
 	if !l.Collections[3].ReadOnly() || l.Get("skill-creator").Collection != nil {
-		t.Error("插件集合只读；不在插件里的内置技能不算集合")
+		t.Error("插件集合只读；不在插件里的内置 Skill 不算集合")
 	}
 	anthropic := l.Collections[1]
 	if anthropic.EnabledIn("claude-code") != 2 || anthropic.EnabledIn("codex") != 3 {

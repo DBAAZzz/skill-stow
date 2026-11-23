@@ -24,8 +24,8 @@ func TestUsagePageRanksUsedSkillsAndListsUnusedOnes(t *testing.T) {
 	if err := tt.Click("使用情况"); err != nil {
 		t.Fatal(err)
 	}
-	if a.scope != scopeUsage || !tt.HasText("近 8 周调用") || !tt.HasText("库内技能") || !tt.HasText("本周") {
-		t.Fatalf("应打开使用情况页，有调用图和库内技能分布：%q", tt.Texts())
+	if a.scope != scopeUsage || !tt.HasText("近 8 周调用") || !tt.HasText("库内 Skill") || !tt.HasText("本周") {
+		t.Fatalf("应打开使用情况页，有调用图和库内 Skill 分布：%q", tt.Texts())
 	}
 	// 日均、有调用的天数、最多的一天各占一格
 	for _, want := range []string{"日均", "有调用的天数", "最多的一天"} {
@@ -132,7 +132,7 @@ func TestInspectorShowsHowOftenASkillWasCalled(t *testing.T) {
 	a.selected = a.lib.Get("tailwind-rules")
 	tt.Frame()
 	if !tt.HasText("没有记录") {
-		t.Errorf("没有记录的 Agent 才读得到的技能应标明没有记录：%q", tt.Texts())
+		t.Errorf("没有记录的 Agent 才读得到的 Skill 应标明没有记录：%q", tt.Texts())
 	}
 }
 

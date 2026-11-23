@@ -43,17 +43,17 @@ func TestAConflictCanBeReplacedAndTheOldVersionGoesToTheTrash(t *testing.T) {
 	must(t, tt.Click("替换"))
 
 	// Then 标成将替换，列出会移到废纸篓的，按钮写明是替换；这时还没动磁盘
-	wantTexts(t, tt, "将替换", "不替换", "添加时换掉下面这些，旧的移到废纸篓：", "~/.agents/skills/vue", "替换 1 个技能")
+	wantTexts(t, tt, "将替换", "不替换", "添加时换掉下面这些，旧的移到废纸篓：", "~/.agents/skills/vue", "替换 1 个 Skill")
 	if !strings.Contains(readBody(t, h(".agents/skills/vue")), "mine") {
 		t.Fatal("确认替换不等于替换：按下按钮前不能动")
 	}
 
 	// When 按「替换 1 个技能」
-	must(t, tt.Click("替换 1 个技能"))
+	must(t, tt.Click("替换 1 个 Skill"))
 
 	// Then 技能库里是新版，旧版在废纸篓
 	if !strings.Contains(readBody(t, h(".agents/skills/vue")), "theirs") {
-		t.Error("技能库里应是要添加的这份")
+		t.Error("Skill 库里应是要添加的这份")
 	}
 	if !strings.Contains(readBody(t, h(".Trash/vue")), "mine") {
 		t.Error("旧版应在废纸篓里")
@@ -75,14 +75,14 @@ func TestReplacingCanBeChosenFromTheCompareAndTakenBack(t *testing.T) {
 	if a.imp.cmp != nil || !a.importReplacing("vue") {
 		t.Fatalf("应回到选择页并标成将替换：cmp=%v", a.imp.cmp != nil)
 	}
-	wantTexts(t, tt, "将替换", "替换 1 个技能")
+	wantTexts(t, tt, "将替换", "替换 1 个 Skill")
 
 	// 改主意：撤回
 	must(t, tt.Click("不替换"))
 	if a.importReplacing("vue") || len(a.importAddable()) != 0 {
 		t.Error("撤回后不应再替换")
 	}
-	wantTexts(t, tt, "已有同名", "添加技能")
+	wantTexts(t, tt, "已有同名", "添加 Skill")
 
 	// 只是多给一个 Agent 建链接：要换掉的还是那一份，确认留着
 	a.setImportReplace("vue", true)
@@ -130,15 +130,15 @@ func TestAReplacementIsRedecidedWhenTheExistingSkillChangedAfterConfirming(t *te
 
 	// 确认之后、按下之前，用户又改了自己的 vue
 	writeTestSkill(t, h(".agents/skills/vue"), "我的 vue", "mine, edited")
-	must(t, tt.Click("替换 1 个技能"))
+	must(t, tt.Click("替换 1 个 Skill"))
 	if !strings.Contains(readBody(t, h(".agents/skills/vue")), "edited") {
 		t.Fatal("改过的不能被换掉")
 	}
-	wantTexts(t, tt, "确认替换之后，技能库里的 vue 又有了改动，这次没有替换。", "再对比一次，还要替换就再点「替换」。")
+	wantTexts(t, tt, "确认替换之后，Skill 库里的 vue 又有了改动，这次没有替换。", "再对比一次，还要替换就再点「替换」。")
 
 	// 看过之后仍要替换：卡片上重新确认，再按
 	must(t, tt.Click("替换"))
-	must(t, tt.Click("替换 1 个技能"))
+	must(t, tt.Click("替换 1 个 Skill"))
 	if !strings.Contains(readBody(t, h(".agents/skills/vue")), "theirs") {
 		t.Error("重新确认后应替换")
 	}

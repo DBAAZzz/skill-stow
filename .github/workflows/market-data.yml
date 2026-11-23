@@ -1,0 +1,107 @@
+name: Market Data
+
+# 每天从 skills.sh 公开网页生成 market-extras.json，并上传到独立的预发布 Release `market-data`。
+# 该 Release 严禁设为 latest，Tag 不以 v 开头，避免干扰 release-pr.yml 与 release.yml。
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: market-data
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: app/go.mod
+          cache-dependency-path: app/go.sum
+
+      - name: Run marketsnap unit tests
+        run: go test ./tools/marketsnap/...
+
+      - name: Download previous market-extras.json
+        id: prev
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prev_file="$RUNNER_TEMP/prev-market-extras.json"
+          if gh release view market-data --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            if gh release download market-data \
+              --repo "$GITHUB_REPOSITORY" \
+              --pattern market-extras.json \
+              --clobber \
+              --output "$prev_file"; then
+              echo "path=$prev_file" >> "$GITHUB_OUTPUT"
+            else
+              echo "path=" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "path=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate and validate market-extras.json
+        env:
+          PREV_FILE: ${{ steps.prev.outputs.path }}
+        run: |
+          out_file="$RUNNER_TEMP/market-extras.json"
+          args=(-min-skills 200 -out "$out_file")
+          if [ -n "$PREV_FILE" ]; then
+            args+=(-prev "$PREV_FILE")
+          fi
+          go run ./tools/marketsnap "${args[@]}"
+          ls -lh "$out_file"
+
+      - name: Upload market-extras.json to prerelease market-data
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_EXISTS: ${{ steps.prev.outputs.exists }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
+        run: |
+          out_file="$RUNNER_TEMP/market-extras.json"
+          if [ "$RELEASE_EXISTS" = "true" ]; then
+            gh release upload market-data "$out_file" \
+              --repo "$GITHUB_REPOSITORY" \
+              --clobber
+            gh release edit market-data \
+              --repo "$GITHUB_REPOSITORY" \
+              --prerelease \
+              --latest=false
+          else
+            gh release create market-data "$out_file" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$DEFAULT_BRANCH" \
+              --prerelease \
+              --latest=false \
+              --title "云市场数据（自动生成，不是应用版本）" \
+              --notes "每日自动从 skills.sh 公开网页提取技能简介与专题索引供客户端读取；非应用发布版本。"
+          fi
+
+      - name: Verify latest release stays on v* app tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          latest_tag="$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq '.tagName')"
+          case "$latest_tag" in
+            v*)
+              echo "latest release check passed: $latest_tag"
+              ;;
+            *)
+              echo "::error::latest Release 必须仍为 v* 应用版本，当前为: ${latest_tag:-<empty>}"
+              exit 1
+              ;;
+          esac

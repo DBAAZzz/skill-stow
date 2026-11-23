@@ -44,19 +44,23 @@ func writeTestSkill(t *testing.T, dir, desc, body string) {
 
 func TestImportPageIsReachableFromTheSidebarAndMySkills(t *testing.T) {
 	a, tt := newTester(t)
-	must(t, tt.Click("添加技能"))
+	must(t, tt.Click("添加 Skill"))
 	if a.scope != scopeImport {
-		t.Fatalf("工具栏「添加技能」应打开添加页：%s", a.scope)
+		t.Fatalf("工具栏「添加 Skill」应打开Skill 市场页：%s", a.scope)
 	}
-	for _, s := range []string{"选取文件夹或 .zip 压缩包", "选取…", "在 skills.sh 浏览", "读取"} {
+	for _, s := range []string{"Skill 市场", "skills.sh", "ClawHub", "最近添加", "从电脑添加", "总榜"} {
 		if !tt.HasText(s) {
 			t.Errorf("缺 %q：%v", s, tt.Texts())
 		}
 	}
 	a.scope = string(library.ScopeMine)
 	tt.Frame()
-	if !tt.HasText("添加技能") {
-		t.Error("侧边栏和「我的技能」工具栏都应有「添加技能」")
+	if !tt.HasText("Skill 市场") || !tt.HasText("添加 Skill") {
+		t.Error("侧边栏应有「Skill 市场」，「我的 Skill」工具栏应有「添加 Skill」")
+	}
+	must(t, tt.Click("Skill 市场"))
+	if a.scope != scopeImport {
+		t.Fatalf("侧边栏「Skill 市场」应打开Skill 市场页：%s", a.scope)
 	}
 }
 
@@ -85,7 +89,7 @@ func TestClipboardLinkIsOfferedForPasting(t *testing.T) {
 	a.openImport()
 	a.offerClipboard("npx skills add https://github.com/vercel-labs/skills --skill find-skills -g -y")
 	tt.Frame()
-	if !tt.HasText("剪贴板里有技能") || !tt.HasText("find-skills") {
+	if !tt.HasText("剪贴板里有 Skill") || !tt.HasText("find-skills") {
 		t.Fatalf("剪贴板提示：%v", tt.Texts())
 	}
 	a.offerClipboard("随便一段话")
@@ -112,13 +116,13 @@ func TestDroppingAFolderAnywhereOpensThePickerAndAddsOnlyWhatIsChecked(t *testin
 	if exists := func(p string) bool { _, err := os.Lstat(p); return err == nil }; exists(h(".agents/skills/deploy")) {
 		t.Fatal("拖入不能直接安装")
 	}
-	for _, s := range []string{"2 个技能", "全选可添加的 2 个", "deploy", "release-notes"} {
+	for _, s := range []string{"2 个 Skill", "全选可添加的 2 个", "deploy", "release-notes"} {
 		if !tt.HasText(s) {
 			t.Errorf("缺 %q：%v", s, tt.Texts())
 		}
 	}
 	must(t, tt.Click("勾选 deploy"))
-	if !tt.HasText("添加 1 个技能") {
+	if !tt.HasText("添加 1 个 Skill") {
 		t.Fatalf("主按钮：%v", tt.Texts())
 	}
 	must(t, tt.Click("deploy"))
@@ -127,24 +131,24 @@ func TestDroppingAFolderAnywhereOpensThePickerAndAddsOnlyWhatIsChecked(t *testin
 			t.Errorf("可执行文件提示缺 %q：%v", want, tt.Texts())
 		}
 	}
-	must(t, tt.Click("添加 1 个技能"))
+	must(t, tt.Click("添加 1 个 Skill"))
 	if _, err := os.Stat(h(".agents/skills/deploy/run.sh")); err != nil {
-		t.Fatalf("deploy 应放进技能库：%v", err)
+		t.Fatalf("deploy 应放进 Skill 库：%v", err)
 	}
 	if _, err := os.Stat(h(".agents/skills/release-notes")); err == nil {
 		t.Error("没勾的不能添加")
 	}
-	for _, s := range []string{"已添加", "继续添加", "在「我的技能」中查看", "已放进 ~/.agents/skills/deploy。"} {
+	for _, s := range []string{"已添加", "继续添加", "在「我的 Skill」中查看", "已放进 ~/.agents/skills/deploy。"} {
 		if !tt.HasText(s) {
 			t.Errorf("缺 %q：%v", s, tt.Texts())
 		}
 	}
 	if a.lib.Get("deploy") == nil {
-		t.Error("添加后应重新扫描，「我的技能」里能看到")
+		t.Error("添加后应重新扫描，「我的 Skill」里能看到")
 	}
-	must(t, tt.Click("在「我的技能」中查看"))
+	must(t, tt.Click("在「我的 Skill」中查看"))
 	if a.scope != string(library.ScopeMine) || a.selected == nil || a.selected.Name != "deploy" {
-		t.Errorf("应去「我的技能」选中 deploy：%s %v", a.scope, a.selected)
+		t.Errorf("应去「我的 Skill」选中 deploy：%s %v", a.scope, a.selected)
 	}
 }
 
@@ -155,7 +159,7 @@ func TestAnExistingSkillIsShownAsAConflictWithACompare(t *testing.T) {
 	a.rescan()
 	a.importPaths([]string{h("Downloads/vue")})
 	tt.Frame()
-	for _, s := range []string{"已有同名", "技能库里已经有 vue，内容和这份不一致。", "对比差异", "你的", "要添加的"} {
+	for _, s := range []string{"已有同名", "Skill 库里已经有 vue，内容和这份不一致。", "对比差异", "你的", "要添加的"} {
 		if !tt.HasText(s) {
 			t.Errorf("缺 %q：%v", s, tt.Texts())
 		}
@@ -182,20 +186,20 @@ func TestAgentModePlacesTheSkillInTheChosenAgentOnly(t *testing.T) {
 	a.importPaths([]string{h("Downloads/slidev")})
 	tt.Frame()
 	if !a.imp.picked["slidev"] {
-		t.Fatal("只有一个技能时默认勾上")
+		t.Fatal("只有一个 Skill 时默认勾上")
 	}
-	must(t, tt.Click("技能库（通用）"))
+	must(t, tt.Click("Skill 库（通用）"))
 	must(t, tt.Click("指定的 Agent…"))
 	if a.imp.place.Library || len(a.imp.place.Agents) != 1 || a.imp.place.Agents[0] != "claude-code" {
 		t.Fatalf("装到 = %+v", a.imp.place)
 	}
 	tt.Frame()
-	must(t, tt.Click("添加 1 个技能"))
+	must(t, tt.Click("添加 1 个 Skill"))
 	if fi, err := os.Lstat(h(".claude/skills/slidev")); err != nil || !fi.IsDir() {
 		t.Fatalf("应放进 Claude Code 自己的目录：%v", err)
 	}
 	if _, err := os.Lstat(h(".agents/skills/slidev")); err == nil {
-		t.Error("不能放进技能库")
+		t.Error("不能放进 Skill 库")
 	}
 }
 
@@ -262,11 +266,11 @@ func TestImportSnapshots(t *testing.T) {
 	a.setImportReplace("vue", false)
 
 	must(t, tt.Click("谁会读到"))
-	t.Logf("谁会读到（技能库）：%v", tt.Texts())
+	t.Logf("谁会读到（Skill 库）：%v", tt.Texts())
 	shot(tt, "import-readers.png")
 	tt.Key(0, ui.KeyEscape)
 	tt.Frame()
-	must(t, tt.Click("技能库（通用）"))
+	must(t, tt.Click("Skill 库（通用）"))
 	shot(tt, "import-place.png")
 	tt.Key(0, ui.KeyEscape)
 
@@ -406,8 +410,8 @@ func TestOnlyTheNamedSkillIsListedWithAWayToShowTheRest(t *testing.T) {
 	}
 	a.discardImport()
 	tt.Frame()
-	if a.imp.batch != nil || !tt.HasText("从链接添加") {
-		t.Errorf("放弃后应回到输入页：%v", tt.Texts())
+	if a.imp.batch != nil || !tt.HasText("总榜") {
+		t.Errorf("放弃后应回到Skill 市场首页：%v", tt.Texts())
 	}
 }
 
@@ -603,13 +607,13 @@ func copyFileTest(src, dst string) error {
 
 func TestImportTagsShowEachSkillsState(t *testing.T) {
 	a, tt, h := importApp(t)
-	writeTestSkill(t, h(".agents/skills/existing"), "已有技能", "mine")
+	writeTestSkill(t, h(".agents/skills/existing"), "已有 Skill", "mine")
 	a.rescan()
 
 	src := h("Downloads/tag-pack")
-	writeTestSkill(t, filepath.Join(src, "risky"), "含高危扫描的技能", "# risky")
-	writeTestSkill(t, filepath.Join(src, "existing"), "同名技能", "theirs")
-	writeTestSkill(t, filepath.Join(src, "fresh"), "正常新技能", "# fresh")
+	writeTestSkill(t, filepath.Join(src, "risky"), "含高危扫描的 Skill", "# risky")
+	writeTestSkill(t, filepath.Join(src, "existing"), "同名 Skill", "theirs")
+	writeTestSkill(t, filepath.Join(src, "fresh"), "正常新 Skill", "# fresh")
 	must(t, os.MkdirAll(filepath.Join(src, "nodesc"), 0o755))
 	must(t, os.WriteFile(filepath.Join(src, "nodesc/SKILL.md"), []byte("---\nname: web-design-guidelines\n---\nno desc"), 0o644))
 
@@ -758,7 +762,7 @@ func TestImportDetailSupportsRawToggleAndCollapsedSafeAudit(t *testing.T) {
 	must(t, tt.Click("查看原文"))
 	must(t, tt.Click("slidev"))
 	if a.imp.skillRaw {
-		t.Error("切换技能后应默认回到渲染态")
+		t.Error("切换 Skill 后应默认回到渲染态")
 	}
 	for _, want := range []string{"查看原文", "安全审计", "没发现问题", "3 家", "文件与权限", "Bash(pnpm slidev *)", "包含 1 个可执行文件", "查看"} {
 		if !tt.HasText(want) {
@@ -806,7 +810,7 @@ func TestAWebsiteSourceIsReadAndAddedLikeNpx(t *testing.T) {
 	if a.imp.batch == nil {
 		t.Fatalf("没读到：%v", a.imp.err)
 	}
-	for _, want := range []string{"well-known 0.1.0", "网站可以随时改内容，没有历史记录", "打开网站", "添加 1 个技能"} {
+	for _, want := range []string{"well-known 0.1.0", "网站可以随时改内容，没有历史记录", "打开网站", "添加 1 个 Skill"} {
 		if !tt.HasText(want) {
 			t.Errorf("缺少 %q：%v", want, tt.Texts())
 		}
@@ -824,7 +828,7 @@ func TestAWebsiteSourceIsReadAndAddedLikeNpx(t *testing.T) {
 	}
 	tt.Frame()
 	if !exists(h(".agents/skills/lesson/SKILL.md")) {
-		t.Fatalf("应加进技能库：%v", tt.Texts())
+		t.Fatalf("应加进 Skill 库：%v", tt.Texts())
 	}
 	raw, err := os.ReadFile(h(".agents/.skill-lock.json"))
 	must(t, err)
@@ -859,14 +863,14 @@ func TestProjectImportAndDeleteFlow(t *testing.T) {
 	proj := h("code/my-app")
 	must(t, os.MkdirAll(proj, 0o755))
 	must(t, a.lib.AddProjects([]string{proj}))
-	writeTestSkill(t, filepath.Join(proj, ".claude/skills/existing-skill"), "已有技能", "# existing")
+	writeTestSkill(t, filepath.Join(proj, ".claude/skills/existing-skill"), "已有 Skill", "# existing")
 	a.rescan()
 	tt.Frame()
 
 	// 从项目页打开导入页，装到预设为该项目
 	must(t, tt.Click("my-app"))
-	if !tt.HasText("添加技能") || tt.HasText("只读") {
-		t.Fatalf("项目页应有「添加技能」且无「只读」：%v", tt.Texts())
+	if !tt.HasText("添加 Skill") || tt.HasText("只读") {
+		t.Fatalf("项目页应有「添加 Skill」且无「只读」：%v", tt.Texts())
 	}
 	a.openImportForProject(proj)
 	tt.Frame()
@@ -876,13 +880,13 @@ func TestProjectImportAndDeleteFlow(t *testing.T) {
 
 	// 读取本地技能并添加到项目
 	src := h("Downloads/proj-skill")
-	writeTestSkill(t, src, "项目新技能", "# proj")
+	writeTestSkill(t, src, "项目新 Skill", "# proj")
 	a.importPaths([]string{src})
-	waitUntil(t, 5*time.Second, "等待读取本地技能", func() bool { tt.Frame(); return tt.HasText("添加 1 个技能") })
+	waitUntil(t, 5*time.Second, "等待读取本地 Skill", func() bool { tt.Frame(); return tt.HasText("添加 1 个 Skill") })
 
-	must(t, tt.Click("添加 1 个技能"))
+	must(t, tt.Click("添加 1 个 Skill"))
 	waitUntil(t, 5*time.Second, "等待添加到项目完成", func() bool { tt.Frame(); return tt.HasText("在「my-app」中查看") })
-	wantTexts(t, tt, "已放进 my-app/.agents/skills/proj-skill。", "项目里的技能暂不参与更新。")
+	wantTexts(t, tt, "已放进 my-app/.agents/skills/proj-skill。", "项目里的 Skill 暂不参与更新。")
 
 	// 点「在「my-app」中查看」回到项目页并选中该技能
 	must(t, tt.Click("在「my-app」中查看"))
@@ -914,6 +918,7 @@ func TestRecentProjectImportOpensInstalledCopy(t *testing.T) {
 	a.rescan()
 	a.openImport()
 	tt.Frame()
+	must(t, tt.Click("最近添加"))
 	must(t, tt.Click("demo"))
 	if a.selected == nil || a.selected.Real != out[0].Place || a.scope != projectScope(a.lib.Project(proj)) {
 		t.Fatalf("recent item opened %v in %q", a.selected, a.scope)
@@ -952,7 +957,7 @@ func TestImportMenuOffersRegisteredEmptyProject(t *testing.T) {
 	writeTestSkill(t, h("Downloads/demo"), "description", "")
 	a.importPaths([]string{h("Downloads/demo")})
 	tt.Frame()
-	must(t, tt.Click("技能库（通用）"))
+	must(t, tt.Click("Skill 库（通用）"))
 	r, ok := tt.Find("放进某个项目，只在这个项目里生效")
 	if !ok {
 		t.Fatal("missing project submenu")
@@ -966,5 +971,51 @@ func TestImportMenuOffersRegisteredEmptyProject(t *testing.T) {
 	must(t, tt.Click("empty-project"))
 	if a.imp.place.Project != h("work/empty-project") {
 		t.Fatal(a.imp.place)
+	}
+}
+
+func TestClawHubImportUIWiringAndInspectorLinks(t *testing.T) {
+	a, tt, h := importApp(t)
+	a.openImport()
+	a.offerClipboard("https://clawhub.ai/awspace/skills/pdf")
+	tt.Frame()
+	if a.imp.clip == "" || !tt.HasText("剪贴板里有 Skill") || !tt.HasText("awspace/pdf") {
+		t.Fatalf("ClawHub 剪贴板应弹出建议：%q clip=%q", tt.Texts(), a.imp.clip)
+	}
+
+	// 验证选择页来源栏、预览副标题和右上角外链按钮都认 ClawHub
+	src, err := library.ParseImportInput("https://clawhub.ai/awspace/skills/pdf")
+	must(t, err)
+	local := h("Downloads/pdf")
+	writeTestSkill(t, local, "PDF toolkit", "# pdf")
+	b, err := library.ReadLocalImport(a.lib.Home, []string{local})
+	must(t, err)
+	defer b.Discard()
+	b.Source = src
+	a.showBatch(b)
+	var opened string
+	a.openURL = func(u string) { opened = u }
+	tt.Frame()
+
+	for _, want := range []string{"awspace/pdf", "ClawHub", "在 ClawHub 上查看"} {
+		if !tt.HasText(want) {
+			t.Errorf("ClawHub 选择页缺 %q：%q", want, tt.Texts())
+		}
+	}
+	if tt.HasText("仓库根目录") {
+		t.Errorf("ClawHub 不应把来源路径显示成「仓库根目录」：%q", tt.Texts())
+	}
+	must(t, tt.Click("在 ClawHub 上查看"))
+	if opened != "https://clawhub.ai/awspace/skills/pdf" {
+		t.Fatalf("打开 ClawHub 链接 = %q", opened)
+	}
+
+	// 写入安装记录并核对详情链接与图标键
+	rec := library.LockEntry{Name: "pdf", Source: "awspace/pdf", SourceType: "clawhub"}
+	if got := recordWebURL(rec); got != "https://clawhub.ai/awspace/skills/pdf" {
+		t.Fatalf("recordWebURL(clawhub) = %q", got)
+	}
+	if got := recordIconKey(rec); got != "clawhub.ai" {
+		t.Fatalf("recordIconKey(clawhub) = %q", got)
 	}
 }

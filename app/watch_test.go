@@ -85,7 +85,7 @@ func TestAppAutoRefreshesWhenSkillCreatedOnDisk(t *testing.T) {
 	must(t, os.WriteFile(filepath.Join(added, "SKILL.md"), []byte("---\nname: ext-fresh\ndescription: fresh skill\n---\n"), 0o644))
 
 	// Then 无需手动点刷新，app 的技能库自动出现该技能
-	waitUntil(t, 4*time.Second, "新技能自动出现在 app.lib 中", func() bool {
+	waitUntil(t, 4*time.Second, "新 Skill 自动出现在 app.lib 中", func() bool {
 		mu.Lock()
 		defer mu.Unlock()
 		return a.lib.ByID("mine:ext-fresh") != nil

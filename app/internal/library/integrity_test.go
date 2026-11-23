@@ -40,7 +40,7 @@ func TestSkillLinkingToMissingFileIsListedAsIncomplete(t *testing.T) {
 
 	// Then 整理里列出它，只报缺的那一个文件
 	if got := incomplete(l); !slices.Equal(got, []string{"test-first"}) {
-		t.Fatalf("不完整的技能：%v", got)
+		t.Fatalf("不完整的 Skill：%v", got)
 	}
 	want := []Defect{{MissingFile, "references/lint-rules.md"}}
 	if got := l.Get("test-first").Defects; !slices.Equal(got, want) {
@@ -137,7 +137,7 @@ func TestBuiltinSkillsAreNotListedInTidy(t *testing.T) {
 
 	// Then 整理里不列
 	if slices.Contains(incomplete(l), "pua") {
-		t.Error("内置技能不应列进整理")
+		t.Error("内置 Skill 不应列进整理")
 	}
 }
 

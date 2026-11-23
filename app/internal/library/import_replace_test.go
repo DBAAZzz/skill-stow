@@ -281,7 +281,7 @@ func TestReplacingSwapsInTheNewVersionAndTrashesTheOld(t *testing.T) {
 		t.Fatalf("结果 = %+v", out)
 	}
 	if hash, _ := TreeHash(h(".agents/skills/vue")); hash != f.upstreamTree("antfu/skills", "skills/vue") {
-		t.Error("技能库里应是要添加的这份")
+		t.Error("Skill 库里应是要添加的这份")
 	}
 	if !strings.Contains(readSkillBody(t, h(".Trash/vue")), "我的 vue") {
 		t.Error("旧版应在废纸篓里")
@@ -331,7 +331,7 @@ func TestReplacingWithALocalFolderDropsTheOldInstallRecord(t *testing.T) {
 		t.Error("其他记录不能动")
 	}
 	if !strings.Contains(readSkillBody(t, h(".agents/skills/vue")), "我自己改的 vue") {
-		t.Error("技能库里应是本机这份")
+		t.Error("Skill 库里应是本机这份")
 	}
 }
 
@@ -403,7 +403,7 @@ func TestReplacingAnOldLinkMovesOnlyTheLink(t *testing.T) {
 		t.Fatalf("结果 = %+v", out)
 	}
 	if real, _ := realPath(h(".claude/skills/vue")); real != h(".agents/skills/vue") {
-		t.Errorf("Claude Code 应改读技能库里的新版：%s", real)
+		t.Errorf("Claude Code 应改读 Skill 库里的新版：%s", real)
 	}
 	if !isLink(h(".Trash/vue")) {
 		t.Error("旧链接应在废纸篓里")

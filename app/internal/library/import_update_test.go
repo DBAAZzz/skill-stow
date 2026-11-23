@@ -58,7 +58,7 @@ func TestUpdatingAnAgentModeSkillReplacesItInPlaceAndKeepsLinks(t *testing.T) {
 		t.Errorf("Kiro 的链接变了：%v %v", real, err)
 	}
 	if exists(h(".agents/skills/vite")) || exists(h(".agents/.skill-lock.json")) {
-		t.Error("不应装进技能库或写安装记录")
+		t.Error("不应装进 Skill 库或写安装记录")
 	}
 	l = Scan(home)
 	if it := itemNamed(t, l.Updates(), "vite"); it.State != UpdLatest {

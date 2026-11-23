@@ -16,7 +16,7 @@ func TestSettingsLayoutUsesLeftSidebarAndRightContent(t *testing.T) {
 	img := st.Image()
 
 	// 4 个导航按钮竖排在左侧栏，同宽左对齐且都在左 192px 内；图标和文字靠左对齐
-	navNames := []string{"通用", "Agent 管理", "项目", "技能更新"}
+	navNames := []string{"通用", "Agent 管理", "项目", "更新 Skill"}
 	var prevY float32 = -1
 	var maxNavRight float32
 	for _, name := range navNames {
@@ -52,15 +52,15 @@ func TestSettingsLayoutUsesLeftSidebarAndRightContent(t *testing.T) {
 	}
 
 	// 右侧内容位于侧栏右边，且顶部不再被 86px 顶栏往下推
-	libLabel, ok := st.Find("技能库")
+	libLabel, ok := st.Find("Skill 库")
 	if !ok {
-		t.Fatal("找不到「技能库」分组标题")
+		t.Fatal("找不到「Skill 库」分组标题")
 	}
 	if libLabel.X < maxNavRight {
 		t.Fatalf("内容区应位于左侧栏右侧：label.X=%.1f, maxNavRight=%.1f", libLabel.X, maxNavRight)
 	}
 	if libLabel.Y >= 60 {
-		t.Fatalf("无顶栏融底布局下「技能库」应贴近顶部起笔，当前 Y=%.1f", libLabel.Y)
+		t.Fatalf("无顶栏融底布局下「Skill 库」应贴近顶部起笔，当前 Y=%.1f", libLabel.Y)
 	}
 }
 
@@ -266,8 +266,8 @@ func TestSettingsRescanShowsSpinnerDoneFeedbackAndRecovers(t *testing.T) {
 		st.Frame()
 
 		// Then 扫出新技能，当前页显示「已检测」，切到项目页不会误显「已检查」
-		if !st.HasText("1 个技能") || !st.HasText("已检测") {
-			t.Fatalf("完成后应刷新技能计数并显示「已检测」：%q", st.Texts())
+		if !st.HasText("1 个 Skill") || !st.HasText("已检测") {
+			t.Fatalf("完成后应刷新 Skill 计数并显示「已检测」：%q", st.Texts())
 		}
 		must(t, st.Click("项目"))
 		st.Frame()

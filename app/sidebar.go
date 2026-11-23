@@ -48,7 +48,7 @@ func (a *app) sidebar(c *ui.Context, vibrant bool) {
 				a.projectItems(c)
 			}
 		}
-	}).Padding(4, 10, 0, 10).Gap(0).Grow(1).Label(locales.NavScopes()).Scrollbars(false).Bind(&a.sideBar)
+	}).Padding(12, 10, 0, 10).Gap(0).Grow(1).Label(locales.NavScopes()).Scrollbars(false).Bind(&a.sideBar)
 	if vibrant {
 		bar.Background(ui.Transparent)
 	}
@@ -78,10 +78,37 @@ func (a *app) sidebar(c *ui.Context, vibrant bool) {
 			a.chooseProjects(true)
 		}
 		ui.Spacer(c)
-		if iconButton(c, iconSettings, locales.WithShortcut(locales.NavSettings(), "⌘,")).Clicked() {
-			a.openSettings()
+		a.settingsGear(c)
+	})
+}
+
+// settingsGear 是底栏的设置按钮（画板「侧边栏留白与应用更新提示」）。找到
+// 应用新版本时右上角有个蓝点，提示带上版本号，点它直接到 设置 › 通用 的
+// 「应用更新」分组。
+func (a *app) settingsGear(c *ui.Context) {
+	version := ""
+	if a.appUpd.Enabled() {
+		version = a.appUpd.Available()
+	}
+	label := locales.NavSettings()
+	if version != "" {
+		label = locales.NavSettingsUpdateAvailable(version)
+	}
+	label = locales.WithShortcut(label, "⌘,")
+	b := ui.ButtonBase(c).Size(28, 26).Radius(6).Center().TextColor(colTextBody).Label(label).Tooltip(label)
+	tintBg(b, ink(0), colInkHover, colInkPress)
+	b.Children(func() {
+		ui.Icon(c, iconSettings).Size(16, 16)
+		if version != "" {
+			ui.Box(c).Size(7, 7).Radius(3.5).Background(colAccent).Absolute().Left(18).Top(4)
 		}
 	})
+	if b.Clicked() {
+		if version != "" {
+			a.set.tab = tabGeneral
+		}
+		a.openSettings()
+	}
 }
 
 // sideItem 是侧边栏的一项，右边是数量。

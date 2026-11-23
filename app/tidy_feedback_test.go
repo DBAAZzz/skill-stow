@@ -114,10 +114,10 @@ func TestCollectFromTidyShowsProgressAndResult(t *testing.T) {
 	a.scope, a.tidy.kind = scopeTidy, library.GlobalLinked
 	clock := stageTidy(a)
 	tt.Frame()
-	must(t, tt.Click("收进我的技能"))
+	must(t, tt.Click("收进我的 Skill"))
 	dt := newUITester(a.collectDialog, 1280, 800)
 	dt.Frame()
-	must(t, dt.Click("收进我的技能"))
+	must(t, dt.Click("收进我的 Skill"))
 	tt.Frame()
 	if !a.tidy.busy() || clock.work == nil {
 		t.Fatal("collect must show progress after confirmation")
@@ -132,7 +132,7 @@ func TestCollectFromTidyShowsProgressAndResult(t *testing.T) {
 	if a.tidy.busy() || len(a.lib.Problems().Global) != 0 {
 		t.Fatal("collect did not finish")
 	}
-	if got := shownText(a, fromTidy); !strings.Contains(got, "已收进我的技能") {
+	if got := shownText(a, fromTidy); !strings.Contains(got, "已收进我的 Skill") {
 		t.Fatalf("missing collect result: %q", got)
 	}
 	if _, err := os.Stat(filepath.Join(h(".agents/skills/probe"), "SKILL.md")); err != nil {
@@ -227,9 +227,9 @@ func TestTidyPreventsOverlappingOperationsAcrossCategories(t *testing.T) {
 	tt.Frame()
 	must(t, tt.Click("全部删掉"))
 	work := a.tidy.work
-	must(t, tt.Click("项目技能被全局链接"))
+	must(t, tt.Click("项目 Skill 被全局链接"))
 	tt.Frame()
-	for _, label := range []string{"保持链接", "只在项目里用", "收进我的技能"} {
+	for _, label := range []string{"保持链接", "只在项目里用", "收进我的 Skill"} {
 		if info, ok := tt.Access(label); !ok || !info.Disabled {
 			t.Fatalf("%s must be disabled during another operation", label)
 		}

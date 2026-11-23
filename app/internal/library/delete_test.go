@@ -67,7 +67,7 @@ func TestDeletedSkillGoesToTrashAndNoAgentSeesItAnymore(t *testing.T) {
 
 	// Then 原件进了废纸篓，链接没了，重新扫描后「我的」里没有它
 	if exists(h(".agents/skills/design-lab")) {
-		t.Error("原件还在技能库里")
+		t.Error("原件还在 Skill 库里")
 	}
 	if !exists(h(".Trash/design-lab/SKILL.md")) {
 		t.Error("废纸篓里没有它")
@@ -106,7 +106,7 @@ func TestBuiltinSkillsCannotBeDeleted(t *testing.T) {
 
 	s := l.ByID("builtin:" + h(".gemini/antigravity/builtin/skills/browser"))
 	if s == nil {
-		t.Fatal("示例技能没扫到")
+		t.Fatal("示例 Skill 没扫到")
 	}
 	// When 删除它
 	_, err := l.Delete(s)

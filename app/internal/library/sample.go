@@ -1,10 +1,14 @@
 package library
 
 import (
+	"bytes"
 	"embed"
+	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
 	"maps"
+	"net/http"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -197,6 +201,7 @@ func Sample() *Library {
 	sampleNativeStates(l)
 	sampleUsage(l)
 	sampleProjectGit(l)
+	l.market = sampleMarketClient()
 	return l
 }
 
@@ -448,4 +453,295 @@ func sampleProjectGit(l *Library) {
 		}
 		p.Git = g
 	}
+}
+
+type sampleMarketTransport struct{}
+
+func (sampleMarketTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	u := req.URL
+	var body []byte
+	status := http.StatusOK
+	switch {
+	case strings.HasSuffix(u.Path, "/market-extras.json"):
+		body, _ = json.Marshal(sampleMarketExtras())
+	case u.Path == "/api/skills/all-time/0":
+		body, _ = json.Marshal(skillsShFeedPayload{Skills: sampleSkillsShAllTime, Total: 9905, HasMore: false, Page: 0})
+	case u.Path == "/api/skills/trending/0":
+		body, _ = json.Marshal(skillsShFeedPayload{Skills: sampleSkillsShTrending, Total: 9966, HasMore: false, Page: 0})
+	case u.Path == "/api/skills/hot/0":
+		body, _ = json.Marshal(skillsShFeedPayload{Skills: sampleSkillsShHot, Total: 4737, HasMore: false, Page: 0})
+	case u.Path == "/api/search":
+		q := strings.ToLower(strings.TrimSpace(u.Query().Get("q")))
+		var hits []skillsShSkill
+		for _, s := range sampleSkillsShSearchItems() {
+			if q == "" || strings.Contains(strings.ToLower(s.Source+"/"+s.SkillID+" "+s.Name), q) {
+				hits = append(hits, s)
+			}
+		}
+		body, _ = json.Marshal(struct {
+			Skills []skillsShSkill `json:"skills"`
+		}{Skills: hits})
+	case u.Path == "/api/v1/skills":
+		cat := strings.TrimSpace(u.Query().Get("category"))
+		var hits []clawHubListItem
+		for _, it := range sampleClawHubItems {
+			if cat == "" || slices.Contains(it.Categories, cat) {
+				hits = append(hits, it)
+			}
+		}
+		body, _ = json.Marshal(clawHubListPayload{Items: hits})
+	case u.Path == "/api/v1/search":
+		q := strings.ToLower(strings.TrimSpace(u.Query().Get("q")))
+		var res []clawHubSearchResult
+		for _, it := range sampleClawHubSearchItems() {
+			hay := strings.ToLower(it.OwnerHandle + " " + it.Slug + " " + it.DisplayName + " " + it.Summary)
+			if q == "" || strings.Contains(hay, q) {
+				res = append(res, it)
+			}
+		}
+		body, _ = json.Marshal(clawHubSearchPayload{Results: res})
+	default:
+		status = http.StatusNotFound
+		body = []byte(`{"error":"not found"}`)
+	}
+	return &http.Response{
+		StatusCode: status,
+		Header:     http.Header{"Content-Type": []string{"application/json"}, "ETag": []string{`"sample-v1"`}},
+		Body:       io.NopCloser(bytes.NewReader(body)),
+		Request:    req,
+	}, nil
+}
+
+// sampleMarketClient 返回仅走内存示例数据的 MarketClient，SKILLS_SAMPLE=1 与界面测试均不联网。
+func sampleMarketClient() *MarketClient {
+	mc := NewMarketClient(DefaultSettings(), "")
+	mc.Client = &http.Client{Transport: sampleMarketTransport{}}
+	return mc
+}
+
+func sampleMarketExtras() MarketExtras {
+	return MarketExtras{
+		Version:     1,
+		GeneratedAt: "2026-11-23T00:00:00Z",
+		Descriptions: map[string]string{
+			"vercel-labs/skills/find-skills":                               "Discover and install open-ecosystem agent skills on demand.",
+			"heygen-com/hyperframes/hyperframes-cli":                       "Render, inspect, and manage Hyperframes video projects from the CLI.",
+			"vercel-labs/agent-browser/agent-browser":                      "Browser automation skill for web testing, navigation, and structured extraction.",
+			"heygen-com/hyperframes/hyperframes":                           "Create programmatic videos with React, CSS, and WebAudio tracks.",
+			"mattpocock/skills/grill-me":                                   "Interview the user relentlessly about a plan or design until edge cases are resolved.",
+			"designed-by-ai/skills/design-mobile-apps":                     "Mobile UI architecture, navigation patterns, and native interaction polish.",
+			"heygen-com/hyperframes/media-use":                             "Inspect, transcode, and prepare audio/video assets for programmatic pipelines.",
+			"flowkit-labs/skills/reddit-automation":                        "Search threads, inspect comments, and summarize subreddit discussions cleanly.",
+			"heygen-com/hyperframes/hyperframes-registry":                  "Browse and load reusable Hyperframes component presets.",
+			"mattpocock/skills/grill-with-docs":                            "Pressure-test requirements against repository docs before coding.",
+			"mattpocock/skills/improve-codebase-architecture":              "Find tight coupling and clarify module boundaries.",
+			"mattpocock/skills/tdd":                                        "Write failing behavior tests first, implement minimal code, then refactor.",
+			"anthropics/skills/frontend-design":                            "Create distinctive, production-grade frontend interfaces with high design quality.",
+			"anthropics/skills/pdf":                                        "Extract text and tables, merge/split PDFs, and handle structured PDF workflows.",
+			"obra/superpowers/test-driven-development":                     "TDD loop: write the failing test first, implement the minimal change, verify, then refactor.",
+			"vercel-labs/react-best-practices/vercel-react-best-practices": "React and Next.js performance optimization rules for client and server components.",
+			"vercel-labs/next-skills/next-best-practices":                  "App Router conventions, caching, and metadata patterns in Next.js.",
+		},
+		Topics: []MarketTopic{
+			{
+				ID:      "react",
+				Title:   "React",
+				Summary: "Component patterns, rendering optimization, and hooks.",
+				Skills: []MarketTopicSkill{
+					{ID: "vercel-labs/react-best-practices/vercel-react-best-practices", What: "57 performance rules for eliminating waterfalls and bundle bloat"},
+					{ID: "anthropics/skills/frontend-design", What: "Distinctive React/CSS UI composition avoiding generic defaults"},
+				},
+			},
+			{
+				ID:      "nextjs",
+				Title:   "Next.js",
+				Summary: "App Router, server actions, and caching strategies.",
+				Skills: []MarketTopicSkill{
+					{ID: "vercel-labs/next-skills/next-best-practices", What: "File conventions, RSC boundaries, and data cache directives"},
+				},
+			},
+			{
+				ID:      "design",
+				Title:   "Design & UI",
+				Summary: "Interface craft, typography, and component systems.",
+				Skills: []MarketTopicSkill{
+					{ID: "anthropics/skills/frontend-design", What: "Distinctive frontend interfaces avoiding generic AI aesthetics"},
+					{ID: "designed-by-ai/skills/design-mobile-apps", What: "Mobile navigation structure, touch targets, and adaptive hierarchy"},
+				},
+			},
+			{
+				ID:      "mobile",
+				Title:   "Mobile",
+				Summary: "iOS, Android, and cross-platform mobile patterns.",
+				Skills: []MarketTopicSkill{
+					{ID: "designed-by-ai/skills/design-mobile-apps", What: "Mobile screen layout, gestures, and responsive state transitions"},
+				},
+			},
+			{
+				ID:      "agent-workflows",
+				Title:   "Agent Workflows",
+				Summary: "Discovery, planning, and autonomous verification loops.",
+				Skills: []MarketTopicSkill{
+					{ID: "vercel-labs/skills/find-skills", What: "Locate installable agent skills when tackling new domains"},
+					{ID: "vercel-labs/agent-browser/agent-browser", What: "Control a headless browser cleanly for verification and scraping"},
+					{ID: "mattpocock/skills/grill-me", What: "Resolve design ambiguity step-by-step before editing code"},
+				},
+			},
+			{
+				ID:      "databases",
+				Title:   "Databases",
+				Summary: "Schema design, migrations, and query tuning.",
+				Skills: []MarketTopicSkill{
+					{ID: "supabase/agent-skills/supabase-postgres-best-practices", What: "Indexing, row-level security, and Postgres query optimization"},
+				},
+			},
+			{
+				ID:      "testing",
+				Title:   "Testing skills",
+				Summary: "TDD loops, Playwright automation, and verification passes.",
+				Skills: []MarketTopicSkill{
+					{ID: "mattpocock/skills/tdd", What: "Red-green-refactor cycle focused on observable behavior"},
+					{ID: "obra/superpowers/test-driven-development", What: "TDD loop: write failing test first, implement minimal change, then refactor"},
+				},
+			},
+			{
+				ID:      "marketing",
+				Title:   "Marketing",
+				Summary: "Launch copy, SEO audits, and landing page conversion.",
+				Skills: []MarketTopicSkill{
+					{ID: "coreyhaines31/marketingskills/copywriting", What: "Clear product positioning, headlines, and landing page messaging"},
+				},
+			},
+		},
+	}
+}
+
+var sampleSkillsShAllTime = []skillsShSkill{
+	{Source: "vercel-labs/skills", SkillID: "find-skills", Name: "find-skills", Installs: 4493759, WeeklyInstalls: []int64{107199, 110524, 121189, 121665, 115285, 110096, 109742, 112607}, IsOfficial: true},
+	{Source: "heygen-com/hyperframes", SkillID: "hyperframes-cli", Name: "hyperframes-cli", Installs: 1676254, WeeklyInstalls: []int64{96486, 146752, 158584, 144957, 125767, 103285, 103703, 95042}},
+	{Source: "vercel-labs/agent-browser", SkillID: "agent-browser", Name: "agent-browser", Installs: 1654673, WeeklyInstalls: []int64{70638, 67374, 75456, 78806, 86942, 103297, 102954, 111582}, IsOfficial: true},
+	{Source: "heygen-com/hyperframes", SkillID: "hyperframes", Name: "hyperframes", Installs: 1641684, WeeklyInstalls: []int64{95609, 137375, 155691, 156397, 121306, 103215, 104944, 97471}},
+	{Source: "mattpocock/skills", SkillID: "grill-me", Name: "grill-me", Installs: 1595947, WeeklyInstalls: []int64{48386, 58939, 52386, 48664, 43368, 41260, 38630, 37978}},
+	{Source: "designed-by-ai/skills", SkillID: "design-mobile-apps", Name: "design-mobile-apps", Installs: 1585183, WeeklyInstalls: []int64{142502, 140054, 140289, 136799, 136787, 138882, 136332, 138427}},
+	{Source: "heygen-com/hyperframes", SkillID: "media-use", Name: "media-use", Installs: 1550131, WeeklyInstalls: []int64{98863, 146510, 147528, 150801, 125622, 104156, 103911, 96441}},
+	{Source: "flowkit-labs/skills", SkillID: "reddit-automation", Name: "reddit-automation", Installs: 1507664, WeeklyInstalls: []int64{114322, 113172, 96986, 103833, 104996, 98412, 97088, 105895}},
+	{Source: "heygen-com/hyperframes", SkillID: "hyperframes-registry", Name: "hyperframes-registry", Installs: 1421567, WeeklyInstalls: []int64{78952, 115713, 99554, 111877, 117525, 98018, 97534, 93179}},
+	{Source: "mattpocock/skills", SkillID: "grill-with-docs", Name: "grill-with-docs", Installs: 1361823, WeeklyInstalls: []int64{41959, 52205, 44944, 41171, 37516, 35476, 30875, 29603}},
+	{Source: "mattpocock/skills", SkillID: "improve-codebase-architecture", Name: "improve-codebase-architecture", Installs: 1298400, WeeklyInstalls: []int64{42271, 53008, 42480, 38894, 38379, 33691, 28230, 26504}},
+	{Source: "mattpocock/skills", SkillID: "tdd", Name: "tdd", Installs: 1271942, WeeklyInstalls: []int64{42084, 54986, 44593, 39153, 35932, 32876, 28168, 27037}},
+	{Source: "anthropics/skills", SkillID: "frontend-design", Name: "frontend-design", Installs: 1155771, WeeklyInstalls: []int64{24769, 25306, 27828, 29060, 30354, 30893, 30153, 31137}, IsOfficial: true},
+	{Source: "anthropics/skills", SkillID: "pdf", Name: "pdf", Installs: 235487, WeeklyInstalls: []int64{4034, 4206, 3873, 4049, 4152, 4309, 4834, 5121}},
+}
+
+var sampleSkillsShTrending = []skillsShSkill{
+	{Source: "beltsh/superpowers", SkillID: "ai-video-generation", Name: "ai-video-generation", Installs: 28712},
+	{Source: "vercel-labs/skills", SkillID: "find-skills", Name: "find-skills", Installs: 15227, IsOfficial: true},
+	{Source: "vercel-labs/agent-browser", SkillID: "agent-browser", Name: "agent-browser", Installs: 12840, IsOfficial: true},
+	{Source: "anthropics/skills", SkillID: "frontend-design", Name: "frontend-design", Installs: 9410, IsOfficial: true},
+}
+
+var sampleSkillsShHot = []skillsShSkill{
+	{Source: "jeffallan/claude-skills", SkillID: "typescript-pro", Name: "typescript-pro", Installs: 103},
+	{Source: "mattpocock/skills", SkillID: "tdd", Name: "tdd", Installs: 86},
+	{Source: "skills.sh", SkillID: "simplify", Name: "simplify", Installs: 2},
+}
+
+func sampleSkillsShSearchItems() []skillsShSkill {
+	items := slices.Clone(sampleSkillsShAllTime)
+	items = append(items,
+		skillsShSkill{Source: "openai/skills", SkillID: "pdf", Name: "pdf", Installs: 13995},
+		skillsShSkill{Source: "github/awesome-copilot", SkillID: "pdftk-server", Name: "pdftk-server", Installs: 10000},
+		skillsShSkill{Source: "tanis90/pdf-converter-mineru", SkillID: "pdf-converter", Name: "pdf-converter", Installs: 9739},
+		skillsShSkill{Source: "anthropics/knowledge-work-plugins", SkillID: "view-pdf", Name: "view-pdf", Installs: 6483},
+		skillsShSkill{Source: "vercel-labs/json-render", SkillID: "react-pdf", Name: "react-pdf", Installs: 2429},
+	)
+	return items
+}
+
+var sampleClawHubItems = []clawHubListItem{
+	{
+		OwnerHandle: "spclaudehome",
+		Slug:        "skill-vetter",
+		DisplayName: "skill-vetter",
+		Summary:     "Security-first skill vetting for AI agents. Use before installing any skill from ClawdHub, GitHub, or other sources.",
+		Categories:  []string{"security"},
+		Stats:       clawHubStats{Downloads: 284044, Installs: 12281, Stars: 1317, Versions: 1},
+	},
+	{
+		OwnerHandle: "tokauthai",
+		Slug:        "skillscan",
+		DisplayName: "skillscan",
+		Summary:     "Security gate for skills. Every new skill MUST pass SkillScan before use.",
+		Categories:  []string{"security"},
+		Stats:       clawHubStats{Downloads: 183917, Installs: 5963, Stars: 41, Versions: 2},
+	},
+	{
+		OwnerHandle: "gpyangyoujun",
+		Slug:        "multi-search-engine",
+		DisplayName: "multi-search-engine",
+		Summary:     "Multi search engine integration with 16 engines (7 CN + 9 Global).",
+		Categories:  []string{"security", "integrations", "research"},
+		Stats:       clawHubStats{Downloads: 166360, Installs: 5543, Stars: 771, Versions: 7},
+	},
+	{
+		OwnerHandle: "awspace",
+		Slug:        "pdf",
+		DisplayName: "Pdf",
+		Summary:     "Comprehensive PDF manipulation toolkit for extracting text and tables.",
+		Categories:  []string{"knowledge", "productivity"},
+		Stats:       clawHubStats{Downloads: 52554, Installs: 1502, Stars: 67, Versions: 1},
+	},
+	{
+		OwnerHandle: "yang1002378395-cmyk",
+		Slug:        "pdf-processor-cn",
+		DisplayName: "Pdf",
+		Summary:     "Extract, merge, split, and convert Chinese PDF documents.",
+		Categories:  []string{"knowledge"},
+		Stats:       clawHubStats{Downloads: 5723, Installs: 210, Stars: 19, Versions: 2},
+	},
+	{
+		OwnerHandle: "thcjp",
+		Slug:        "pdf",
+		DisplayName: "PDF处理工具",
+		Summary:     "提供PDF文本和表格提取、PDF创建、合并及表单自动填写的中文PDF处理工具。",
+		Categories:  []string{"automation"},
+		Stats:       clawHubStats{Downloads: 837, Installs: 42, Stars: 5, Versions: 2},
+	},
+	{
+		OwnerHandle: "paudyyin",
+		Slug:        "pdf",
+		DisplayName: "pdf",
+		Summary:     "Lightweight CLI helper to extract text and convert PDFs cleanly.",
+		Categories:  []string{"development"},
+		Stats:       clawHubStats{Downloads: 756, Installs: 31, Stars: 4, Versions: 1},
+	},
+	{
+		OwnerHandle: "cxdanger123-commits",
+		Slug:        "pdf",
+		DisplayName: "PDF 文档处理",
+		Summary:     "Parse tables and forms from scanned PDF documents.",
+		Categories:  []string{"productivity"},
+		Stats:       clawHubStats{Downloads: 420, Installs: 18, Stars: 3, Versions: 1},
+	},
+}
+
+func sampleClawHubSearchItems() []clawHubSearchResult {
+	out := make([]clawHubSearchResult, 0, len(sampleClawHubItems))
+	for _, it := range sampleClawHubItems {
+		r := clawHubSearchResult{
+			Source:       "clawhub",
+			OwnerHandle:  it.OwnerHandle,
+			Slug:         it.Slug,
+			DisplayName:  it.DisplayName,
+			Summary:      it.Summary,
+			Categories:   it.Categories,
+			CanonicalURL: "/" + it.OwnerHandle + "/skills/" + it.Slug,
+			Downloads:    it.Stats.Downloads,
+		}
+		r.Install.Kind = "clawhub"
+		st := it.Stats
+		r.Native = &clawHubNative{Skill: &clawHubNativeSkill{Stats: st}}
+		out = append(out, r)
+	}
+	return out
 }

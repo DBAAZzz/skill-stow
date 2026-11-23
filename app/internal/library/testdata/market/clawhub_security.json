@@ -1,0 +1,101 @@
+{
+  "items": [
+    {
+      "ownerHandle": "spclaudehome",
+      "slug": "skill-vetter",
+      "displayName": "Skill Vetter",
+      "summary": "Security-first skill vetting for AI agents. Use before installing any skill from ClawdHub, GitHub, or other sources. Checks for red flags, permission scope, and suspicious patterns.",
+      "description": null,
+      "categories": [
+        "security"
+      ],
+      "topics": [
+        "GitHub",
+        "Permission"
+      ],
+      "tags": {
+        "latest": "1.0.0"
+      },
+      "stats": {
+        "comments": 0,
+        "downloads": 284044,
+        "installs": 12281,
+        "stars": 1317,
+        "versions": 1
+      },
+      "createdAt": 1769863429632,
+      "updatedAt": 1789594554485,
+      "latestVersion": {
+        "version": "1.0.0",
+        "createdAt": 1769863429632,
+        "changelog": "Initial release - Security-first skill vetting for AI agents",
+        "license": null
+      },
+      "metadata": null
+    },
+    {
+      "ownerHandle": "tokauthai",
+      "slug": "skillscan",
+      "displayName": "SkillScan",
+      "summary": "Security gate for skills. Every new skill MUST pass SkillScan before use. Activate on any install, load, add, evaluate, or safety question about a skill. On...",
+      "description": null,
+      "categories": [
+        "security"
+      ],
+      "topics": [],
+      "tags": {
+        "latest": "1.1.6"
+      },
+      "stats": {
+        "comments": 0,
+        "downloads": 183917,
+        "installs": 5963,
+        "stars": 41,
+        "versions": 2
+      },
+      "createdAt": 1775528508402,
+      "updatedAt": 1779075607591,
+      "latestVersion": {
+        "version": "1.1.6",
+        "createdAt": 1776650587310,
+        "changelog": "- Major cleanup: The readme documentation was removed.\n- Simplified \"First Load\" process in SKILL.md by removing the requirement to write Skill Security rules to SOUL.md.\n- Uninstall instructions regarding SOUL.md cleanup were dropped from the SKILL.md.\n- Updated metadata version to 1.1.6.",
+        "license": "MIT-0"
+      },
+      "metadata": null
+    },
+    {
+      "ownerHandle": "gpyangyoujun",
+      "slug": "multi-search-engine",
+      "displayName": "Multi Search Engine",
+      "summary": "Multi search engine integration with 16 engines (7 CN + 9 Global). Supports advanced search operators, time filters, site search, privacy engines, and Wolfra...",
+      "description": null,
+      "categories": [
+        "security",
+        "integrations"
+      ],
+      "topics": [
+        "Privacy"
+      ],
+      "tags": {
+        "latest": "2.1.3"
+      },
+      "stats": {
+        "comments": 6,
+        "downloads": 166360,
+        "installs": 5543,
+        "stars": 771,
+        "versions": 7
+      },
+      "createdAt": 1770221093765,
+      "updatedAt": 1778486017068,
+      "latestVersion": {
+        "version": "2.1.3",
+        "createdAt": 1775879953831,
+        "changelog": "**Summary:**  \nThis version updates cookie handling and search execution policies for increased privacy and more ethical crawling.\n\n- Switched to initializing an empty in-memory cookie store; no cookies are pre-loaded from files.\n- Cookies are acquired dynamically only when a search request is denied and cleared immediately after the session.\n- Only relevant search engines are queried, based on language and engine availability, rather than always searching all engines in a category.\n- Introduced stricter rate limiting (1-2 second delays, batch sizes of 3-4) to control request flow.\n- Strengthened privacy statements: cookies are held strictly in memory and never written to disk or config files.\n- Improved documentation of search logic, cookie management, and crawling ethics.",
+        "license": "MIT-0"
+      },
+      "metadata": null
+    }
+  ],
+  "nextCursor": "{\"v\":1,\"index\":\"by_active_stats_downloads\",\"key\":[{\"__undef\":1},29441,1790941264737,1773255949236.6028,\"r171nv050krvywt9f1brxq15rd82p9cn\"]}"
+}

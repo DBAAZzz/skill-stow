@@ -29,7 +29,7 @@ func TestEmptyLibraryLeadsToAddSkillsPage(t *testing.T) {
 			tt.ClickAt(g.Bounds.X+g.Bounds.W/2, g.Bounds.Y+g.Bounds.H-4)
 			tt.Frame()
 			if a.scope != scopeImport {
-				t.Fatalf("%s 视图 %d：点添加技能后到了 %q，不是添加技能页", scope, mode, a.scope)
+				t.Fatalf("%s 视图 %d：点添加 Skill 后到了 %q，不是添加 Skill 页", scope, mode, a.scope)
 			}
 		}
 	}
@@ -43,7 +43,7 @@ func TestSearchWithNoResultsSaysSoInsteadOfEmptyLibrary(t *testing.T) {
 		t.Fatal("搜索没结果时没有说明是搜索没结果")
 	}
 	if tt.HasText(locales.BrowseNoSkillsYetTitle()) || tt.HasText(locales.ActionClearFilters()) {
-		t.Fatal("搜索没结果时不该引导添加技能，也没有筛选可清除")
+		t.Fatal("搜索没结果时不该引导添加 Skill，也没有筛选可清除")
 	}
 
 	a.currentFilter().unused = true
@@ -75,7 +75,7 @@ func TestPlacesNewSkillsDoNotLandInDoNotOfferAddingSkills(t *testing.T) {
 			tt := newUITester(a.view, 1280, 800)
 			tt.Frame()
 			if tt.HasText(locales.BrowseNoSkillsYetTitle()) {
-				t.Fatalf("%s 视图 %d：不该引导添加技能", p.name, mode)
+				t.Fatalf("%s 视图 %d：不该引导添加 Skill", p.name, mode)
 			}
 			if !tt.HasText(want) {
 				t.Fatalf("%s 视图 %d：没有显示 %q：%q", p.name, mode, want, tt.Texts())

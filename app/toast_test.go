@@ -45,7 +45,7 @@ func TestAtMostThreeToastsShowAndTheOldestLeavesFirst(t *testing.T) {
 	// Given 已经有三条不同来源的提示条
 	a, tt := newTester(t)
 	a.deleteNotice(toastPlain, "已把 grill-me 移到废纸篓", true)
-	a.notify(fromTidy, toastOK, "13 个技能已收成一份")
+	a.notify(fromTidy, toastOK, "13 个 Skill 已收成一份")
 	a.notify(fromUpdate, toastWarn, "已更新 1 个，1 个失败")
 
 	// When 又来一条
@@ -56,7 +56,7 @@ func TestAtMostThreeToastsShowAndTheOldestLeavesFirst(t *testing.T) {
 	if tt.HasText("已把 grill-me 移到废纸篓") {
 		t.Errorf("最早的一条应先收起：%q", tt.Texts())
 	}
-	for _, want := range []string{"13 个技能已收成一份", "已更新 1 个，1 个失败", "无法打开链接：没有可以打开这个链接的应用"} {
+	for _, want := range []string{"13 个 Skill 已收成一份", "已更新 1 个，1 个失败", "无法打开链接：没有可以打开这个链接的应用"} {
 		if !tt.HasText(want) {
 			t.Errorf("缺少 %q：%q", want, tt.Texts())
 		}
@@ -66,7 +66,7 @@ func TestAtMostThreeToastsShowAndTheOldestLeavesFirst(t *testing.T) {
 func TestOnlyWarningsAndErrorsCanBeClosedByHand(t *testing.T) {
 	// Given 一条成功提示和一条错误提示
 	a, tt := newTester(t)
-	a.notify(fromTidy, toastOK, "13 个技能已收成一份")
+	a.notify(fromTidy, toastOK, "13 个 Skill 已收成一份")
 	tt.Frame()
 
 	// Then 成功的会自己收起，没有关闭按钮
@@ -80,7 +80,7 @@ func TestOnlyWarningsAndErrorsCanBeClosedByHand(t *testing.T) {
 	must(t, tt.Click("关闭提示"))
 
 	// Then 错误提示收起，成功的还在
-	if tt.HasText("无法打开链接：没有可以打开这个链接的应用") || !tt.HasText("13 个技能已收成一份") {
+	if tt.HasText("无法打开链接：没有可以打开这个链接的应用") || !tt.HasText("13 个 Skill 已收成一份") {
 		t.Errorf("应只收起错误提示：%q", tt.Texts())
 	}
 }

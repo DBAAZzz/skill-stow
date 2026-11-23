@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "generatedAt": "2026-11-23T00:00:00Z",
+  "descriptions": {
+    "vercel-labs/skills/find-skills": "Helps users discover and install agent skills when they ask how to perform a task.",
+    "anthropics/skills/frontend-design": "Create distinctive, production-grade frontend interfaces with high design quality."
+  },
+  "topics": [
+    {
+      "id": "design",
+      "title": "Design & UI",
+      "summary": "Frontend craft and UI design guidelines.",
+      "skills": [
+        {
+          "id": "anthropics/skills/frontend-design",
+          "what": "Distinctive frontend interfaces avoiding generic AI aesthetics"
+        },
+        {
+          "id": "obra/superpowers/ui-review",
+          "what": "Review UI layout hierarchy and contrast"
+        }
+      ]
+    },
+    {
+      "id": "testing",
+      "title": "Testing skills",
+      "summary": "TDD loops and verification passes.",
+      "skills": [
+        {
+          "id": "obra/superpowers/test-driven-development",
+          "what": "Write the failing test first, implement minimal change, then refactor"
+        }
+      ]
+    }
+  ]
+}

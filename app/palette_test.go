@@ -12,7 +12,7 @@ func openPaletteAndType(t *testing.T, tt *ui.Tester, query string) {
 	t.Helper()
 	tt.Key(ui.Cmd, ui.KeyK)
 	tt.HoldModifiers(0) // 松开 ⌘
-	if !tt.HasText("搜索技能") {
+	if !tt.HasText("搜索 Skill") {
 		t.Fatalf("⌘K 应打开搜索弹窗：%q", tt.Texts())
 	}
 	tt.Type(query)
@@ -22,11 +22,11 @@ func TestCommandKFindsASkillByNameAndEnterOpensIt(t *testing.T) {
 	a, tt := newTester(t)
 	openPaletteAndType(t, tt, "vue-best")
 	if !tt.HasText("vue-best-practices") {
-		t.Fatalf("应列出名称命中的技能：%q", tt.Texts())
+		t.Fatalf("应列出名称命中的 Skill：%q", tt.Texts())
 	}
 	tt.Key(0, ui.KeyEnter)
 	if a.pal.open {
-		t.Error("打开技能后弹窗应关掉")
+		t.Error("打开 Skill 后弹窗应关掉")
 	}
 	if a.reading == nil || a.reading.Name != "vue-best-practices" {
 		t.Fatalf("↵ 应打开阅读视图，reading = %v", a.reading)
@@ -37,7 +37,7 @@ func TestCommandKFindsWordsOnlyInTheBodyAndOpensThatFile(t *testing.T) {
 	a, tt := newTester(t)
 	openPaletteAndType(t, tt, "只验证一件事")
 	if !tt.HasText("test-first") {
-		t.Fatalf("正文命中的技能应列出：%q", tt.Texts())
+		t.Fatalf("正文命中的 Skill 应列出：%q", tt.Texts())
 	}
 	if !tt.HasText("只验证一件事") {
 		t.Errorf("说明里应显示命中的那句：%q", tt.Texts())
@@ -55,11 +55,11 @@ func TestCommandKFindsSkillsFromEverySourceWithTheSourceNoted(t *testing.T) {
 	a, tt := newTester(t)
 	openPaletteAndType(t, tt, "skill-creator")
 	if !tt.HasText("skill-creator") || !tt.HasText("内置") {
-		t.Fatalf("在「我的」页也应搜到内置技能，并标出来源：%q", tt.Texts())
+		t.Fatalf("在「我的」页也应搜到内置 Skill，并标出来源：%q", tt.Texts())
 	}
 	tt.Key(0, ui.KeyEnter)
 	if a.scope != string(library.ScopeBuiltin) || a.reading == nil {
-		t.Errorf("打开内置技能应换到内置页的阅读视图：scope=%q reading=%v", a.scope, a.reading)
+		t.Errorf("打开内置 Skill 应换到内置页的阅读视图：scope=%q reading=%v", a.scope, a.reading)
 	}
 }
 
@@ -103,7 +103,7 @@ func TestEmptyPaletteListsRecentlyOpenedSkillsAndPlaces(t *testing.T) {
 	tt.Frame()
 	tt.Key(ui.Cmd, ui.KeyK)
 	tt.HoldModifiers(0)
-	for _, want := range []string{"最近", "test-first", "跳转", "检查技能更新", "设置"} {
+	for _, want := range []string{"最近", "test-first", "跳转", "检查 Skill 更新", "设置"} {
 		if !tt.HasText(want) {
 			t.Errorf("空输入时应有 %q：%q", want, tt.Texts())
 		}
@@ -117,7 +117,7 @@ func TestEscapeClosesThePaletteAndNoMatchSaysSo(t *testing.T) {
 		t.Errorf("没有结果时应说明：%q", tt.Texts())
 	}
 	tt.Key(0, ui.KeyEscape)
-	if a.pal.open || tt.HasText("搜索技能") {
+	if a.pal.open || tt.HasText("搜索 Skill") {
 		t.Error("Esc 应关掉弹窗")
 	}
 }
@@ -126,7 +126,7 @@ func TestPinyinFindsChineseSkillsInTheChineseInterface(t *testing.T) {
 	a, tt := newTester(t)
 	openPaletteAndType(t, tt, "ceshi")
 	if !tt.HasText("test-first") {
-		t.Fatalf("简体中文界面输入 ceshi 应找到简介里有「测试」的技能：%q", tt.Texts())
+		t.Fatalf("简体中文界面输入 ceshi 应找到简介里有「测试」的 Skill：%q", tt.Texts())
 	}
 	tt.Key(0, ui.KeyEnter)
 	if a.reading == nil || a.reading.Name != "test-first" {
@@ -149,7 +149,7 @@ func TestCommandEnterRevealsASkillInsideACollectionEvenWhenTheToolbarFilters(t *
 	if s == nil || s.Collection == nil {
 		t.Fatal("示例数据里 doc-coauthoring 应在一个集合里")
 	}
-	a.query = "不会匹配任何技能"
+	a.query = "不会匹配任何 Skill"
 	openPaletteAndType(t, tt, "doc-coauthoring")
 	tt.Key(ui.Cmd, ui.KeyEnter)
 	if a.query != "" || a.inColl != s.Collection || a.selected != s {
@@ -162,9 +162,9 @@ func TestCommandEnterRevealsASkillInsideACollectionEvenWhenTheToolbarFilters(t *
 
 func TestCommandKFindsSkillUpdatesInBothLanguages(t *testing.T) {
 	a, tt := newTester(t)
-	openPaletteAndType(t, tt, "技能更新")
-	if !tt.HasText("检查技能更新") {
-		t.Fatalf("应列出「检查技能更新」操作：%q", tt.Texts())
+	openPaletteAndType(t, tt, "更新 Skill")
+	if !tt.HasText("检查 Skill 更新") {
+		t.Fatalf("应列出「检查 Skill 更新」操作：%q", tt.Texts())
 	}
 	tt.Key(0, ui.KeyEscape)
 

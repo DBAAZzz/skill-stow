@@ -1,0 +1,23 @@
+{
+  "skills": [
+    {
+      "source": "jeffallan/claude-skills",
+      "skillId": "typescript-pro",
+      "name": "typescript-pro",
+      "installs": 103,
+      "installsYesterday": 2,
+      "change": 101
+    },
+    {
+      "source": "skills.sh",
+      "skillId": "simplify",
+      "name": "simplify",
+      "installs": 2,
+      "installsYesterday": 0,
+      "change": 2
+    }
+  ],
+  "total": 4737,
+  "hasMore": false,
+  "page": 0
+}

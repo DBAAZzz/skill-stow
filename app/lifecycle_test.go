@@ -246,7 +246,7 @@ func TestClosedMainWindowSafelyHandlesAsyncCallbacksAndQuitCleanup(t *testing.T)
 	must(t, os.MkdirAll(added, 0o755))
 	must(t, os.WriteFile(filepath.Join(added, "SKILL.md"), []byte("---\nname: closed-win-skill\ndescription: added while closed\n---\n"), 0o644))
 
-	waitUntil(t, 4*time.Second, "关窗期间新技能同步进 app.lib", func() bool {
+	waitUntil(t, 4*time.Second, "关窗期间新 Skill 同步进 app.lib", func() bool {
 		mu.Lock()
 		defer mu.Unlock()
 		return a.lib.ByID("mine:closed-win-skill") != nil
@@ -260,7 +260,7 @@ func TestClosedMainWindowSafelyHandlesAsyncCallbacksAndQuitCleanup(t *testing.T)
 	// 4. 准备一条待撤销删除后执行 ⌘Q 真退出（shutdown）：应清理撤销副本并停止监听
 	target := a.lib.ByID("mine:closed-win-skill")
 	if target == nil {
-		t.Fatal("未找到新技能")
+		t.Fatal("未找到新 Skill")
 	}
 	undo, err := a.lib.Delete(target)
 	must(t, err)

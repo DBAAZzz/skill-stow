@@ -57,6 +57,7 @@ func TestGroupedPagesShareOneContentColumn(t *testing.T) {
 			updateFixture(upd)
 			imp := newApp(library.Sample())
 			imp.scope = scopeImport
+			imp.imp.input = "https://github.com/anthropics/skills"
 
 			left := int(usage.sidebarRoom())
 			shot := func(a *app) *image.RGBA {
@@ -66,19 +67,19 @@ func TestGroupedPagesShareOneContentColumn(t *testing.T) {
 			}
 			ux0, ux1, uy := cardEdges(t, shot(usage), left)
 			px0, px1, py := cardEdges(t, shot(upd), left)
-			// 技能更新的卡片描边画在框内、使用情况的细线画在框外，白色起点差 1 像素以内算重合
+			// 更新 Skill的卡片描边画在框内、使用情况的细线画在框外，白色起点差 1 像素以内算重合
 			near := func(a, b int) bool { return a-b <= 1 && b-a <= 1 }
 			if !near(ux0, px0) || !near(ux1, px1) || !near(uy, py) {
-				t.Errorf("使用情况与技能更新的内容栏应完全重合：使用情况 x=%d…%d y=%d，技能更新 x=%d…%d y=%d",
+				t.Errorf("使用情况与更新 Skill的内容栏应完全重合：使用情况 x=%d…%d y=%d，更新 Skill x=%d…%d y=%d",
 					ux0, ux1, uy, px0, px1, py)
 			}
 
 			ix0, ix1, _ := cardEdges(t, shot(imp), left)
 			if ix1-ix0 > ux1-ux0 {
-				t.Errorf("添加技能是表单页，内容栏不应比使用情况宽：%d > %d", ix1-ix0, ux1-ux0)
+				t.Errorf("添加 Skill 是表单页，内容栏不应比使用情况宽：%d > %d", ix1-ix0, ux1-ux0)
 			}
 			if d := (ix0 + ix1) - (ux0 + ux1); d < -1 || d > 1 {
-				t.Errorf("添加技能应与其它页居中在同一条轴上：添加 %d…%d，使用情况 %d…%d", ix0, ix1, ux0, ux1)
+				t.Errorf("添加 Skill 应与其它页居中在同一条轴上：添加 %d…%d，使用情况 %d…%d", ix0, ix1, ux0, ux1)
 			}
 		})
 	}
@@ -187,7 +188,7 @@ func TestGroupedPagesFitNarrowestWindowWithInspector(t *testing.T) {
 	})
 }
 
-// 技能更新在详情栏开着、内容栏不宽时：英文按钮更宽、名字后面还跟着
+// 更新 Skill在详情栏开着、内容栏不宽时：英文按钮更宽、名字后面还跟着
 // 「装在哪」的标签，名字和完整的提交时间也都要放得下，commit 号不压按钮。
 func TestNarrowUpdateRowsKeepNameAndTimeWhole(t *testing.T) {
 	setup := func(a *app) {
@@ -214,7 +215,7 @@ func TestNarrowUpdateRowsKeepNameAndTimeWhole(t *testing.T) {
 			useLocale(t, tt, "en")
 			tt.Advance(paneDuration)
 			if r, _ := tt.Find("vite"); r.W < fullName.W-0.5 {
-				t.Errorf("技能名被挤窄：%.1f，完整 %.1f", r.W, fullName.W)
+				t.Errorf("Skill 名被挤窄：%.1f，完整 %.1f", r.W, fullName.W)
 			}
 			if r, _ := tt.Find(when); r.W < fullTime.W-0.5 {
 				t.Errorf("提交时间被截断：%.1f，完整 %.1f", r.W, fullTime.W)

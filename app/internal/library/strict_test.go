@@ -129,7 +129,7 @@ func TestOperationsOnABusySkillWait(t *testing.T) {
 		t.Error("忙的时候不应删掉")
 	}
 	if _, err := lockSkill("design-lab"); !errors.Is(err, ErrBusy) {
-		t.Errorf("同一技能不能同时做两件事：%v", err)
+		t.Errorf("同一 Skill 不能同时做两件事：%v", err)
 	}
 	release()
 	if _, err := l.Delete(l.Get("design-lab")); err != nil {

@@ -40,7 +40,7 @@ func TestBackAndForwardRetraceVisitedPagesAndTheirSelection(t *testing.T) {
 	}
 	goBack(t, tt)
 	if a.inColl != nil || a.scope != string(library.ScopeMine) || a.coll == nil || a.coll.Name != "open.feishu.cn" {
-		t.Fatalf("应回到我的技能并选中集合，scope=%q inColl=%v coll=%v", a.scope, a.inColl, a.coll)
+		t.Fatalf("应回到我的 Skill 并选中集合，scope=%q inColl=%v coll=%v", a.scope, a.inColl, a.coll)
 	}
 	goBack(t, tt) // 已是第一页，没有反应
 	if a.scope != string(library.ScopeMine) || a.inColl != nil {
@@ -84,7 +84,7 @@ func TestHistorySkipsPagesOfDeletedSkills(t *testing.T) {
 	// When 前进 Then 没有可去的页面，什么都不变
 	goForward(t, tt)
 	if a.reading != nil || a.selected != selected {
-		t.Fatalf("前进应跳过已删除的技能，reading=%v selected=%v（原来 %v）", a.reading, a.selected, selected)
+		t.Fatalf("前进应跳过已删除的 Skill，reading=%v selected=%v（原来 %v）", a.reading, a.selected, selected)
 	}
 }
 
@@ -115,7 +115,7 @@ func TestBackAfterSwitchingInTheSidebarReturnsToTheSourcePage(t *testing.T) {
 	// When 后退 Then 回到我的技能，前进又回到整理
 	goBack(t, tt)
 	if a.scope != string(library.ScopeMine) {
-		t.Fatalf("后退应回到我的技能，scope=%q", a.scope)
+		t.Fatalf("后退应回到我的 Skill，scope=%q", a.scope)
 	}
 	goForward(t, tt)
 	if a.scope != scopeTidy {

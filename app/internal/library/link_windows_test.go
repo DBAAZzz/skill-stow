@@ -24,7 +24,7 @@ func TestJunctionKeepsShellMetacharactersInPathsLiteral(t *testing.T) {
 		t.Fatalf("链接应指向 %q，得到 %q %v", target, got, err)
 	}
 	if _, err := os.Stat(filepath.Join(at, "SKILL.md")); err != nil {
-		t.Fatalf("透过链接读不到技能：%v", err)
+		t.Fatalf("透过链接读不到 Skill：%v", err)
 	}
 	if real, err := realPath(at); err != nil || real != target {
 		t.Errorf("真实路径应为 %q，得到 %q %v", target, real, err)

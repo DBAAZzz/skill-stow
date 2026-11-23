@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/egoist/mygo/ui"
+
+	"skillmanager/locales"
 )
 
 // fakeAppUpdates 是测试里的应用更新，记下检查和开关的调用。
@@ -132,5 +134,37 @@ func TestAppUpdatePluginRegisters(t *testing.T) {
 	out, err := cmd.CombinedOutput()
 	if err != nil || !strings.Contains(string(out), "--- PASS: TestAppUpdatePluginRegisters") {
 		t.Fatalf("注册更新插件失败：%v\n%s", err, out)
+	}
+}
+
+func TestSettingsGearShowsAFoundAppUpdateAndOpensGeneral(t *testing.T) {
+	a, tt := newTester(t)
+	upd := &fakeAppUpdates{enabled: true}
+	a.appUpd = upd
+	plain := locales.WithShortcut(locales.NavSettings(), "⌘,")
+	found := locales.WithShortcut(locales.NavSettingsUpdateAvailable("9.9.0"), "⌘,")
+
+	tt.Frame()
+	if _, ok := tt.Find(plain); !ok {
+		t.Fatalf("没有新版本时齿轮应叫 %q", plain)
+	}
+
+	upd.available = "9.9.0"
+	a.set.tab = tabUpdates
+	tt.Frame()
+	if _, ok := tt.Find(found); !ok {
+		t.Fatalf("找到新版本时齿轮的提示应带版本号 %q", found)
+	}
+	if err := tt.Click(found); err != nil {
+		t.Fatal(err)
+	}
+	if !a.set.open || a.set.tab != tabGeneral {
+		t.Fatalf("有新版本时点齿轮应打开 设置 › 通用：open=%v tab=%d", a.set.open, a.set.tab)
+	}
+
+	upd.enabled = false
+	tt.Frame()
+	if _, ok := tt.Find(found); ok {
+		t.Error("不能自行更新时不提示新版本")
 	}
 }

@@ -19,7 +19,7 @@ func TestSidebarToggleHidesTheSidebarAndMakesRoomInTheToolbar(t *testing.T) {
 	if tt.HasText("添加项目") {
 		t.Error("收起后不应再显示侧边栏")
 	}
-	title, ok := tt.Find("我的技能")
+	title, ok := tt.Find("我的 Skill")
 	if !ok {
 		t.Fatalf("工具栏标题不见了：%q", tt.Texts())
 	}
