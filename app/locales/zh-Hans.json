@@ -7831,5 +7831,13 @@
   "marketEmptyFilter": "这里暂时没有技能。",
   "@marketEmptyFilter": {
     "description": "某个分类或专题下没有技能"
+  },
+  "marketGroupTopics": "专题",
+  "@marketGroupTopics": {
+    "description": "云市场标签栏：skills.sh 专题这一组前面的小标题"
+  },
+  "marketGroupCategories": "分类",
+  "@marketGroupCategories": {
+    "description": "云市场标签栏：ClawHub 分类这一组前面的小标题"
   }
 }

@@ -1267,5 +1267,7 @@
   "marketRetry": "Try Again",
   "marketSourceUnavailable": "{source} isn’t responding, so these results may be incomplete.",
   "marketNoResults": "No skills match “{query}”.",
-  "marketEmptyFilter": "No skills here yet."
+  "marketEmptyFilter": "No skills here yet.",
+  "marketGroupTopics": "Topics",
+  "marketGroupCategories": "Categories"
 }

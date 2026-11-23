@@ -18273,3 +18273,31 @@ func MarketEmptyFilter() string { return In(i18n.Locale()).MarketEmptyFilter() }
 func (msgs Messages) MarketEmptyFilter() string {
 	return Catalog.Format(msgs.locale, "marketEmptyFilter", nil)
 }
+
+// MarketGroupTopics says "专题"
+// in the language the app shows.
+//
+// 云市场标签栏：skills.sh 专题这一组前面的小标题
+func MarketGroupTopics() string { return In(i18n.Locale()).MarketGroupTopics() }
+
+// MarketGroupTopics says "专题"
+// in the language of msgs.
+//
+// 云市场标签栏：skills.sh 专题这一组前面的小标题
+func (msgs Messages) MarketGroupTopics() string {
+	return Catalog.Format(msgs.locale, "marketGroupTopics", nil)
+}
+
+// MarketGroupCategories says "分类"
+// in the language the app shows.
+//
+// 云市场标签栏：ClawHub 分类这一组前面的小标题
+func MarketGroupCategories() string { return In(i18n.Locale()).MarketGroupCategories() }
+
+// MarketGroupCategories says "分类"
+// in the language of msgs.
+//
+// 云市场标签栏：ClawHub 分类这一组前面的小标题
+func (msgs Messages) MarketGroupCategories() string {
+	return Catalog.Format(msgs.locale, "marketGroupCategories", nil)
+}

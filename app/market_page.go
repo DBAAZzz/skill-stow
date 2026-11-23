@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"math"
 	"slices"
 	"strings"
@@ -505,13 +504,13 @@ func (a *app) marketChipBar(c *ui.Context) {
 	bar := ui.ScrollHorizontal(c.Key("market-chips")).Height(54).Shrink(0).Scrollbars(false).
 		BorderWidth(0, 0, 1, 0).BorderColor(colBorderSubtle)
 	bar.Children(func() {
-		ui.Row(c).Height(54).Padding(0, 20).Gap(8).AlignItems(ui.Center).Children(func() {
+		ui.Row(c).Height(54).Padding(0, 20).Gap(2).AlignItems(ui.Center).Children(func() {
 			if a.currentMarketSource() == library.MarketClawHub {
 				curView, curCat := a.currentMarketView()
 				if marketChip(c, locales.MarketAll(), iconMarketAll, curView == library.MarketViewAllTime || curCat == "").Clicked() {
 					a.selectClawHubCategory("")
 				}
-				ui.Box(c).Size(1, 18).Shrink(0).Margin(0, 4).Background(colBorderDefault)
+				marketChipGroupLabel(c, locales.MarketGroupCategories())
 				for _, cat := range library.ClawHubCategories {
 					cat := cat
 					if marketChip(c, marketCategoryLabel(cat), nil, curView == library.MarketViewCategory && curCat == cat).Clicked() {
@@ -539,7 +538,7 @@ func (a *app) marketChipBar(c *ui.Context) {
 				}
 			}
 			if a.mkt.extras != nil && len(a.mkt.extras.Topics) > 0 {
-				ui.Box(c).Size(1, 18).Shrink(0).Margin(0, 4).Background(colBorderDefault)
+				marketChipGroupLabel(c, locales.MarketGroupTopics())
 				for _, t := range a.mkt.extras.Topics {
 					t := t
 					if marketChip(c, marketTopicLabel(t.ID, t.Title), nil, curView == library.MarketViewTopic && curTopic == t.ID).Clicked() {
@@ -551,27 +550,32 @@ func (a *app) marketChipBar(c *ui.Context) {
 	})
 }
 
+// marketChip 是标签栏里的一项：和工具栏的 iconButton 同一套手感，平时
+// 透明、悬停叠一层浅灰；选中时是分段控件轨道的灰底，字加重。
 func marketChip(c *ui.Context, label string, ic *ui.SVG, selected bool) ui.Element {
-	b := ui.ButtonBase(c).Height(30).Shrink(0).Padding(0, 11).Radius(8).Gap(6).
+	b := ui.ButtonBase(c).Height(26).Shrink(0).Padding(0, 9).Radius(6).Gap(5).
 		AlignItems(ui.Center).Cursor(ui.CursorPointer).Label(label)
 	if selected {
-		tintSolid(b, colBgFill)
-		b.Border(1, colBorderStrong).TextColor(colTextPrimary)
+		b.Background(colBgFill).TextColor(colTextPrimary)
 	} else {
-		tintSolid(b, colBgCard)
-		b.Border(1, colBorderDefault).TextColor(colTextBody)
+		tintInk(b)
+		b.TextColor(colTextBody)
 	}
 	b.Children(func() {
 		if ic != nil {
-			iconCol := colTextSecondary
-			if selected {
-				iconCol = colTextPrimary
-			}
-			ui.Icon(c, ic).Size(14, 14).TextColor(iconCol)
+			ui.Icon(c, ic).Size(13, 13)
 		}
-		ui.Text(c, label).FontSize(13).FontWeight(500).SingleLine()
+		t := ui.Text(c, label).FontSize(13).SingleLine()
+		if selected {
+			t.FontWeight(500)
+		}
 	})
 	return b
+}
+
+// marketChipGroupLabel 放在第二组标签前面，用留白和小字分组，不画分割线。
+func marketChipGroupLabel(c *ui.Context, text string) {
+	ui.Text(c, text).FontSize(12).TextColor(colTextMuted).SingleLine().Shrink(0).Margin(0, 6, 0, 20)
 }
 
 func marketTopicLabel(id, title string) string {
@@ -838,10 +842,10 @@ func (a *app) marketMainWithPane(c *ui.Context, mode marketMode) {
 		area := ui.Column(c.Key("market-content")).Grow(1).MinWidth(0).Clip().Transition(contentTransition)
 		area.Children(func() {
 			if mode == marketModeSearch {
-				a.marketSearchBody(c, pane)
+				a.marketSearchBody(c)
 				return
 			}
-			a.marketBrowseBody(c, pane)
+			a.marketBrowseBody(c)
 		})
 		if pane {
 			ui.Row(c.Key("market-pane")).Shrink(0).AlignItems(ui.Stretch).Transition(paneTransition).Children(func() {
@@ -852,7 +856,7 @@ func (a *app) marketMainWithPane(c *ui.Context, mode marketMode) {
 	})
 }
 
-func (a *app) marketBrowseBody(c *ui.Context, hasPane bool) {
+func (a *app) marketBrowseBody(c *ui.Context) {
 	src := a.currentMarketSource()
 	view, key := a.currentMarketView()
 	fk := marketFeedKey{source: src, view: view, key: key}
@@ -886,10 +890,6 @@ func (a *app) marketBrowseBody(c *ui.Context, hasPane bool) {
 		return
 	}
 
-	cols := 2
-	if hasPane {
-		cols = 1
-	}
 	inTopic := src == library.MarketSkillsSh && view == library.MarketViewTopic
 	scroll := ui.Scroll(c.Key("market-scroll")).Grow(1).MinHeight(0).Background(colBgSurface).Scrollbars(false).TrackScroll(&a.mkt.scroll)
 	if a.mkt.scroll.MaxY > 0 && a.mkt.scroll.Y >= a.mkt.scroll.MaxY-120 && f.hasMore && !f.loading && view != library.MarketViewTopic {
@@ -903,7 +903,7 @@ func (a *app) marketBrowseBody(c *ui.Context, hasPane bool) {
 					a.marketTopicIntroBanner(c, topic)
 				}
 			}
-			a.marketItemsGrid(c, cols, f.items, inTopic, false)
+			a.marketItemsList(c, f.items, inTopic, false)
 		})
 		a.marketDeselectOnBlank(col)
 	})
@@ -933,7 +933,7 @@ func (a *app) marketTopicIntroBanner(c *ui.Context, topic *library.MarketTopic) 
 	})
 }
 
-func (a *app) marketSearchBody(c *ui.Context, hasPane bool) {
+func (a *app) marketSearchBody(c *ui.Context) {
 	m := &a.mkt
 	a.lib.MarkInstalled(m.searchRes.SkillsSh)
 	a.lib.MarkInstalled(m.searchRes.ClawHub)
@@ -957,26 +957,22 @@ func (a *app) marketSearchBody(c *ui.Context, hasPane bool) {
 		return
 	}
 
-	cols := 2
-	if hasPane {
-		cols = 1
-	}
 	scroll := ui.Scroll(c.Key("market-search-scroll")).Grow(1).MinHeight(0).Background(colBgSurface).Scrollbars(false)
 	scroll.Children(func() {
 		col := ui.Column(c).Padding(8, 20)
 		col.Children(func() {
 			if m.searchExpand == "" || m.searchExpand == library.MarketSkillsSh {
-				a.marketSearchGroupSection(c, library.MarketSkillsSh, locales.MarketGroupByInstalls(), sh, shErr, cols)
+				a.marketSearchGroupSection(c, library.MarketSkillsSh, locales.MarketGroupByInstalls(), sh, shErr)
 			}
 			if m.searchExpand == "" || m.searchExpand == library.MarketClawHub {
-				a.marketSearchGroupSection(c, library.MarketClawHub, locales.MarketGroupByDownloads(), ch, chErr, cols)
+				a.marketSearchGroupSection(c, library.MarketClawHub, locales.MarketGroupByDownloads(), ch, chErr)
 			}
 		})
 		a.marketDeselectOnBlank(col)
 	})
 }
 
-func (a *app) marketSearchGroupSection(c *ui.Context, src library.MarketSource, unitHint string, items []library.MarketItem, err error, cols int) {
+func (a *app) marketSearchGroupSection(c *ui.Context, src library.MarketSource, unitHint string, items []library.MarketItem, err error) {
 	if err == nil && len(items) == 0 {
 		return
 	}
@@ -1008,53 +1004,44 @@ func (a *app) marketSearchGroupSection(c *ui.Context, src library.MarketSource, 
 			ui.Text(c, locales.MarketSourceUnavailable(marketSourceName(src))).FontSize(12.5).TextColor(colTextSecondary).Padding(8, 10)
 			return
 		}
-		a.marketItemsGrid(c, cols, shown, false, true)
+		a.marketItemsList(c, shown, false, true)
 	})
 }
 
-func (a *app) marketItemsGrid(c *ui.Context, cols int, items []library.MarketItem, inTopic, isSearch bool) {
+// marketItemsList 是一列技能行：榜单按名次从上往下读，详情栏打开时只是
+// 变窄，不换列。行之间留 4pt，悬停的底色碰不到选中行。
+func (a *app) marketItemsList(c *ui.Context, items []library.MarketItem, inTopic, isSearch bool) {
 	keyMoved := a.mkt.keyMoved
 	a.mkt.keyMoved = false
-	for i := 0; i < len(items); i += cols {
-		ui.Row(c.Key(fmt.Sprintf("mrow-%d", i))).Gap(28).AlignItems(ui.Stretch).Children(func() {
-			for colIdx := range cols {
-				idx := i + colIdx
-				if idx >= len(items) {
-					ui.Box(c).Grow(1).MinWidth(0)
-					continue
-				}
-				it := items[idx]
-				selected := a.mkt.selected != nil && sameMarketItem(*a.mkt.selected, it)
-				row := a.marketRow(c.Key(string(it.Source)+":"+it.ID), it, selected, inTopic, isSearch)
-				row.Grow(1).MinWidth(0)
-				if selected && keyMoved {
-					row.ScrollIntoView()
-				}
-				if row.Clicked() {
-					a.mkt.picked = true
-					if selected {
-						a.mkt.selected = nil
-					} else {
-						cp := it
-						a.mkt.selected = &cp
-					}
-				}
-				if row.DoubleClicked() {
-					a.startImport(it.ImportRef)
+	ui.Column(c).Gap(4).Children(func() {
+		for _, it := range items {
+			selected := a.mkt.selected != nil && sameMarketItem(*a.mkt.selected, it)
+			row := a.marketRow(c.Key(string(it.Source)+":"+it.ID), it, selected, inTopic, isSearch)
+			if selected && keyMoved {
+				row.ScrollIntoView()
+			}
+			if row.Clicked() {
+				a.mkt.picked = true
+				if selected {
+					a.mkt.selected = nil
+				} else {
+					cp := it
+					a.mkt.selected = &cp
 				}
 			}
-		})
-	}
+			if row.DoubleClicked() {
+				a.startImport(it.ImportRef)
+			}
+		}
+	})
 }
 
 func (a *app) marketRow(c *ui.Context, it library.MarketItem, selected, inTopic, isSearch bool) ui.Element {
 	row := ui.ButtonBase(c).Height(62).Padding(0, 10).Radius(9).Gap(12).AlignItems(ui.Center).
 		Cursor(ui.CursorPointer).Label(it.Name)
-	switch {
-	case selected:
-		row.Background(colAccentBg).Border(1, colAccentEdge)
-	case row.Hovered():
-		row.Background(colInkHover.Over(colBgSurface))
+	selectableRow(row, selected, colAccentBg)
+	if selected {
+		row.Border(1, colAccentEdge)
 	}
 	row.Children(func() {
 		a.marketItemIcon(c, it, 36, 9, 17)
