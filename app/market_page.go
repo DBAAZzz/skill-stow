@@ -322,7 +322,6 @@ func (a *app) marketToolbar(c *ui.Context, mode marketMode) {
 		ui.Text(c, locales.MarketTitle()).FontSize(13).FontWeight(600).SingleLine().Shrink(0)
 	}, func() {
 		a.marketSearchGroup(c, mode, reading)
-		ui.Spacer(c)
 		if mode == marketModeBrowse {
 			prev := a.mkt.sourceIdx
 			seg := segmentedOptions(c.Key("market-source"), &a.mkt.sourceIdx, 84,
@@ -374,10 +373,7 @@ func (a *app) marketSearchGroup(c *ui.Context, mode marketMode, reading bool) {
 	st := &a.imp
 	m := &a.mkt
 
-	wrap := ui.Row(c).Grow(1).MinWidth(280).MaxWidth(696).Gap(8).AlignItems(ui.Center)
-	if mode != marketModeLink {
-		wrap.MaxWidth(620)
-	}
+	wrap := ui.Row(c).Grow(1).MinWidth(280).Gap(8).AlignItems(ui.Center)
 	wrap.Children(func() {
 		field := ui.Row(c).Grow(1).MinWidth(280).MaxWidth(620).Height(32).Radius(8).Padding(0, 10).Gap(7).
 			AlignItems(ui.Center).Transition(ui.ElementTransition{Shadows: true, Colors: true, Duration: hoverIn})

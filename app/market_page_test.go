@@ -381,6 +381,11 @@ func TestMarketSnapshots(t *testing.T) {
 	a.imp.input = "pdf"
 	a.syncMarketSearchState()
 	a.triggerMarketSearchNow("pdf")
+	tt.Frame()
+	if acc, ok := tt.AccessByRole(ui.RoleTextField, locales.MarketTitle()); ok {
+		tt.ClickAt(acc.Bounds.X+acc.Bounds.W-6, acc.Bounds.Y+acc.Bounds.H/2)
+		tt.Key(0, ui.KeyRight)
+	}
 	tt.Move(0, 0)
 	tt.Frame()
 	shot(tt, "m4-search.png")
@@ -388,6 +393,12 @@ func TestMarketSnapshots(t *testing.T) {
 	a.clearMarketInput()
 	a.imp.input = "https://github.com/anthropics/skills"
 	a.syncMarketSearchState()
+	tt.Frame()
+	if acc, ok := tt.AccessByRole(ui.RoleTextField, locales.MarketTitle()); ok {
+		tt.ClickAt(acc.Bounds.X+acc.Bounds.W-10, acc.Bounds.Y+acc.Bounds.H/2)
+		tt.Key(0, ui.KeyRight)
+	}
+	tt.Move(0, 0)
 	tt.Frame()
 	shot(tt, "m5-link-ready.png")
 
@@ -448,5 +459,52 @@ func TestMarketEnglishLocaleAndNarrowChipBar(t *testing.T) {
 	must(t, tt.Click("Marketing"))
 	if curView, curKey := a.currentMarketView(); curView != library.MarketViewTopic || curKey != "marketing" {
 		t.Fatalf("窄窗滚动后选择 Marketing 失败: (%s, %q)", curView, curKey)
+	}
+}
+
+func TestMarketSearchBarWidthScalesAcrossModesAndWindows(t *testing.T) {
+	a, tt := newTester(t)
+	a.openImport()
+	tt.Frame()
+
+	fieldBounds := func() ui.Rect {
+		t.Helper()
+		acc, ok := tt.AccessByRole(ui.RoleTextField, locales.MarketTitle())
+		if !ok {
+			t.Fatal("找不到云市场搜索输入框")
+		}
+		return acc.Bounds
+	}
+
+	// 1280×800 浏览模式下应占满上限 620pt，不再缩到约 355pt
+	wideBrowse := fieldBounds()
+	if wideBrowse.W < 540 || wideBrowse.W > 600 {
+		t.Fatalf("1280 浏览态输入框内部宽度应接近上限 620pt（扣去图标与 ⌘F），实际 W=%v", wideBrowse.W)
+	}
+
+	// 1000×640（类似 r9 设计稿窗口）下随窗口收窄并紧邻右侧来源切换控件，保持 >= 280pt
+	tt.SetSize(1000, 640)
+	tt.Frame()
+	midBrowse := fieldBounds()
+	if midBrowse.W >= wideBrowse.W-20 || midBrowse.W < 230 {
+		t.Fatalf("1000 浏览态应随窗口收窄且保持在最小 280pt 以上，实际 W=%v (wide=%v)", midBrowse.W, wideBrowse.W)
+	}
+
+	// 1280×800 下浏览、搜索、链接三种状态搜索框右边界基本一致（仅差右端清除/读取提示几 pt，不再从 355 跳到 445）
+	tt.SetSize(1280, 800)
+	a.imp.input = "pdf"
+	a.syncMarketSearchState()
+	tt.Frame()
+	wideSearch := fieldBounds()
+	if diff := wideSearch.X + wideSearch.W - (wideBrowse.X + wideBrowse.W); diff < -20 || diff > 25 {
+		t.Fatalf("浏览与搜索模式输入框右边界不应大幅跳动: browse=%+v search=%+v", wideBrowse, wideSearch)
+	}
+
+	a.imp.input = "https://github.com/anthropics/skills"
+	a.syncMarketSearchState()
+	tt.Frame()
+	wideLink := fieldBounds()
+	if diff := wideLink.W - wideSearch.W; diff < -5 || diff > 5 {
+		t.Fatalf("搜索与链接模式输入框宽度应一致（均顶到 620pt 上限）: search=%+v link=%+v", wideSearch, wideLink)
 	}
 }
