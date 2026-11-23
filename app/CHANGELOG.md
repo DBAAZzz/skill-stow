@@ -2,6 +2,46 @@
 
 每个版本一节，标题是 `## <版本>`。这一节就是应用内更新窗口里的「更新说明」，先写中文、再写英文。用编号列表，不用 `-`：更新窗口会把无序列表画成圆点。
 
+## 0.5.0
+
+中文
+
+1. feat(import): read GitHub-backed ClawHub skills from their GitHub repository
+2. feat(update): show a dot on the settings gear when an app update is found
+3. feat(market): show ClawHub author avatars
+4. feat(market): add marketsnap to build market-extras.json
+5. feat(market): add the cloud market page
+6. feat(import): read ClawHub links in the add page
+7. feat(market): fetch and cache skills.sh and ClawHub listings
+8. feat(import): add ClawHub as an import source
+9. fix(i18n): use the word Skill throughout the Chinese UI
+10. fix(i18n): rename the market and skill updates pages in Chinese
+11. fix(update): drop the hint under the automatic app update switch
+12. fix(sidebar): leave more room between the toolbar and the first item
+13. fix(market): use an upload icon for importing from the computer
+14. fix(market): restyle filter chips and list skills in one column
+15. fix(market): make search box span toolbar width and focus snapshots
+16. fix(market): fix dark mode fallback icon contrast and search group keys
+
+English
+
+1. feat(import): read GitHub-backed ClawHub skills from their GitHub repository
+2. feat(update): show a dot on the settings gear when an app update is found
+3. feat(market): show ClawHub author avatars
+4. feat(market): add marketsnap to build market-extras.json
+5. feat(market): add the cloud market page
+6. feat(import): read ClawHub links in the add page
+7. feat(market): fetch and cache skills.sh and ClawHub listings
+8. feat(import): add ClawHub as an import source
+9. fix(i18n): use the word Skill throughout the Chinese UI
+10. fix(i18n): rename the market and skill updates pages in Chinese
+11. fix(update): drop the hint under the automatic app update switch
+12. fix(sidebar): leave more room between the toolbar and the first item
+13. fix(market): use an upload icon for importing from the computer
+14. fix(market): restyle filter chips and list skills in one column
+15. fix(market): make search box span toolbar width and focus snapshots
+16. fix(market): fix dark mode fallback icon contrast and search group keys
+
 ## 0.4.0
 
 中文
