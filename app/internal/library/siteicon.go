@@ -35,8 +35,8 @@ type IconFetcher struct {
 }
 
 const (
-	iconRequestMax = 1 << 20    // 单个请求最多读 1MB
-	iconHTMLMax    = 256 << 10  // 首页 HTML 最多读 256KB
+	iconRequestMax = 1 << 20   // 单个请求最多读 1MB
+	iconHTMLMax    = 256 << 10 // 首页 HTML 最多读 256KB
 	iconTimeout    = 15 * time.Second
 )
 
@@ -298,6 +298,50 @@ func (f *IconFetcher) FetchAvatar(ctx context.Context, owner string) (string, er
 		return "", errors.New("avatar: not a recognized bitmap")
 	}
 	return f.save("github/"+owner, file)
+}
+
+// LoadClawHubAvatar 读缓存的 ClawHub 作者头像（clawhub/<owner>.png）；没有
+// 就返回 false，调用方再去 FetchClawHubAvatar。
+func (f *IconFetcher) LoadClawHubAvatar(owner string) ([]byte, bool) {
+	if !iconNameOK(owner) {
+		return nil, false
+	}
+	if b, err := os.ReadFile(filepath.Join(f.Dir, "clawhub", owner+".png")); err == nil && len(b) > 0 {
+		return b, true
+	}
+	return nil, false
+}
+
+// FetchClawHubAvatar 下载 ClawHub 作者头像 imageURL（只认 https）并缓存为
+// PNG。GitHub 头像地址会加 s=96 要小图。和 GitHub 头像一样不设过期。
+func (f *IconFetcher) FetchClawHubAvatar(ctx context.Context, owner, imageURL string) (string, error) {
+	if !iconNameOK(owner) {
+		return "", fmt.Errorf("avatar: %q is not a ClawHub handle", owner)
+	}
+	if f.Dir == "" || f.Client == nil {
+		return "", errors.New("avatar: fetcher is not initialized")
+	}
+	u, err := url.Parse(imageURL)
+	if err != nil || u.Scheme != "https" || u.Host == "" {
+		return "", fmt.Errorf("avatar: %q is not an https URL", imageURL)
+	}
+	if u.Host == "avatars.githubusercontent.com" {
+		q := u.Query()
+		q.Set("s", "96")
+		u.RawQuery = q.Encode()
+	}
+	data, err := f.get(ctx, u.String(), iconRequestMax)
+	if err != nil {
+		return "", err
+	}
+	file, err := normalizeIcon(data)
+	if err != nil {
+		return "", err
+	}
+	if file.ext != ".png" {
+		return "", errors.New("avatar: not a recognized bitmap")
+	}
+	return f.save("clawhub/"+owner, file)
 }
 
 // iconNameOK 只认干净的缓存文件名（host 或 GitHub 用户名），防目录跳转。

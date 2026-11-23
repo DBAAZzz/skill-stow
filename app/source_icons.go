@@ -82,23 +82,13 @@ func (a *app) scheduleSourceIcon(key string, fetch func(context.Context) error) 
 	a.srcIconBusy[key] = true
 	f := a.iconFetch
 	a.background(func(post func(func())) {
-		var data []byte
-		var ok bool
-		if strings.HasPrefix(key, "gh:") {
-			data, ok = f.LoadAvatar(strings.TrimPrefix(key, "gh:"))
-		} else {
-			data, ok = f.Load(key)
-		}
+		data, ok := loadSourceIcon(f, key)
 		if !ok {
 			if err := fetch(context.Background()); err != nil {
 				post(func() { a.srcIconBusy[key] = false })
 				return
 			}
-			if strings.HasPrefix(key, "gh:") {
-				data, ok = f.LoadAvatar(strings.TrimPrefix(key, "gh:"))
-			} else {
-				data, ok = f.Load(key)
-			}
+			data, ok = loadSourceIcon(f, key)
 			if !ok {
 				post(func() { a.srcIconBusy[key] = false })
 				return
@@ -117,6 +107,18 @@ func (a *app) scheduleSourceIcon(key string, fetch func(context.Context) error) 
 			a.changed()
 		})
 	})
+}
+
+// loadSourceIcon 按键读磁盘缓存：gh:<owner> 是 GitHub 头像，ch:<owner> 是
+// ClawHub 作者头像，其余是站点图标。
+func loadSourceIcon(f *library.IconFetcher, key string) ([]byte, bool) {
+	if owner, ok := strings.CutPrefix(key, "gh:"); ok {
+		return f.LoadAvatar(owner)
+	}
+	if owner, ok := strings.CutPrefix(key, "ch:"); ok {
+		return f.LoadClawHubAvatar(owner)
+	}
+	return f.Load(key)
 }
 
 // sourceKey 返回技能的来源图标在 srcIcons 里的键；没有记录来源时为空。

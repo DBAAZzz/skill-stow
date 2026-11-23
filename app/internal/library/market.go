@@ -68,6 +68,7 @@ const (
 
 	marketLongCacheTTL  = 6 * time.Hour
 	marketHotCacheTTL   = 1 * time.Hour
+	clawHubOwnerLookups = 4 // 一页 50 个技能，同时最多查 4 个作者
 	clawHubPageSize     = 50
 	maxMarketBodyBytes  = 16 << 20
 	marketFallbackLimit = 200
@@ -80,6 +81,7 @@ type MarketItem struct {
 	SkillID     string       `json:"skillId,omitempty"`
 	Name        string       `json:"name"`
 	Owner       string       `json:"owner"`
+	OwnerImage  string       `json:"ownerImage,omitempty"` // ClawHub 作者头像地址；只有搜索结果直接带，列表要用 ClawHubOwnerImage 查
 	Repo        string       `json:"repo,omitempty"`
 	Description string       `json:"description,omitempty"`
 	What        string       `json:"what,omitempty"`
@@ -155,6 +157,7 @@ type MarketClient struct {
 	MaxRetryWait time.Duration
 
 	mu          sync.Mutex
+	ownerSem    chan struct{} // 同时查 ClawHub 作者头像的上限；nil 为不限
 	searchCache map[searchCacheKey][]MarketItem
 	memIndex    map[string]MarketItem
 	extras      *MarketExtras
@@ -178,6 +181,7 @@ func NewMarketClient(s Settings, cacheDir string) *MarketClient {
 		Now:          time.Now,
 		Sleep:        sleepContext,
 		MaxRetryWait: clawHubMaxWait,
+		ownerSem:     make(chan struct{}, clawHubOwnerLookups),
 		searchCache:  make(map[searchCacheKey][]MarketItem),
 	}
 }
@@ -1299,11 +1303,24 @@ type clawHubSearchResult struct {
 	Metrics struct {
 		Rolling60DayInstalls *int64 `json:"rolling60DayInstalls"`
 	} `json:"metrics"`
-	Native *struct {
-		Skill *struct {
-			Stats clawHubStats `json:"stats"`
-		} `json:"skill"`
-	} `json:"native"`
+	Native *clawHubNative `json:"native"`
+}
+
+// clawHubNative 是搜索结果里 ClawHub 自己的原始记录。
+type clawHubNative struct {
+	Owner *clawHubOwner       `json:"owner"`
+	Skill *clawHubNativeSkill `json:"skill"`
+}
+
+type clawHubNativeSkill struct {
+	Stats clawHubStats `json:"stats"`
+}
+
+// clawHubOwner 是 ClawHub 接口里的作者；image 一般是 GitHub 头像地址（按
+// 用户 ID，不是按 handle：ClawHub 的 handle 不一定等于 GitHub 用户名）。
+type clawHubOwner struct {
+	Handle string `json:"handle"`
+	Image  string `json:"image"`
 }
 
 func (r clawHubSearchResult) isNativeClawHub() bool {
@@ -1337,6 +1354,10 @@ func (r clawHubSearchResult) toMarketItem() MarketItem {
 	} else if r.Metrics.Rolling60DayInstalls != nil {
 		installs = *r.Metrics.Rolling60DayInstalls
 	}
+	var ownerImage string
+	if r.Native != nil && r.Native.Owner != nil {
+		ownerImage = safeHTTPSURL(r.Native.Owner.Image)
+	}
 
 	importRef := fmt.Sprintf("%s/%s/skills/%s", defaultClawHubBase, owner, slug)
 	webURL := importRef
@@ -1350,6 +1371,7 @@ func (r clawHubSearchResult) toMarketItem() MarketItem {
 		SkillID:     slug,
 		Name:        name,
 		Owner:       owner,
+		OwnerImage:  ownerImage,
 		Description: strings.TrimSpace(r.Summary),
 		Count:       count,
 		Metric:      MarketMetricDownloads,
@@ -1360,4 +1382,46 @@ func (r clawHubSearchResult) toMarketItem() MarketItem {
 		WebURL:      webURL,
 		ImportRef:   importRef,
 	}
+}
+
+// ClawHubOwnerImage 查 ClawHub 作者的头像地址。列表接口不带作者信息，要用
+// 单个技能的详情接口（/api/v1/skills/<slug>?ownerHandle=<owner>）取
+// owner.image。没有头像时返回空串和 nil；网络或解析失败返回错误。结果不
+// 缓存：头像图片本身由 IconFetcher 存盘，存过就不会再查。
+func (m *MarketClient) ClawHubOwnerImage(ctx context.Context, owner, slug string) (string, error) {
+	if !validClawHubIdent(owner) || !validClawHubIdent(slug) {
+		return "", fmt.Errorf("clawhub owner: bad owner %q or slug %q", owner, slug)
+	}
+	if m.ownerSem != nil {
+		select {
+		case m.ownerSem <- struct{}{}:
+			defer func() { <-m.ownerSem }()
+		case <-ctx.Done():
+			return "", ctx.Err()
+		}
+	}
+	u := m.clawHubBase() + "/api/v1/skills/" + url.PathEscape(slug) + "?ownerHandle=" + url.QueryEscape(owner)
+	data, _, err := m.getBytes(ctx, u, "", false)
+	if err != nil {
+		return "", err
+	}
+	var resp struct {
+		Owner *clawHubOwner `json:"owner"`
+	}
+	if err := json.Unmarshal(data, &resp); err != nil {
+		return "", fmt.Errorf("decode clawhub skill: %w", err)
+	}
+	if resp.Owner == nil {
+		return "", nil
+	}
+	return safeHTTPSURL(resp.Owner.Image), nil
+}
+
+// safeHTTPSURL 只放行带主机名的 https 地址，其余返回空串。
+func safeHTTPSURL(raw string) string {
+	u, err := url.Parse(strings.TrimSpace(raw))
+	if err != nil || u.Scheme != "https" || u.Host == "" || u.User != nil {
+		return ""
+	}
+	return u.String()
 }

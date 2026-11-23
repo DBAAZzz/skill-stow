@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"math"
 	"slices"
 	"strings"
@@ -1134,7 +1135,10 @@ func (a *app) marketItemIcon(c *ui.Context, it library.MarketItem, size, radius,
 	var src ui.ImageSource
 	fallback := iconSkillsSh
 	if it.Source == library.MarketClawHub {
-		src = a.srcIcons["clawhub.ai"]
+		// 作者头像没到之前先用 ClawHub 的站标
+		if src = a.srcIcons[clawHubOwnerKey(it.Owner)]; src == nil {
+			src = a.srcIcons["clawhub.ai"]
+		}
 		fallback = iconClawHub
 	} else if it.Owner != "" {
 		src = a.srcIcons["gh:"+it.Owner]
@@ -1164,6 +1168,7 @@ func (a *app) scheduleMarketIcons(items []library.MarketItem) {
 				_, err := a.iconFetch.Fetch(ctx, "https://clawhub.ai", "clawhub.ai")
 				return err
 			})
+			a.scheduleClawHubAvatar(it)
 			continue
 		}
 		owner := it.Owner
@@ -1174,6 +1179,38 @@ func (a *app) scheduleMarketIcons(items []library.MarketItem) {
 			})
 		}
 	}
+}
+
+// clawHubOwnerKey 是 ClawHub 作者头像在 srcIcons 里的键。ClawHub 的 handle
+// 不一定是 GitHub 用户名，所以不和 gh:<owner> 共用。
+func clawHubOwnerKey(owner string) string {
+	if owner == "" {
+		return ""
+	}
+	return "ch:" + owner
+}
+
+// scheduleClawHubAvatar 给一个 ClawHub 技能的作者排头像抓取：搜索结果自带
+// 头像地址，列表的要先用详情接口查。同一作者只排一次。
+func (a *app) scheduleClawHubAvatar(it library.MarketItem) {
+	mc, allowNet := a.marketClient()
+	if !allowNet || it.Owner == "" {
+		return
+	}
+	owner, slug, image := it.Owner, it.SkillID, it.OwnerImage
+	a.scheduleSourceIcon(clawHubOwnerKey(owner), func(ctx context.Context) error {
+		if image == "" {
+			var err error
+			if image, err = mc.ClawHubOwnerImage(ctx, owner, slug); err != nil {
+				return err
+			}
+			if image == "" {
+				return errors.New("clawhub: owner has no avatar")
+			}
+		}
+		_, err := a.iconFetch.FetchClawHubAvatar(ctx, owner, image)
+		return err
+	})
 }
 
 func (a *app) marketDeselectOnBlank(area ui.Element) {

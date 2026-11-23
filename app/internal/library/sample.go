@@ -524,23 +524,23 @@ func sampleMarketExtras() MarketExtras {
 		Version:     1,
 		GeneratedAt: "2026-11-23T00:00:00Z",
 		Descriptions: map[string]string{
-			"vercel-labs/skills/find-skills":               "Discover and install open-ecosystem agent skills on demand.",
-			"heygen-com/hyperframes/hyperframes-cli":       "Render, inspect, and manage Hyperframes video projects from the CLI.",
-			"vercel-labs/agent-browser/agent-browser":      "Browser automation skill for web testing, navigation, and structured extraction.",
-			"heygen-com/hyperframes/hyperframes":           "Create programmatic videos with React, CSS, and WebAudio tracks.",
-			"mattpocock/skills/grill-me":                   "Interview the user relentlessly about a plan or design until edge cases are resolved.",
-			"designed-by-ai/skills/design-mobile-apps":     "Mobile UI architecture, navigation patterns, and native interaction polish.",
-			"heygen-com/hyperframes/media-use":             "Inspect, transcode, and prepare audio/video assets for programmatic pipelines.",
-			"flowkit-labs/skills/reddit-automation":        "Search threads, inspect comments, and summarize subreddit discussions cleanly.",
-			"heygen-com/hyperframes/hyperframes-registry":  "Browse and load reusable Hyperframes component presets.",
-			"mattpocock/skills/grill-with-docs":            "Pressure-test requirements against repository docs before coding.",
-			"mattpocock/skills/improve-codebase-architecture": "Find tight coupling and clarify module boundaries.",
-			"mattpocock/skills/tdd":                        "Write failing behavior tests first, implement minimal code, then refactor.",
-			"anthropics/skills/frontend-design":            "Create distinctive, production-grade frontend interfaces with high design quality.",
-			"anthropics/skills/pdf":                        "Extract text and tables, merge/split PDFs, and handle structured PDF workflows.",
-			"obra/superpowers/test-driven-development":     "TDD loop: write the failing test first, implement the minimal change, verify, then refactor.",
+			"vercel-labs/skills/find-skills":                               "Discover and install open-ecosystem agent skills on demand.",
+			"heygen-com/hyperframes/hyperframes-cli":                       "Render, inspect, and manage Hyperframes video projects from the CLI.",
+			"vercel-labs/agent-browser/agent-browser":                      "Browser automation skill for web testing, navigation, and structured extraction.",
+			"heygen-com/hyperframes/hyperframes":                           "Create programmatic videos with React, CSS, and WebAudio tracks.",
+			"mattpocock/skills/grill-me":                                   "Interview the user relentlessly about a plan or design until edge cases are resolved.",
+			"designed-by-ai/skills/design-mobile-apps":                     "Mobile UI architecture, navigation patterns, and native interaction polish.",
+			"heygen-com/hyperframes/media-use":                             "Inspect, transcode, and prepare audio/video assets for programmatic pipelines.",
+			"flowkit-labs/skills/reddit-automation":                        "Search threads, inspect comments, and summarize subreddit discussions cleanly.",
+			"heygen-com/hyperframes/hyperframes-registry":                  "Browse and load reusable Hyperframes component presets.",
+			"mattpocock/skills/grill-with-docs":                            "Pressure-test requirements against repository docs before coding.",
+			"mattpocock/skills/improve-codebase-architecture":              "Find tight coupling and clarify module boundaries.",
+			"mattpocock/skills/tdd":                                        "Write failing behavior tests first, implement minimal code, then refactor.",
+			"anthropics/skills/frontend-design":                            "Create distinctive, production-grade frontend interfaces with high design quality.",
+			"anthropics/skills/pdf":                                        "Extract text and tables, merge/split PDFs, and handle structured PDF workflows.",
+			"obra/superpowers/test-driven-development":                     "TDD loop: write the failing test first, implement the minimal change, verify, then refactor.",
 			"vercel-labs/react-best-practices/vercel-react-best-practices": "React and Next.js performance optimization rules for client and server components.",
-			"vercel-labs/next-skills/next-best-practices":  "App Router conventions, caching, and metadata patterns in Next.js.",
+			"vercel-labs/next-skills/next-best-practices":                  "App Router conventions, caching, and metadata patterns in Next.js.",
 		},
 		Topics: []MarketTopic{
 			{
@@ -740,13 +740,7 @@ func sampleClawHubSearchItems() []clawHubSearchResult {
 		}
 		r.Install.Kind = "clawhub"
 		st := it.Stats
-		r.Native = &struct {
-			Skill *struct {
-				Stats clawHubStats `json:"stats"`
-			} `json:"skill"`
-		}{Skill: &struct {
-			Stats clawHubStats `json:"stats"`
-		}{Stats: st}}
+		r.Native = &clawHubNative{Skill: &clawHubNativeSkill{Stats: st}}
 		out = append(out, r)
 	}
 	return out
