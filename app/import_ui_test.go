@@ -968,3 +968,49 @@ func TestImportMenuOffersRegisteredEmptyProject(t *testing.T) {
 		t.Fatal(a.imp.place)
 	}
 }
+
+func TestClawHubImportUIWiringAndInspectorLinks(t *testing.T) {
+	a, tt, h := importApp(t)
+	a.openImport()
+	a.offerClipboard("https://clawhub.ai/awspace/skills/pdf")
+	tt.Frame()
+	if a.imp.clip == "" || !tt.HasText("剪贴板里有技能") || !tt.HasText("awspace/pdf") {
+		t.Fatalf("ClawHub 剪贴板应弹出建议：%q clip=%q", tt.Texts(), a.imp.clip)
+	}
+
+	// 验证选择页来源栏、预览副标题和右上角外链按钮都认 ClawHub
+	src, err := library.ParseImportInput("https://clawhub.ai/awspace/skills/pdf")
+	must(t, err)
+	local := h("Downloads/pdf")
+	writeTestSkill(t, local, "PDF toolkit", "# pdf")
+	b, err := library.ReadLocalImport(a.lib.Home, []string{local})
+	must(t, err)
+	defer b.Discard()
+	b.Source = src
+	a.showBatch(b)
+	var opened string
+	a.openURL = func(u string) { opened = u }
+	tt.Frame()
+
+	for _, want := range []string{"awspace/pdf", "ClawHub", "在 ClawHub 上查看"} {
+		if !tt.HasText(want) {
+			t.Errorf("ClawHub 选择页缺 %q：%q", want, tt.Texts())
+		}
+	}
+	if tt.HasText("仓库根目录") {
+		t.Errorf("ClawHub 不应把来源路径显示成「仓库根目录」：%q", tt.Texts())
+	}
+	must(t, tt.Click("在 ClawHub 上查看"))
+	if opened != "https://clawhub.ai/awspace/skills/pdf" {
+		t.Fatalf("打开 ClawHub 链接 = %q", opened)
+	}
+
+	// 写入安装记录并核对详情链接与图标键
+	rec := library.LockEntry{Name: "pdf", Source: "awspace/pdf", SourceType: "clawhub"}
+	if got := recordWebURL(rec); got != "https://clawhub.ai/awspace/skills/pdf" {
+		t.Fatalf("recordWebURL(clawhub) = %q", got)
+	}
+	if got := recordIconKey(rec); got != "clawhub.ai" {
+		t.Fatalf("recordIconKey(clawhub) = %q", got)
+	}
+}

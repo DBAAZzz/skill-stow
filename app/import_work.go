@@ -160,7 +160,7 @@ func (a *app) offerClipboard(text string) {
 		return
 	}
 	src, err := library.ParseImportInput(text)
-	if err != nil || src.Kind != library.ImportGitHub && src.Kind != library.ImportWebsite {
+	if err != nil || (src.Kind != library.ImportGitHub && src.Kind != library.ImportWebsite && src.Kind != library.ImportClawHub) {
 		a.imp.clip = ""
 		return
 	}
@@ -202,7 +202,7 @@ func (a *app) startImport(text string) {
 	a.readRemote(src)
 }
 
-// readRemote 读一个 GitHub 或网站来源。
+// readRemote 读一个 GitHub、网站或 ClawHub 来源。
 func (a *app) readRemote(src library.ImportSource) {
 	if a.lib.Home == "" {
 		a.imp.err = &library.ImportError{Msg: locales.ImportSampleNoNetwork()}
@@ -211,10 +211,14 @@ func (a *app) readRemote(src library.ImportSource) {
 	a.runRead(src.Label(), func(ctx context.Context, l *library.Library, post func(func())) (*library.ImportBatch, error) {
 		r := library.NewImportRemote(l.Settings)
 		progress := func(p library.ImportProgress) { post(func() { a.imp.prog = p }) }
-		if src.Kind == library.ImportWebsite {
+		switch src.Kind {
+		case library.ImportWebsite:
 			return library.ReadWebsiteImport(ctx, l.Home, r.Web, src, progress)
+		case library.ImportClawHub:
+			return library.ReadClawHubImport(ctx, l.Home, r.Web, src, progress)
+		default:
+			return library.ReadGitHubImport(ctx, l.Home, r, src, progress)
 		}
-		return library.ReadGitHubImport(ctx, l.Home, r, src, progress)
 	})
 }
 
@@ -326,6 +330,11 @@ func (a *app) showBatch(b *library.ImportBatch) {
 	case b.Source.Kind == library.ImportWebsite:
 		a.scheduleSourceIcon(b.Site, func(ctx context.Context) error {
 			_, err := a.iconFetch.Fetch(ctx, b.BaseURL, b.Site)
+			return err
+		})
+	case b.Source.Kind == library.ImportClawHub:
+		a.scheduleSourceIcon("clawhub.ai", func(ctx context.Context) error {
+			_, err := a.iconFetch.Fetch(ctx, "https://clawhub.ai", "clawhub.ai")
 			return err
 		})
 	}

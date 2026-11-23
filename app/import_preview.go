@@ -134,6 +134,8 @@ func (a *app) importHead(c *ui.Context, s *library.ImportSkill, files []library.
 				where = a.lib.Display(where)
 			case st.batch.Source.Kind == library.ImportWebsite:
 				where = webPath(s.SourceURL)
+			case st.batch.Source.Kind == library.ImportClawHub:
+				where = st.batch.Source.Repo
 			case where == "":
 				where = locales.ImportRepositoryRoot()
 			}

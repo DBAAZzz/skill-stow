@@ -7307,7 +7307,11 @@
   "importProjectDirectoryOutside": "{dir} 指向项目外，请选择项目内的技能目录。",
   "@importProjectDirectoryOutside": {
     "description": "项目技能目录指向项目外时的提示",
-    "placeholders": { "dir": { "type": "String" } }
+    "placeholders": {
+      "dir": {
+        "type": "String"
+      }
+    }
   },
   "deleteProjectLocationChanged": "项目技能的位置已变化，请重新扫描后再删除。",
   "@deleteProjectLocationChanged": {
@@ -7521,6 +7525,32 @@
     "placeholders": {
       "count": {
         "type": "int"
+      }
+    }
+  },
+  "importViewOnClawHub": "在 ClawHub 上查看",
+  "@importViewOnClawHub": {
+    "description": "添加技能选择页右上角按钮：跳转到 ClawHub 技能页"
+  },
+  "importClawHubWebsiteNote": "来自 clawhub.ai，暂不参与自动检查更新",
+  "@importClawHubWebsiteNote": {
+    "description": "添加技能选择页来源栏的副标题"
+  },
+  "importSourceClawHub": "来源记为 ClawHub：{repo}，暂不参与自动更新。",
+  "@importSourceClawHub": {
+    "description": "添加完成后说明来源",
+    "placeholders": {
+      "repo": {
+        "type": "String"
+      }
+    }
+  },
+  "importProjectSourceClawHub": "来源记为 ClawHub：{repo}，项目技能暂不参与更新。",
+  "@importProjectSourceClawHub": {
+    "description": "添加技能到项目完成后说明来源",
+    "placeholders": {
+      "repo": {
+        "type": "String"
       }
     }
   }

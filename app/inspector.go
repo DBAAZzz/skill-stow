@@ -141,6 +141,11 @@ func (a *app) infoPane(c *ui.Context, s *library.Skill, note string, noteColor u
 							ui.Text(c, rec.Source).FontSize(13).MinWidth(0).SingleLine()
 							return
 						}
+						if rec.SourceType == "clawhub" {
+							ui.Icon(c, iconClawHub).Size(14, 14).Shrink(0).TextColor(colTextPrimary).Label("ClawHub")
+							ui.Text(c, rec.Source).FontSize(13).MinWidth(0).SingleLine()
+							return
+						}
 						ui.Text(c, rec.Source).FontSize(13).MinWidth(0).Shrink(1).SingleLine()
 						if rec.SourceType != "" {
 							pillTag(c, rec.SourceType)
@@ -183,6 +188,13 @@ func recordWebURL(rec library.LockEntry) string {
 		if repo != "" && strings.Count(repo, "/") == 1 && !strings.Contains(repo, "..") &&
 			!strings.HasPrefix(repo, "http") {
 			return "https://github.com/" + repo
+		}
+	case "clawhub":
+		if strings.HasPrefix(rec.SourceURL, "https://") || strings.HasPrefix(rec.SourceURL, "http://") {
+			return rec.SourceURL
+		}
+		if owner, slug, ok := strings.Cut(rec.Source, "/"); ok && owner != "" && slug != "" {
+			return "https://clawhub.ai/" + owner + "/skills/" + slug
 		}
 	case "well-known", "gitlab", "git", "download":
 		for _, u := range []string{rec.SourceBaseURL, rec.SourceURL} {

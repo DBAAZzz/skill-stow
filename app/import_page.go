@@ -154,8 +154,15 @@ func (a *app) importInputRow(c *ui.Context, reading bool) {
 		}
 		field.Children(func() {
 			ic := iconLink
-			if src, err := library.ParseImportInput(st.input); err == nil && src.Kind == library.ImportWebsite {
-				ic = iconGlobe
+			if src, err := library.ParseImportInput(st.input); err == nil {
+				switch src.Kind {
+				case library.ImportWebsite:
+					ic = iconGlobe
+				case library.ImportClawHub:
+					ic = iconClawHub
+				case library.ImportGitHub:
+					ic = iconGitHub
+				}
 			} else if strings.Contains(st.input, "github") || strings.Count(st.input, "/") == 1 {
 				ic = iconGitHub
 			}
@@ -201,8 +208,13 @@ func (a *app) importClipRow(c *ui.Context) {
 	importBoxRow(c, "import-clip", func() {
 		ic, what := iconGitHub, locales.ImportClipboardRepository()
 		src, err := library.ParseImportInput(st.clip)
-		if err == nil && src.Kind == library.ImportWebsite {
-			ic, what = iconGlobe, locales.ImportClipboardWebsite()
+		if err == nil {
+			switch {
+			case src.Kind == library.ImportWebsite:
+				ic, what = iconGlobe, locales.ImportClipboardWebsite()
+			case src.Kind == library.ImportClawHub:
+				ic, what = iconClawHub, locales.ImportClipboardSkill()
+			}
 		}
 		if err == nil && len(src.Skills) == 1 {
 			what = locales.ImportClipboardSkill()
@@ -311,6 +323,8 @@ func (a *app) recentImports(c *ui.Context) {
 					ic = iconFolder
 				case "well-known":
 					ic = iconGlobe
+				case "clawhub":
+					ic = iconClawHub
 				}
 				ui.Box(c).Size(22, 22).Radius(6).Shrink(0).Background(colBgFill).Center().Children(func() {
 					ui.Icon(c, ic).Size(13, 13).TextColor(colTextSecondary)
@@ -359,6 +373,13 @@ func (a *app) importPickPage(c *ui.Context) {
 					u += "/tree/" + ref + "/" + b.Source.Subpath
 				}
 				a.openExternalURL(u)
+			}
+		}
+		if b.Source.Kind == library.ImportClawHub {
+			if owner, slug, ok := strings.Cut(b.Source.Repo, "/"); ok {
+				if updButton(c, iconExternal, locales.ImportViewOnClawHub(), false).Clicked() {
+					a.openExternalURL("https://clawhub.ai/" + owner + "/skills/" + slug)
+				}
 			}
 		}
 	})
@@ -410,6 +431,9 @@ func (a *app) importSourceBar(c *ui.Context) {
 				case library.ImportWebsite:
 					iconLabel(iconGlobe, "well-known "+b.Protocol)
 					ui.Text(c, locales.ImportWebsiteMutable()).FontSize(12).SingleLine().Shrink(1).MinWidth(0)
+				case library.ImportClawHub:
+					iconLabel(iconClawHub, "ClawHub")
+					ui.Text(c, locales.ImportClawHubWebsiteNote()).FontSize(12).SingleLine().Shrink(1).MinWidth(0)
 				default:
 					iconLabel(iconFolder, locales.CommonLocal())
 				}
@@ -490,30 +514,39 @@ func (a *app) importResultCounts() (added, notAdded int) {
 
 // importSourceIcon 是来源的头像或图标。
 func (a *app) importSourceIcon(c *ui.Context, b *library.ImportBatch) {
-	if b.Source.Kind == library.ImportGitHub {
+	logoBox := func(src ui.ImageSource) bool {
+		if src == nil {
+			return false
+		}
+		box := ui.Box(c).Size(34, 34).Radius(8).Clip().Background(colBgLogo).Shrink(0)
+		hairline(box, 0.12)
+		box.Children(func() { ui.Image(c, src).Size(34, 34).Fit(ui.Cover) })
+		return true
+	}
+	switch b.Source.Kind {
+	case library.ImportGitHub:
 		owner, _, _ := strings.Cut(b.Source.Repo, "/")
-		if src := a.srcIcons["gh:"+owner]; src != nil {
-			box := ui.Box(c).Size(34, 34).Radius(8).Clip().Background(colBgLogo).Shrink(0)
-			hairline(box, 0.12)
-			box.Children(func() { ui.Image(c, src).Size(34, 34).Fit(ui.Cover) })
+		if logoBox(a.srcIcons["gh:"+owner]) {
 			return
 		}
 		ui.Column(c).Size(34, 34).Radius(8).Background(colTextPrimary).Center().Shrink(0).Children(func() {
 			ui.Icon(c, iconGitHub).Size(18, 18).TextColor(white)
 		})
-		return
-	}
-	if b.Source.Kind == library.ImportWebsite {
-		if src := a.srcIcons[b.Site]; src != nil {
-			box := ui.Box(c).Size(34, 34).Radius(8).Clip().Background(colBgLogo).Shrink(0)
-			hairline(box, 0.12)
-			box.Children(func() { ui.Image(c, src).Size(34, 34).Fit(ui.Cover) })
+	case library.ImportWebsite:
+		if logoBox(a.srcIcons[b.Site]) {
 			return
 		}
 		squircleIcon(c, iconGlobe, 34, squircleTeal)
-		return
+	case library.ImportClawHub:
+		if logoBox(a.srcIcons["clawhub.ai"]) {
+			return
+		}
+		box := ui.Box(c).Size(34, 34).Radius(8).Background(colBgLogo).Center().Shrink(0)
+		hairline(box, 0.16)
+		box.Children(func() { ui.Icon(c, iconClawHub).Size(18, 18).TextColor(colTextPrimary) })
+	default:
+		squircleIcon(c, iconNavFolder, 34, squircleBlue)
 	}
-	squircleIcon(c, iconNavFolder, 34, squircleBlue)
 }
 
 // placementMenu 是「装到」：技能库（通用）、指定的 Agent 或项目。
@@ -1001,6 +1034,8 @@ func (a *app) importedNote(s *library.ImportSkill) string {
 			return locales.ImportProjectSourceLocal(a.lib.Display(s.RepoPath))
 		case library.ImportWebsite:
 			return locales.ImportProjectSourceWebsite(b.Site)
+		case library.ImportClawHub:
+			return locales.ImportProjectSourceClawHub(b.Source.Repo)
 		}
 		return locales.ImportProjectSourceGitHub(b.Source.Repo, shortCommit(b.Commit))
 	}
@@ -1009,6 +1044,8 @@ func (a *app) importedNote(s *library.ImportSkill) string {
 		return locales.ImportSourceLocal(a.lib.Display(s.RepoPath))
 	case library.ImportWebsite:
 		return locales.ImportSourceWebsite(b.Site)
+	case library.ImportClawHub:
+		return locales.ImportSourceClawHub(b.Source.Repo)
 	}
 	return locales.ImportSourceGitHub(b.Source.Repo, shortCommit(b.Commit))
 }
@@ -1089,6 +1126,8 @@ func (a *app) conflictCard(c *ui.Context, s *library.ImportSkill, existing, titl
 			theirs, meta = strings.TrimSuffix(b.Source.Repo+"/"+s.RepoPath, "/"), shortCommit(b.Commit)
 		case library.ImportWebsite:
 			theirs, meta = webPath(s.SourceURL), locales.CommonWebsite()
+		case library.ImportClawHub:
+			theirs, meta = b.Source.Repo, "ClawHub"
 		}
 		mine := ""
 		if src, ok := a.lib.ImportedFrom(existing); ok {

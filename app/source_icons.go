@@ -61,6 +61,11 @@ func (a *app) ensureSourceIcons() {
 					_, err := a.iconFetch.Fetch(ctx, rec.SourceBaseURL, rec.Source)
 					return err
 				})
+			case "clawhub":
+				a.scheduleSourceIcon("clawhub.ai", func(ctx context.Context) error {
+					_, err := a.iconFetch.Fetch(ctx, "https://clawhub.ai", "clawhub.ai")
+					return err
+				})
 			}
 		}
 	}
@@ -135,6 +140,8 @@ func recordIconKey(rec library.LockEntry) string {
 		return "gh:" + owner
 	case "well-known":
 		return rec.Source
+	case "clawhub":
+		return "clawhub.ai"
 	}
 	return ""
 }

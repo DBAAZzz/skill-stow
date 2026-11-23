@@ -17345,3 +17345,61 @@ func DeleteBodyOutsideWithLinks(count int) string {
 func (msgs Messages) DeleteBodyOutsideWithLinks(count int) string {
 	return Catalog.Format(msgs.locale, "deleteBodyOutsideWithLinks", map[string]any{"count": count})
 }
+
+// ImportViewOnClawHub says "在 ClawHub 上查看"
+// in the language the app shows.
+//
+// 添加技能选择页右上角按钮：跳转到 ClawHub 技能页
+func ImportViewOnClawHub() string { return In(i18n.Locale()).ImportViewOnClawHub() }
+
+// ImportViewOnClawHub says "在 ClawHub 上查看"
+// in the language of msgs.
+//
+// 添加技能选择页右上角按钮：跳转到 ClawHub 技能页
+func (msgs Messages) ImportViewOnClawHub() string {
+	return Catalog.Format(msgs.locale, "importViewOnClawHub", nil)
+}
+
+// ImportClawHubWebsiteNote says "来自 clawhub.ai，暂不参与自动检查更新"
+// in the language the app shows.
+//
+// 添加技能选择页来源栏的副标题
+func ImportClawHubWebsiteNote() string { return In(i18n.Locale()).ImportClawHubWebsiteNote() }
+
+// ImportClawHubWebsiteNote says "来自 clawhub.ai，暂不参与自动检查更新"
+// in the language of msgs.
+//
+// 添加技能选择页来源栏的副标题
+func (msgs Messages) ImportClawHubWebsiteNote() string {
+	return Catalog.Format(msgs.locale, "importClawHubWebsiteNote", nil)
+}
+
+// ImportSourceClawHub says "来源记为 ClawHub：{repo}，暂不参与自动更新。"
+// in the language the app shows.
+//
+// 添加完成后说明来源
+func ImportSourceClawHub(repo string) string { return In(i18n.Locale()).ImportSourceClawHub(repo) }
+
+// ImportSourceClawHub says "来源记为 ClawHub：{repo}，暂不参与自动更新。"
+// in the language of msgs.
+//
+// 添加完成后说明来源
+func (msgs Messages) ImportSourceClawHub(repo string) string {
+	return Catalog.Format(msgs.locale, "importSourceClawHub", map[string]any{"repo": repo})
+}
+
+// ImportProjectSourceClawHub says "来源记为 ClawHub：{repo}，项目技能暂不参与更新。"
+// in the language the app shows.
+//
+// 添加技能到项目完成后说明来源
+func ImportProjectSourceClawHub(repo string) string {
+	return In(i18n.Locale()).ImportProjectSourceClawHub(repo)
+}
+
+// ImportProjectSourceClawHub says "来源记为 ClawHub：{repo}，项目技能暂不参与更新。"
+// in the language of msgs.
+//
+// 添加技能到项目完成后说明来源
+func (msgs Messages) ImportProjectSourceClawHub(repo string) string {
+	return Catalog.Format(msgs.locale, "importProjectSourceClawHub", map[string]any{"repo": repo})
+}
