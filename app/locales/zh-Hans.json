@@ -7381,10 +7381,6 @@
   "@settingsAutoCheckAppUpdates": {
     "description": "设置 › 通用 › 应用更新：后台自动检查的开关"
   },
-  "settingsAutoCheckAppUpdatesHint": "打开后，每次启动和之后每天在后台向 GitHub 查一次新版本。关闭时只在你点击「检查更新…」时联网。",
-  "@settingsAutoCheckAppUpdatesHint": {
-    "description": "设置 › 通用 › 应用更新：自动检查开关的说明"
-  },
   "appUpdateUnavailableMessage": "{app} 不能自行更新。",
   "@appUpdateUnavailableMessage": {
     "description": "更新窗口：应用不能自己更新时的说明，替换插件默认的「软件包管理器」说法；app 由更新窗口填入应用名",

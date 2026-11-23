@@ -110,7 +110,7 @@ func (a *app) appUpdateGroup(c *ui.Context) {
 			}
 		})
 		setRow(c).Children(func() {
-			rowText(c, locales.SettingsAutoCheckAppUpdates(), locales.SettingsAutoCheckAppUpdatesHint(), false)
+			rowText(c, locales.SettingsAutoCheckAppUpdates(), "", false)
 			on := u.AutomaticChecks()
 			if t := toggle(c, &on, locales.SettingsAutoCheckAppUpdates()).Disabled(!u.Enabled()); t.Changed() {
 				u.SetAutomaticChecks(on)

@@ -17048,22 +17048,6 @@ func (msgs Messages) SettingsAutoCheckAppUpdates() string {
 	return Catalog.Format(msgs.locale, "settingsAutoCheckAppUpdates", nil)
 }
 
-// SettingsAutoCheckAppUpdatesHint says "打开后，每次启动和之后每天在后台向 GitHub …"
-// in the language the app shows.
-//
-// 设置 › 通用 › 应用更新：自动检查开关的说明
-func SettingsAutoCheckAppUpdatesHint() string {
-	return In(i18n.Locale()).SettingsAutoCheckAppUpdatesHint()
-}
-
-// SettingsAutoCheckAppUpdatesHint says "打开后，每次启动和之后每天在后台向 GitHub …"
-// in the language of msgs.
-//
-// 设置 › 通用 › 应用更新：自动检查开关的说明
-func (msgs Messages) SettingsAutoCheckAppUpdatesHint() string {
-	return Catalog.Format(msgs.locale, "settingsAutoCheckAppUpdatesHint", nil)
-}
-
 // AppUpdateUnavailableMessage says "{app} 不能自行更新。"
 // in the language the app shows.
 //
