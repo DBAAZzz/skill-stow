@@ -48,7 +48,7 @@ func (a *app) sidebar(c *ui.Context, vibrant bool) {
 				a.projectItems(c)
 			}
 		}
-	}).Padding(4, 10, 0, 10).Gap(0).Grow(1).Label(locales.NavScopes()).Scrollbars(false).Bind(&a.sideBar)
+	}).Padding(12, 10, 0, 10).Gap(0).Grow(1).Label(locales.NavScopes()).Scrollbars(false).Bind(&a.sideBar)
 	if vibrant {
 		bar.Background(ui.Transparent)
 	}
