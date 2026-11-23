@@ -442,6 +442,24 @@ func (msgs Messages) NavSettings() string {
 	return Catalog.Format(msgs.locale, "navSettings", nil)
 }
 
+// NavSettingsUpdateAvailable says "设置，新版本 {version} 可以安装"
+// in the language the app shows.
+//
+// 侧边栏底部齿轮按钮：找到应用新版本时的悬停提示和读屏标签，齿轮右上角同时有蓝色圆点；version
+// 是新版本号
+func NavSettingsUpdateAvailable(version string) string {
+	return In(i18n.Locale()).NavSettingsUpdateAvailable(version)
+}
+
+// NavSettingsUpdateAvailable says "设置，新版本 {version} 可以安装"
+// in the language of msgs.
+//
+// 侧边栏底部齿轮按钮：找到应用新版本时的悬停提示和读屏标签，齿轮右上角同时有蓝色圆点；version
+// 是新版本号
+func (msgs Messages) NavSettingsUpdateAvailable(version string) string {
+	return Catalog.Format(msgs.locale, "navSettingsUpdateAvailable", map[string]any{"version": version})
+}
+
 // SidebarHide says "隐藏边栏"
 // in the language the app shows.
 //

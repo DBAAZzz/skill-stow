@@ -129,6 +129,15 @@
   "@navSettings": {
     "description": "侧边栏底部齿轮按钮"
   },
+  "navSettingsUpdateAvailable": "设置，新版本 {version} 可以安装",
+  "@navSettingsUpdateAvailable": {
+    "description": "侧边栏底部齿轮按钮：找到应用新版本时的悬停提示和读屏标签，齿轮右上角同时有蓝色圆点；version 是新版本号",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "sidebarHide": "隐藏边栏",
   "@sidebarHide": {
     "description": "收起侧边栏的按钮"

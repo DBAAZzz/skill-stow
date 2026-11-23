@@ -29,6 +29,7 @@
   "navAddProject": "Add Project",
   "navAddProjectEllipsis": "Add Project…",
   "navSettings": "Settings",
+  "navSettingsUpdateAvailable": "Settings, version {version} available",
   "sidebarHide": "Hide Sidebar",
   "sidebarShow": "Show Sidebar",
   "navBack": "Back",
