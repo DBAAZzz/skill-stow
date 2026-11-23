@@ -24,6 +24,7 @@ const (
 	ImportWebsite                // 网站来源（well-known）
 	ImportLocal                  // 本机文件夹或 zip
 	ImportUnsupported            // GitLab、其他 git 地址等
+	ImportClawHub                // ClawHub 市场技能
 )
 
 // ImportSource 是识别出的来源。
@@ -58,6 +59,8 @@ func (s ImportSource) Label() string {
 		return l
 	case ImportWebsite:
 		return strings.TrimPrefix(strings.TrimPrefix(s.URL, "https://"), "http://")
+	case ImportClawHub:
+		return s.Repo
 	case ImportLocal:
 		if len(s.Paths) == 1 {
 			return filepath.Base(s.Paths[0])
@@ -77,9 +80,11 @@ var (
 var wellKnownSkillURL = regexp.MustCompile(`^(.*?)/\.well-known/(?:agent-skills|skills)(?:/([^/]+))?(?:/.*)?$`)
 
 // GitHub 用户名：字母数字和连字符；仓库名还能有点和下划线。
+// ClawHub 用户名和 slug 允许字母数字、点、下划线和连字符。
 var (
-	ghOwner = regexp.MustCompile(`^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$`)
-	ghRepo  = regexp.MustCompile(`^[A-Za-z0-9._-]{1,100}$`)
+	ghOwner      = regexp.MustCompile(`^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$`)
+	ghRepo       = regexp.MustCompile(`^[A-Za-z0-9._-]{1,100}$`)
+	clawHubIdent = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$`)
 )
 
 // ParseImportInput 识别一段输入。认不出时返回 ErrImportUnknown；能认出
@@ -288,13 +293,16 @@ func expandTilde(p string) string {
 	return p
 }
 
-// webURL 认出带协议的网址，以及不带协议的 github.com/… 和 skills.sh/…。
+// webURL 认出带协议的网址，以及不带协议的 github.com/…、skills.sh/… 和 clawhub.ai/…。
 func webURL(in string) (*url.URL, bool) {
 	raw := in
 	if !strings.Contains(raw, "://") {
 		host, _, _ := strings.Cut(raw, "/")
 		h := strings.ToLower(host)
-		if h != "github.com" && h != "www.github.com" && h != "skills.sh" && h != "www.skills.sh" && h != "gitlab.com" {
+		if h != "github.com" && h != "www.github.com" &&
+			h != "skills.sh" && h != "www.skills.sh" &&
+			h != "clawhub.ai" && h != "www.clawhub.ai" &&
+			h != "gitlab.com" {
 			return nil, false
 		}
 		raw = "https://" + raw
@@ -340,23 +348,9 @@ func parseWebURL(out ImportSource, u *url.URL) (ImportSource, error) {
 		}
 		return out, nil
 	case "skills.sh":
-		// skills.sh/<owner>/<repo>/<skill>；owner 带点的是网站来源的技能
-		if len(segs) < 2 {
-			return out, ErrImportUnknown
-		}
-		if strings.Contains(segs[0], ".") {
-			out.Kind, out.URL, out.Guessed = ImportWebsite, "https://"+segs[0], true
-			out.Skills = []string{segs[len(segs)-1]}
-			return out, nil
-		}
-		if !ghOwner.MatchString(segs[0]) || !ghRepo.MatchString(segs[1]) {
-			return out, ErrImportUnknown
-		}
-		out.Kind, out.Repo = ImportGitHub, segs[0]+"/"+segs[1]
-		if len(segs) >= 3 {
-			out.Skills = []string{segs[2]}
-		}
-		return out, nil
+		return parseSkillsShSegments(out, segs)
+	case "clawhub.ai":
+		return parseClawHubURL(out, segs)
 	case "gitlab.com":
 		out.Kind = ImportUnsupported
 		return out, nil
@@ -372,6 +366,51 @@ func parseWebURL(out ImportSource, u *url.URL) (ImportSource, error) {
 	}
 	out.URL = strings.TrimSuffix(u.String(), "/")
 	return out, nil
+}
+
+func parseSkillsShSegments(out ImportSource, segs []string) (ImportSource, error) {
+	// skills.sh/<owner>/<repo>/<skill>；owner 带点的是网站来源的技能
+	if len(segs) < 2 {
+		return out, ErrImportUnknown
+	}
+	if strings.Contains(segs[0], ".") {
+		out.Kind, out.URL, out.Guessed = ImportWebsite, "https://"+segs[0], true
+		out.Skills = []string{segs[len(segs)-1]}
+		return out, nil
+	}
+	if !ghOwner.MatchString(segs[0]) || !ghRepo.MatchString(segs[1]) {
+		return out, ErrImportUnknown
+	}
+	out.Kind, out.Repo = ImportGitHub, segs[0]+"/"+segs[1]
+	if len(segs) >= 3 {
+		out.Skills = []string{segs[2]}
+	}
+	return out, nil
+}
+
+func parseClawHubURL(out ImportSource, segs []string) (ImportSource, error) {
+	var owner, slug string
+	switch {
+	case len(segs) == 4 && segs[0] == "skills-sh":
+		return parseSkillsShSegments(out, segs[1:])
+	case len(segs) == 3 && segs[1] == "skills":
+		owner, slug = segs[0], segs[2]
+	case len(segs) == 2 && !slices.Contains([]string{"skills", "user", "api"}, strings.ToLower(segs[0])):
+		owner, slug = segs[0], segs[1]
+	default:
+		return out, ErrImportUnknown
+	}
+	if !validClawHubIdent(owner) || !validClawHubIdent(slug) {
+		return out, ErrImportUnknown
+	}
+	out.Kind = ImportClawHub
+	out.Repo = owner + "/" + slug
+	out.URL = "https://clawhub.ai/" + owner + "/skills/" + slug
+	return out, nil
+}
+
+func validClawHubIdent(s string) bool {
+	return clawHubIdent.MatchString(s) && !strings.Contains(s, "..")
 }
 
 // parseShorthand 是不带协议的写法：owner/repo、owner/repo/子目录、

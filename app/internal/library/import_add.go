@@ -889,7 +889,7 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 		}
 		return err
 	}
-	if p.Library && (src.Kind == ImportGitHub || src.Kind == ImportWebsite) {
+	if p.Library && (src.Kind == ImportGitHub || src.Kind == ImportWebsite || src.Kind == ImportClawHub) {
 		rec := lockRecordFor(b, sk)
 		recorded = rec.SkillFolderHash
 		prev, err := addInstallRecord(l.Home, sk.Name, rec)
@@ -924,6 +924,9 @@ func (l *Library) addImport(b *ImportBatch, sk *ImportSkill, p ImportPlacement, 
 		mark.Path, mark.Commit = sk.RepoPath, b.Commit
 	case ImportWebsite:
 		mark.Source = SourceID{Type: "well-known", Repo: b.Site}
+		mark.Path = sk.SourceURL
+	case ImportClawHub:
+		mark.Source = SourceID{Type: "clawhub", Repo: src.Repo}
 		mark.Path = sk.SourceURL
 	case ImportLocal:
 		mark.Source = SourceID{Type: "local", Repo: sk.RepoPath}
@@ -1164,9 +1167,13 @@ func jsTime(t time.Time) string { return t.UTC().Format("2006-01-02T15:04:05.000
 
 func lockRecordFor(b *ImportBatch, sk *ImportSkill) lockRecord {
 	now := jsTime(time.Now())
-	if b.Source.Kind == ImportWebsite {
+	switch b.Source.Kind {
+	case ImportWebsite:
 		return lockRecord{Source: b.Site, SourceType: "well-known", SourceURL: sk.SourceURL,
 			SourceBaseURL: b.BaseURL, WellKnownDigest: sk.Digest, InstalledAt: now, UpdatedAt: now}
+	case ImportClawHub:
+		return lockRecord{Source: b.Source.Repo, SourceType: "clawhub", SourceURL: sk.SourceURL,
+			SkillFolderHash: sk.Tree, InstalledAt: now, UpdatedAt: now}
 	}
 	r := lockRecord{
 		Source: b.Source.Repo, SourceType: "github", SourceURL: "https://github.com/" + b.Source.Repo + ".git",

@@ -44,6 +44,14 @@ func TestImportInputRecognisesEveryDocumentedForm(t *testing.T) {
 		{in: "npx skills add https://mintlify.com/docs", kind: ImportWebsite, url: "https://mintlify.com/docs"},
 		{in: "mintlify.com/mintlify", kind: ImportWebsite, url: "https://mintlify.com", sub: "mintlify", skills: []string{"mintlify"}},
 		{in: "skills.sh/mintlify.com/mintlify", kind: ImportWebsite, url: "https://mintlify.com", skills: []string{"mintlify"}},
+		{in: "https://clawhub.ai/awspace/skills/pdf", kind: ImportClawHub, repo: "awspace/pdf", url: "https://clawhub.ai/awspace/skills/pdf"},
+		{in: "https://www.clawhub.ai/spclaudehome/skills/skill-vetter/", kind: ImportClawHub, repo: "spclaudehome/skill-vetter", url: "https://clawhub.ai/spclaudehome/skills/skill-vetter"},
+		{in: "https://clawhub.ai/awspace/pdf", kind: ImportClawHub, repo: "awspace/pdf", url: "https://clawhub.ai/awspace/skills/pdf"},
+		{in: "clawhub.ai/awspace/pdf", kind: ImportClawHub, repo: "awspace/pdf", url: "https://clawhub.ai/awspace/skills/pdf"},
+		{in: "clawhub.ai/awspace/skills/pdf", kind: ImportClawHub, repo: "awspace/pdf", url: "https://clawhub.ai/awspace/skills/pdf"},
+		{in: "npx skills add https://clawhub.ai/awspace/skills/pdf -g -y", kind: ImportClawHub, repo: "awspace/pdf", url: "https://clawhub.ai/awspace/skills/pdf", ignored: true},
+		{in: "npx skills add clawhub.ai/awspace/pdf", kind: ImportClawHub, repo: "awspace/pdf", url: "https://clawhub.ai/awspace/skills/pdf"},
+		{in: "https://clawhub.ai/skills-sh/anthropics/skills/pdf", kind: ImportGitHub, repo: "anthropics/skills", skills: []string{"pdf"}},
 		{in: "https://gitlab.com/a/b", kind: ImportUnsupported},
 		{in: "git@github.com:a/b.git", kind: ImportUnsupported},
 	}
@@ -69,7 +77,11 @@ func TestImportInputRejectsWhatItCannotRead(t *testing.T) {
 	if _, err := ParseImportInput("   "); !errors.Is(err, ErrImportEmpty) {
 		t.Errorf("空输入：%v", err)
 	}
-	for _, in := range []string{"vite", "hello world", "npx skills add", "a b/c", "-bad/repo"} {
+	for _, in := range []string{
+		"vite", "hello world", "npx skills add", "a b/c", "-bad/repo",
+		"https://clawhub.ai", "https://clawhub.ai/awspace", "https://clawhub.ai/skills/pdf",
+		"https://clawhub.ai/user/awspace", "https://clawhub.ai/a..b/skills/pdf",
+	} {
 		if got, err := ParseImportInput(in); !errors.Is(err, ErrImportUnknown) {
 			t.Errorf("%q 应认不出，得到 %+v %v", in, got, err)
 		}

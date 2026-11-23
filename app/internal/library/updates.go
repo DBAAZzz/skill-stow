@@ -151,6 +151,14 @@ func (it UpdateItem) WebURL() string {
 			return "https://" + strings.TrimSpace(it.Source.Repo)
 		}
 		return ""
+	case "clawhub":
+		if u := safeHTTPURL(it.Record.SourceURL); u != "" {
+			return u
+		}
+		if segs, ok := splitSafePath(it.Source.Repo, 2, true); ok {
+			return "https://clawhub.ai/" + segs[0] + "/skills/" + segs[1]
+		}
+		return ""
 	}
 	if u := safeHTTPURL(it.Record.SourceBaseURL); u != "" {
 		return u
