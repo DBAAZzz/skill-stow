@@ -1,0 +1,63 @@
+{
+  "query": "pdf",
+  "searchType": "fuzzy",
+  "searchVersion": "algolia",
+  "skills": [
+    {
+      "id": "anthropics/skills/pdf",
+      "source": "anthropics/skills",
+      "skillId": "pdf",
+      "name": "pdf",
+      "installs": 235455
+    },
+    {
+      "id": "vercel-labs/json-render/react-pdf",
+      "source": "vercel-labs/json-render",
+      "skillId": "react-pdf",
+      "name": "react-pdf",
+      "installs": 2429
+    },
+    {
+      "id": "openai/skills/pdf",
+      "source": "openai/skills",
+      "skillId": "pdf",
+      "name": "pdf",
+      "installs": 13995
+    },
+    {
+      "id": "github/awesome-copilot/pdftk-server",
+      "source": "github/awesome-copilot",
+      "skillId": "pdftk-server",
+      "name": "pdftk-server",
+      "installs": 10000
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins/view-pdf",
+      "source": "anthropics/knowledge-work-plugins",
+      "skillId": "view-pdf",
+      "name": "view-pdf",
+      "installs": 6483
+    },
+    {
+      "id": "tanis90/pdf-converter-mineru/pdf-converter",
+      "source": "tanis90/pdf-converter-mineru",
+      "skillId": "pdf-converter",
+      "name": "pdf-converter",
+      "installs": 9739
+    }
+  ],
+  "count": 6,
+  "duration_ms": 225,
+  "timings_ms": {
+    "rate_limit": 29.210698999930173,
+    "flags": 1.3334729997441173,
+    "retrieval": 136.11977099999785,
+    "visibility": 107.94969600019976,
+    "algolia_processing": 236,
+    "repositories": 35.13961600000039,
+    "ranking": 16.362145999912173,
+    "search": 225,
+    "total": 254.6867800001055
+  },
+  "provider_duration_ms": 136.11977099999785
+}

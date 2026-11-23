@@ -1,0 +1,107 @@
+{
+  "skills": [
+    {
+      "source": "vercel-labs/skills",
+      "skillId": "find-skills",
+      "name": "find-skills",
+      "installs": 4493759,
+      "weeklyInstalls": [
+        107199,
+        110524,
+        121189,
+        121665,
+        115285,
+        110096,
+        109742,
+        112607
+      ],
+      "isOfficial": true
+    },
+    {
+      "source": "heygen-com/hyperframes",
+      "skillId": "hyperframes-cli",
+      "name": "hyperframes-cli",
+      "installs": 1676254,
+      "weeklyInstalls": [
+        96486,
+        146752,
+        158584,
+        144957,
+        125767,
+        103285,
+        103703,
+        95042
+      ]
+    },
+    {
+      "source": "vercel-labs/agent-browser",
+      "skillId": "agent-browser",
+      "name": "agent-browser",
+      "installs": 1654673,
+      "weeklyInstalls": [
+        70638,
+        67374,
+        75456,
+        78806,
+        86942,
+        103297,
+        102954,
+        111582
+      ],
+      "isOfficial": true
+    },
+    {
+      "source": "heygen-com/hyperframes",
+      "skillId": "hyperframes",
+      "name": "hyperframes",
+      "installs": 1641684,
+      "weeklyInstalls": [
+        95609,
+        137375,
+        155691,
+        156397,
+        121306,
+        103215,
+        104944,
+        97471
+      ]
+    },
+    {
+      "source": "anthropics/skills",
+      "skillId": "frontend-design",
+      "name": "frontend-design",
+      "installs": 1155771,
+      "weeklyInstalls": [
+        24769,
+        25306,
+        27828,
+        29060,
+        30354,
+        30893,
+        30153,
+        31137
+      ],
+      "isOfficial": true
+    },
+    {
+      "source": "anthropics/skills",
+      "skillId": "pdf",
+      "name": "pdf",
+      "installs": 235487,
+      "weeklyInstalls": [
+        4034,
+        4206,
+        3873,
+        4049,
+        4152,
+        4309,
+        4834,
+        5121
+      ],
+      "isOfficial": false
+    }
+  ],
+  "total": 9905,
+  "hasMore": true,
+  "page": 0
+}

@@ -1,0 +1,978 @@
+{
+  "results": [
+    {
+      "canonicalUrl": "/awspace/skills/pdf",
+      "categories": [
+        "knowledge"
+      ],
+      "displayName": "Pdf",
+      "downloads": 52554,
+      "featured": true,
+      "icon": null,
+      "id": "clawhub:kd74n44stcpmhfvqe02yj7r6ms808nvm",
+      "install": {
+        "kind": "clawhub",
+        "reference": "awspace/pdf",
+        "sourceUrl": null
+      },
+      "links": {
+        "canonical": "/awspace/skills/pdf",
+        "source": null
+      },
+      "metrics": {
+        "bookmarks": 0,
+        "rolling60DayInstalls": 26,
+        "updatedAt": 1789594554485
+      },
+      "native": {
+        "owner": {
+          "_creationTime": 1780781797184.5854,
+          "_id": "s176rb1anzaaw78jd9qd65j08x884mmr",
+          "displayName": "awspace",
+          "handle": "awspace",
+          "image": "https://avatars.githubusercontent.com/u/131568675?v=4",
+          "kind": "user",
+          "linkedUserId": "kn725kyxpr1g1e3rjqtkp26v0s809930"
+        },
+        "ownerHandle": "awspace",
+        "skill": {
+          "_creationTime": 1769847855729.2668,
+          "_id": "kd74n44stcpmhfvqe02yj7r6ms808nvm",
+          "badges": {
+            "highlighted": {
+              "at": 1789594554485,
+              "byUserId": "kn7485dek1erzmvwaqz77rm5vh85pyb3"
+            }
+          },
+          "categories": [
+            "knowledge"
+          ],
+          "createdAt": 1769847855729,
+          "displayName": "Pdf",
+          "isSuspicious": false,
+          "latestVersionId": "k97cz981kj0veqx1m79dd5sy4n809j57",
+          "ownerPublisherId": "s176rb1anzaaw78jd9qd65j08x884mmr",
+          "ownerUserId": "kn725kyxpr1g1e3rjqtkp26v0s809930",
+          "slug": "pdf",
+          "stats": {
+            "comments": 1,
+            "downloads": 52554,
+            "installs": 1502,
+            "stars": 67,
+            "versions": 1
+          },
+          "summary": "Comprehensive PDF manipulation toolkit for extracting text and tables, creating new PDFs, merging/splitting documents, and handling forms. When Claude needs to fill in a PDF form or programmatically process, generate, or analyze PDF documents at scale.",
+          "tags": {
+            "latest": "k97cz981kj0veqx1m79dd5sy4n809j57"
+          },
+          "topics": [
+            "PDF"
+          ],
+          "updatedAt": 1789594554485
+        },
+        "version": null
+      },
+      "official": false,
+      "ownerHandle": "awspace",
+      "publisher": {
+        "displayName": "awspace",
+        "handle": "awspace",
+        "image": "https://avatars.githubusercontent.com/u/131568675?v=4",
+        "kind": "user",
+        "official": false
+      },
+      "score": 6120,
+      "slug": "pdf",
+      "source": "clawhub",
+      "sourceIdentity": {
+        "host": null,
+        "id": "kd74n44stcpmhfvqe02yj7r6ms808nvm",
+        "lifetimeInstalls": null,
+        "owner": "awspace",
+        "repo": null
+      },
+      "summary": "Comprehensive PDF manipulation toolkit for extracting text and tables, creating new PDFs, merging/splitting documents, and handling forms. When Claude needs to fill in a PDF form or programmatically process, generate, or analyze PDF documents at scale.",
+      "trust": {
+        "clawHubVerdict": null,
+        "installability": "installable",
+        "sourceFreshness": "native",
+        "upstreamScanners": null,
+        "visibility": "public"
+      },
+      "updatedAt": 1789594554485,
+      "version": null,
+      "owner": {
+        "handle": "awspace",
+        "displayName": "awspace",
+        "image": "https://avatars.githubusercontent.com/u/131568675?v=4"
+      }
+    },
+    {
+      "canonicalUrl": "/thcjp/skills/pdf",
+      "categories": [
+        "automation"
+      ],
+      "displayName": "PDF\u5904\u7406\u5de5\u5177",
+      "downloads": 837,
+      "featured": false,
+      "icon": null,
+      "id": "clawhub:kd7cm0dz3qm2m2q4gj1982krfs8cegex",
+      "install": {
+        "kind": "clawhub",
+        "reference": "thcjp/pdf",
+        "sourceUrl": null
+      },
+      "links": {
+        "canonical": "/thcjp/skills/pdf",
+        "source": null
+      },
+      "metrics": {
+        "bookmarks": 0,
+        "rolling60DayInstalls": 2,
+        "updatedAt": 1790017028529
+      },
+      "native": {
+        "owner": {
+          "_creationTime": 1784320770231.3508,
+          "_id": "s173q6vayrg64xn0drt9jav6a98aqzb1",
+          "displayName": "\u5929\u8f70\u7a7f",
+          "handle": "thcjp",
+          "image": "https://avatars.githubusercontent.com/u/957992?v=4",
+          "kind": "user",
+          "linkedUserId": "kn746s881gfq2c1ewb5nv630yd8aq1ck"
+        },
+        "ownerHandle": "thcjp",
+        "skill": {
+          "_creationTime": 1786702826866.7542,
+          "_id": "kd7cm0dz3qm2m2q4gj1982krfs8cegex",
+          "badges": {},
+          "categories": [
+            "automation"
+          ],
+          "createdAt": 1786702826866,
+          "displayName": "PDF\u5904\u7406\u5de5\u5177",
+          "isSuspicious": false,
+          "latestVersionId": "k975b8e62syyzwxgtby6v62yf98cf2y9",
+          "ownerPublisherId": "s173q6vayrg64xn0drt9jav6a98aqzb1",
+          "ownerUserId": "kn746s881gfq2c1ewb5nv630yd8aq1ck",
+          "slug": "pdf",
+          "stats": {
+            "comments": 0,
+            "downloads": 837,
+            "installs": 2,
+            "stars": 0,
+            "versions": 2
+          },
+          "summary": "\u63d0\u4f9bPDF\u6587\u672c\u548c\u8868\u683c\u63d0\u53d6\u3001PDF\u521b\u5efa\u3001\u5408\u5e76\u53ca\u8868\u5355\u81ea\u52a8\u586b\u5199\u7684\u5168\u65b9\u4f4d\u4e2d\u6587PDF\u5904\u7406\u5de5\u5177\u3002",
+          "tags": {
+            "latest": "k975b8e62syyzwxgtby6v62yf98cf2y9"
+          },
+          "topics": [
+            "pdf"
+          ],
+          "updatedAt": 1790017028529
+        },
+        "version": null
+      },
+      "official": false,
+      "ownerHandle": "thcjp",
+      "publisher": {
+        "displayName": "\u5929\u8f70\u7a7f",
+        "handle": "thcjp",
+        "image": "https://avatars.githubusercontent.com/u/957992?v=4",
+        "kind": "user",
+        "official": false
+      },
+      "score": 6120,
+      "slug": "pdf",
+      "source": "clawhub",
+      "sourceIdentity": {
+        "host": null,
+        "id": "kd7cm0dz3qm2m2q4gj1982krfs8cegex",
+        "lifetimeInstalls": null,
+        "owner": "thcjp",
+        "repo": null
+      },
+      "summary": "\u63d0\u4f9bPDF\u6587\u672c\u548c\u8868\u683c\u63d0\u53d6\u3001PDF\u521b\u5efa\u3001\u5408\u5e76\u53ca\u8868\u5355\u81ea\u52a8\u586b\u5199\u7684\u5168\u65b9\u4f4d\u4e2d\u6587PDF\u5904\u7406\u5de5\u5177\u3002",
+      "trust": {
+        "clawHubVerdict": null,
+        "installability": "installable",
+        "sourceFreshness": "native",
+        "upstreamScanners": null,
+        "visibility": "public"
+      },
+      "updatedAt": 1790017028529,
+      "version": null,
+      "owner": {
+        "handle": "thcjp",
+        "displayName": "\u5929\u8f70\u7a7f",
+        "image": "https://avatars.githubusercontent.com/u/957992?v=4"
+      }
+    },
+    {
+      "canonicalUrl": "/paudyyin/skills/pdf",
+      "categories": [
+        "other"
+      ],
+      "displayName": "pdf",
+      "downloads": 756,
+      "featured": false,
+      "icon": null,
+      "id": "clawhub:kd7b8ss1qm3j396ddwffdqh7gs8bs58e",
+      "install": {
+        "kind": "clawhub",
+        "reference": "paudyyin/pdf",
+        "sourceUrl": null
+      },
+      "links": {
+        "canonical": "/paudyyin/skills/pdf",
+        "source": null
+      },
+      "metrics": {
+        "bookmarks": 0,
+        "rolling60DayInstalls": 1,
+        "updatedAt": 1785720075756
+      },
+      "native": {
+        "owner": {
+          "_creationTime": 1778546830438.7551,
+          "_id": "s172x1s50dh0bgmm3yc9516nr586kk4b",
+          "displayName": "paudyyin",
+          "handle": "paudyyin",
+          "image": "https://avatars.githubusercontent.com/u/46261184?v=4",
+          "kind": "user",
+          "linkedUserId": "kn73z7zhz92tv6skpnmpy5pdfh86j68x"
+        },
+        "ownerHandle": "paudyyin",
+        "skill": {
+          "_creationTime": 1785719998441.045,
+          "_id": "kd7b8ss1qm3j396ddwffdqh7gs8bs58e",
+          "badges": {},
+          "categories": [
+            "other"
+          ],
+          "createdAt": 1785719998441,
+          "displayName": "pdf",
+          "isSuspicious": false,
+          "latestVersionId": "k9795c59hnrcqwjcre5w07a3eh8bshxc",
+          "ownerPublisherId": "s172x1s50dh0bgmm3yc9516nr586kk4b",
+          "ownerUserId": "kn73z7zhz92tv6skpnmpy5pdfh86j68x",
+          "slug": "pdf",
+          "stats": {
+            "comments": 0,
+            "downloads": 756,
+            "installs": 2,
+            "stars": 0,
+            "versions": 1
+          },
+          "summary": "Process PDF files \ufffd\ufffd read, merge, split, rotate, watermark, create, fill forms, encrypt/decrypt, OCR",
+          "tags": {
+            "latest": "k9795c59hnrcqwjcre5w07a3eh8bshxc"
+          },
+          "updatedAt": 1785720075756
+        },
+        "version": null
+      },
+      "official": false,
+      "ownerHandle": "paudyyin",
+      "publisher": {
+        "displayName": "paudyyin",
+        "handle": "paudyyin",
+        "image": "https://avatars.githubusercontent.com/u/46261184?v=4",
+        "kind": "user",
+        "official": false
+      },
+      "score": 6120,
+      "slug": "pdf",
+      "source": "clawhub",
+      "sourceIdentity": {
+        "host": null,
+        "id": "kd7b8ss1qm3j396ddwffdqh7gs8bs58e",
+        "lifetimeInstalls": null,
+        "owner": "paudyyin",
+        "repo": null
+      },
+      "summary": "Process PDF files \ufffd\ufffd read, merge, split, rotate, watermark, create, fill forms, encrypt/decrypt, OCR",
+      "trust": {
+        "clawHubVerdict": null,
+        "installability": "installable",
+        "sourceFreshness": "native",
+        "upstreamScanners": null,
+        "visibility": "public"
+      },
+      "updatedAt": 1785720075756,
+      "version": null,
+      "owner": {
+        "handle": "paudyyin",
+        "displayName": "paudyyin",
+        "image": "https://avatars.githubusercontent.com/u/46261184?v=4"
+      }
+    },
+    {
+      "canonicalUrl": "/cxdanger123-commits/skills/pdf",
+      "categories": [
+        "other"
+      ],
+      "displayName": "PDF \u6587\u6863\u5904\u7406",
+      "downloads": 133,
+      "featured": false,
+      "icon": null,
+      "id": "clawhub:kd75hcj83z5yj3q9tx6hjc8yvn8j3r7s",
+      "install": {
+        "kind": "clawhub",
+        "reference": "cxdanger123-commits/pdf",
+        "sourceUrl": null
+      },
+      "links": {
+        "canonical": "/cxdanger123-commits/skills/pdf",
+        "source": null
+      },
+      "metrics": {
+        "bookmarks": 0,
+        "rolling60DayInstalls": 0,
+        "updatedAt": 1794448577392
+      },
+      "native": {
+        "owner": {
+          "_creationTime": 1794446529208.5662,
+          "_id": "s17f7p0yhjg5cacpjcx5eyj58x8j3q1e",
+          "displayName": "cxdanger123-commits",
+          "handle": "cxdanger123-commits",
+          "image": "https://avatars.githubusercontent.com/u/257805794?v=4",
+          "kind": "user",
+          "linkedUserId": "kn7d8va2q9r4q3hsk1pw7wge9h8j2c6n"
+        },
+        "ownerHandle": "cxdanger123-commits",
+        "skill": {
+          "_creationTime": 1794448110540.2078,
+          "_id": "kd75hcj83z5yj3q9tx6hjc8yvn8j3r7s",
+          "badges": {},
+          "categories": [
+            "other"
+          ],
+          "createdAt": 1794448110540,
+          "displayName": "PDF \u6587\u6863\u5904\u7406",
+          "isSuspicious": false,
+          "latestVersionId": "k973kv37tdrbhra7b663ymbfed8j2r5k",
+          "ownerPublisherId": "s17f7p0yhjg5cacpjcx5eyj58x8j3q1e",
+          "ownerUserId": "kn7d8va2q9r4q3hsk1pw7wge9h8j2c6n",
+          "slug": "pdf",
+          "stats": {
+            "comments": 0,
+            "downloads": 133,
+            "installs": 0,
+            "stars": 0,
+            "versions": 1
+          },
+          "summary": "PDF \u6587\u6863\u5904\u7406\u5de5\u5177\uff0c\u652f\u6301\u6587\u672c\u4e0e\u8868\u683c\u63d0\u53d6\u3001PDF \u521b\u5efa\u3001\u5408\u5e76\u62c6\u5206\u3001\u8868\u5355\u586b\u5199\u53ca\u6279\u91cf\u5206\u6790\u3002",
+          "tags": {
+            "latest": "k973kv37tdrbhra7b663ymbfed8j2r5k"
+          },
+          "topics": [
+            "xahp",
+            "pdf"
+          ],
+          "updatedAt": 1794448577392
+        },
+        "version": null
+      },
+      "official": false,
+      "ownerHandle": "cxdanger123-commits",
+      "publisher": {
+        "displayName": "cxdanger123-commits",
+        "handle": "cxdanger123-commits",
+        "image": "https://avatars.githubusercontent.com/u/257805794?v=4",
+        "kind": "user",
+        "official": false
+      },
+      "score": 6120,
+      "slug": "pdf",
+      "source": "clawhub",
+      "sourceIdentity": {
+        "host": null,
+        "id": "kd75hcj83z5yj3q9tx6hjc8yvn8j3r7s",
+        "lifetimeInstalls": null,
+        "owner": "cxdanger123-commits",
+        "repo": null
+      },
+      "summary": "PDF \u6587\u6863\u5904\u7406\u5de5\u5177\uff0c\u652f\u6301\u6587\u672c\u4e0e\u8868\u683c\u63d0\u53d6\u3001PDF \u521b\u5efa\u3001\u5408\u5e76\u62c6\u5206\u3001\u8868\u5355\u586b\u5199\u53ca\u6279\u91cf\u5206\u6790\u3002",
+      "trust": {
+        "clawHubVerdict": null,
+        "installability": "installable",
+        "sourceFreshness": "native",
+        "upstreamScanners": null,
+        "visibility": "public"
+      },
+      "updatedAt": 1794448577392,
+      "version": null,
+      "owner": {
+        "handle": "cxdanger123-commits",
+        "displayName": "cxdanger123-commits",
+        "image": "https://avatars.githubusercontent.com/u/257805794?v=4"
+      }
+    },
+    {
+      "canonicalUrl": "/momansouri83/skills/pdf",
+      "categories": [
+        "other"
+      ],
+      "displayName": "pdf",
+      "downloads": 326,
+      "featured": false,
+      "icon": null,
+      "id": "clawhub:kd7anz0aavj3nxegccy9nwvpmd8ba74z",
+      "install": {
+        "kind": "clawhub",
+        "reference": "momansouri83/pdf",
+        "sourceUrl": null
+      },
+      "links": {
+        "canonical": "/momansouri83/skills/pdf",
+        "source": null
+      },
+      "metrics": {
+        "bookmarks": 0,
+        "rolling60DayInstalls": 0,
+        "updatedAt": 1785154679235
+      },
+      "native": {
+        "owner": {
+          "_creationTime": 1785152416127.6978,
+          "_id": "s172771x40dt3vyfbn0cnbf2gd8baakz",
+          "displayName": "momansouri83",
+          "handle": "momansouri83",
+          "image": "https://avatars.githubusercontent.com/u/98988828?v=4",
+          "kind": "user",
+          "linkedUserId": "kn72gama2bt8vqxfzrdxxez86s8bbf8z"
+        },
+        "ownerHandle": "momansouri83",
+        "skill": {
+          "_creationTime": 1785152590502.632,
+          "_id": "kd7anz0aavj3nxegccy9nwvpmd8ba74z",
+          "badges": {},
+          "canonicalSkillId": "kd74n44stcpmhfvqe02yj7r6ms808nvm",
+          "categories": [
+            "other"
+          ],
+          "createdAt": 1785152590502,
+          "displayName": "pdf",
+          "forkOf": {
+            "at": 1785152590502,
+            "kind": "fork",
+            "skillId": "kd74n44stcpmhfvqe02yj7r6ms808nvm",
+            "version": "0.1.0"
+          },
+          "isSuspicious": false,
+          "latestVersionId": "k97cb66tc5tqz1ffg8d1ry9pxx8bagv2",
+          "ownerPublisherId": "s172771x40dt3vyfbn0cnbf2gd8baakz",
+          "ownerUserId": "kn72gama2bt8vqxfzrdxxez86s8bbf8z",
+          "slug": "pdf",
+          "stats": {
+            "comments": 0,
+            "downloads": 326,
+            "installs": 0,
+            "stars": 0,
+            "versions": 1
+          },
+          "summary": "Comprehensive PDF manipulation toolkit for extracting text and tables, creating new PDFs, merging/splitting documents, and handling forms. When Claude needs to fill in a PDF form or programmatically process, generate, or analyze PDF documents at scale.",
+          "tags": {
+            "latest": "k97cb66tc5tqz1ffg8d1ry9pxx8bagv2"
+          },
+          "updatedAt": 1785154679235
+        },
+        "version": null
+      },
+      "official": false,
+      "ownerHandle": "momansouri83",
+      "publisher": {
+        "displayName": "momansouri83",
+        "handle": "momansouri83",
+        "image": "https://avatars.githubusercontent.com/u/98988828?v=4",
+        "kind": "user",
+        "official": false
+      },
+      "score": 6120,
+      "slug": "pdf",
+      "source": "clawhub",
+      "sourceIdentity": {
+        "host": null,
+        "id": "kd7anz0aavj3nxegccy9nwvpmd8ba74z",
+        "lifetimeInstalls": null,
+        "owner": "momansouri83",
+        "repo": null
+      },
+      "summary": "Comprehensive PDF manipulation toolkit for extracting text and tables, creating new PDFs, merging/splitting documents, and handling forms. When Claude needs to fill in a PDF form or programmatically process, generate, or analyze PDF documents at scale.",
+      "trust": {
+        "clawHubVerdict": null,
+        "installability": "installable",
+        "sourceFreshness": "native",
+        "upstreamScanners": null,
+        "visibility": "public"
+      },
+      "updatedAt": 1785154679235,
+      "version": null,
+      "owner": {
+        "handle": "momansouri83",
+        "displayName": "momansouri83",
+        "image": "https://avatars.githubusercontent.com/u/98988828?v=4"
+      }
+    },
+    {
+      "canonicalUrl": "/yang1002378395-cmyk/skills/pdf-processor-cn",
+      "categories": [
+        "knowledge"
+      ],
+      "displayName": "Pdf",
+      "downloads": 5723,
+      "featured": false,
+      "icon": null,
+      "id": "clawhub:kd7chgqs1bqdw4mw758x7z46xs83ghcb",
+      "install": {
+        "kind": "clawhub",
+        "reference": "yang1002378395-cmyk/pdf-processor-cn",
+        "sourceUrl": null
+      },
+      "links": {
+        "canonical": "/yang1002378395-cmyk/skills/pdf-processor-cn",
+        "source": null
+      },
+      "metrics": {
+        "bookmarks": 0,
+        "rolling60DayInstalls": 1,
+        "updatedAt": 1778492143015
+      },
+      "native": {
+        "owner": {
+          "_creationTime": 0,
+          "_id": "s17627rpbb3atq3mbfabqbgtm983g9et",
+          "displayName": "yang1002378395-cmyk",
+          "handle": "yang1002378395-cmyk",
+          "image": "https://avatars.githubusercontent.com/u/261632147?v=4",
+          "kind": "user",
+          "linkedUserId": "kn7a0nk2nhyhkcwjry4knbqngn82qxtg"
+        },
+        "ownerHandle": "yang1002378395-cmyk",
+        "skill": {
+          "_creationTime": 1774319972231,
+          "_id": "kd7chgqs1bqdw4mw758x7z46xs83ghcb",
+          "badges": {},
+          "canonicalSkillId": "kd75n74rwc8st2pes930yn85ws82xfdd",
+          "categories": [
+            "knowledge"
+          ],
+          "createdAt": 1774319972231,
+          "displayName": "Pdf",
+          "forkOf": {
+            "at": 1774319972231,
+            "kind": "duplicate",
+            "skillId": "kd75n74rwc8st2pes930yn85ws82xfdd"
+          },
+          "isSuspicious": false,
+          "latestVersionId": "k97bj1fnw0m643kmag7bkag08d83g5x4",
+          "ownerPublisherId": "s17627rpbb3atq3mbfabqbgtm983g9et",
+          "ownerUserId": "kn7a0nk2nhyhkcwjry4knbqngn82qxtg",
+          "slug": "pdf-processor-cn",
+          "stats": {
+            "comments": 0,
+            "downloads": 5723,
+            "installs": 59,
+            "stars": 0,
+            "versions": 1
+          },
+          "summary": "Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multipl...",
+          "tags": {
+            "chinese": "k97bj1fnw0m643kmag7bkag08d83g5x4",
+            "document": "k97bj1fnw0m643kmag7bkag08d83g5x4",
+            "latest": "k97bj1fnw0m643kmag7bkag08d83g5x4",
+            "pdf": "k97bj1fnw0m643kmag7bkag08d83g5x4"
+          },
+          "topics": [
+            "PDF",
+            "OCR"
+          ],
+          "updatedAt": 1778492143015
+        },
+        "version": null
+      },
+      "official": false,
+      "ownerHandle": "yang1002378395-cmyk",
+      "publisher": {
+        "displayName": "yang1002378395-cmyk",
+        "handle": "yang1002378395-cmyk",
+        "image": "https://avatars.githubusercontent.com/u/261632147?v=4",
+        "kind": "user",
+        "official": false
+      },
+      "score": 6110,
+      "slug": "pdf-processor-cn",
+      "source": "clawhub",
+      "sourceIdentity": {
+        "host": null,
+        "id": "kd7chgqs1bqdw4mw758x7z46xs83ghcb",
+        "lifetimeInstalls": null,
+        "owner": "yang1002378395-cmyk",
+        "repo": null
+      },
+      "summary": "Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multipl...",
+      "trust": {
+        "clawHubVerdict": null,
+        "installability": "installable",
+        "sourceFreshness": "native",
+        "upstreamScanners": null,
+        "visibility": "public"
+      },
+      "updatedAt": 1778492143015,
+      "version": null,
+      "owner": {
+        "handle": "yang1002378395-cmyk",
+        "displayName": "yang1002378395-cmyk",
+        "image": "https://avatars.githubusercontent.com/u/261632147?v=4"
+      }
+    },
+    {
+      "canonicalUrl": "/skills-sh/openai/skills/pdf",
+      "categories": [
+        "knowledge"
+      ],
+      "displayName": "pdf",
+      "downloads": 13870,
+      "featured": false,
+      "icon": null,
+      "id": "skills-sh:openai/skills/pdf",
+      "install": {
+        "kind": "skills-sh",
+        "reference": "skills-sh:openai/skills/pdf",
+        "sourceUrl": "https://www.skills.sh/openai/skills/pdf"
+      },
+      "links": {
+        "canonical": "/skills-sh/openai/skills/pdf",
+        "source": "https://www.skills.sh/openai/skills/pdf"
+      },
+      "metrics": {
+        "bookmarks": null,
+        "rolling60DayInstalls": null,
+        "updatedAt": 1794828007279
+      },
+      "native": null,
+      "official": false,
+      "ownerHandle": "openai",
+      "publisher": null,
+      "score": 6110,
+      "slug": "pdf",
+      "source": "skills-sh",
+      "sourceIdentity": {
+        "host": null,
+        "id": "openai/skills/pdf",
+        "lifetimeInstalls": 13870,
+        "owner": "openai",
+        "repo": "skills"
+      },
+      "summary": "# PDF Skill ## When to use - Read or review PDF content where layout and visuals matter. - Create PDFs programmatically with reliable formatting. - Validate final rendering before delivery. ## Workflow 1. Prefer visual review: render PDF pages to PNGs and inspect them. - Use `pdftoppm` if available. - If unavailable, install Poppler or ask the user to review the output locally. 2. Use `reportlab` to generate PDFs when creating new documents. 3. Use `pdfplumber` (or `pypdf`) for text extraction and quick che",
+      "trust": {
+        "clawHubVerdict": null,
+        "installability": "installable",
+        "sourceFreshness": "observed-only",
+        "upstreamScanners": {
+          "genAgentTrustHub": {
+            "sourceCheckedAt": "2026-09-15T01:56:39.687Z",
+            "sourceUrl": "https://www.skills.sh/openai/skills/pdf/security/agent-trust-hub",
+            "status": "pass"
+          },
+          "snyk": {
+            "sourceCheckedAt": "2026-09-15T01:56:35.683576+00:00",
+            "sourceUrl": "https://www.skills.sh/openai/skills/pdf/security/snyk",
+            "status": "warn"
+          },
+          "socket": {
+            "sourceCheckedAt": "2026-09-15T01:57:08.126Z",
+            "sourceUrl": "https://www.skills.sh/openai/skills/pdf/security/socket",
+            "status": "pass"
+          }
+        },
+        "visibility": "public"
+      },
+      "updatedAt": 1794828007279,
+      "version": null
+    },
+    {
+      "canonicalUrl": "/skills-sh/anthropics/skills/pdf",
+      "categories": [
+        "knowledge"
+      ],
+      "displayName": "pdf",
+      "downloads": 230570,
+      "featured": false,
+      "icon": null,
+      "id": "skills-sh:anthropics/skills/pdf",
+      "install": {
+        "kind": "skills-sh",
+        "reference": "skills-sh:anthropics/skills/pdf",
+        "sourceUrl": "https://www.skills.sh/anthropics/skills/pdf"
+      },
+      "links": {
+        "canonical": "/skills-sh/anthropics/skills/pdf",
+        "source": "https://www.skills.sh/anthropics/skills/pdf"
+      },
+      "metrics": {
+        "bookmarks": null,
+        "rolling60DayInstalls": null,
+        "updatedAt": 1794827477179
+      },
+      "native": null,
+      "official": false,
+      "ownerHandle": "anthropics",
+      "publisher": null,
+      "score": 6110,
+      "slug": "pdf",
+      "source": "skills-sh",
+      "sourceIdentity": {
+        "host": null,
+        "id": "anthropics/skills/pdf",
+        "lifetimeInstalls": 230570,
+        "owner": "anthropics",
+        "repo": "skills"
+      },
+      "summary": "# PDF Processing Guide ## Overview This guide covers essential PDF processing operations using Python libraries and command-line tools. For advanced features, JavaScript libraries, and detailed examples, see REFERENCE.md. If you need to fill out a PDF form, read FORMS.md and follow its instructions. ## Quick Start ```python from pypdf import PdfReader, PdfWriter # Read a PDF reader = PdfReader(\"document.pdf\") print(f\"Pages: {len(reader.pages)}\") # Extract text text = \"\" for page in reader.pages: text += pag",
+      "trust": {
+        "clawHubVerdict": null,
+        "installability": "installable",
+        "sourceFreshness": "observed-only",
+        "upstreamScanners": {
+          "genAgentTrustHub": {
+            "sourceCheckedAt": "2026-11-14T21:43:42.502Z",
+            "sourceUrl": "https://www.skills.sh/anthropics/skills/pdf/security/agent-trust-hub",
+            "status": "pass"
+          },
+          "snyk": {
+            "sourceCheckedAt": "2026-11-14T21:43:20.477715+00:00",
+            "sourceUrl": "https://www.skills.sh/anthropics/skills/pdf/security/snyk",
+            "status": "pass"
+          },
+          "socket": {
+            "sourceCheckedAt": "2026-11-15T21:45:07.640Z",
+            "sourceUrl": "https://www.skills.sh/anthropics/skills/pdf/security/socket",
+            "status": "pass"
+          }
+        },
+        "visibility": "public"
+      },
+      "updatedAt": 1794827477179,
+      "version": null
+    },
+    {
+      "canonicalUrl": "/iirtegova/skills/pdf-rezume",
+      "categories": [
+        "other"
+      ],
+      "displayName": "PDF: \u0440\u0435\u0437\u044e\u043c\u0435 \u0434\u043b\u044f \u0440\u0443\u043a\u043e\u0432\u043e\u0434\u0438\u0442\u0435\u043b\u044f \u043d\u0430 \u043e\u0434\u043d\u0443 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0443",
+      "downloads": 594,
+      "featured": false,
+      "icon": null,
+      "id": "clawhub:kd7fczmc676ezr6w7zd1z1tk5d8et2zh",
+      "install": {
+        "kind": "clawhub",
+        "reference": "iirtegova/pdf-rezume",
+        "sourceUrl": null
+      },
+      "links": {
+        "canonical": "/iirtegova/skills/pdf-rezume",
+        "source": null
+      },
+      "metrics": {
+        "bookmarks": 0,
+        "rolling60DayInstalls": 0,
+        "updatedAt": 1791459096055
+      },
+      "native": {
+        "owner": {
+          "_creationTime": 0,
+          "_id": "s17db1sjz5ejhj4eabge460gjx8ek15w",
+          "displayName": "iirtegova",
+          "handle": "iirtegova",
+          "image": "https://avatars.githubusercontent.com/u/93735389?v=4",
+          "kind": "user",
+          "linkedUserId": "kn75a0dxs3v4k8mfv29m15fsq98ejrq4"
+        },
+        "ownerHandle": "iirtegova",
+        "skill": {
+          "_creationTime": 1789985153610,
+          "_id": "kd7fczmc676ezr6w7zd1z1tk5d8et2zh",
+          "badges": {},
+          "categories": [
+            "other"
+          ],
+          "createdAt": 1789985153610,
+          "displayName": "PDF: \u0440\u0435\u0437\u044e\u043c\u0435 \u0434\u043b\u044f \u0440\u0443\u043a\u043e\u0432\u043e\u0434\u0438\u0442\u0435\u043b\u044f \u043d\u0430 \u043e\u0434\u043d\u0443 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0443",
+          "isSuspicious": false,
+          "latestVersionId": "k97bj1n5g3gfc1qbt4wk7rp8nd8fwwvn",
+          "ownerPublisherId": "s17db1sjz5ejhj4eabge460gjx8ek15w",
+          "ownerUserId": "kn75a0dxs3v4k8mfv29m15fsq98ejrq4",
+          "slug": "pdf-rezume",
+          "stats": {
+            "comments": 0,
+            "downloads": 594,
+            "installs": 0,
+            "stars": 0,
+            "versions": 5
+          },
+          "summary": "\u041e\u0434\u043d\u043e\u0441\u0442\u0440\u0430\u043d\u0438\u0447\u043d\u043e\u0435 \u0440\u0435\u0437\u044e\u043c\u0435 PDF-\u043e\u0442\u0447\u0451\u0442\u0430 \u0434\u043b\u044f \u0440\u0443\u043a\u043e\u0432\u043e\u0434\u0438\u0442\u0435\u043b\u044f (A4, \u043a\u043b\u044e\u0447\u0435\u0432\u044b\u0435 \u0432\u044b\u0432\u043e\u0434\u044b \u0438 \u0432\u043e\u043f\u0440\u043e\u0441\u044b \u0434\u043b\u044f \u043e\u0431\u0441\u0443\u0436\u0434\u0435\u043d\u0438\u044f). \u0420\u0443\u0441\u0441\u043a\u0438\u0435 \u0438 \u0430\u043d\u0433\u043b\u0438\u0439\u0441\u043a\u0438\u0435 PDF \u0441 \u0442\u0435\u043a\u0441\u0442\u043e\u043c; \u0441\u043a\u0430\u043d\u044b \u2014 \u043d\u0430 \u043b\u0430\u0442\u0438\u043d\u0438\u0446\u0435 (\u0432\u0441\u0442\u0440\u043e\u0435\u043d\u043d\u044b\u0439 OCR \u0431\u0435\u0437 \u0441\u0435\u0442\u0438). \u041a\u0430\u0436\u0434\u043e\u0435 \u0447\u0438\u0441\u043b\u043e \u0441\u0432\u0435\u0440\u044f\u0435\u0442\u0441\u044f \u0441 \u0442\u0435\u043a\u0441\u0442\u043e\u043c \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u044b \u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438.",
+          "tags": {
+            "latest": "k97bj1n5g3gfc1qbt4wk7rp8nd8fwwvn"
+          },
+          "topics": [
+            "pdf",
+            "summary",
+            "executive-summary",
+            "russian",
+            "ocr"
+          ],
+          "updatedAt": 1791459096055
+        },
+        "version": null
+      },
+      "official": false,
+      "ownerHandle": "iirtegova",
+      "publisher": {
+        "displayName": "iirtegova",
+        "handle": "iirtegova",
+        "image": "https://avatars.githubusercontent.com/u/93735389?v=4",
+        "kind": "user",
+        "official": false
+      },
+      "score": 6110,
+      "slug": "pdf-rezume",
+      "source": "clawhub",
+      "sourceIdentity": {
+        "host": null,
+        "id": "kd7fczmc676ezr6w7zd1z1tk5d8et2zh",
+        "lifetimeInstalls": null,
+        "owner": "iirtegova",
+        "repo": null
+      },
+      "summary": "\u041e\u0434\u043d\u043e\u0441\u0442\u0440\u0430\u043d\u0438\u0447\u043d\u043e\u0435 \u0440\u0435\u0437\u044e\u043c\u0435 PDF-\u043e\u0442\u0447\u0451\u0442\u0430 \u0434\u043b\u044f \u0440\u0443\u043a\u043e\u0432\u043e\u0434\u0438\u0442\u0435\u043b\u044f (A4, \u043a\u043b\u044e\u0447\u0435\u0432\u044b\u0435 \u0432\u044b\u0432\u043e\u0434\u044b \u0438 \u0432\u043e\u043f\u0440\u043e\u0441\u044b \u0434\u043b\u044f \u043e\u0431\u0441\u0443\u0436\u0434\u0435\u043d\u0438\u044f). \u0420\u0443\u0441\u0441\u043a\u0438\u0435 \u0438 \u0430\u043d\u0433\u043b\u0438\u0439\u0441\u043a\u0438\u0435 PDF \u0441 \u0442\u0435\u043a\u0441\u0442\u043e\u043c; \u0441\u043a\u0430\u043d\u044b \u2014 \u043d\u0430 \u043b\u0430\u0442\u0438\u043d\u0438\u0446\u0435 (\u0432\u0441\u0442\u0440\u043e\u0435\u043d\u043d\u044b\u0439 OCR \u0431\u0435\u0437 \u0441\u0435\u0442\u0438). \u041a\u0430\u0436\u0434\u043e\u0435 \u0447\u0438\u0441\u043b\u043e \u0441\u0432\u0435\u0440\u044f\u0435\u0442\u0441\u044f \u0441 \u0442\u0435\u043a\u0441\u0442\u043e\u043c \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u044b \u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438.",
+      "trust": {
+        "clawHubVerdict": null,
+        "installability": "installable",
+        "sourceFreshness": "native",
+        "upstreamScanners": null,
+        "visibility": "public"
+      },
+      "updatedAt": 1791459096055,
+      "version": null,
+      "owner": {
+        "handle": "iirtegova",
+        "displayName": "iirtegova",
+        "image": "https://avatars.githubusercontent.com/u/93735389?v=4"
+      }
+    },
+    {
+      "canonicalUrl": "/iirtegova/skills/pdf-perevod",
+      "categories": [
+        "productivity",
+        "development",
+        "automation"
+      ],
+      "displayName": "PDF: \u043f\u0435\u0440\u0435\u0432\u043e\u0434 \u043d\u0430 \u0440\u0443\u0441\u0441\u043a\u0438\u0439 \u0441 \u0441\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435\u043c \u0432\u0451\u0440\u0441\u0442\u043a\u0438",
+      "downloads": 603,
+      "featured": false,
+      "icon": null,
+      "id": "clawhub:kd7d3zf36dge8306918hjfyj5x8etmmw",
+      "install": {
+        "kind": "clawhub",
+        "reference": "iirtegova/pdf-perevod",
+        "sourceUrl": null
+      },
+      "links": {
+        "canonical": "/iirtegova/skills/pdf-perevod",
+        "source": null
+      },
+      "metrics": {
+        "bookmarks": 0,
+        "rolling60DayInstalls": 0,
+        "updatedAt": 1791458552734
+      },
+      "native": {
+        "owner": {
+          "_creationTime": 0,
+          "_id": "s17db1sjz5ejhj4eabge460gjx8ek15w",
+          "displayName": "iirtegova",
+          "handle": "iirtegova",
+          "image": "https://avatars.githubusercontent.com/u/93735389?v=4",
+          "kind": "user",
+          "linkedUserId": "kn75a0dxs3v4k8mfv29m15fsq98ejrq4"
+        },
+        "ownerHandle": "iirtegova",
+        "skill": {
+          "_creationTime": 1789984901646,
+          "_id": "kd7d3zf36dge8306918hjfyj5x8etmmw",
+          "badges": {},
+          "categories": [
+            "productivity",
+            "development",
+            "automation"
+          ],
+          "createdAt": 1789984901646,
+          "displayName": "PDF: \u043f\u0435\u0440\u0435\u0432\u043e\u0434 \u043d\u0430 \u0440\u0443\u0441\u0441\u043a\u0438\u0439 \u0441 \u0441\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435\u043c \u0432\u0451\u0440\u0441\u0442\u043a\u0438",
+          "isSuspicious": false,
+          "latestVersionId": "k97e44yep6vpwb0gmb5r15v79d8fwge1",
+          "ownerPublisherId": "s17db1sjz5ejhj4eabge460gjx8ek15w",
+          "ownerUserId": "kn75a0dxs3v4k8mfv29m15fsq98ejrq4",
+          "slug": "pdf-perevod",
+          "stats": {
+            "comments": 0,
+            "downloads": 603,
+            "installs": 0,
+            "stars": 0,
+            "versions": 5
+          },
+          "summary": "\u041f\u0435\u0440\u0435\u0432\u043e\u0434 PDF \u043d\u0430 \u0440\u0443\u0441\u0441\u043a\u0438\u0439 \u0441 \u0441\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435\u043c \u0438\u0441\u0445\u043e\u0434\u043d\u043e\u0439 \u0432\u0451\u0440\u0441\u0442\u043a\u0438, \u0433\u0440\u0430\u0444\u0438\u043a\u043e\u0432 \u0438 \u043e\u0444\u043e\u0440\u043c\u043b\u0435\u043d\u0438\u044f: \u0430\u043d\u0433\u043b\u0438\u0439\u0441\u043a\u0438\u0439 \u0442\u0435\u043a\u0441\u0442 \u0437\u0430\u043c\u0435\u043d\u044f\u0435\u0442\u0441\u044f \u0440\u0443\u0441\u0441\u043a\u0438\u043c \u043f\u0440\u044f\u043c\u043e \u043d\u0430 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435. \u0427\u0438\u0442\u0430\u0435\u0442 \u0438 \u0441\u043a\u0430\u043d\u044b (\u0432\u0441\u0442\u0440\u043e\u0435\u043d\u043d\u044b\u0439 OCR \u0431\u0435\u0437 \u0441\u0435\u0442\u0438) \u2014 \u043d\u0430 \u043d\u0438\u0445 \u043f\u0435\u0440\u0435\u0432\u043e\u0434 \u0440\u0438\u0441\u0443\u0435\u0442\u0441\u044f \u043f\u043e\u0432\u0435\u0440\u0445 \u043a\u0430\u0440\u0442\u0438\u043d\u043a\u0438.",
+          "tags": {
+            "latest": "k97e44yep6vpwb0gmb5r15v79d8fwge1"
+          },
+          "topics": [
+            "translation",
+            "russian",
+            "ocr",
+            "layout"
+          ],
+          "updatedAt": 1791458552734
+        },
+        "version": null
+      },
+      "official": false,
+      "ownerHandle": "iirtegova",
+      "publisher": {
+        "displayName": "iirtegova",
+        "handle": "iirtegova",
+        "image": "https://avatars.githubusercontent.com/u/93735389?v=4",
+        "kind": "user",
+        "official": false
+      },
+      "score": 6110,
+      "slug": "pdf-perevod",
+      "source": "clawhub",
+      "sourceIdentity": {
+        "host": null,
+        "id": "kd7d3zf36dge8306918hjfyj5x8etmmw",
+        "lifetimeInstalls": null,
+        "owner": "iirtegova",
+        "repo": null
+      },
+      "summary": "\u041f\u0435\u0440\u0435\u0432\u043e\u0434 PDF \u043d\u0430 \u0440\u0443\u0441\u0441\u043a\u0438\u0439 \u0441 \u0441\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435\u043c \u0438\u0441\u0445\u043e\u0434\u043d\u043e\u0439 \u0432\u0451\u0440\u0441\u0442\u043a\u0438, \u0433\u0440\u0430\u0444\u0438\u043a\u043e\u0432 \u0438 \u043e\u0444\u043e\u0440\u043c\u043b\u0435\u043d\u0438\u044f: \u0430\u043d\u0433\u043b\u0438\u0439\u0441\u043a\u0438\u0439 \u0442\u0435\u043a\u0441\u0442 \u0437\u0430\u043c\u0435\u043d\u044f\u0435\u0442\u0441\u044f \u0440\u0443\u0441\u0441\u043a\u0438\u043c \u043f\u0440\u044f\u043c\u043e \u043d\u0430 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435. \u0427\u0438\u0442\u0430\u0435\u0442 \u0438 \u0441\u043a\u0430\u043d\u044b (\u0432\u0441\u0442\u0440\u043e\u0435\u043d\u043d\u044b\u0439 OCR \u0431\u0435\u0437 \u0441\u0435\u0442\u0438) \u2014 \u043d\u0430 \u043d\u0438\u0445 \u043f\u0435\u0440\u0435\u0432\u043e\u0434 \u0440\u0438\u0441\u0443\u0435\u0442\u0441\u044f \u043f\u043e\u0432\u0435\u0440\u0445 \u043a\u0430\u0440\u0442\u0438\u043d\u043a\u0438.",
+      "trust": {
+        "clawHubVerdict": null,
+        "installability": "installable",
+        "sourceFreshness": "native",
+        "upstreamScanners": null,
+        "visibility": "public"
+      },
+      "updatedAt": 1791458552734,
+      "version": null,
+      "owner": {
+        "handle": "iirtegova",
+        "displayName": "iirtegova",
+        "image": "https://avatars.githubusercontent.com/u/93735389?v=4"
+      }
+    }
+  ]
+}

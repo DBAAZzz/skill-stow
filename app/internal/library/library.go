@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"sync"
 	"time"
 
 	"skillmanager/locales"
@@ -313,6 +314,8 @@ type Library struct {
 	recovered      []string                // 这次扫描时坏了、挪到旁边的数据文件
 	unreadable     []string                // 扫描时存在却读不了的目录
 	scanTook       time.Duration
+	marketMu       sync.Mutex
+	market         *MarketClient
 }
 
 // Display 把主目录换成 ~，用于界面显示路径。分隔符统一成 /。

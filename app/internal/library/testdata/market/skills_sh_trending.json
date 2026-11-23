@@ -1,0 +1,20 @@
+{
+  "skills": [
+    {
+      "source": "beltsh/superpowers",
+      "skillId": "ai-video-generation",
+      "name": "ai-video-generation",
+      "installs": 28712
+    },
+    {
+      "source": "vercel-labs/skills",
+      "skillId": "find-skills",
+      "name": "find-skills",
+      "installs": 15227,
+      "isOfficial": true
+    }
+  ],
+  "total": 9966,
+  "hasMore": true,
+  "page": 0
+}
