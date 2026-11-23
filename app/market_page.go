@@ -363,7 +363,7 @@ func (a *app) marketToolbar(c *ui.Context, mode marketMode) {
 				a.goTo(scopeUpdates)
 			}
 		})
-		if iconButton(c, iconFolderAdd, locales.ImportFromComputer()).Size(28, 28).Clicked() {
+		if iconButton(c, iconUpload, locales.ImportFromComputer()).Size(28, 28).Clicked() {
 			a.chooseImport()
 		}
 	})

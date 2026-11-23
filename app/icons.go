@@ -29,9 +29,11 @@ var (
 )
 
 var (
-	iconAll       = icon(`<rect x="7" y="7" width="13" height="13" rx="2.5"/><path d="M4 15V6.5A2.5 2.5 0 0 1 6.5 4H15"/>`)
-	iconWarn      = icon(`<path d="M12 4 21 19.5H3z"/><path d="M12 10v4.5M12 17.2v.01"/>`)
-	iconFolder    = icon(`<path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>`)
+	iconAll    = icon(`<rect x="7" y="7" width="13" height="13" rx="2.5"/><path d="M4 15V6.5A2.5 2.5 0 0 1 6.5 4H15"/>`)
+	iconWarn   = icon(`<path d="M12 4 21 19.5H3z"/><path d="M12 10v4.5M12 17.2v.01"/>`)
+	iconFolder = icon(`<path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>`)
+	// iconUpload 是「从电脑上传」：托盘加向上的箭头（SF Symbols tray.and.arrow.up）。
+	iconUpload    = icon(`<path d="M12 15V4.5M8 8.5l4-4 4 4"/><path d="M4.5 13v4.5a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V13"/>`)
 	iconFolderAdd = icon(`<path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/><path d="M12 10.5v6M9 13.5h6"/>`)
 	iconLink      = icon(`<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>`)
 	iconGear      = icon(`<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>`)
@@ -79,14 +81,14 @@ var (
 	iconMarketHot      = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M8 14.2c2.6 0 4.4-1.8 4.4-4.3 0-3-2.6-4.4-3.2-7.7-1.9 1.3-2.6 3.1-2.4 4.7-.9-.4-1.4-1.3-1.5-2.2C3.9 6 3.6 7.6 3.6 9.9c0 2.5 1.8 4.3 4.4 4.3z"/></svg>`))
 	iconMarketOfficial = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M8 1.6 9.6 3l2.1-.1.5 2 1.8 1.2-.9 1.9.5 2-2 .7-1 1.9L8 12l-2.6.6-1-1.9-2-.7.5-2-.9-1.9 1.8-1.2.5-2L6.4 3z"/><path d="m5.9 7.3 1.4 1.4 2.8-2.9" stroke-linecap="round"/></svg>`))
 	symOfficial        = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12"><path d="M6 .8 7.4 2l1.8-.1.4 1.8L11.2 5 10.3 6.6l.4 1.8-1.7.6L7.9 10.6 6 10l-1.9.6L3 9l-1.7-.6.4-1.8L.8 5l1.6-1.3.4-1.8L4.6 2z" fill="#007aff"/><path d="m4.1 6.1 1.3 1.3 2.5-2.6" fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`))
-	iconGitAdded    = icon(`<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M12 8.5v7M8.5 12h7"/>`)
-	iconGitModified = icon(`<rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none"/>`)
-	iconGitCommit   = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.5"/><path d="M3 12h5.5M15.5 12H21"/></svg>`))
-	iconAgentGrid   = icon(`<rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/>`)
-	iconUnbound     = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4" stroke-dasharray="3.2 2.5"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none" opacity=".55"/></svg>`))
-	iconEyeOff      = icon(`<path d="M17.9 17.9A10.1 10.1 0 0 1 12 20c-6 0-10-8-10-8a18.5 18.5 0 0 1 5.1-5.9M9.9 4.2A9.1 9.1 0 0 1 12 4c6 0 10 8 10 8a18.5 18.5 0 0 1-2.2 3.2"/><path d="M14.1 14.1a3 3 0 1 1-4.2-4.2"/><path d="M3 3l18 18"/>`)
-	iconPauseCircle = icon(`<circle cx="12" cy="12" r="8.5"/><path d="M10 9v6M14 9v6"/>`)
-	iconInbox       = icon(`<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>`)
+	iconGitAdded       = icon(`<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M12 8.5v7M8.5 12h7"/>`)
+	iconGitModified    = icon(`<rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none"/>`)
+	iconGitCommit      = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.5"/><path d="M3 12h5.5M15.5 12H21"/></svg>`))
+	iconAgentGrid      = icon(`<rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/>`)
+	iconUnbound        = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4" stroke-dasharray="3.2 2.5"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none" opacity=".55"/></svg>`))
+	iconEyeOff         = icon(`<path d="M17.9 17.9A10.1 10.1 0 0 1 12 20c-6 0-10-8-10-8a18.5 18.5 0 0 1 5.1-5.9M9.9 4.2A9.1 9.1 0 0 1 12 4c6 0 10 8 10 8a18.5 18.5 0 0 1-2.2 3.2"/><path d="M14.1 14.1a3 3 0 1 1-4.2-4.2"/><path d="M3 3l18 18"/>`)
+	iconPauseCircle    = icon(`<circle cx="12" cy="12" r="8.5"/><path d="M10 9v6M14 9v6"/>`)
+	iconInbox          = icon(`<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>`)
 	// iconEmptyTray 是「还没有技能」空状态的大符号（托盘和落进去的箭头）：
 	// 按 52px 显示画的，描边比 16px 的图标细，放大后和系统符号一样轻。
 	iconEmptyTray = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v8.6M8.7 8.4l3.3 3.3 3.3-3.3"/><path d="M7.3 9.3H6.2a1.8 1.8 0 0 0-1.68 1.16L3.5 13.4v4.6a2.2 2.2 0 0 0 2.2 2.2h12.6a2.2 2.2 0 0 0 2.2-2.2v-4.6l-1.02-2.94A1.8 1.8 0 0 0 17.8 9.3h-1.1"/><path d="M3.5 13.4h4.3l1.3 2.4h5.8l1.3-2.4h4.3"/></svg>`))
