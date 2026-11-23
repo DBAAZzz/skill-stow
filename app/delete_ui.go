@@ -18,9 +18,14 @@ import (
 // 「撤销」或 ⌘Z 放回去。提示条收起后 ⌘Z 仍能撤销，直到下一次删除。
 // 使用情况页可以勾选几个没用过的一起删。
 
+type deletePreview struct {
+	target  library.DeleteTarget
+	impacts []library.Impact
+}
+
 // deleteState 是删除的状态。
 type deleteState struct {
-	confirm     []*library.Skill // 待确认删除的技能
+	confirm     []deletePreview // 打开确认框时读取的路径和影响
 	confirmOpen bool
 	copies      *library.Skill // 有同名副本、要先去对比的技能
 	copiesOpen  bool
@@ -41,19 +46,29 @@ func (a *app) requestDelete(skills ...*library.Skill) {
 		a.del.copies, a.del.copiesOpen = skills[0], true
 		return
 	}
-	a.del.confirm, a.del.confirmOpen = skills, true
+	preview := make([]deletePreview, 0, len(skills))
+	for _, s := range skills {
+		preview = append(preview, deletePreview{target: a.lib.DeleteTarget(s), impacts: a.lib.DeleteImpact(s)})
+	}
+	a.del.confirm, a.del.confirmOpen = preview, true
 }
 
-// doDelete 删掉确认框里的技能，上一次删除就此放下，不能再撤销。
+// doDelete 删掉确认框里的技能，只动确认框列出的路径；上一次删除就此放下，
+// 不能再撤销。
 func (a *app) doDelete() {
-	skills := a.del.confirm
+	skills := make([]*library.Skill, 0, len(a.del.confirm))
+	targets := make([]library.DeleteTarget, 0, len(a.del.confirm))
+	for _, item := range a.del.confirm {
+		skills = append(skills, item.target.Skill)
+		targets = append(targets, item.target)
+	}
 	a.del.confirm, a.del.confirmOpen = nil, false
 	next := a.nextSelection(skills)
 	if a.del.last != nil {
 		a.del.last.Discard()
 		a.del.last = nil
 	}
-	d, err := a.lib.Delete(skills...)
+	d, err := a.lib.DeleteConfirmed(targets...)
 	if d != nil && len(d.Names) > 0 {
 		a.del.last = d
 		if slices.Contains(skills, a.selected) {
@@ -207,7 +222,6 @@ func (a *app) cardActions(c *ui.Context, s *library.Skill) {
 	})
 	ui.Spacer(c)
 	if cardAction(c, locales.ActionDelete(), colDangerText).Clicked() {
-		a.selected, a.coll, a.picked = s, nil, true
 		a.requestDelete(s)
 	}
 }
@@ -235,70 +249,41 @@ func (a *app) deleteDialogs(c *ui.Context) {
 	}
 }
 
-// confirmDeleteDialog 是确认框（del2-a、del5-b）：原件进废纸篓，按 Agent
-// 写出各自少了什么。默认按钮是「取消」，回车不会删。
+// confirmDeleteDialog 是确认框（del2-a、del5-b）：先列出会移到废纸篓的原件与
+// 一并删除的链接路径，再紧凑列出受影响的 Agent。默认按钮是「取消」，回车不会删。
 func (a *app) confirmDeleteDialog(c *ui.Context) {
-	skills := a.del.confirm
-	impacts := map[*library.Skill][]library.Impact{}
-	links := 0
-	for _, s := range skills {
-		impacts[s] = a.lib.DeleteImpact(s)
-		for _, im := range impacts[s] {
-			if im.Kind == library.ImpactLink {
-				links++
-			}
+	preview := a.del.confirm
+	if len(preview) == 0 {
+		return
+	}
+	first := preview[0]
+	title := locales.DeleteTitleOne(first.target.Skill.Name)
+	body := locales.DeleteBodyTrash(len(preview))
+	if len(preview) > 1 {
+		title = locales.DeleteConfirmCount(len(preview))
+		totalLinks := 0
+		for _, item := range preview {
+			totalLinks += len(item.target.Links)
+		}
+		if totalLinks > 0 {
+			body = locales.DeleteBodyBatchWithLinks(totalLinks)
+		}
+	} else {
+		links := len(first.target.Links)
+		switch {
+		case first.target.Outside && links > 0:
+			body = locales.DeleteBodyOutsideWithLinks(links)
+		case first.target.Outside:
+			body = locales.DeleteBodyOutsideShort()
+		case links > 0:
+			body = locales.DeleteBodyTrashWithLinks(links)
 		}
 	}
-	title := locales.DeleteTitleOne(skills[0].Name)
-	body := locales.DeleteBodyTrash(len(skills))
-	if len(skills) == 1 {
-		if real, outside := a.lib.RealOutside(skills[0]); outside {
-			body = locales.DeleteBodyOutside(a.lib.Display(real))
-		}
-	}
-	switch {
-	case len(skills) > 1:
-		title = locales.DeleteConfirmCount(len(skills))
-		if links > 0 {
-			body += locales.DeleteBodyLinksMany(links)
-		}
-		var outside []string
-		for _, s := range skills {
-			if real, ok := a.lib.RealOutside(s); ok {
-				outside = append(outside, locales.NameWithPath(s.Name, a.lib.Display(real)))
-			}
-		}
-		if len(outside) > 0 {
-			body += locales.DeleteOutsideOriginals(strings.Join(outside, locales.ListSeparator()))
-		}
-	case links > 0:
-		body += locales.DeleteBodyLinksOne()
-	}
-	body = locales.SentenceEnd(body)
 	dialog(c, &a.del.confirmOpen, title, body, func() {
-		if len(skills) > 1 {
-			a.batchImpacts(c, skills, impacts)
+		if len(preview) > 1 {
+			a.batchDeleteContent(c, preview)
 		} else {
-			a.skillImpacts(c, impacts[skills[0]])
-			if s := skills[0]; s.Source == library.Project {
-				if gl := s.GlobalLinks(); len(gl) > 0 {
-					var dirs []string
-					for _, p := range gl {
-						d := a.lib.Display(filepath.Dir(p))
-						if !slices.Contains(dirs, d) {
-							dirs = append(dirs, d)
-						}
-					}
-					var agents []string
-					for _, id := range s.Enabled {
-						if name := library.AgentName(id); !slices.Contains(agents, name) {
-							agents = append(agents, name)
-						}
-					}
-					ui.Text(c, locales.DeleteGlobalLinksNote(len(gl), joinNames(dirs), joinNames(agents))).
-						FontSize(12).LineHeight(1.5).TextColor(colTextSecondary).Margin(10, 0, 0, 0)
-				}
-			}
+			a.singleDeleteContent(c, first.target.Skill, first.target, first.impacts)
 		}
 	}, func() {
 		cancel := dialogButton(c, locales.ActionCancel(), false).AutoFocus()
@@ -311,27 +296,86 @@ func (a *app) confirmDeleteDialog(c *ui.Context) {
 	})
 }
 
-// skillImpacts 是删一个技能时每个 Agent 一行；和上一行一样的写「同上」。
-func (a *app) skillImpacts(c *ui.Context, impacts []library.Impact) {
+type affectedAgentItem struct {
+	id      string
+	tooltip string
+}
+
+// singleDeleteContent 先展示会动到的原件与链接路径，再紧凑平铺受影响的 Agent。
+func (a *app) singleDeleteContent(c *ui.Context, s *library.Skill, target library.DeleteTarget, impacts []library.Impact) {
+	sectionLabel(c, locales.DeleteAffectedFiles()).Margin(14, 2, 6, 2)
+	rows := func() {
+		deleteFileRow(c.Key("orig"), true, func() {
+			folderColor := colFolder
+			if target.Outside {
+				folderColor = colWarnText
+			}
+			ui.Icon(c, iconFolderFill).Size(15, 15).Shrink(0).TextColor(folderColor)
+			ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
+				orig := a.lib.Display(target.Original)
+				ui.Text(c, orig).Font("monospace").FontSize(12).
+					TextColor(colTextPrimary).SingleLine().Selectable().Tooltip(orig)
+				if target.Outside {
+					ui.Text(c, locales.DeleteOutsideHint()).FontSize(11).LineHeight(1.4).TextColor(colWarnText)
+				}
+			})
+			if !target.Outside {
+				ui.Text(c, locales.DeleteRoleOriginal()).FontSize(11).TextColor(colTextMuted).SingleLine().Shrink(0)
+			}
+			if rowIcon(c, iconExternal, locales.ActionShowInFinder()).TextColor(colAccent).Clicked() {
+				a.reveal(target.Original)
+			}
+		})
+		for i, ln := range target.Links {
+			deleteFileRow(c.Key(i), false, func() {
+				ui.Icon(c, iconLink).Size(14, 14).Shrink(0).TextColor(colTextMuted)
+				linkPath := a.lib.Display(ln.Path)
+				ui.Text(c, linkPath).Font("monospace").FontSize(12).
+					TextColor(colTextBody).Grow(1).MinWidth(0).SingleLine().Selectable().Tooltip(linkPath)
+				if ln.Global {
+					ui.Text(c, locales.DeleteRoleGlobalLink()).FontSize(11).FontWeight(500).TextColor(colWarnText).SingleLine().Shrink(0)
+				} else {
+					ui.Text(c, locales.DeleteRoleLink()).FontSize(11).TextColor(colTextMuted).SingleLine().Shrink(0)
+				}
+			})
+		}
+	}
+	deleteInsetBox(c, 1+len(target.Links) > 5, 196, rows)
+
+	hasGlobal := s.Source == library.Project && slices.ContainsFunc(target.Links, func(ln library.DeleteLink) bool { return ln.Global })
+	if hasGlobal {
+		var agents []string
+		for _, id := range s.Readers(true) {
+			if name := library.AgentName(id); !slices.Contains(agents, name) {
+				agents = append(agents, name)
+			}
+		}
+		if len(agents) == 0 {
+			for _, id := range s.Enabled {
+				if name := library.AgentName(id); !slices.Contains(agents, name) {
+					agents = append(agents, name)
+				}
+			}
+		}
+		if len(agents) > 0 {
+			ui.Text(c, locales.DeleteGlobalLinkWarning(joinNames(agents))).
+				FontSize(12).LineHeight(1.5).TextColor(colTextSecondary).Margin(10, 2, 0, 2)
+		}
+	}
+
 	if len(impacts) == 0 {
 		return
 	}
-	impactList(c, func() {
-		prev := ""
-		for i, im := range impacts {
-			what := a.impactText(im)
-			shown := what
-			if what == prev {
-				shown = locales.DeleteSameAsAbove()
-			}
-			prev = what
-			impactRow(c.Key(i), i == 0, func() {
-				agentBadge(c, im.Agent, 15)
-				ui.Text(c, library.AgentName(im.Agent)).FontSize(13).FontWeight(500).Width(96).Shrink(0).SingleLine()
-				ui.Text(c, shown).FontSize(12).TextColor(colTextSecondary).Grow(1).MinWidth(0).SingleLine()
-			})
-		}
-	})
+	topMargin := float32(14)
+	if hasGlobal {
+		topMargin = 12
+	}
+	sectionLabel(c, locales.DeleteAffectedAgentsSingle(len(impacts))).Margin(topMargin, 2, 6, 2)
+	items := make([]affectedAgentItem, 0, len(impacts))
+	for _, im := range impacts {
+		items = append(items, affectedAgentItem{id: im.Agent, tooltip: a.impactText(im)})
+	}
+	affectedAgentsWrap(c, items)
 }
 
 func (a *app) impactText(im library.Impact) string {
@@ -350,73 +394,97 @@ func (a *app) impactText(im library.Impact) string {
 	return locales.DeleteLinkInDirectory()
 }
 
-// batchImpacts 是删几个技能时的影响（del5-b）：先列名字，再按「少了哪几个」
-// 把 Agent 归成一行。
-func (a *app) batchImpacts(c *ui.Context, skills []*library.Skill, impacts map[*library.Skill][]library.Impact) {
-	var names []string
-	for _, s := range skills {
-		names = append(names, s.Name)
-	}
-	ui.Text(c, nameList(names, batchNamesShown)).FontSize(13).FontWeight(500).LineHeight(1.5).Margin(8, 0, 0, 0)
-	lost := map[string][]string{} // Agent → 少了的技能
-	var agents []string
-	for _, s := range skills {
-		for _, im := range impacts[s] {
-			if _, ok := lost[im.Agent]; !ok {
-				agents = append(agents, im.Agent)
-			}
-			lost[im.Agent] = append(lost[im.Agent], s.Name)
-		}
-	}
-	type group struct{ agents, lost []string }
-	var groups []*group
-	byLost := map[string]*group{}
-	for _, id := range agents {
-		key := strings.Join(lost[id], locales.ListSeparator())
-		g := byLost[key]
-		if g == nil {
-			g = &group{lost: lost[id]}
-			byLost[key] = g
-			groups = append(groups, g)
-		}
-		g.agents = append(g.agents, id)
-	}
-	if len(groups) == 0 {
-		return
-	}
-	impactList(c, func() {
-		for i, g := range groups {
-			var who []string
-			for _, id := range g.agents {
-				who = append(who, library.AgentName(id))
-			}
-			impactRow(c.Key(i), i == 0, func() {
-				ui.Row(c).Gap(3).Shrink(0).Children(func() {
-					for _, id := range g.agents {
-						agentBadge(c.Key(id), id, 15)
-					}
-				})
-				names := strings.Join(who, locales.ListSeparator())
-				if len(who) > batchAgentsNamed {
-					names = locales.DeleteAgentListSummary(strings.Join(who[:2], locales.ListSeparator()), len(who))
+// batchDeleteContent 是删多个技能时的确认内容：每个技能一行写出名称与原件路径，
+// 下方汇总所有受影响的 Agent。
+func (a *app) batchDeleteContent(c *ui.Context, preview []deletePreview) {
+	sectionLabel(c, locales.DeleteBatchSkillsHeading()).Margin(14, 2, 6, 2)
+	deleteInsetBox(c, len(preview) > 5, 220, func() {
+		for i, item := range preview {
+			s, dt := item.target.Skill, item.target
+			deleteFileRow(c.Key(i), i == 0, func() {
+				folderColor := colFolder
+				pathColor := colTextSecondary
+				if dt.Outside {
+					folderColor = colWarnText
+					pathColor = colWarnText
 				}
-				ui.Text(c, names).FontSize(13).FontWeight(500).Shrink(0).SingleLine()
-				ui.Text(c, locales.DeleteLoses(nameList(g.lost, batchLostShown))).FontSize(12).TextColor(colTextSecondary).Grow(1).MinWidth(0).SingleLine()
+				ui.Icon(c, iconFolderFill).Size(15, 15).Shrink(0).TextColor(folderColor)
+				ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
+					orig := a.lib.Display(dt.Original)
+					ui.Text(c, s.Name).FontSize(13).FontWeight(500).TextColor(colTextPrimary).SingleLine()
+					ui.Text(c, orig).Font("monospace").FontSize(11).
+						TextColor(pathColor).SingleLine().Selectable().Tooltip(orig)
+				})
+				switch {
+				case dt.Outside:
+					ui.Text(c, locales.DeleteRoleOutsideOriginal()).FontSize(11).FontWeight(500).TextColor(colWarnText).SingleLine().Shrink(0)
+				case len(dt.Links) > 0:
+					ui.Text(c, locales.DeleteBatchSkillLinks(len(dt.Links))).FontSize(11).TextColor(colTextMuted).SingleLine().Shrink(0)
+				}
 			})
 		}
 	})
+
+	lost := map[string][]string{}
+	var agents []string
+	for _, item := range preview {
+		for _, im := range item.impacts {
+			if _, ok := lost[im.Agent]; !ok {
+				agents = append(agents, im.Agent)
+			}
+			lost[im.Agent] = append(lost[im.Agent], item.target.Skill.Name)
+		}
+	}
+	if len(agents) == 0 {
+		return
+	}
+	sectionLabel(c, locales.DeleteAffectedAgentsBatch(len(agents))).Margin(14, 2, 6, 2)
+	items := make([]affectedAgentItem, 0, len(agents))
+	for _, id := range agents {
+		items = append(items, affectedAgentItem{
+			id:      id,
+			tooltip: locales.DeleteLoses(nameList(lost[id], batchLostShown)),
+		})
+	}
+	affectedAgentsWrap(c, items)
 }
 
-// batchAgentsNamed 是批量确认框里一组最多写出几个 Agent 的名字，多了写
-// 「A、B 等 N 个」，免得把「少了…」挤出框。
-const batchAgentsNamed = 3
+func deleteInsetBox(c *ui.Context, scrollable bool, maxHeight float32, fn func()) {
+	box := ui.Column(c).Radius(9).Background(colBgSubtle).Clip()
+	if !scrollable {
+		box.Children(fn)
+		return
+	}
+	box.Children(func() {
+		ui.Scroll(c).MaxHeight(maxHeight).Children(func() {
+			ui.Column(c).Children(fn)
+		})
+	})
+}
 
-// 批量确认框里最多写出几个技能名、每个 Agent「少了」后面最多写几个：一次
-// 勾一个集合就是几十个，全写出来框会很长。
-const (
-	batchNamesShown = 10
-	batchLostShown  = 3
-)
+func deleteFileRow(c *ui.Context, first bool, fn func()) {
+	row := ui.Row(c).MinHeight(36).Padding(7, 12).Gap(9).AlignItems(ui.Center)
+	if !first {
+		row.BorderWidth(1, 0, 0, 0).BorderColor(colBorderSubtle)
+	}
+	row.Children(fn)
+}
+
+func affectedAgentsWrap(c *ui.Context, items []affectedAgentItem) {
+	ui.Column(c).Radius(9).Background(colBgSubtle).Padding(10, 12).Children(func() {
+		ui.Row(c).Wrap().GapX(14).GapY(8).AlignItems(ui.Center).Children(func() {
+			for _, it := range items {
+				ui.Row(c.Key(it.id)).Gap(6).AlignItems(ui.Center).Shrink(0).Tooltip(it.tooltip).Children(func() {
+					agentBadge(c, it.id, 15)
+					ui.Text(c, library.AgentName(it.id)).FontSize(12).TextColor(colTextBody).SingleLine()
+				})
+			}
+		})
+	})
+}
+
+// 批量确认框里每个 Agent 悬停提示「少了」后面最多写几个技能名。
+const batchLostShown = 3
 
 // nameList 是「、」连起来的名字，多于 limit 个时写「A、B 等 N 个」。
 func nameList(names []string, limit int) string {

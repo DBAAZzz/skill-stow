@@ -5274,36 +5274,6 @@ func (msgs Messages) DeleteTitleOne(name string) string {
 	return Catalog.Format(msgs.locale, "deleteTitleOne", map[string]any{"name": name})
 }
 
-// NameWithPath says "{name}（{path}）"
-// in the language the app shows.
-//
-// 技能名后面括号里写它的位置
-func NameWithPath(name string, path string) string { return In(i18n.Locale()).NameWithPath(name, path) }
-
-// NameWithPath says "{name}（{path}）"
-// in the language of msgs.
-//
-// 技能名后面括号里写它的位置
-func (msgs Messages) NameWithPath(name string, path string) string {
-	return Catalog.Format(msgs.locale, "nameWithPath", map[string]any{"name": name, "path": path})
-}
-
-// DeleteOutsideOriginals says "；其中原件在技能目录之外：{list}，也会整个移到废纸篓"
-// in the language the app shows.
-//
-// 批量删除确认框正文后接的一句
-func DeleteOutsideOriginals(list string) string {
-	return In(i18n.Locale()).DeleteOutsideOriginals(list)
-}
-
-// DeleteOutsideOriginals says "；其中原件在技能目录之外：{list}，也会整个移到废纸篓"
-// in the language of msgs.
-//
-// 批量删除确认框正文后接的一句
-func (msgs Messages) DeleteOutsideOriginals(list string) string {
-	return Catalog.Format(msgs.locale, "deleteOutsideOriginals", map[string]any{"list": list})
-}
-
 // DeleteImpactReads says "读的是{where}，原件移走后就没有了"
 // in the language the app shows.
 //
@@ -7362,20 +7332,6 @@ func ActionMoveToTrash() string { return In(i18n.Locale()).ActionMoveToTrash() }
 // 删除确认对话框中说明原件和链接的影响显示的文案。
 func (msgs Messages) ActionMoveToTrash() string {
 	return Catalog.Format(msgs.locale, "actionMoveToTrash", nil)
-}
-
-// DeleteSameAsAbove says "同上"
-// in the language the app shows.
-//
-// 删除确认对话框中说明原件和链接的影响显示的文案。
-func DeleteSameAsAbove() string { return In(i18n.Locale()).DeleteSameAsAbove() }
-
-// DeleteSameAsAbove says "同上"
-// in the language of msgs.
-//
-// 删除确认对话框中说明原件和链接的影响显示的文案。
-func (msgs Messages) DeleteSameAsAbove() string {
-	return Catalog.Format(msgs.locale, "deleteSameAsAbove", nil)
 }
 
 // DeleteOriginalInDirectory says "原件就在它的目录里"
@@ -13304,60 +13260,18 @@ func (msgs Messages) ListEtcTotal(names string, count int) string {
 	return Catalog.Format(msgs.locale, "listEtcTotal", map[string]any{"names": names, "count": count})
 }
 
-// DeleteBodyTrash says "{count, plural, other {原件会移到废纸篓}}"
+// DeleteBodyTrash says "{count, plural, other {原件会移到废纸篓。}}"
 // in the language the app shows.
 //
-// 删除确认框正文的开头；后面可能接着说链接，最后补句号
+// 删除确认框正文：原件移到废纸篓，没有一并删除的链接
 func DeleteBodyTrash(count int) string { return In(i18n.Locale()).DeleteBodyTrash(count) }
 
-// DeleteBodyTrash says "{count, plural, other {原件会移到废纸篓}}"
+// DeleteBodyTrash says "{count, plural, other {原件会移到废纸篓。}}"
 // in the language of msgs.
 //
-// 删除确认框正文的开头；后面可能接着说链接，最后补句号
+// 删除确认框正文：原件移到废纸篓，没有一并删除的链接
 func (msgs Messages) DeleteBodyTrash(count int) string {
 	return Catalog.Format(msgs.locale, "deleteBodyTrash", map[string]any{"count": count})
-}
-
-// DeleteBodyOutside says "原件在 {path}，会整个移到废纸篓"
-// in the language the app shows.
-//
-// 删除确认框正文：技能原件在技能库外的文件夹里
-func DeleteBodyOutside(path string) string { return In(i18n.Locale()).DeleteBodyOutside(path) }
-
-// DeleteBodyOutside says "原件在 {path}，会整个移到废纸篓"
-// in the language of msgs.
-//
-// 删除确认框正文：技能原件在技能库外的文件夹里
-func (msgs Messages) DeleteBodyOutside(path string) string {
-	return Catalog.Format(msgs.locale, "deleteBodyOutside", map[string]any{"path": path})
-}
-
-// DeleteBodyLinksMany says "，指向它们的 {count} 个链接一并删除"
-// in the language the app shows.
-//
-// 删除确认框正文：接在开头后面，说明指向这些技能的链接也会删除
-func DeleteBodyLinksMany(count int) string { return In(i18n.Locale()).DeleteBodyLinksMany(count) }
-
-// DeleteBodyLinksMany says "，指向它们的 {count} 个链接一并删除"
-// in the language of msgs.
-//
-// 删除确认框正文：接在开头后面，说明指向这些技能的链接也会删除
-func (msgs Messages) DeleteBodyLinksMany(count int) string {
-	return Catalog.Format(msgs.locale, "deleteBodyLinksMany", map[string]any{"count": count})
-}
-
-// DeleteBodyLinksOne says "，指向它的链接一并删除"
-// in the language the app shows.
-//
-// 删除确认框正文：接在开头后面，说明指向这个技能的链接也会删除
-func DeleteBodyLinksOne() string { return In(i18n.Locale()).DeleteBodyLinksOne() }
-
-// DeleteBodyLinksOne says "，指向它的链接一并删除"
-// in the language of msgs.
-//
-// 删除确认框正文：接在开头后面，说明指向这个技能的链接也会删除
-func (msgs Messages) DeleteBodyLinksOne() string {
-	return Catalog.Format(msgs.locale, "deleteBodyLinksOne", nil)
 }
 
 // TidyMergeRow says "收成一份"
@@ -16978,22 +16892,6 @@ func (msgs Messages) ProjectInvalidFolder() string {
 	return Catalog.Format(msgs.locale, "projectInvalidFolder", nil)
 }
 
-// DeleteGlobalLinksNote says "{count, plural, =1 {其中一个链接在 {dirs}，是全局链接。删掉后，{agents} …"
-// in the language the app shows.
-//
-// 删除项目技能时还有全局链接指向它的说明
-func DeleteGlobalLinksNote(count int, dirs string, agents string) string {
-	return In(i18n.Locale()).DeleteGlobalLinksNote(count, dirs, agents)
-}
-
-// DeleteGlobalLinksNote says "{count, plural, =1 {其中一个链接在 {dirs}，是全局链接。删掉后，{agents} …"
-// in the language of msgs.
-//
-// 删除项目技能时还有全局链接指向它的说明
-func (msgs Messages) DeleteGlobalLinksNote(count int, dirs string, agents string) string {
-	return Catalog.Format(msgs.locale, "deleteGlobalLinksNote", map[string]any{"count": count, "dirs": dirs, "agents": agents})
-}
-
 // SettingsAppUpdates says "应用更新"
 // in the language the app shows.
 //
@@ -17224,4 +17122,226 @@ func GitRowModified(name string) string { return In(i18n.Locale()).GitRowModifie
 // in the language of msgs.
 func (msgs Messages) GitRowModified(name string) string {
 	return Catalog.Format(msgs.locale, "gitRowModified", map[string]any{"name": name})
+}
+
+// DeleteBodyOutsideShort says "原件位于技能目录之外，会整个移到废纸篓。"
+// in the language the app shows.
+//
+// 单技能删除确认框正文：原件在技能目录之外（路径已在下方文件列表展示）
+func DeleteBodyOutsideShort() string { return In(i18n.Locale()).DeleteBodyOutsideShort() }
+
+// DeleteBodyOutsideShort says "原件位于技能目录之外，会整个移到废纸篓。"
+// in the language of msgs.
+//
+// 单技能删除确认框正文：原件在技能目录之外（路径已在下方文件列表展示）
+func (msgs Messages) DeleteBodyOutsideShort() string {
+	return Catalog.Format(msgs.locale, "deleteBodyOutsideShort", nil)
+}
+
+// DeleteAffectedFiles says "涉及的文件"
+// in the language the app shows.
+//
+// 删除确认框：文件列表的分组标题
+func DeleteAffectedFiles() string { return In(i18n.Locale()).DeleteAffectedFiles() }
+
+// DeleteAffectedFiles says "涉及的文件"
+// in the language of msgs.
+//
+// 删除确认框：文件列表的分组标题
+func (msgs Messages) DeleteAffectedFiles() string {
+	return Catalog.Format(msgs.locale, "deleteAffectedFiles", nil)
+}
+
+// DeleteRoleOriginal says "原件"
+// in the language the app shows.
+//
+// 删除确认框：原件路径右侧的标记
+func DeleteRoleOriginal() string { return In(i18n.Locale()).DeleteRoleOriginal() }
+
+// DeleteRoleOriginal says "原件"
+// in the language of msgs.
+//
+// 删除确认框：原件路径右侧的标记
+func (msgs Messages) DeleteRoleOriginal() string {
+	return Catalog.Format(msgs.locale, "deleteRoleOriginal", nil)
+}
+
+// DeleteRoleLink says "链接"
+// in the language the app shows.
+//
+// 删除确认框：普通符号链接路径右侧的标记
+func DeleteRoleLink() string { return In(i18n.Locale()).DeleteRoleLink() }
+
+// DeleteRoleLink says "链接"
+// in the language of msgs.
+//
+// 删除确认框：普通符号链接路径右侧的标记
+func (msgs Messages) DeleteRoleLink() string {
+	return Catalog.Format(msgs.locale, "deleteRoleLink", nil)
+}
+
+// DeleteRoleGlobalLink says "全局链接"
+// in the language the app shows.
+//
+// 删除确认框：项目技能的全局链接路径右侧的标记
+func DeleteRoleGlobalLink() string { return In(i18n.Locale()).DeleteRoleGlobalLink() }
+
+// DeleteRoleGlobalLink says "全局链接"
+// in the language of msgs.
+//
+// 删除确认框：项目技能的全局链接路径右侧的标记
+func (msgs Messages) DeleteRoleGlobalLink() string {
+	return Catalog.Format(msgs.locale, "deleteRoleGlobalLink", nil)
+}
+
+// DeleteRoleOutsideOriginal says "目录外原件"
+// in the language the app shows.
+//
+// 批量删除确认框：原件位于技能目录之外时的橙色标记
+func DeleteRoleOutsideOriginal() string { return In(i18n.Locale()).DeleteRoleOutsideOriginal() }
+
+// DeleteRoleOutsideOriginal says "目录外原件"
+// in the language of msgs.
+//
+// 批量删除确认框：原件位于技能目录之外时的橙色标记
+func (msgs Messages) DeleteRoleOutsideOriginal() string {
+	return Catalog.Format(msgs.locale, "deleteRoleOutsideOriginal", nil)
+}
+
+// DeleteOutsideHint says "原件在技能目录之外，请确认这不是仍在使用的文件夹"
+// in the language the app shows.
+//
+// 单技能删除确认框：原件路径下方的目录外风险提示
+func DeleteOutsideHint() string { return In(i18n.Locale()).DeleteOutsideHint() }
+
+// DeleteOutsideHint says "原件在技能目录之外，请确认这不是仍在使用的文件夹"
+// in the language of msgs.
+//
+// 单技能删除确认框：原件路径下方的目录外风险提示
+func (msgs Messages) DeleteOutsideHint() string {
+	return Catalog.Format(msgs.locale, "deleteOutsideHint", nil)
+}
+
+// DeleteAffectedAgentsSingle says "{count, plural, other {以下 {count} 个 Agent 将无法使用}}"
+// in the language the app shows.
+//
+// 单技能删除确认框：受影响 Agent 列表的分组标题
+func DeleteAffectedAgentsSingle(count int) string {
+	return In(i18n.Locale()).DeleteAffectedAgentsSingle(count)
+}
+
+// DeleteAffectedAgentsSingle says "{count, plural, other {以下 {count} 个 Agent 将无法使用}}"
+// in the language of msgs.
+//
+// 单技能删除确认框：受影响 Agent 列表的分组标题
+func (msgs Messages) DeleteAffectedAgentsSingle(count int) string {
+	return Catalog.Format(msgs.locale, "deleteAffectedAgentsSingle", map[string]any{"count": count})
+}
+
+// DeleteGlobalLinkWarning says "删掉全局链接后，{agents} 在任何项目里都读不到它。"
+// in the language the app shows.
+//
+// 删除带全局链接的项目技能时，文件列表下方的后果说明
+func DeleteGlobalLinkWarning(agents string) string {
+	return In(i18n.Locale()).DeleteGlobalLinkWarning(agents)
+}
+
+// DeleteGlobalLinkWarning says "删掉全局链接后，{agents} 在任何项目里都读不到它。"
+// in the language of msgs.
+//
+// 删除带全局链接的项目技能时，文件列表下方的后果说明
+func (msgs Messages) DeleteGlobalLinkWarning(agents string) string {
+	return Catalog.Format(msgs.locale, "deleteGlobalLinkWarning", map[string]any{"agents": agents})
+}
+
+// DeleteBatchSkillsHeading says "将移到废纸篓的技能"
+// in the language the app shows.
+//
+// 批量删除确认框：技能与路径列表的分组标题
+func DeleteBatchSkillsHeading() string { return In(i18n.Locale()).DeleteBatchSkillsHeading() }
+
+// DeleteBatchSkillsHeading says "将移到废纸篓的技能"
+// in the language of msgs.
+//
+// 批量删除确认框：技能与路径列表的分组标题
+func (msgs Messages) DeleteBatchSkillsHeading() string {
+	return Catalog.Format(msgs.locale, "deleteBatchSkillsHeading", nil)
+}
+
+// DeleteBatchSkillLinks says "{count, plural, other {另有 {count} 个链接}}"
+// in the language the app shows.
+//
+// 批量删除确认框：单个技能行右侧附加的链接数
+func DeleteBatchSkillLinks(count int) string { return In(i18n.Locale()).DeleteBatchSkillLinks(count) }
+
+// DeleteBatchSkillLinks says "{count, plural, other {另有 {count} 个链接}}"
+// in the language of msgs.
+//
+// 批量删除确认框：单个技能行右侧附加的链接数
+func (msgs Messages) DeleteBatchSkillLinks(count int) string {
+	return Catalog.Format(msgs.locale, "deleteBatchSkillLinks", map[string]any{"count": count})
+}
+
+// DeleteAffectedAgentsBatch says "{count, plural, other {以下 {count} 个 Agent 将受影响}}"
+// in the language the app shows.
+//
+// 批量删除确认框：受影响 Agent 汇总的分组标题
+func DeleteAffectedAgentsBatch(count int) string {
+	return In(i18n.Locale()).DeleteAffectedAgentsBatch(count)
+}
+
+// DeleteAffectedAgentsBatch says "{count, plural, other {以下 {count} 个 Agent 将受影响}}"
+// in the language of msgs.
+//
+// 批量删除确认框：受影响 Agent 汇总的分组标题
+func (msgs Messages) DeleteAffectedAgentsBatch(count int) string {
+	return Catalog.Format(msgs.locale, "deleteAffectedAgentsBatch", map[string]any{"count": count})
+}
+
+// DeleteBodyTrashWithLinks says "{count, plural, other {原件会移到废纸篓，指向它的 {count} 个链接一并删除。}}"
+// in the language the app shows.
+//
+// 单技能删除确认框正文：原件移到废纸篓，并删除指向它的链接
+func DeleteBodyTrashWithLinks(count int) string {
+	return In(i18n.Locale()).DeleteBodyTrashWithLinks(count)
+}
+
+// DeleteBodyTrashWithLinks says "{count, plural, other {原件会移到废纸篓，指向它的 {count} 个链接一并删除。}}"
+// in the language of msgs.
+//
+// 单技能删除确认框正文：原件移到废纸篓，并删除指向它的链接
+func (msgs Messages) DeleteBodyTrashWithLinks(count int) string {
+	return Catalog.Format(msgs.locale, "deleteBodyTrashWithLinks", map[string]any{"count": count})
+}
+
+// DeleteBodyBatchWithLinks says "{count, plural, other {原件会移到废纸篓，指向它们的 {count} 个链接一并删除。}}"
+// in the language the app shows.
+//
+// 批量删除确认框正文：原件移到废纸篓，并删除指向这些技能的链接
+func DeleteBodyBatchWithLinks(count int) string {
+	return In(i18n.Locale()).DeleteBodyBatchWithLinks(count)
+}
+
+// DeleteBodyBatchWithLinks says "{count, plural, other {原件会移到废纸篓，指向它们的 {count} 个链接一并删除。}}"
+// in the language of msgs.
+//
+// 批量删除确认框正文：原件移到废纸篓，并删除指向这些技能的链接
+func (msgs Messages) DeleteBodyBatchWithLinks(count int) string {
+	return Catalog.Format(msgs.locale, "deleteBodyBatchWithLinks", map[string]any{"count": count})
+}
+
+// DeleteBodyOutsideWithLinks says "{count, plural, other {原件位于技能目录之外，会整个移到废纸篓，指向它的 {count} …"
+// in the language the app shows.
+//
+// 单技能删除确认框正文：原件在技能目录之外，并删除指向它的链接
+func DeleteBodyOutsideWithLinks(count int) string {
+	return In(i18n.Locale()).DeleteBodyOutsideWithLinks(count)
+}
+
+// DeleteBodyOutsideWithLinks says "{count, plural, other {原件位于技能目录之外，会整个移到废纸篓，指向它的 {count} …"
+// in the language of msgs.
+//
+// 单技能删除确认框正文：原件在技能目录之外，并删除指向它的链接
+func (msgs Messages) DeleteBodyOutsideWithLinks(count int) string {
+	return Catalog.Format(msgs.locale, "deleteBodyOutsideWithLinks", map[string]any{"count": count})
 }

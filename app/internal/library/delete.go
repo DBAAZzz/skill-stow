@@ -37,6 +37,74 @@ type Impact struct {
 	Dir   string // ImpactShared 时它读的目录
 }
 
+// DeleteTarget 是删除一个技能时会动到的磁盘路径。
+type DeleteTarget struct {
+	Skill    *Skill
+	Original string       // 将移到废纸篓的原件目录
+	Outside  bool         // 原件位于已知技能目录之外
+	Links    []DeleteLink // 一并删除的链接
+}
+
+// DeleteLink 是删除技能时会一并移除的一个链接。
+type DeleteLink struct {
+	Path   string
+	Global bool // 项目技能的全局链接（删掉后其他项目也读不到）
+}
+
+// DeleteTarget 返回删除 s 会动到的原件路径与链接路径，供确认框展示。
+func (l *Library) DeleteTarget(s *Skill) DeleteTarget {
+	if s == nil {
+		return DeleteTarget{}
+	}
+	dt := DeleteTarget{Skill: s, Original: s.Real}
+	if dt.Original == "" {
+		dt.Original = s.Dir
+	}
+	_, dt.Outside = l.RealOutside(s)
+	seen := map[string]bool{}
+	add := func(p string, global bool) {
+		if p == "" || seen[p] || p == dt.Original {
+			return
+		}
+		seen[p] = true
+		dt.Links = append(dt.Links, DeleteLink{Path: p, Global: global})
+	}
+	if l.disk {
+		for _, ln := range l.linksTo(s) {
+			add(ln.path, s.Source == Project && !ln.trash)
+		}
+		return dt
+	}
+	if s.Source == Project {
+		for _, p := range s.globalLinks {
+			add(p, true)
+		}
+		for _, r := range s.Reads {
+			if r.Global {
+				add(filepath.Join(r.Dir, s.Name), true)
+			}
+		}
+		return dt
+	}
+	for _, im := range l.DeleteImpact(s) {
+		if im.Kind != ImpactLink {
+			continue
+		}
+		p := s.Links[im.Agent]
+		if p == "" {
+			if ag, ok := l.agentByID(im.Agent); ok {
+				dir := ag.Skills
+				if !filepath.IsAbs(dir) {
+					dir = filepath.Join("~", dir)
+				}
+				p = filepath.Join(dir, s.Name)
+			}
+		}
+		add(p, false)
+	}
+	return dt
+}
+
 // Deletion 记着一次删除做了什么，撤销时按它放回去。
 type Deletion struct {
 	Names []string // 删掉的技能，按删除的顺序
@@ -66,7 +134,7 @@ type removedLink struct {
 }
 
 // RealOutside 报告 s 的真实目录是否落在任何已知技能目录（技能库、各 Agent 目录、
-// 早年目录）之外；在外时返回真实目录路径。
+// 早年目录）之外；项目技能按该项目的技能目录判断。在外时返回真实目录路径。
 func (l *Library) RealOutside(s *Skill) (string, bool) {
 	if s == nil || s.Real == "" {
 		return "", false
@@ -74,6 +142,18 @@ func (l *Library) RealOutside(s *Skill) (string, bool) {
 	real := filepath.Clean(s.Real)
 	if r, err := realPath(real); err == nil {
 		real = r
+	}
+	if s.Source == Project {
+		root := s.ProjectDir
+		if resolved, err := realPath(root); err == nil {
+			root = resolved
+		}
+		for _, rel := range projectSkillDirs {
+			if isUnderDir(real, filepath.Join(root, rel)) {
+				return "", false
+			}
+		}
+		return s.Real, true
 	}
 	homes := []string{l.Home}
 	if l.Home != "" {
@@ -208,7 +288,24 @@ func (l *Library) projectDeleteImpact(s *Skill) []Impact {
 // Delete 删除这些技能：原件移到废纸篓，删掉指向它的链接，去掉 npx skills 的
 // 安装记录和本应用写进 Agent 配置的停用记录。有一个不能删就一个都不删。
 // 原件移进废纸篓之后的步骤出错时，照样返回 Deletion，可以撤销。
-func (l *Library) Delete(skills ...*Skill) (_ *Deletion, err error) {
+func (l *Library) Delete(skills ...*Skill) (*Deletion, error) {
+	return l.deleteSkills(skills, nil)
+}
+
+// DeleteConfirmed 和 Delete 一样，但链接只删 targets 里列出的：确认框打开之后
+// 才出现的链接用户没看到过，留着不动（原件移走后它成了断链，整理页会列出来）。
+func (l *Library) DeleteConfirmed(targets ...DeleteTarget) (*Deletion, error) {
+	skills := make([]*Skill, 0, len(targets))
+	confirmed := make(map[*Skill][]DeleteLink, len(targets))
+	for _, t := range targets {
+		skills = append(skills, t.Skill)
+		confirmed[t.Skill] = t.Links
+	}
+	return l.deleteSkills(skills, confirmed)
+}
+
+// deleteSkills 删除 skills；confirmed 不为 nil 时，每个技能只删其中列出的链接。
+func (l *Library) deleteSkills(skills []*Skill, confirmed map[*Skill][]DeleteLink) (_ *Deletion, err error) {
 	defer l.track("delete", "delete", skillNames(skills))(&err)
 	var names []string
 	for _, s := range skills {
@@ -225,7 +322,8 @@ func (l *Library) Delete(skills ...*Skill) (_ *Deletion, err error) {
 	d := &Deletion{}
 	var errs []error
 	for _, s := range skills {
-		item, err := l.deleteOne(s)
+		listed, onlyListed := confirmed[s]
+		item, err := l.deleteOne(s, listed, onlyListed)
 		if item != nil {
 			d.items = append(d.items, item)
 			d.Names = append(d.Names, s.Name)
@@ -241,11 +339,17 @@ func (l *Library) Delete(skills ...*Skill) (_ *Deletion, err error) {
 }
 
 // deleteOne 删一个技能。原件没能移进废纸篓时什么都不改，返回 nil。
-func (l *Library) deleteOne(s *Skill) (*deleted, error) {
+// onlyListed 时只删 listed 里的链接。
+func (l *Library) deleteOne(s *Skill, listed []DeleteLink, onlyListed bool) (*deleted, error) {
 	if !l.disk {
 		return &deleted{skill: s, at: l.unlist(s)}, nil
 	}
 	links := l.linksTo(s)
+	if onlyListed {
+		links = slices.DeleteFunc(links, func(ln removedLink) bool {
+			return !slices.ContainsFunc(listed, func(d DeleteLink) bool { return d.Path == ln.path })
+		})
+	}
 	disabled := l.ownDisables(s)
 	// 先留一份撤销用的，再移原件：mygo 不告诉移到了废纸篓的哪里，
 	// macOS 也不让普通应用读废纸篓，撤销只能用自己留的这份
