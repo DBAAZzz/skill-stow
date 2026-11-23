@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-// MarketSource identifies an upstream cloud skill marketplace.
+// MarketSource 表示云端技能市场的来源。
 type MarketSource string
 
 const (
@@ -27,7 +27,7 @@ const (
 	MarketClawHub  MarketSource = "clawhub"
 )
 
-// MarketView selects a leaderboard, topic, or category view inside a marketplace.
+// MarketView 表示云市场里的榜单、专题或分类视图。
 type MarketView string
 
 const (
@@ -44,7 +44,7 @@ const (
 	MarketMetricDownloads = "downloads"
 )
 
-// ClawHubCategories lists the canonical ClawHub category filter keys in display order.
+// ClawHubCategories 是 ClawHub 固定的 14 个分类键，按界面展示顺序排列。
 var ClawHubCategories = []string{
 	"integrations",
 	"research",
@@ -73,7 +73,7 @@ const (
 	marketFallbackLimit = 200
 )
 
-// MarketItem is the unified UI representation of a skill from skills.sh or ClawHub.
+// MarketItem 是界面展示的统一云市场技能条目。
 type MarketItem struct {
 	Source      MarketSource `json:"source"`
 	ID          string       `json:"id"`
@@ -98,9 +98,8 @@ type MarketItem struct {
 	Installed   bool         `json:"installed,omitempty"`
 }
 
-// MarketListResult contains a marketplace page plus cache and provenance flags.
-// When upstream refresh fails and Stale is true, Items holds the expired disk cache
-// while FetchErr records the refresh error.
+// MarketListResult 是一页榜单/列表及其缓存来源。
+// 刷新失败但本地有过期缓存时，Stale 为真且 Items 返回旧缓存，同时在 FetchErr 保留失败原因。
 type MarketListResult struct {
 	Items      []MarketItem `json:"items"`
 	HasMore    bool         `json:"hasMore"`
@@ -112,7 +111,7 @@ type MarketListResult struct {
 	FetchErr   error        `json:"-"`
 }
 
-// MarketSearchResult holds concurrent search results and independent errors per market.
+// MarketSearchResult 存放两个市场并发搜索各自的结果与错误。
 type MarketSearchResult struct {
 	Query       string
 	SkillsSh    []MarketItem
@@ -121,7 +120,7 @@ type MarketSearchResult struct {
 	ClawHubErr  error
 }
 
-// MarketExtras holds curated descriptions and topic collections published separately from APIs.
+// MarketExtras 是补充文件 market-extras.json 中的简介与专题清单。
 type MarketExtras struct {
 	Version      int               `json:"version"`
 	GeneratedAt  string            `json:"generatedAt"`
@@ -129,7 +128,7 @@ type MarketExtras struct {
 	Topics       []MarketTopic     `json:"topics"`
 }
 
-// MarketTopic defines a curated skills.sh topic tab and its member skills.
+// MarketTopic 定义 skills.sh 的一个专题标签及其包含的技能列表。
 type MarketTopic struct {
 	ID      string             `json:"id"`
 	Title   string             `json:"title"`
@@ -137,14 +136,14 @@ type MarketTopic struct {
 	Skills  []MarketTopicSkill `json:"skills"`
 }
 
-// MarketTopicSkill references a skills.sh skill inside a topic together with a short purpose line.
+// MarketTopicSkill 记录专题里的单个 skills.sh 技能 ID 及其一句用途说明。
 type MarketTopicSkill struct {
 	ID   string `json:"id"`
 	What string `json:"what"`
 }
 
-// MarketClient fetches, searches, and caches skills.sh and ClawHub marketplace feeds.
-// Client inherits proxy and timeout configuration from Settings via NewImportRemote.
+// MarketClient 拉取、搜索并缓存 skills.sh 与 ClawHub 的市场数据；
+// 代理与超时设置复用 NewImportRemote。
 type MarketClient struct {
 	Client       *http.Client
 	SkillsShBase string
@@ -166,7 +165,7 @@ type searchCacheKey struct {
 	query  string
 }
 
-// NewMarketClient creates a MarketClient configured with Settings proxy rules and cacheDir.
+// NewMarketClient 按 Settings 的代理策略和缓存目录创建 MarketClient。
 func NewMarketClient(s Settings, cacheDir string) *MarketClient {
 	remote := NewImportRemote(s)
 	return &MarketClient{
@@ -182,7 +181,7 @@ func NewMarketClient(s Settings, cacheDir string) *MarketClient {
 	}
 }
 
-// MarketClient returns a shared MarketClient storing caches under AppDir()/market.
+// MarketClient 返回共享的云市场客户端，磁盘缓存放在 AppDir()/market 下。
 func (l *Library) MarketClient() *MarketClient {
 	if l == nil {
 		return NewMarketClient(Settings{}, "")
@@ -248,8 +247,7 @@ func (m *MarketClient) extrasURL() string {
 	return defaultMarketExtrasURL
 }
 
-// FetchMarketList returns a paginated view for source, honoring per-view TTLs
-// and falling back to expired disk cache when upstream requests fail.
+// FetchMarketList 按视图缓存时长拉取指定页；过期后若网络失败则回落到旧磁盘缓存。
 func (m *MarketClient) FetchMarketList(ctx context.Context, source MarketSource, view MarketView, key string, page int) (*MarketListResult, error) {
 	if page < 0 {
 		page = 0
@@ -264,8 +262,7 @@ func (m *MarketClient) FetchMarketList(ctx context.Context, source MarketSource,
 	}
 }
 
-// CachedMarketList reads the disk-cached page without touching the network.
-// It returns nil when no readable cache exists on disk.
+// CachedMarketList 仅读磁盘缓存（不联网），没有可读缓存时返回 nil。
 func (m *MarketClient) CachedMarketList(source MarketSource, view MarketView, key string, page int) *MarketListResult {
 	if page < 0 {
 		page = 0
@@ -520,7 +517,7 @@ func (m *MarketClient) requestClawHubFeed(ctx context.Context, category, cursor 
 	q := url.Values{}
 	q.Set("sort", "downloads")
 	q.Set("limit", strconv.Itoa(clawHubPageSize))
-	// ClawHub returns 400 Invalid skill category when category is present and empty.
+	// category 为空但传了键时 ClawHub 会返回 400 Invalid skill category，全部视图必须省略该参数。
 	if category != "" {
 		q.Set("category", category)
 	}
@@ -549,8 +546,7 @@ func (m *MarketClient) requestClawHubFeed(ctx context.Context, category, cursor 
 	}, nil
 }
 
-// SearchMarket concurrently searches skills.sh and ClawHub for query, sorting each source
-// descending by its own metric and keeping session results cached in memory only.
+// SearchMarket 并发搜索 skills.sh 与 ClawHub，各自按指标降序排列并仅留在当前会话内存缓存。
 func (m *MarketClient) SearchMarket(ctx context.Context, query string) MarketSearchResult {
 	q := strings.TrimSpace(query)
 	out := MarketSearchResult{Query: q}
@@ -574,7 +570,7 @@ func (m *MarketClient) SearchMarket(ctx context.Context, query string) MarketSea
 	return out
 }
 
-// SearchMarketSource runs search against one marketplace and uses the session memory cache.
+// SearchMarketSource 对单个市场执行搜索，命中当前会话内存缓存时直接返回。
 func (m *MarketClient) SearchMarketSource(ctx context.Context, source MarketSource, query string) ([]MarketItem, error) {
 	q := strings.TrimSpace(query)
 	if q == "" {
@@ -590,7 +586,7 @@ func (m *MarketClient) SearchMarketSource(ctx context.Context, source MarketSour
 	)
 	switch source {
 	case MarketSkillsSh:
-		// Upstream rejects queries shorter than 2 characters with HTTP 400.
+		// 上游对不足 2 个字符的查询返回 HTTP 400。
 		if len([]rune(q)) < 2 {
 			return []MarketItem{}, nil
 		}
@@ -615,7 +611,7 @@ func (m *MarketClient) finalizeSearchItems(source MarketSource, src []MarketItem
 			if cached, ok := idx[out[i].ID]; ok && len(cached.Weekly) > 0 {
 				out[i].Weekly = slices.Clone(cached.Weekly)
 			}
-			// Official badge only applies to curated leaderboards, never search results.
+			// 搜索结果不含官方维度，即使缓存榜单里有也只补每周趋势。
 			out[i].Official = false
 		}
 		m.MergeMarketExtras(out, m.CachedMarketExtras())
@@ -674,8 +670,7 @@ func (m *MarketClient) requestClawHubSearch(ctx context.Context, query string) (
 	return items, nil
 }
 
-// FetchMarketExtras downloads market-extras.json with ETag revalidation and caches it on disk.
-// When offline or upstream fails, it falls back to any cached copy and only returns an error if none exists.
+// FetchMarketExtras 使用 ETag 拉取并缓存 market-extras.json；失败且已有本地缓存时回落到缓存。
 func (m *MarketClient) FetchMarketExtras(ctx context.Context) (*MarketExtras, error) {
 	env := m.readExtrasEnvelope()
 	var ifNoneMatch string
@@ -723,7 +718,7 @@ func (m *MarketClient) FetchMarketExtras(ctx context.Context) (*MarketExtras, er
 	return cloneMarketExtras(&extras), nil
 }
 
-// CachedMarketExtras returns extras from memory or disk without making network calls.
+// CachedMarketExtras 从内存或磁盘读取补充文件，不发起网络请求。
 func (m *MarketClient) CachedMarketExtras() *MarketExtras {
 	m.mu.Lock()
 	mem := m.extras
@@ -754,7 +749,7 @@ func (m *MarketClient) setMemoryExtras(ex *MarketExtras, etag string) {
 	}
 }
 
-// MergeMarketExtras enriches skills.sh items with descriptions and topic memberships from extras.
+// MergeMarketExtras 将补充文件里的简介与所属专题合并进 skills.sh 条目。
 func (m *MarketClient) MergeMarketExtras(items []MarketItem, extras *MarketExtras) {
 	if extras == nil || len(items) == 0 {
 		return
@@ -778,7 +773,7 @@ func (m *MarketClient) MergeMarketExtras(items []MarketItem, extras *MarketExtra
 	}
 }
 
-// MarkInstalled updates each item's Installed flag from l's lock and app-import records.
+// MarkInstalled 按安装记录与本机应用记录更新云市场条目的 Installed 状态。
 func (l *Library) MarkInstalled(items []MarketItem) {
 	if len(items) == 0 {
 		return
@@ -790,9 +785,9 @@ func (l *Library) MarkInstalled(items []MarketItem) {
 	MarkInstalledWithRecords(items, l.updateEntries())
 }
 
-// MarkInstalledWithRecords sets Installed on items strictly from lock records:
-// skills.sh requires Source == owner/repo and Name == skillId; ClawHub requires
-// SourceType == "clawhub" with matching owner/slug source and slug.
+// MarkInstalledWithRecords 严格按 LockEntry 规则判断已安装：
+// skills.sh 要求 Source == owner/repo 且 Name == skillId；
+// ClawHub 要求 SourceType == "clawhub" 且来源为 owner/slug、slug 一致。
 func MarkInstalledWithRecords(items []MarketItem, entries []LockEntry) {
 	for i := range items {
 		items[i].Installed = isMarketItemInstalled(items[i], entries)
@@ -1038,7 +1033,7 @@ func (m *MarketClient) loadCachedSkillsShIndex() map[string]MarketItem {
 	if err != nil {
 		return idx
 	}
-	// Prefer all-time (lifetime installs + weeklyInstalls) before trending and hot.
+	// 优先用总榜（含累计安装与 8 周趋势）补数字，其次趋势、热门。
 	for _, prefix := range []string{"all-time-p", "trending-p", "hot-p"} {
 		var files []string
 		for _, de := range entries {
@@ -1128,7 +1123,7 @@ func cloneMarketExtras(ex *MarketExtras) *MarketExtras {
 	return &cp
 }
 
-// --- Upstream wire JSON shapes & field mapping ---
+// 上游接口报文结构与字段映射
 
 type skillsShFeedPayload struct {
 	Skills  []skillsShSkill `json:"skills"`
