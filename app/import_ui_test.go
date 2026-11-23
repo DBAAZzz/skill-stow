@@ -46,17 +46,21 @@ func TestImportPageIsReachableFromTheSidebarAndMySkills(t *testing.T) {
 	a, tt := newTester(t)
 	must(t, tt.Click("添加技能"))
 	if a.scope != scopeImport {
-		t.Fatalf("工具栏「添加技能」应打开添加页：%s", a.scope)
+		t.Fatalf("工具栏「添加技能」应打开云市场页：%s", a.scope)
 	}
-	for _, s := range []string{"选取文件夹或 .zip 压缩包", "选取…", "在 skills.sh 浏览", "读取"} {
+	for _, s := range []string{"云市场", "skills.sh", "ClawHub", "最近添加", "从电脑添加", "总榜"} {
 		if !tt.HasText(s) {
 			t.Errorf("缺 %q：%v", s, tt.Texts())
 		}
 	}
 	a.scope = string(library.ScopeMine)
 	tt.Frame()
-	if !tt.HasText("添加技能") {
-		t.Error("侧边栏和「我的技能」工具栏都应有「添加技能」")
+	if !tt.HasText("云市场") || !tt.HasText("添加技能") {
+		t.Error("侧边栏应有「云市场」，「我的技能」工具栏应有「添加技能」")
+	}
+	must(t, tt.Click("云市场"))
+	if a.scope != scopeImport {
+		t.Fatalf("侧边栏「云市场」应打开云市场页：%s", a.scope)
 	}
 }
 
@@ -406,8 +410,8 @@ func TestOnlyTheNamedSkillIsListedWithAWayToShowTheRest(t *testing.T) {
 	}
 	a.discardImport()
 	tt.Frame()
-	if a.imp.batch != nil || !tt.HasText("从链接添加") {
-		t.Errorf("放弃后应回到输入页：%v", tt.Texts())
+	if a.imp.batch != nil || !tt.HasText("总榜") {
+		t.Errorf("放弃后应回到云市场首页：%v", tt.Texts())
 	}
 }
 
@@ -914,6 +918,7 @@ func TestRecentProjectImportOpensInstalledCopy(t *testing.T) {
 	a.rescan()
 	a.openImport()
 	tt.Frame()
+	must(t, tt.Click("最近添加"))
 	must(t, tt.Click("demo"))
 	if a.selected == nil || a.selected.Real != out[0].Place || a.scope != projectScope(a.lib.Project(proj)) {
 		t.Fatalf("recent item opened %v in %q", a.selected, a.scope)

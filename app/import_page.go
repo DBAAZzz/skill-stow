@@ -28,15 +28,15 @@ var (
 	iconShield    = icon(`<path d="M12 3.5 19 6v5.5c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z"/><path d="m9 12 2 2 4-4"/>`)
 )
 
-// importSidebar 是侧边栏「更新」下面的「添加技能」。
+// importSidebar 是侧边栏最顶上的「云市场」入口。
 func (a *app) importSidebar(c *ui.Context) {
-	row := a.sideRow(c, scopeImport, iconNavImport, locales.ActionAddSkills(), colTextSecondary).Height(sideRowHeight).Padding(0, 8)
+	row := a.sideRow(c, scopeImport, iconNavImport, locales.MarketTitle(), colTextSecondary).Height(sideRowHeight).Padding(0, 8)
 	if row.Clicked() {
 		a.checkClipboard()
 	}
 }
 
-// importPage 画添加技能页。
+// importPage 按路由画添加对比页、选择预览页，或云市场首页。
 func (a *app) importPage(c *ui.Context) {
 	st := &a.imp
 	if st.cmp != nil {
@@ -47,18 +47,7 @@ func (a *app) importPage(c *ui.Context) {
 		a.importPickPage(c)
 		return
 	}
-	a.toolbarRow(c, func() {
-		ui.Text(c, locales.ActionAddSkills()).FontSize(13).FontWeight(600).SingleLine()
-	}, func() {
-		ui.Spacer(c)
-		if updButton(c, iconExternal, locales.ImportBrowseSkillsWebsite(), false).Clicked() {
-			a.openExternalURL("https://skills.sh")
-		}
-	})
-	w, _ := c.Size()
-	ui.Scroll(c).Grow(1).MinHeight(0).Background(colBgPage).Scrollbars(false).Children(func() {
-		pageColumn(c, w-a.sidebarRoom(), formMaxWidth, func(float32) { a.importHome(c) })
-	})
+	a.marketPage(c)
 }
 
 // 入口页（画板「添加技能」第九轮）：系统设置那样的灰底白色分组。读取中、

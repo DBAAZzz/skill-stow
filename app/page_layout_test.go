@@ -57,6 +57,7 @@ func TestGroupedPagesShareOneContentColumn(t *testing.T) {
 			updateFixture(upd)
 			imp := newApp(library.Sample())
 			imp.scope = scopeImport
+			imp.imp.input = "https://github.com/anthropics/skills"
 
 			left := int(usage.sidebarRoom())
 			shot := func(a *app) *image.RGBA {

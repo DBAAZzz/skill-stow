@@ -156,6 +156,7 @@ type MarketClient struct {
 
 	mu          sync.Mutex
 	searchCache map[searchCacheKey][]MarketItem
+	memIndex    map[string]MarketItem
 	extras      *MarketExtras
 	extrasETag  string
 }
@@ -329,6 +330,7 @@ func (m *MarketClient) fetchSkillsShList(ctx context.Context, view MarketView, k
 			return nil, err
 		}
 		m.writeCachedList(cachePath, fresh)
+		m.indexSkillsShItems(view, fresh.Items)
 		out := cloneMarketListResult(fresh)
 		m.MergeMarketExtras(out.Items, m.CachedMarketExtras())
 		return out, nil
@@ -1023,37 +1025,65 @@ func writeAtomicCacheJSON(file string, v any) error {
 	return os.Rename(tmpName, file)
 }
 
+func (m *MarketClient) indexSkillsShItems(view MarketView, items []MarketItem) {
+	if len(items) == 0 {
+		return
+	}
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.memIndex == nil {
+		m.memIndex = make(map[string]MarketItem)
+	}
+	for _, it := range items {
+		prev, exists := m.memIndex[it.ID]
+		// 总榜含累计安装与周趋势，不被趋势/热门覆盖；其它字段仅在尚未索引时写入。
+		if !exists || (view == MarketViewAllTime && len(it.Weekly) > 0 && len(prev.Weekly) == 0) {
+			cp := it
+			cp.Weekly = slices.Clone(it.Weekly)
+			cp.Categories = slices.Clone(it.Categories)
+			cp.Topics = slices.Clone(it.Topics)
+			m.memIndex[it.ID] = cp
+		}
+	}
+}
+
 func (m *MarketClient) loadCachedSkillsShIndex() map[string]MarketItem {
 	idx := make(map[string]MarketItem)
-	if m.CacheDir == "" {
-		return idx
-	}
-	dir := filepath.Join(m.CacheDir, "skills-sh")
-	entries, err := os.ReadDir(dir)
-	if err != nil {
-		return idx
-	}
-	// 优先用总榜（含累计安装与 8 周趋势）补数字，其次趋势、热门。
-	for _, prefix := range []string{"all-time-p", "trending-p", "hot-p"} {
-		var files []string
-		for _, de := range entries {
-			if !de.IsDir() && strings.HasPrefix(de.Name(), prefix) && strings.HasSuffix(de.Name(), ".json") {
-				files = append(files, de.Name())
-			}
-		}
-		slices.Sort(files)
-		for _, name := range files {
-			cached := m.readCachedList(filepath.Join(dir, name), 0)
-			if cached == nil {
-				continue
-			}
-			for _, it := range cached.Items {
-				if _, exists := idx[it.ID]; !exists {
-					idx[it.ID] = it
+	if m.CacheDir != "" {
+		dir := filepath.Join(m.CacheDir, "skills-sh")
+		if entries, err := os.ReadDir(dir); err == nil {
+			// 优先用总榜（含累计安装与 8 周趋势）补数字，其次趋势、热门。
+			for _, prefix := range []string{"all-time-p", "trending-p", "hot-p"} {
+				var files []string
+				for _, de := range entries {
+					if !de.IsDir() && strings.HasPrefix(de.Name(), prefix) && strings.HasSuffix(de.Name(), ".json") {
+						files = append(files, de.Name())
+					}
+				}
+				slices.Sort(files)
+				for _, name := range files {
+					cached := m.readCachedList(filepath.Join(dir, name), 0)
+					if cached == nil {
+						continue
+					}
+					for _, it := range cached.Items {
+						if _, exists := idx[it.ID]; !exists {
+							idx[it.ID] = it
+						}
+					}
 				}
 			}
 		}
 	}
+	m.mu.Lock()
+	for id, it := range m.memIndex {
+		if _, exists := idx[id]; !exists {
+			cp := it
+			cp.Weekly = slices.Clone(it.Weekly)
+			idx[id] = cp
+		}
+	}
+	m.mu.Unlock()
 	return idx
 }
 

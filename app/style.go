@@ -216,21 +216,51 @@ func sectionLabel(c *ui.Context, text string) ui.Element {
 
 var segmentedSpring = ui.Animation{Spring: ui.SpringOptions{Duration: 280 * time.Millisecond, Bounce: 0.14}}
 
+type segmentOption struct {
+	label string
+	icon  *ui.SVG
+}
+
 // segmented 是工具栏的分段控件（r8 .seg）：灰底，白色滑块浮起，
 // 切换时滑块带弹性动画滑到选中的段。各段等宽，滑块的位置才算得出来。
 func segmented(c *ui.Context, selected *int, labels ...string) ui.Element {
-	const pad, segW, segH = 2, 52, 24
-	seg := ui.SegmentedBase(c, selected, len(labels))
+	opts := make([]segmentOption, len(labels))
+	for i, l := range labels {
+		opts[i] = segmentOption{label: l}
+	}
+	return segmentedOptions(c, selected, 52, opts...)
+}
+
+// segmentedOptions 与 segmented 共用实现，按 segW 指定每段宽度并可选带 11pt 图标。
+func segmentedOptions(c *ui.Context, selected *int, segW float32, opts ...segmentOption) ui.Element {
+	const pad, segH = 2, 24
+	seg := ui.SegmentedBase(c, selected, len(opts))
 	track := seg.Track.Padding(pad).Radius(6).Background(colBgFill)
 	x := track.AnimateTo("thumb", float32(*selected)*segW, segmentedSpring)
 	track.Children(func() {
 		thumb := ui.Box(c.Key("thumb")).Absolute().ZIndex(-1).Top(pad).Left(pad).Translate(x, 0).Size(segW, segH).Radius(4).Background(colBgThumb)
 		lift(thumb, 1, 1.5, 0.14)
 		hairline(thumb, 0.05)
-		for i, label := range labels {
-			s := seg.Segment(i).Size(segW, segH).Radius(4).Center().Label(label)
+		for i, opt := range opts {
+			s := seg.Segment(i).Size(segW, segH).Radius(4).Center().Label(opt.label)
 			s.Children(func() {
-				t := ui.Text(c, label).FontSize(13).SingleLine().TextColor(colTextBody)
+				if opt.icon != nil {
+					row := ui.Row(c).Gap(5).AlignItems(ui.Center).TextColor(colTextBody)
+					if i == *selected {
+						row.TextColor(colTextPrimary)
+					} else if s.Pressed() {
+						row.Opacity(0.6)
+					}
+					row.Children(func() {
+						ui.Icon(c, opt.icon).Size(11, 11)
+						t := ui.Text(c, opt.label).FontSize(12).SingleLine()
+						if i == *selected {
+							t.FontWeight(500)
+						}
+					})
+					return
+				}
+				t := ui.Text(c, opt.label).FontSize(13).SingleLine().TextColor(colTextBody)
 				if i == *selected {
 					t.TextColor(colTextPrimary).FontWeight(500)
 				} else if s.Pressed() {

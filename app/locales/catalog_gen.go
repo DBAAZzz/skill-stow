@@ -17403,3 +17403,873 @@ func ImportProjectSourceClawHub(repo string) string {
 func (msgs Messages) ImportProjectSourceClawHub(repo string) string {
 	return Catalog.Format(msgs.locale, "importProjectSourceClawHub", map[string]any{"repo": repo})
 }
+
+// ActionClearSearch says "清除搜索"
+// in the language the app shows.
+//
+// 搜索框清空按钮的无障碍与提示标签
+func ActionClearSearch() string { return In(i18n.Locale()).ActionClearSearch() }
+
+// ActionClearSearch says "清除搜索"
+// in the language of msgs.
+//
+// 搜索框清空按钮的无障碍与提示标签
+func (msgs Messages) ActionClearSearch() string {
+	return Catalog.Format(msgs.locale, "actionClearSearch", nil)
+}
+
+// MarketTitle says "云市场"
+// in the language the app shows.
+//
+// 侧边栏首项及云市场页面标题
+func MarketTitle() string { return In(i18n.Locale()).MarketTitle() }
+
+// MarketTitle says "云市场"
+// in the language of msgs.
+//
+// 侧边栏首项及云市场页面标题
+func (msgs Messages) MarketTitle() string {
+	return Catalog.Format(msgs.locale, "marketTitle", nil)
+}
+
+// MarketSearchPlaceholder says "搜索技能，或粘贴链接、owner/repo、npx 命令"
+// in the language the app shows.
+//
+// 云市场顶部搜索与粘贴框占位提示
+func MarketSearchPlaceholder() string { return In(i18n.Locale()).MarketSearchPlaceholder() }
+
+// MarketSearchPlaceholder says "搜索技能，或粘贴链接、owner/repo、npx 命令"
+// in the language of msgs.
+//
+// 云市场顶部搜索与粘贴框占位提示
+func (msgs Messages) MarketSearchPlaceholder() string {
+	return Catalog.Format(msgs.locale, "marketSearchPlaceholder", nil)
+}
+
+// MarketViewAllTime says "总榜"
+// in the language the app shows.
+//
+// skills.sh 标签：总榜
+func MarketViewAllTime() string { return In(i18n.Locale()).MarketViewAllTime() }
+
+// MarketViewAllTime says "总榜"
+// in the language of msgs.
+//
+// skills.sh 标签：总榜
+func (msgs Messages) MarketViewAllTime() string {
+	return Catalog.Format(msgs.locale, "marketViewAllTime", nil)
+}
+
+// MarketViewTrending says "趋势"
+// in the language the app shows.
+//
+// skills.sh 标签：趋势
+func MarketViewTrending() string { return In(i18n.Locale()).MarketViewTrending() }
+
+// MarketViewTrending says "趋势"
+// in the language of msgs.
+//
+// skills.sh 标签：趋势
+func (msgs Messages) MarketViewTrending() string {
+	return Catalog.Format(msgs.locale, "marketViewTrending", nil)
+}
+
+// MarketViewHot says "热门"
+// in the language the app shows.
+//
+// skills.sh 标签：热门
+func MarketViewHot() string { return In(i18n.Locale()).MarketViewHot() }
+
+// MarketViewHot says "热门"
+// in the language of msgs.
+//
+// skills.sh 标签：热门
+func (msgs Messages) MarketViewHot() string {
+	return Catalog.Format(msgs.locale, "marketViewHot", nil)
+}
+
+// MarketViewOfficial says "官方"
+// in the language the app shows.
+//
+// skills.sh 标签：官方
+func MarketViewOfficial() string { return In(i18n.Locale()).MarketViewOfficial() }
+
+// MarketViewOfficial says "官方"
+// in the language of msgs.
+//
+// skills.sh 标签：官方
+func (msgs Messages) MarketViewOfficial() string {
+	return Catalog.Format(msgs.locale, "marketViewOfficial", nil)
+}
+
+// MarketAll says "全部"
+// in the language the app shows.
+//
+// ClawHub 标签：全部技能
+func MarketAll() string { return In(i18n.Locale()).MarketAll() }
+
+// MarketAll says "全部"
+// in the language of msgs.
+//
+// ClawHub 标签：全部技能
+func (msgs Messages) MarketAll() string {
+	return Catalog.Format(msgs.locale, "marketAll", nil)
+}
+
+// MarketTopicDesign says "设计与界面"
+// in the language the app shows.
+//
+// skills.sh 专题：design
+func MarketTopicDesign() string { return In(i18n.Locale()).MarketTopicDesign() }
+
+// MarketTopicDesign says "设计与界面"
+// in the language of msgs.
+//
+// skills.sh 专题：design
+func (msgs Messages) MarketTopicDesign() string {
+	return Catalog.Format(msgs.locale, "marketTopicDesign", nil)
+}
+
+// MarketTopicMobile says "移动端"
+// in the language the app shows.
+//
+// skills.sh 专题：mobile
+func MarketTopicMobile() string { return In(i18n.Locale()).MarketTopicMobile() }
+
+// MarketTopicMobile says "移动端"
+// in the language of msgs.
+//
+// skills.sh 专题：mobile
+func (msgs Messages) MarketTopicMobile() string {
+	return Catalog.Format(msgs.locale, "marketTopicMobile", nil)
+}
+
+// MarketTopicAgentWorkflows says "Agent 工作流"
+// in the language the app shows.
+//
+// skills.sh 专题：agent-workflows
+func MarketTopicAgentWorkflows() string { return In(i18n.Locale()).MarketTopicAgentWorkflows() }
+
+// MarketTopicAgentWorkflows says "Agent 工作流"
+// in the language of msgs.
+//
+// skills.sh 专题：agent-workflows
+func (msgs Messages) MarketTopicAgentWorkflows() string {
+	return Catalog.Format(msgs.locale, "marketTopicAgentWorkflows", nil)
+}
+
+// MarketTopicDatabases says "数据库"
+// in the language the app shows.
+//
+// skills.sh 专题：databases
+func MarketTopicDatabases() string { return In(i18n.Locale()).MarketTopicDatabases() }
+
+// MarketTopicDatabases says "数据库"
+// in the language of msgs.
+//
+// skills.sh 专题：databases
+func (msgs Messages) MarketTopicDatabases() string {
+	return Catalog.Format(msgs.locale, "marketTopicDatabases", nil)
+}
+
+// MarketTopicTesting says "测试"
+// in the language the app shows.
+//
+// skills.sh 专题：testing
+func MarketTopicTesting() string { return In(i18n.Locale()).MarketTopicTesting() }
+
+// MarketTopicTesting says "测试"
+// in the language of msgs.
+//
+// skills.sh 专题：testing
+func (msgs Messages) MarketTopicTesting() string {
+	return Catalog.Format(msgs.locale, "marketTopicTesting", nil)
+}
+
+// MarketTopicMarketing says "营销"
+// in the language the app shows.
+//
+// skills.sh 专题：marketing
+func MarketTopicMarketing() string { return In(i18n.Locale()).MarketTopicMarketing() }
+
+// MarketTopicMarketing says "营销"
+// in the language of msgs.
+//
+// skills.sh 专题：marketing
+func (msgs Messages) MarketTopicMarketing() string {
+	return Catalog.Format(msgs.locale, "marketTopicMarketing", nil)
+}
+
+// MarketCategoryIntegrations says "集成"
+// in the language the app shows.
+//
+// ClawHub 分类：integrations
+func MarketCategoryIntegrations() string { return In(i18n.Locale()).MarketCategoryIntegrations() }
+
+// MarketCategoryIntegrations says "集成"
+// in the language of msgs.
+//
+// ClawHub 分类：integrations
+func (msgs Messages) MarketCategoryIntegrations() string {
+	return Catalog.Format(msgs.locale, "marketCategoryIntegrations", nil)
+}
+
+// MarketCategoryResearch says "研究"
+// in the language the app shows.
+//
+// ClawHub 分类：research
+func MarketCategoryResearch() string { return In(i18n.Locale()).MarketCategoryResearch() }
+
+// MarketCategoryResearch says "研究"
+// in the language of msgs.
+//
+// ClawHub 分类：research
+func (msgs Messages) MarketCategoryResearch() string {
+	return Catalog.Format(msgs.locale, "marketCategoryResearch", nil)
+}
+
+// MarketCategoryAutomation says "自动化"
+// in the language the app shows.
+//
+// ClawHub 分类：automation
+func MarketCategoryAutomation() string { return In(i18n.Locale()).MarketCategoryAutomation() }
+
+// MarketCategoryAutomation says "自动化"
+// in the language of msgs.
+//
+// ClawHub 分类：automation
+func (msgs Messages) MarketCategoryAutomation() string {
+	return Catalog.Format(msgs.locale, "marketCategoryAutomation", nil)
+}
+
+// MarketCategoryCreative says "创意"
+// in the language the app shows.
+//
+// ClawHub 分类：creative
+func MarketCategoryCreative() string { return In(i18n.Locale()).MarketCategoryCreative() }
+
+// MarketCategoryCreative says "创意"
+// in the language of msgs.
+//
+// ClawHub 分类：creative
+func (msgs Messages) MarketCategoryCreative() string {
+	return Catalog.Format(msgs.locale, "marketCategoryCreative", nil)
+}
+
+// MarketCategoryAgents says "智能体"
+// in the language the app shows.
+//
+// ClawHub 分类：agents
+func MarketCategoryAgents() string { return In(i18n.Locale()).MarketCategoryAgents() }
+
+// MarketCategoryAgents says "智能体"
+// in the language of msgs.
+//
+// ClawHub 分类：agents
+func (msgs Messages) MarketCategoryAgents() string {
+	return Catalog.Format(msgs.locale, "marketCategoryAgents", nil)
+}
+
+// MarketCategoryDevelopment says "开发"
+// in the language the app shows.
+//
+// ClawHub 分类：development
+func MarketCategoryDevelopment() string { return In(i18n.Locale()).MarketCategoryDevelopment() }
+
+// MarketCategoryDevelopment says "开发"
+// in the language of msgs.
+//
+// ClawHub 分类：development
+func (msgs Messages) MarketCategoryDevelopment() string {
+	return Catalog.Format(msgs.locale, "marketCategoryDevelopment", nil)
+}
+
+// MarketCategoryCommunication says "沟通"
+// in the language the app shows.
+//
+// ClawHub 分类：communication
+func MarketCategoryCommunication() string { return In(i18n.Locale()).MarketCategoryCommunication() }
+
+// MarketCategoryCommunication says "沟通"
+// in the language of msgs.
+//
+// ClawHub 分类：communication
+func (msgs Messages) MarketCategoryCommunication() string {
+	return Catalog.Format(msgs.locale, "marketCategoryCommunication", nil)
+}
+
+// MarketCategoryKnowledge says "知识"
+// in the language the app shows.
+//
+// ClawHub 分类：knowledge
+func MarketCategoryKnowledge() string { return In(i18n.Locale()).MarketCategoryKnowledge() }
+
+// MarketCategoryKnowledge says "知识"
+// in the language of msgs.
+//
+// ClawHub 分类：knowledge
+func (msgs Messages) MarketCategoryKnowledge() string {
+	return Catalog.Format(msgs.locale, "marketCategoryKnowledge", nil)
+}
+
+// MarketCategoryFinance says "财务"
+// in the language the app shows.
+//
+// ClawHub 分类：finance
+func MarketCategoryFinance() string { return In(i18n.Locale()).MarketCategoryFinance() }
+
+// MarketCategoryFinance says "财务"
+// in the language of msgs.
+//
+// ClawHub 分类：finance
+func (msgs Messages) MarketCategoryFinance() string {
+	return Catalog.Format(msgs.locale, "marketCategoryFinance", nil)
+}
+
+// MarketCategoryProductivity says "效率"
+// in the language the app shows.
+//
+// ClawHub 分类：productivity
+func MarketCategoryProductivity() string { return In(i18n.Locale()).MarketCategoryProductivity() }
+
+// MarketCategoryProductivity says "效率"
+// in the language of msgs.
+//
+// ClawHub 分类：productivity
+func (msgs Messages) MarketCategoryProductivity() string {
+	return Catalog.Format(msgs.locale, "marketCategoryProductivity", nil)
+}
+
+// MarketCategorySecurity says "安全"
+// in the language the app shows.
+//
+// ClawHub 分类：security
+func MarketCategorySecurity() string { return In(i18n.Locale()).MarketCategorySecurity() }
+
+// MarketCategorySecurity says "安全"
+// in the language of msgs.
+//
+// ClawHub 分类：security
+func (msgs Messages) MarketCategorySecurity() string {
+	return Catalog.Format(msgs.locale, "marketCategorySecurity", nil)
+}
+
+// MarketCategoryOperations says "运维"
+// in the language the app shows.
+//
+// ClawHub 分类：operations
+func MarketCategoryOperations() string { return In(i18n.Locale()).MarketCategoryOperations() }
+
+// MarketCategoryOperations says "运维"
+// in the language of msgs.
+//
+// ClawHub 分类：operations
+func (msgs Messages) MarketCategoryOperations() string {
+	return Catalog.Format(msgs.locale, "marketCategoryOperations", nil)
+}
+
+// MarketCategoryLifestyle says "生活"
+// in the language the app shows.
+//
+// ClawHub 分类：lifestyle
+func MarketCategoryLifestyle() string { return In(i18n.Locale()).MarketCategoryLifestyle() }
+
+// MarketCategoryLifestyle says "生活"
+// in the language of msgs.
+//
+// ClawHub 分类：lifestyle
+func (msgs Messages) MarketCategoryLifestyle() string {
+	return Catalog.Format(msgs.locale, "marketCategoryLifestyle", nil)
+}
+
+// MarketCategoryOther says "其他"
+// in the language the app shows.
+//
+// ClawHub 分类：other
+func MarketCategoryOther() string { return In(i18n.Locale()).MarketCategoryOther() }
+
+// MarketCategoryOther says "其他"
+// in the language of msgs.
+//
+// ClawHub 分类：other
+func (msgs Messages) MarketCategoryOther() string {
+	return Catalog.Format(msgs.locale, "marketCategoryOther", nil)
+}
+
+// MarketTopicIntro says "{count} 个技能，由 skills.sh 编辑整理"
+// in the language the app shows.
+//
+// 专题页顶部数量说明
+func MarketTopicIntro(count int) string { return In(i18n.Locale()).MarketTopicIntro(count) }
+
+// MarketTopicIntro says "{count} 个技能，由 skills.sh 编辑整理"
+// in the language of msgs.
+//
+// 专题页顶部数量说明
+func (msgs Messages) MarketTopicIntro(count int) string {
+	return Catalog.Format(msgs.locale, "marketTopicIntro", map[string]any{"count": count})
+}
+
+// MarketUnitInstalls says "安装"
+// in the language the app shows.
+//
+// skills.sh 列表右侧数量单位
+func MarketUnitInstalls() string { return In(i18n.Locale()).MarketUnitInstalls() }
+
+// MarketUnitInstalls says "安装"
+// in the language of msgs.
+//
+// skills.sh 列表右侧数量单位
+func (msgs Messages) MarketUnitInstalls() string {
+	return Catalog.Format(msgs.locale, "marketUnitInstalls", nil)
+}
+
+// MarketUnitDownloads says "下载"
+// in the language the app shows.
+//
+// ClawHub 列表右侧数量单位
+func MarketUnitDownloads() string { return In(i18n.Locale()).MarketUnitDownloads() }
+
+// MarketUnitDownloads says "下载"
+// in the language of msgs.
+//
+// ClawHub 列表右侧数量单位
+func (msgs Messages) MarketUnitDownloads() string {
+	return Catalog.Format(msgs.locale, "marketUnitDownloads", nil)
+}
+
+// MarketGroupByInstalls says "按安装量"
+// in the language the app shows.
+//
+// 搜索结果 skills.sh 分组口径
+func MarketGroupByInstalls() string { return In(i18n.Locale()).MarketGroupByInstalls() }
+
+// MarketGroupByInstalls says "按安装量"
+// in the language of msgs.
+//
+// 搜索结果 skills.sh 分组口径
+func (msgs Messages) MarketGroupByInstalls() string {
+	return Catalog.Format(msgs.locale, "marketGroupByInstalls", nil)
+}
+
+// MarketGroupByDownloads says "按下载量"
+// in the language the app shows.
+//
+// 搜索结果 ClawHub 分组口径
+func MarketGroupByDownloads() string { return In(i18n.Locale()).MarketGroupByDownloads() }
+
+// MarketGroupByDownloads says "按下载量"
+// in the language of msgs.
+//
+// 搜索结果 ClawHub 分组口径
+func (msgs Messages) MarketGroupByDownloads() string {
+	return Catalog.Format(msgs.locale, "marketGroupByDownloads", nil)
+}
+
+// MarketShowAll says "显示全部"
+// in the language the app shows.
+//
+// 搜索结果组标题右侧展开全部
+func MarketShowAll() string { return In(i18n.Locale()).MarketShowAll() }
+
+// MarketShowAll says "显示全部"
+// in the language of msgs.
+//
+// 搜索结果组标题右侧展开全部
+func (msgs Messages) MarketShowAll() string {
+	return Catalog.Format(msgs.locale, "marketShowAll", nil)
+}
+
+// MarketTagInstalled says "已安装"
+// in the language the app shows.
+//
+// 云市场列表与详情已安装标签
+func MarketTagInstalled() string { return In(i18n.Locale()).MarketTagInstalled() }
+
+// MarketTagInstalled says "已安装"
+// in the language of msgs.
+//
+// 云市场列表与详情已安装标签
+func (msgs Messages) MarketTagInstalled() string {
+	return Catalog.Format(msgs.locale, "marketTagInstalled", nil)
+}
+
+// MarketTagOfficial says "官方"
+// in the language the app shows.
+//
+// skills.sh 榜单官方标签
+func MarketTagOfficial() string { return In(i18n.Locale()).MarketTagOfficial() }
+
+// MarketTagOfficial says "官方"
+// in the language of msgs.
+//
+// skills.sh 榜单官方标签
+func (msgs Messages) MarketTagOfficial() string {
+	return Catalog.Format(msgs.locale, "marketTagOfficial", nil)
+}
+
+// MarketViewAndAdd says "查看并添加…"
+// in the language the app shows.
+//
+// 详情栏主按钮：读取来源并进入预览添加
+func MarketViewAndAdd() string { return In(i18n.Locale()).MarketViewAndAdd() }
+
+// MarketViewAndAdd says "查看并添加…"
+// in the language of msgs.
+//
+// 详情栏主按钮：读取来源并进入预览添加
+func (msgs Messages) MarketViewAndAdd() string {
+	return Catalog.Format(msgs.locale, "marketViewAndAdd", nil)
+}
+
+// MarketOpenOnWeb says "在网页中打开"
+// in the language the app shows.
+//
+// 详情栏次按钮：用浏览器打开原技能页面
+func MarketOpenOnWeb() string { return In(i18n.Locale()).MarketOpenOnWeb() }
+
+// MarketOpenOnWeb says "在网页中打开"
+// in the language of msgs.
+//
+// 详情栏次按钮：用浏览器打开原技能页面
+func (msgs Messages) MarketOpenOnWeb() string {
+	return Catalog.Format(msgs.locale, "marketOpenOnWeb", nil)
+}
+
+// MarketSectionData says "数据"
+// in the language the app shows.
+//
+// 详情栏数据分组小标题
+func MarketSectionData() string { return In(i18n.Locale()).MarketSectionData() }
+
+// MarketSectionData says "数据"
+// in the language of msgs.
+//
+// 详情栏数据分组小标题
+func (msgs Messages) MarketSectionData() string {
+	return Catalog.Format(msgs.locale, "marketSectionData", nil)
+}
+
+// MarketSectionTopic says "专题"
+// in the language the app shows.
+//
+// 详情栏专题分组小标题
+func MarketSectionTopic() string { return In(i18n.Locale()).MarketSectionTopic() }
+
+// MarketSectionTopic says "专题"
+// in the language of msgs.
+//
+// 详情栏专题分组小标题
+func (msgs Messages) MarketSectionTopic() string {
+	return Catalog.Format(msgs.locale, "marketSectionTopic", nil)
+}
+
+// MarketSectionCategory says "分类"
+// in the language the app shows.
+//
+// 详情栏分类分组小标题
+func MarketSectionCategory() string { return In(i18n.Locale()).MarketSectionCategory() }
+
+// MarketSectionCategory says "分类"
+// in the language of msgs.
+//
+// 详情栏分类分组小标题
+func (msgs Messages) MarketSectionCategory() string {
+	return Catalog.Format(msgs.locale, "marketSectionCategory", nil)
+}
+
+// MarketSectionLinks says "链接"
+// in the language the app shows.
+//
+// 详情栏链接分组小标题
+func MarketSectionLinks() string { return In(i18n.Locale()).MarketSectionLinks() }
+
+// MarketSectionLinks says "链接"
+// in the language of msgs.
+//
+// 详情栏链接分组小标题
+func (msgs Messages) MarketSectionLinks() string {
+	return Catalog.Format(msgs.locale, "marketSectionLinks", nil)
+}
+
+// MarketSkillsShTopic says "skills.sh 专题"
+// in the language the app shows.
+//
+// 详情栏归类行左边名称
+func MarketSkillsShTopic() string { return In(i18n.Locale()).MarketSkillsShTopic() }
+
+// MarketSkillsShTopic says "skills.sh 专题"
+// in the language of msgs.
+//
+// 详情栏归类行左边名称
+func (msgs Messages) MarketSkillsShTopic() string {
+	return Catalog.Format(msgs.locale, "marketSkillsShTopic", nil)
+}
+
+// MarketClawHubCategory says "ClawHub 分类"
+// in the language the app shows.
+//
+// 详情栏分类行左边名称
+func MarketClawHubCategory() string { return In(i18n.Locale()).MarketClawHubCategory() }
+
+// MarketClawHubCategory says "ClawHub 分类"
+// in the language of msgs.
+//
+// 详情栏分类行左边名称
+func (msgs Messages) MarketClawHubCategory() string {
+	return Catalog.Format(msgs.locale, "marketClawHubCategory", nil)
+}
+
+// MarketWeeklyInstalls says "每周安装"
+// in the language the app shows.
+//
+// skills.sh 详情栏周安装趋势标签
+func MarketWeeklyInstalls() string { return In(i18n.Locale()).MarketWeeklyInstalls() }
+
+// MarketWeeklyInstalls says "每周安装"
+// in the language of msgs.
+//
+// skills.sh 详情栏周安装趋势标签
+func (msgs Messages) MarketWeeklyInstalls() string {
+	return Catalog.Format(msgs.locale, "marketWeeklyInstalls", nil)
+}
+
+// MarketTotalInstalls says "总安装量"
+// in the language the app shows.
+//
+// skills.sh 详情栏总安装量
+func MarketTotalInstalls() string { return In(i18n.Locale()).MarketTotalInstalls() }
+
+// MarketTotalInstalls says "总安装量"
+// in the language of msgs.
+//
+// skills.sh 详情栏总安装量
+func (msgs Messages) MarketTotalInstalls() string {
+	return Catalog.Format(msgs.locale, "marketTotalInstalls", nil)
+}
+
+// MarketRank says "总榜排名"
+// in the language the app shows.
+//
+// skills.sh 总榜详情栏排名
+func MarketRank() string { return In(i18n.Locale()).MarketRank() }
+
+// MarketRank says "总榜排名"
+// in the language of msgs.
+//
+// skills.sh 总榜详情栏排名
+func (msgs Messages) MarketRank() string {
+	return Catalog.Format(msgs.locale, "marketRank", nil)
+}
+
+// MarketRankValue says "第 {rank}"
+// in the language the app shows.
+//
+// skills.sh 总榜名次
+func MarketRankValue(rank int) string { return In(i18n.Locale()).MarketRankValue(rank) }
+
+// MarketRankValue says "第 {rank}"
+// in the language of msgs.
+//
+// skills.sh 总榜名次
+func (msgs Messages) MarketRankValue(rank int) string {
+	return Catalog.Format(msgs.locale, "marketRankValue", map[string]any{"rank": rank})
+}
+
+// MarketDownloads says "下载量"
+// in the language the app shows.
+//
+// ClawHub 详情栏下载量
+func MarketDownloads() string { return In(i18n.Locale()).MarketDownloads() }
+
+// MarketDownloads says "下载量"
+// in the language of msgs.
+//
+// ClawHub 详情栏下载量
+func (msgs Messages) MarketDownloads() string {
+	return Catalog.Format(msgs.locale, "marketDownloads", nil)
+}
+
+// MarketInstalls says "安装量"
+// in the language the app shows.
+//
+// ClawHub 详情栏安装量
+func MarketInstalls() string { return In(i18n.Locale()).MarketInstalls() }
+
+// MarketInstalls says "安装量"
+// in the language of msgs.
+//
+// ClawHub 详情栏安装量
+func (msgs Messages) MarketInstalls() string {
+	return Catalog.Format(msgs.locale, "marketInstalls", nil)
+}
+
+// MarketStars says "收藏"
+// in the language the app shows.
+//
+// ClawHub 详情栏收藏数
+func MarketStars() string { return In(i18n.Locale()).MarketStars() }
+
+// MarketStars says "收藏"
+// in the language of msgs.
+//
+// ClawHub 详情栏收藏数
+func (msgs Messages) MarketStars() string {
+	return Catalog.Format(msgs.locale, "marketStars", nil)
+}
+
+// MarketVersions says "版本"
+// in the language the app shows.
+//
+// ClawHub 详情栏版本数
+func MarketVersions() string { return In(i18n.Locale()).MarketVersions() }
+
+// MarketVersions says "版本"
+// in the language of msgs.
+//
+// ClawHub 详情栏版本数
+func (msgs Messages) MarketVersions() string {
+	return Catalog.Format(msgs.locale, "marketVersions", nil)
+}
+
+// MarketLinkKindGitHub says "GitHub 仓库"
+// in the language the app shows.
+//
+// 粘贴链接状态：来源类型说明
+func MarketLinkKindGitHub() string { return In(i18n.Locale()).MarketLinkKindGitHub() }
+
+// MarketLinkKindGitHub says "GitHub 仓库"
+// in the language of msgs.
+//
+// 粘贴链接状态：来源类型说明
+func (msgs Messages) MarketLinkKindGitHub() string {
+	return Catalog.Format(msgs.locale, "marketLinkKindGitHub", nil)
+}
+
+// MarketLinkKindSkillsSh says "skills.sh 上的技能"
+// in the language the app shows.
+//
+// 粘贴链接状态：来源类型说明
+func MarketLinkKindSkillsSh() string { return In(i18n.Locale()).MarketLinkKindSkillsSh() }
+
+// MarketLinkKindSkillsSh says "skills.sh 上的技能"
+// in the language of msgs.
+//
+// 粘贴链接状态：来源类型说明
+func (msgs Messages) MarketLinkKindSkillsSh() string {
+	return Catalog.Format(msgs.locale, "marketLinkKindSkillsSh", nil)
+}
+
+// MarketLinkKindClawHub says "ClawHub 上的技能"
+// in the language the app shows.
+//
+// 粘贴链接状态：来源类型说明
+func MarketLinkKindClawHub() string { return In(i18n.Locale()).MarketLinkKindClawHub() }
+
+// MarketLinkKindClawHub says "ClawHub 上的技能"
+// in the language of msgs.
+//
+// 粘贴链接状态：来源类型说明
+func (msgs Messages) MarketLinkKindClawHub() string {
+	return Catalog.Format(msgs.locale, "marketLinkKindClawHub", nil)
+}
+
+// MarketLinkKindWebsite says "网站发布的技能"
+// in the language the app shows.
+//
+// 粘贴链接状态：来源类型说明
+func MarketLinkKindWebsite() string { return In(i18n.Locale()).MarketLinkKindWebsite() }
+
+// MarketLinkKindWebsite says "网站发布的技能"
+// in the language of msgs.
+//
+// 粘贴链接状态：来源类型说明
+func (msgs Messages) MarketLinkKindWebsite() string {
+	return Catalog.Format(msgs.locale, "marketLinkKindWebsite", nil)
+}
+
+// MarketLoading says "正在载入 {source} 的技能…"
+// in the language the app shows.
+//
+// 首次无缓存加载市场列表
+func MarketLoading(source string) string { return In(i18n.Locale()).MarketLoading(source) }
+
+// MarketLoading says "正在载入 {source} 的技能…"
+// in the language of msgs.
+//
+// 首次无缓存加载市场列表
+func (msgs Messages) MarketLoading(source string) string {
+	return Catalog.Format(msgs.locale, "marketLoading", map[string]any{"source": source})
+}
+
+// MarketLoadFailed says "没能载入 {source} 的技能，请检查网络后重试。"
+// in the language the app shows.
+//
+// 无缓存时加载市场列表失败
+func MarketLoadFailed(source string) string { return In(i18n.Locale()).MarketLoadFailed(source) }
+
+// MarketLoadFailed says "没能载入 {source} 的技能，请检查网络后重试。"
+// in the language of msgs.
+//
+// 无缓存时加载市场列表失败
+func (msgs Messages) MarketLoadFailed(source string) string {
+	return Catalog.Format(msgs.locale, "marketLoadFailed", map[string]any{"source": source})
+}
+
+// MarketRetry says "重试"
+// in the language the app shows.
+//
+// 云市场加载失败后的重试按钮
+func MarketRetry() string { return In(i18n.Locale()).MarketRetry() }
+
+// MarketRetry says "重试"
+// in the language of msgs.
+//
+// 云市场加载失败后的重试按钮
+func (msgs Messages) MarketRetry() string {
+	return Catalog.Format(msgs.locale, "marketRetry", nil)
+}
+
+// MarketSourceUnavailable says "{source} 暂时没有响应，这一组结果不完整。"
+// in the language the app shows.
+//
+// 搜索时某一方市场请求失败提示
+func MarketSourceUnavailable(source string) string {
+	return In(i18n.Locale()).MarketSourceUnavailable(source)
+}
+
+// MarketSourceUnavailable says "{source} 暂时没有响应，这一组结果不完整。"
+// in the language of msgs.
+//
+// 搜索时某一方市场请求失败提示
+func (msgs Messages) MarketSourceUnavailable(source string) string {
+	return Catalog.Format(msgs.locale, "marketSourceUnavailable", map[string]any{"source": source})
+}
+
+// MarketNoResults says "没有找到与「{query}」相关的技能。"
+// in the language the app shows.
+//
+// 搜索两侧都无匹配结果
+func MarketNoResults(query string) string { return In(i18n.Locale()).MarketNoResults(query) }
+
+// MarketNoResults says "没有找到与「{query}」相关的技能。"
+// in the language of msgs.
+//
+// 搜索两侧都无匹配结果
+func (msgs Messages) MarketNoResults(query string) string {
+	return Catalog.Format(msgs.locale, "marketNoResults", map[string]any{"query": query})
+}
+
+// MarketEmptyFilter says "这里暂时没有技能。"
+// in the language the app shows.
+//
+// 某个分类或专题下没有技能
+func MarketEmptyFilter() string { return In(i18n.Locale()).MarketEmptyFilter() }
+
+// MarketEmptyFilter says "这里暂时没有技能。"
+// in the language of msgs.
+//
+// 某个分类或专题下没有技能
+func (msgs Messages) MarketEmptyFilter() string {
+	return Catalog.Format(msgs.locale, "marketEmptyFilter", nil)
+}

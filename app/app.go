@@ -27,6 +27,7 @@ type app struct {
 
 	upd               updatePageState
 	imp               importPageState // 添加技能页（import_page.go）
+	mkt               marketPageState // 云市场浏览与搜索状态（market_page.go）
 	sec               securityUI      // 本地安全检查（security.go）
 	lib               *library.Library
 	win               *mygo.Window // 测试里为 nil
@@ -204,6 +205,9 @@ func (a *app) view(c *ui.Context) {
 	c.OnWindowShortcut(0, ui.KeyEscape, a.back)
 	c.OnWindowShortcut(ui.Cmd, ui.KeyComma, a.openSettings)
 	c.OnWindowShortcut(ui.Cmd, ui.KeyK, a.openPalette)
+	if a.scope == scopeImport && a.imp.batch == nil && a.imp.cmp == nil && !a.windowMenuOpen(menuWinMain) {
+		c.OnWindowShortcut(ui.Cmd, ui.KeyF, a.focusMarketSearch)
+	}
 	if !a.windowMenuOpen(menuWinMain) {
 		a.deleteShortcuts(c)
 		a.historyShortcuts(c)
@@ -473,6 +477,10 @@ func (a *app) back() {
 		a.closeUpdateCompare()
 	case a.scope == scopeImport && a.imp.cmp != nil:
 		a.imp.cmp = nil
+	case a.scope == scopeImport && a.imp.batch == nil && a.imp.cancel == nil && strings.TrimSpace(a.imp.input) != "":
+		a.clearMarketInput()
+	case a.scope == scopeImport && a.imp.batch == nil && a.mkt.selected != nil:
+		a.mkt.selected = nil
 	case a.batch.on:
 		a.exitBatch()
 	case a.scope == scopeUsage && a.del.picking:

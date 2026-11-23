@@ -179,7 +179,7 @@ func clipLabel(text string) string {
 	return src.Label()
 }
 
-// startImport 读取输入框里的来源。
+// startImport 读取输入框或云市场条目传入的来源。
 func (a *app) startImport(text string) {
 	st := &a.imp
 	if st.cancel != nil {
@@ -187,6 +187,10 @@ func (a *app) startImport(text string) {
 	}
 	st.err = nil
 	src, err := library.ParseImportInput(text)
+	if marketInputIsSource(strings.TrimSpace(text)) || (err == nil && src.Kind == library.ImportUnsupported) {
+		st.input = text
+		a.mkt.selected = nil
+	}
 	if err != nil {
 		st.err = &library.ImportError{Msg: err.Error()}
 		return
