@@ -16,7 +16,7 @@ func TestSettingsLayoutUsesLeftSidebarAndRightContent(t *testing.T) {
 	img := st.Image()
 
 	// 4 个导航按钮竖排在左侧栏，同宽左对齐且都在左 192px 内；图标和文字靠左对齐
-	navNames := []string{"通用", "Agent 管理", "项目", "技能更新"}
+	navNames := []string{"通用", "Agent 管理", "项目", "更新 Skill"}
 	var prevY float32 = -1
 	var maxNavRight float32
 	for _, name := range navNames {

@@ -103,7 +103,7 @@ func TestEmptyPaletteListsRecentlyOpenedSkillsAndPlaces(t *testing.T) {
 	tt.Frame()
 	tt.Key(ui.Cmd, ui.KeyK)
 	tt.HoldModifiers(0)
-	for _, want := range []string{"最近", "test-first", "跳转", "检查技能更新", "设置"} {
+	for _, want := range []string{"最近", "test-first", "跳转", "检查 Skill 更新", "设置"} {
 		if !tt.HasText(want) {
 			t.Errorf("空输入时应有 %q：%q", want, tt.Texts())
 		}
@@ -162,9 +162,9 @@ func TestCommandEnterRevealsASkillInsideACollectionEvenWhenTheToolbarFilters(t *
 
 func TestCommandKFindsSkillUpdatesInBothLanguages(t *testing.T) {
 	a, tt := newTester(t)
-	openPaletteAndType(t, tt, "技能更新")
-	if !tt.HasText("检查技能更新") {
-		t.Fatalf("应列出「检查技能更新」操作：%q", tt.Texts())
+	openPaletteAndType(t, tt, "更新 Skill")
+	if !tt.HasText("检查 Skill 更新") {
+		t.Fatalf("应列出「检查 Skill 更新」操作：%q", tt.Texts())
 	}
 	tt.Key(0, ui.KeyEscape)
 

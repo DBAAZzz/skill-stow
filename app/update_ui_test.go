@@ -39,8 +39,8 @@ func TestUpdatePageSeparatesSafeUpdatesFromConfirmations(t *testing.T) {
 }
 func TestUpdateFirstVisitDoesNotClaimEverythingIsLatest(t *testing.T) {
 	a, tt := newTester(t)
-	must(t, tt.Click("技能更新"))
-	if !tt.HasText("还没检查过技能更新") || !tt.HasText("检查技能更新") {
+	must(t, tt.Click("更新 Skill"))
+	if !tt.HasText("还没检查过 Skill 更新") || !tt.HasText("检查 Skill 更新") {
 		t.Fatal(tt.Texts())
 	}
 	a.upd.report = library.UpdateReport{Checked: time.Now(), Complete: false}
@@ -189,12 +189,12 @@ func TestUpdateFullGroupsAndSecondaryStates(t *testing.T) {
 	)
 	a.upd.group = library.GroupIgnored
 	tt = newUITester(a.view, 1280, 800)
-	for _, want := range []string{"已忽略的更新", "已忽略", "已保留本地版本，跳过上游", "取消忽略", "返回技能更新"} {
+	for _, want := range []string{"已忽略的更新", "已忽略", "已保留本地版本，跳过上游", "取消忽略", "返回更新 Skill"} {
 		if !tt.HasText(want) {
 			t.Errorf("missing %q in ignored view: %v", want, tt.Texts())
 		}
 	}
-	must(t, tt.Click("返回技能更新"))
+	must(t, tt.Click("返回更新 Skill"))
 	if a.upd.group != "" {
 		t.Fatal("back to active group did not switch")
 	}

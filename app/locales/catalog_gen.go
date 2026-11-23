@@ -5574,7 +5574,7 @@ func (msgs Messages) ImportSourceWebsite(site string) string {
 	return Catalog.Format(msgs.locale, "importSourceWebsite", map[string]any{"site": site})
 }
 
-// ImportSourceGitHub says "来源记为 {repo}（{commit}），上游有新版本时会出现在「技能更新」里。"
+// ImportSourceGitHub says "来源记为 {repo}（{commit}），上游有新版本时会出现在「更新 Skill」里。"
 // in the language the app shows.
 //
 // 添加完成后说明来源
@@ -5582,7 +5582,7 @@ func ImportSourceGitHub(repo string, commit string) string {
 	return In(i18n.Locale()).ImportSourceGitHub(repo, commit)
 }
 
-// ImportSourceGitHub says "来源记为 {repo}（{commit}），上游有新版本时会出现在「技能更新」里。"
+// ImportSourceGitHub says "来源记为 {repo}（{commit}），上游有新版本时会出现在「更新 Skill」里。"
 // in the language of msgs.
 //
 // 添加完成后说明来源
@@ -7960,13 +7960,13 @@ func (msgs Messages) ImportRecentlyAdded() string {
 	return Catalog.Format(msgs.locale, "importRecentlyAdded", nil)
 }
 
-// ImportViewInUpdates says "在「技能更新」里查看"
+// ImportViewInUpdates says "在「更新 Skill」里查看"
 // in the language the app shows.
 //
 // 添加技能页展示最近添加记录时显示的文案。
 func ImportViewInUpdates() string { return In(i18n.Locale()).ImportViewInUpdates() }
 
-// ImportViewInUpdates says "在「技能更新」里查看"
+// ImportViewInUpdates says "在「更新 Skill」里查看"
 // in the language of msgs.
 //
 // 添加技能页展示最近添加记录时显示的文案。
@@ -11214,13 +11214,13 @@ func (msgs Messages) ToastDismiss() string {
 	return Catalog.Format(msgs.locale, "toastDismiss", nil)
 }
 
-// UpdateBack says "返回技能更新"
+// UpdateBack says "返回更新 Skill"
 // in the language the app shows.
 //
 // 技能更新页工具栏的返回、检查和设置操作显示的文案。
 func UpdateBack() string { return In(i18n.Locale()).UpdateBack() }
 
-// UpdateBack says "返回技能更新"
+// UpdateBack says "返回更新 Skill"
 // in the language of msgs.
 //
 // 技能更新页工具栏的返回、检查和设置操作显示的文案。
@@ -11228,13 +11228,13 @@ func (msgs Messages) UpdateBack() string {
 	return Catalog.Format(msgs.locale, "updateBack", nil)
 }
 
-// UpdateCheck says "检查技能更新"
+// UpdateCheck says "检查 Skill 更新"
 // in the language the app shows.
 //
 // 技能更新页工具栏的返回、检查和设置操作显示的文案。
 func UpdateCheck() string { return In(i18n.Locale()).UpdateCheck() }
 
-// UpdateCheck says "检查技能更新"
+// UpdateCheck says "检查 Skill 更新"
 // in the language of msgs.
 //
 // 技能更新页工具栏的返回、检查和设置操作显示的文案。
@@ -11256,13 +11256,13 @@ func (msgs Messages) UpdateMoreActions() string {
 	return Catalog.Format(msgs.locale, "updateMoreActions", nil)
 }
 
-// UpdateSettingsEllipsis says "技能更新设置…"
+// UpdateSettingsEllipsis says "Skill 更新设置…"
 // in the language the app shows.
 //
 // 技能更新页工具栏的返回、检查和设置操作显示的文案。
 func UpdateSettingsEllipsis() string { return In(i18n.Locale()).UpdateSettingsEllipsis() }
 
-// UpdateSettingsEllipsis says "技能更新设置…"
+// UpdateSettingsEllipsis says "Skill 更新设置…"
 // in the language of msgs.
 //
 // 技能更新页工具栏的返回、检查和设置操作显示的文案。
@@ -11332,13 +11332,13 @@ func (msgs Messages) UpdateDownloading() string {
 	return Catalog.Format(msgs.locale, "updateDownloading", nil)
 }
 
-// UpdateNotCheckedYet says "还没检查过技能更新"
+// UpdateNotCheckedYet says "还没检查过 Skill 更新"
 // in the language the app shows.
 //
 // 更新页首次进入或列表为空时显示的文案。
 func UpdateNotCheckedYet() string { return In(i18n.Locale()).UpdateNotCheckedYet() }
 
-// UpdateNotCheckedYet says "还没检查过技能更新"
+// UpdateNotCheckedYet says "还没检查过 Skill 更新"
 // in the language of msgs.
 //
 // 更新页首次进入或列表为空时显示的文案。
@@ -12486,13 +12486,13 @@ func (msgs Messages) UpdateSkillsCompleted(updated int) string {
 	return Catalog.Format(msgs.locale, "updateSkillsCompleted", map[string]any{"updated": updated})
 }
 
-// NavUpdates says "技能更新"
+// NavUpdates says "更新 Skill"
 // in the language the app shows.
 //
 // 侧边栏：技能更新页；也是技能更新页标题
 func NavUpdates() string { return In(i18n.Locale()).NavUpdates() }
 
-// NavUpdates says "技能更新"
+// NavUpdates says "更新 Skill"
 // in the language of msgs.
 //
 // 侧边栏：技能更新页；也是技能更新页标题
@@ -12860,13 +12860,13 @@ func (msgs Messages) PaletteNoResults(query string) string {
 	return Catalog.Format(msgs.locale, "paletteNoResults", map[string]any{"query": query})
 }
 
-// PaletteCheckUpdates says "检查技能更新"
+// PaletteCheckUpdates says "检查 Skill 更新"
 // in the language the app shows.
 //
 // ⌘K 的动作
 func PaletteCheckUpdates() string { return In(i18n.Locale()).PaletteCheckUpdates() }
 
-// PaletteCheckUpdates says "检查技能更新"
+// PaletteCheckUpdates says "检查 Skill 更新"
 // in the language of msgs.
 //
 // ⌘K 的动作
@@ -12916,13 +12916,13 @@ func (msgs Messages) SettingsTabProjects() string {
 	return Catalog.Format(msgs.locale, "settingsTabProjects", nil)
 }
 
-// SettingsTabUpdates says "技能更新"
+// SettingsTabUpdates says "更新 Skill"
 // in the language the app shows.
 //
 // 设置标签页
 func SettingsTabUpdates() string { return In(i18n.Locale()).SettingsTabUpdates() }
 
-// SettingsTabUpdates says "技能更新"
+// SettingsTabUpdates says "更新 Skill"
 // in the language of msgs.
 //
 // 设置标签页
@@ -17420,13 +17420,13 @@ func (msgs Messages) ActionClearSearch() string {
 	return Catalog.Format(msgs.locale, "actionClearSearch", nil)
 }
 
-// MarketTitle says "云市场"
+// MarketTitle says "Skill 市场"
 // in the language the app shows.
 //
 // 侧边栏首项及云市场页面标题
 func MarketTitle() string { return In(i18n.Locale()).MarketTitle() }
 
-// MarketTitle says "云市场"
+// MarketTitle says "Skill 市场"
 // in the language of msgs.
 //
 // 侧边栏首项及云市场页面标题

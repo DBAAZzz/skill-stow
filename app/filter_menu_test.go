@@ -194,11 +194,11 @@ func TestBrowseFilterWorksInKanbanBoardMode(t *testing.T) {
 }
 
 func TestFrostedActionMenusOperateAcrossUpdateInspectorAndBoard(t *testing.T) {
-	// Scenario 1: 更新页面顶部「…」打开统一毛玻璃菜单并支持进入「技能更新设置…」
+	// Scenario 1: 更新页面顶部「…」打开统一毛玻璃菜单并支持进入「Skill 更新设置…」
 	a, tt := newTester(t)
-	must(t, tt.Click("技能更新"))
+	must(t, tt.Click("更新 Skill"))
 	clickMenuButton(t, tt, "更多更新操作")
-	for _, want := range []string{"已忽略的更新", "已停止检查", "其他检查结果", "技能更新设置…"} {
+	for _, want := range []string{"已忽略的更新", "已停止检查", "其他检查结果", "Skill 更新设置…"} {
 		if !tt.HasText(want) {
 			t.Fatalf("更新页「…」菜单缺少 %q：%q", want, tt.Texts())
 		}

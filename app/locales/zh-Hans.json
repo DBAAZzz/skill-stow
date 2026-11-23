@@ -2597,7 +2597,7 @@
       }
     }
   },
-  "importSourceGitHub": "来源记为 {repo}（{commit}），上游有新版本时会出现在「技能更新」里。",
+  "importSourceGitHub": "来源记为 {repo}（{commit}），上游有新版本时会出现在「更新 Skill」里。",
   "@importSourceGitHub": {
     "description": "添加完成后说明来源",
     "placeholders": {
@@ -3648,7 +3648,7 @@
     "description": "添加技能页展示最近添加记录时显示的文案。",
     "placeholders": {}
   },
-  "importViewInUpdates": "在「技能更新」里查看",
+  "importViewInUpdates": "在「更新 Skill」里查看",
   "@importViewInUpdates": {
     "description": "添加技能页展示最近添加记录时显示的文案。",
     "placeholders": {}
@@ -4976,12 +4976,12 @@
     "description": "操作结果提示条关闭按钮的辅助功能名称显示的文案。",
     "placeholders": {}
   },
-  "updateBack": "返回技能更新",
+  "updateBack": "返回更新 Skill",
   "@updateBack": {
     "description": "技能更新页工具栏的返回、检查和设置操作显示的文案。",
     "placeholders": {}
   },
-  "updateCheck": "检查技能更新",
+  "updateCheck": "检查 Skill 更新",
   "@updateCheck": {
     "description": "技能更新页工具栏的返回、检查和设置操作显示的文案。",
     "placeholders": {}
@@ -4991,7 +4991,7 @@
     "description": "技能更新页工具栏的返回、检查和设置操作显示的文案。",
     "placeholders": {}
   },
-  "updateSettingsEllipsis": "技能更新设置…",
+  "updateSettingsEllipsis": "Skill 更新设置…",
   "@updateSettingsEllipsis": {
     "description": "技能更新页工具栏的返回、检查和设置操作显示的文案。",
     "placeholders": {}
@@ -5037,7 +5037,7 @@
     "description": "后台检查仓库、更新技能或下载文件期间的进度区显示的文案。",
     "placeholders": {}
   },
-  "updateNotCheckedYet": "还没检查过技能更新",
+  "updateNotCheckedYet": "还没检查过 Skill 更新",
   "@updateNotCheckedYet": {
     "description": "更新页首次进入或列表为空时显示的文案。",
     "placeholders": {}
@@ -5504,7 +5504,7 @@
       }
     }
   },
-  "navUpdates": "技能更新",
+  "navUpdates": "更新 Skill",
   "@navUpdates": {
     "description": "侧边栏：技能更新页；也是技能更新页标题"
   },
@@ -5720,7 +5720,7 @@
       }
     }
   },
-  "paletteCheckUpdates": "检查技能更新",
+  "paletteCheckUpdates": "检查 Skill 更新",
   "@paletteCheckUpdates": {
     "description": "⌘K 的动作"
   },
@@ -5736,7 +5736,7 @@
   "@settingsTabProjects": {
     "description": "设置标签页"
   },
-  "settingsTabUpdates": "技能更新",
+  "settingsTabUpdates": "更新 Skill",
   "@settingsTabUpdates": {
     "description": "设置标签页"
   },
@@ -7563,7 +7563,7 @@
   "@actionClearSearch": {
     "description": "搜索框清空按钮的无障碍与提示标签"
   },
-  "marketTitle": "云市场",
+  "marketTitle": "Skill 市场",
   "@marketTitle": {
     "description": "侧边栏首项及云市场页面标题"
   },

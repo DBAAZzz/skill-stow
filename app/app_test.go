@@ -532,12 +532,12 @@ func TestSettingsWindow(t *testing.T) {
 		t.Error("展开后应列出全部目录")
 	}
 
-	if err := st.Click("技能更新"); err != nil {
+	if err := st.Click("更新 Skill"); err != nil {
 		t.Fatal(err)
 	}
 	for _, want := range []string{"网络与旧版本", "GitHub 授权"} {
 		if !st.HasText(want) {
-			t.Errorf("技能更新设置缺少 %q：%q", want, st.Texts())
+			t.Errorf("更新 Skill设置缺少 %q：%q", want, st.Texts())
 		}
 	}
 

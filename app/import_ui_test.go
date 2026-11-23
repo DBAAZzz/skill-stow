@@ -46,21 +46,21 @@ func TestImportPageIsReachableFromTheSidebarAndMySkills(t *testing.T) {
 	a, tt := newTester(t)
 	must(t, tt.Click("添加技能"))
 	if a.scope != scopeImport {
-		t.Fatalf("工具栏「添加技能」应打开云市场页：%s", a.scope)
+		t.Fatalf("工具栏「添加技能」应打开Skill 市场页：%s", a.scope)
 	}
-	for _, s := range []string{"云市场", "skills.sh", "ClawHub", "最近添加", "从电脑添加", "总榜"} {
+	for _, s := range []string{"Skill 市场", "skills.sh", "ClawHub", "最近添加", "从电脑添加", "总榜"} {
 		if !tt.HasText(s) {
 			t.Errorf("缺 %q：%v", s, tt.Texts())
 		}
 	}
 	a.scope = string(library.ScopeMine)
 	tt.Frame()
-	if !tt.HasText("云市场") || !tt.HasText("添加技能") {
-		t.Error("侧边栏应有「云市场」，「我的技能」工具栏应有「添加技能」")
+	if !tt.HasText("Skill 市场") || !tt.HasText("添加技能") {
+		t.Error("侧边栏应有「Skill 市场」，「我的技能」工具栏应有「添加技能」")
 	}
-	must(t, tt.Click("云市场"))
+	must(t, tt.Click("Skill 市场"))
 	if a.scope != scopeImport {
-		t.Fatalf("侧边栏「云市场」应打开云市场页：%s", a.scope)
+		t.Fatalf("侧边栏「Skill 市场」应打开Skill 市场页：%s", a.scope)
 	}
 }
 
@@ -411,7 +411,7 @@ func TestOnlyTheNamedSkillIsListedWithAWayToShowTheRest(t *testing.T) {
 	a.discardImport()
 	tt.Frame()
 	if a.imp.batch != nil || !tt.HasText("总榜") {
-		t.Errorf("放弃后应回到云市场首页：%v", tt.Texts())
+		t.Errorf("放弃后应回到Skill 市场首页：%v", tt.Texts())
 	}
 }
 

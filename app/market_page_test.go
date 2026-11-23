@@ -350,7 +350,7 @@ func TestMarketCompactCountAndMonotoneSparklineBounds(t *testing.T) {
 func TestMarketSnapshots(t *testing.T) {
 	dir := os.Getenv("SNAPSHOT_DIR")
 	if dir == "" {
-		t.Skip("设置 SNAPSHOT_DIR 以输出云市场截图")
+		t.Skip("设置 SNAPSHOT_DIR 以输出Skill 市场截图")
 	}
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
@@ -471,7 +471,7 @@ func TestMarketSearchBarWidthScalesAcrossModesAndWindows(t *testing.T) {
 		t.Helper()
 		acc, ok := tt.AccessByRole(ui.RoleTextField, locales.MarketTitle())
 		if !ok {
-			t.Fatal("找不到云市场搜索输入框")
+			t.Fatal("找不到Skill 市场搜索输入框")
 		}
 		return acc.Bounds
 	}
