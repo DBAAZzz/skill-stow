@@ -96,13 +96,11 @@ jobs:
           git push origin --delete release/prepare 2>/dev/null || true
           echo "should_release=true" >> "$GITHUB_OUTPUT"
 
-      - name: Create or update release PR
+      - name: Check release PR state
+        id: pr
         if: steps.plan.outputs.action == 'pr'
         env:
           GH_TOKEN: ${{ github.token }}
-          NEXT_VERSION: ${{ steps.plan.outputs.next_version }}
-          LATEST_TAG: ${{ steps.plan.outputs.latest_tag }}
-          COMMITS_FILE: ${{ steps.plan.outputs.commits_file }}
         run: |
           pr_number="$(gh pr list \
             --repo "$GITHUB_REPOSITORY" \
@@ -111,26 +109,98 @@ jobs:
             --state open \
             --json number \
             --jq '.[0].number // empty')"
+          echo "number=$pr_number" >> "$GITHUB_OUTPUT"
 
           if [ -n "$pr_number" ] && git fetch origin release/prepare 2>/dev/null; then
             non_bot="$(git log "HEAD..origin/release/prepare" --format='%an' | grep -Fvx 'github-actions[bot]' || true)"
             if [ -n "$non_bot" ]; then
               echo "发版 PR #$pr_number 已有人工修改，保持分支与说明不动" >> "$GITHUB_STEP_SUMMARY"
+              echo "manual=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
           fi
+          echo "manual=false" >> "$GITHUB_OUTPUT"
 
-          pr_body="$RUNNER_TEMP/pr-body.md"
+      - name: Draft version bump and changelog
+        if: steps.plan.outputs.action == 'pr' && steps.pr.outputs.manual == 'false'
+        env:
+          NEXT_VERSION: ${{ steps.plan.outputs.next_version }}
+          LATEST_TAG: ${{ steps.plan.outputs.latest_tag }}
+          COMMITS_FILE: ${{ steps.plan.outputs.commits_file }}
+        run: |
           git checkout -B release/prepare "$GITHUB_SHA"
-
           go run ./tools/releasenotes bump \
             -version "$NEXT_VERSION" \
             -mygo mygo.json \
             -changelog CHANGELOG.md \
             -commits "$COMMITS_FILE" \
             -latest-tag "$LATEST_TAG" \
-            -pr-body-out "$pr_body"
+            -pr-body-out "$RUNNER_TEMP/pr-body.md"
 
+      # 让 Claude 把 commit 原文草稿改写成用户看得懂的更新说明。
+      # 没配 token、调用失败或输出没通过 releasenotes apply 的格式检查时，保留 commit 原文草稿，发版不受影响。
+      - name: Polish release notes with Claude
+        id: polish
+        if: steps.plan.outputs.action == 'pr' && steps.pr.outputs.manual == 'false'
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          NEXT_VERSION: ${{ steps.plan.outputs.next_version }}
+          LATEST_TAG: ${{ steps.plan.outputs.latest_tag }}
+          RELEASE_NOTES_MODEL: claude-haiku-5-5
+        run: |
+          fallback() {
+            echo "status=fallback" >> "$GITHUB_OUTPUT"
+            echo "reason=$1" >> "$GITHUB_OUTPUT"
+            echo "未用 Claude 改写更新说明（$1），保留 commit 原文草稿" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          }
+          [ -n "$CLAUDE_CODE_OAUTH_TOKEN" ] || fallback "仓库未配置 CLAUDE_CODE_OAUTH_TOKEN"
+          npm install -g @anthropic-ai/claude-code >/dev/null 2>&1 || fallback "安装 Claude Code 失败"
+
+          context="$RUNNER_TEMP/release-context.md"
+          range="${LATEST_TAG:+$LATEST_TAG..}HEAD"
+          {
+            echo "# 提交"
+            echo
+            git log --no-merges --format='## %h %s%n%n%b' "$range"
+            echo
+            echo "# 改动文件统计"
+            echo
+            git diff --stat=200 "${LATEST_TAG:-$(git rev-list --max-parents=0 HEAD)}" HEAD -- ..
+          } > "$context"
+
+          prompt="$(sed \
+            -e "s|{{VERSION}}|$NEXT_VERSION|g" \
+            -e "s|{{LATEST_TAG}}|${LATEST_TAG:-首个版本}|g" \
+            -e "s|{{CONTEXT}}|$context|g" \
+            ../.github/release-notes-prompt.md)"
+
+          output="$RUNNER_TEMP/claude-notes.txt"
+          if ! (cd .. && timeout 600 claude -p "$prompt" \
+              --model "$RELEASE_NOTES_MODEL" \
+              --max-turns 30 \
+              --permission-mode dontAsk \
+              --allowedTools "Read" "Grep" "Glob" "Bash(git show:*)" "Bash(git log:*)" "Bash(git diff:*)" \
+              --add-dir "$RUNNER_TEMP" \
+              --output-format text) > "$output"; then
+            fallback "Claude 调用失败"
+          fi
+          if ! go run ./tools/releasenotes apply -version "$NEXT_VERSION" -changelog CHANGELOG.md -notes "$output" 2> "$RUNNER_TEMP/apply.err"; then
+            cat "$RUNNER_TEMP/apply.err"
+            fallback "输出未通过格式检查：$(tail -n1 "$RUNNER_TEMP/apply.err")"
+          fi
+          echo "status=polished" >> "$GITHUB_OUTPUT"
+          echo "已用 $RELEASE_NOTES_MODEL 改写 v$NEXT_VERSION 的更新说明" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit and open release PR
+        if: steps.plan.outputs.action == 'pr' && steps.pr.outputs.manual == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEXT_VERSION: ${{ steps.plan.outputs.next_version }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          POLISH_STATUS: ${{ steps.polish.outputs.status }}
+          POLISH_REASON: ${{ steps.polish.outputs.reason }}
+        run: |
           slug="$(jq -r .slug mygo.json)"
           go run ./tools/releasenotes render \
             -version "$NEXT_VERSION" \
@@ -142,6 +212,18 @@ jobs:
             -out /dev/null
           go test ./tools/releasenotes
 
+          pr_body="$RUNNER_TEMP/pr-body.md"
+          {
+            echo
+            echo "### 更新说明草稿"
+            echo
+            if [ "$POLISH_STATUS" = "polished" ]; then
+              echo "\`app/CHANGELOG.md\` 里 \`## $NEXT_VERSION\` 的中英文说明由 Claude 根据上面的提交和代码改写，已通过格式检查。合并前通读一遍，措辞不对就直接在本 PR 里改。"
+            else
+              echo "Claude 没有改写更新说明（${POLISH_REASON:-未知原因}），\`## $NEXT_VERSION\` 现在是 commit 原文，合并前需要手动润色。"
+            fi
+          } >> "$pr_body"
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add mygo.json CHANGELOG.md
@@ -149,7 +231,7 @@ jobs:
           git push --force origin release/prepare
 
           title="build(release): prepare v$NEXT_VERSION"
-          if [ -z "$pr_number" ]; then
+          if [ -z "$PR_NUMBER" ]; then
             pr_url="$(gh pr create \
               --repo "$GITHUB_REPOSITORY" \
               --base main \
@@ -158,11 +240,11 @@ jobs:
               --body-file "$pr_body")"
             echo "已创建发版 PR：$pr_url" >> "$GITHUB_STEP_SUMMARY"
           else
-            gh pr edit "$pr_number" \
+            gh pr edit "$PR_NUMBER" \
               --repo "$GITHUB_REPOSITORY" \
               --title "$title" \
               --body-file "$pr_body"
-            echo "已更新发版 PR #$pr_number（目标版本 v$NEXT_VERSION）" >> "$GITHUB_STEP_SUMMARY"
+            echo "已更新发版 PR #$PR_NUMBER（目标版本 v$NEXT_VERSION）" >> "$GITHUB_STEP_SUMMARY"
           fi
 
   release:
