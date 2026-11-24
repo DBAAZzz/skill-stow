@@ -578,3 +578,55 @@ func TestConcurrentScanAndCatalogIndex(t *testing.T) {
 	}
 	wg.Wait()
 }
+
+// WorkBuddy 预装的插件不全在 -builtin 市场里：它在 configured-plugins.json
+// 里列出预装名单，名单里的也是内置；名单读不到时只按市场名判断。
+func TestWorkBuddyPresetPluginsCountAsBuiltin(t *testing.T) {
+	for _, c := range []struct {
+		name   string
+		config string
+		wecom  Source
+	}{
+		{"按预装名单", `{"version":1,"builtInMarketPlugins":[{"name":"wecom-unified","marketplaceName":"workbuddy-wecom-unified","scope":"user"}],"builtInMarketPluginsMerge":[]}`, Builtin},
+		{"名单写在 Merge 里", `{"builtInMarketPlugins":[],"builtInMarketPluginsMerge":[{"name":"wecom-unified","marketplaceName":"workbuddy-wecom-unified"}]}`, Builtin},
+		{"名单坏了只看市场名", `{not json`, ViaPlugin},
+		{"没有名单只看市场名", "", ViaPlugin},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			// Given WorkBuddy 装了：预装名单里的 wecom-unified、名单外的旧预装
+			// tencent-docx（-builtin 市场），和用户从 CodeBuddy 官方市场装的 find-skills
+			root, _ := filepath.EvalSymlinks(t.TempDir())
+			h := func(p string) string { return filepath.Join(root, ".workbuddy/plugins", p) }
+			plugins := map[string]string{
+				"wecom-unified@workbuddy-wecom-unified":  "cache/workbuddy-wecom-unified/wecom-unified/1.1.10",
+				"tencent-docx@workbuddy-builtin":         "cache/workbuddy-builtin/tencent-docx/0.3.0",
+				"find-skills@codebuddy-plugins-official": "cache/codebuddy-plugins-official/find-skills/1.0.0",
+			}
+			var entries []string
+			for id, dir := range plugins {
+				name, _, _ := strings.Cut(id, "@")
+				writeSkill(t, filepath.Join(h(dir), "skills", name), "")
+				entries = append(entries, `"`+id+`":[{"scope":"user","installPath":"`+jsonStr(h(dir))+`"}]`)
+			}
+			must(t, os.WriteFile(h("installed_plugins.json"), []byte(`{"version":2,"plugins":{`+strings.Join(entries, ",")+`}}`), 0o644))
+			if c.config != "" {
+				must(t, os.WriteFile(h("configured-plugins.json"), []byte(c.config), 0o644))
+			}
+			must(t, os.WriteFile(filepath.Join(root, ".workbuddy/config.json"), []byte("{}"), 0o644))
+
+			// When 扫描
+			l := Scan(root)
+
+			// Then wecom-unified 按名单判断，tencent-docx 按市场名算内置，find-skills 是用户装的
+			for name, want := range map[string]Source{"wecom-unified": c.wecom, "tencent-docx": Builtin, "find-skills": ViaPlugin} {
+				i := slices.IndexFunc(l.Skills, func(s *Skill) bool { return s.Name == name })
+				if i < 0 {
+					t.Fatalf("没扫到 %s：%v", name, names(l))
+				}
+				if s := l.Skills[i]; s.Source != want || s.Provider != "workbuddy" {
+					t.Errorf("%s 应是 WorkBuddy 的%s，实际 %s 的%s", name, want.Label(), s.Provider, s.Source.Label())
+				}
+			}
+		})
+	}
+}

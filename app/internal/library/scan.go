@@ -451,8 +451,7 @@ func readSkillMD(dir string) SkillMD {
 
 // plugins 读插件里的技能和各 Agent 自带的内置技能。插件只认
 // installed_plugins.json 里登记的，市场里没装的不算；其中 Agent 预装的
-// （市场名以 -builtin 结尾，如 WorkBuddy 的 workbuddy-builtin）是内置，
-// 其余是用户装的。
+// 是内置（见 preinstalled），其余是用户装的。
 func (sc *scanner) plugins() []*Skill {
 	seen := map[string]bool{}
 	var out []*Skill
@@ -479,6 +478,7 @@ func (sc *scanner) pluginSkills(a Agent, seen map[string]bool) []*Skill {
 	if json.Unmarshal(b, &reg) != nil {
 		return nil
 	}
+	preset := sc.presetPlugins(a)
 	var out []*Skill
 	names := make([]string, 0, len(reg.Plugins))
 	for name := range reg.Plugins {
@@ -503,7 +503,7 @@ func (sc *scanner) pluginSkills(a Agent, seen map[string]bool) []*Skill {
 				n := filepath.Base(d)
 				plugin, market, _ := strings.Cut(name, "@")
 				src := ViaPlugin
-				if strings.HasSuffix(market, "-builtin") {
+				if preinstalled(market, preset[name]) {
 					src = Builtin
 				}
 				if d == inst.InstallPath {
@@ -515,6 +515,42 @@ func (sc *scanner) pluginSkills(a Agent, seen map[string]bool) []*Skill {
 					Source: src, Provider: a.ID, Plugin: plugin, Dir: real, Real: real,
 				})
 			}
+		}
+	}
+	return out
+}
+
+// preinstalled 报告插件是 Agent 预装的：市场名以 -builtin 结尾（如 WorkBuddy
+// 的 workbuddy-builtin），或者 Agent 把它列为预装（presetPlugins）。两样都要看：
+// 预装名单里有别的市场的（WorkBuddy 的企业微信插件来自 workbuddy-wecom-unified），
+// 而新版本不再预装、留在磁盘上的 -builtin 插件又不在名单里。
+func preinstalled(market string, listed bool) bool {
+	return listed || strings.HasSuffix(market, "-builtin")
+}
+
+// presetPlugins 是 Agent 自己记下的预装插件（plugin@market）：CodeBuddy、
+// WorkBuddy 写在插件目录的 configured-plugins.json 里。读不到就是空的，
+// 只按市场名判断。
+func (sc *scanner) presetPlugins(a Agent) map[string]bool {
+	b, err := os.ReadFile(filepath.Join(sc.home, a.Plugins, "configured-plugins.json"))
+	if err != nil {
+		return nil
+	}
+	type entry struct {
+		Name   string `json:"name"`
+		Market string `json:"marketplaceName"`
+	}
+	var cfg struct {
+		Plugins []entry `json:"builtInMarketPlugins"`
+		Merge   []entry `json:"builtInMarketPluginsMerge"`
+	}
+	if json.Unmarshal(b, &cfg) != nil {
+		return nil
+	}
+	out := map[string]bool{}
+	for _, e := range slices.Concat(cfg.Plugins, cfg.Merge) {
+		if e.Name != "" && e.Market != "" {
+			out[e.Name+"@"+e.Market] = true
 		}
 	}
 	return out
