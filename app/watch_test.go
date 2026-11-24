@@ -232,6 +232,9 @@ func TestAppDefersWatchScanDuringActiveInteractionAndFlushesLater(t *testing.T) 
 		{"删除确认框", func() { a.del.confirmOpen = true }, func() { a.del.confirmOpen = false }},
 		{"合并清理进行中", func() { a.tidy.work = &tidyWork{} }, func() { a.tidy.work = nil }},
 		{"更新差异确认页", func() { a.upd.prepared = &library.Prepared{} }, func() { a.upd.prepared = nil }},
+		// 卸载命令会改插件登记，扫到的新库不能换掉确认框里列着的技能
+		{"卸载插件确认框", func() { a.plug.open = true }, func() { a.plug.open = false }},
+		{"卸载插件命令执行中", func() { a.plug.running = true }, func() { a.plug.running = false }},
 	}
 
 	for _, tc := range cases {

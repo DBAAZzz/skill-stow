@@ -397,8 +397,10 @@ func TestZCodeConfigsAreWatched(t *testing.T) {
 			t.Errorf("应监听 %s：%v", want, plan.Files)
 		}
 	}
-	if len(plan.Creates) != 0 {
-		t.Errorf("配置都在时只做单文件监听：%+v", plan.Creates)
+	// 假 home 里的 Codex 还没装过插件，在等它的插件缓存目录，和 ZCode 无关
+	waits := slices.DeleteFunc(slices.Clone(plan.Creates), func(c WatchCreate) bool { return c.Dir == h(".codex") })
+	if len(waits) != 0 {
+		t.Errorf("配置都在时只做单文件监听：%+v", waits)
 	}
 }
 

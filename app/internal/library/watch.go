@@ -155,10 +155,13 @@ func (l *Library) watchPlanWithLimit(limit int) WatchPlan {
 			}
 		}
 		if a.ID == codex {
-			// Codex 从远程目录装插件只在缓存里新建 市场/名称 目录，不改 config.toml
-			markets, _ := filepath.Glob(filepath.Join(homePath(a.Home), codexPluginCache, "*"))
-			for _, m := range markets {
-				addDir(m)
+			// Codex 从远程目录装插件只在缓存里新建 市场/名称 目录，不改 config.toml；
+			// 第一次从某个市场装时连市场目录也是新建的，所以看整个缓存目录
+			if fi, err := os.Stat(homePath(a.Home)); err == nil && fi.IsDir() {
+				cache := filepath.Join(homePath(a.Home), codexPluginCache)
+				if !addDir(cache) && !plan.Truncated {
+					addMissing(cache)
+				}
 			}
 		}
 	}

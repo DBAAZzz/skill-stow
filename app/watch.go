@@ -185,6 +185,8 @@ func (a *app) isWatchApplyDeferred() bool {
 		a.tidy.busy() ||
 		a.del.confirmOpen ||
 		a.del.copiesOpen ||
+		a.plug.open ||
+		a.plug.running ||
 		a.confirmOpen ||
 		a.collectOpen ||
 		a.linkedOpen ||

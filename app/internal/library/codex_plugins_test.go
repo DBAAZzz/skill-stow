@@ -467,10 +467,28 @@ func TestRescansWhenCodexInstallsARemotePlugin(t *testing.T) {
 	home := codexHome(t)
 	plan := Scan(home).WatchPlan()
 
-	// Then 缓存里的每个市场目录都在监听里
-	for _, m := range []string{"local-m", "remote-m"} {
-		if !slices.Contains(plan.Dirs, filepath.Join(home, ".codex", codexPluginCache, m)) {
-			t.Errorf("应监听 Codex 插件缓存的 %s：%v", m, plan.Dirs)
+	// Then 监听整个缓存目录：已有的市场和第一次从新市场装时新建的市场都在里面
+	cache := filepath.Join(home, ".codex", codexPluginCache)
+	if !slices.Contains(plan.Dirs, cache) {
+		t.Errorf("应监听 Codex 插件缓存目录：%v", plan.Dirs)
+	}
+	for _, m := range []string{"local-m", "remote-m", "new-market"} {
+		if !pathUnderAny(filepath.Join(cache, m, "p"), plan.Dirs) {
+			t.Errorf("Codex 插件缓存的 %s 应在监听范围里：%v", m, plan.Dirs)
 		}
+	}
+}
+
+func TestWaitsForCodexPluginCacheToAppear(t *testing.T) {
+	// Given Codex 还没装过插件，缓存目录不存在
+	home, _ := filepath.EvalSymlinks(t.TempDir())
+	must(t, os.MkdirAll(filepath.Join(home, ".codex"), 0o755))
+	must(t, os.WriteFile(filepath.Join(home, ".codex/config.toml"), []byte("model = \"gpt-5\"\n"), 0o644))
+	plan := Scan(home).WatchPlan()
+
+	// Then 等 plugins 目录出现，出现后重扫再改成监听缓存目录
+	want := WatchCreate{Dir: filepath.Join(home, ".codex"), Names: []string{"plugins"}}
+	if !slices.ContainsFunc(plan.Creates, func(c WatchCreate) bool { return c.Dir == want.Dir && slices.Contains(c.Names, "plugins") }) {
+		t.Errorf("应在 %s 等 plugins 出现：%+v", want.Dir, plan.Creates)
 	}
 }
