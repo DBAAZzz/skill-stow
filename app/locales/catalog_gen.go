@@ -18553,3 +18553,17 @@ func InspectorBuiltinDisableOnly(agent string) string {
 func (msgs Messages) InspectorBuiltinDisableOnly(agent string) string {
 	return Catalog.Format(msgs.locale, "inspectorBuiltinDisableOnly", map[string]any{"agent": agent})
 }
+
+// PluginUninstallFailedNoReason says "命令报告卸载失败，但没有说明原因。"
+// in the language the app shows.
+//
+// 卸载插件失败的原因：命令说失败了却没写原因
+func PluginUninstallFailedNoReason() string { return In(i18n.Locale()).PluginUninstallFailedNoReason() }
+
+// PluginUninstallFailedNoReason says "命令报告卸载失败，但没有说明原因。"
+// in the language of msgs.
+//
+// 卸载插件失败的原因：命令说失败了却没写原因
+func (msgs Messages) PluginUninstallFailedNoReason() string {
+	return Catalog.Format(msgs.locale, "pluginUninstallFailedNoReason", nil)
+}

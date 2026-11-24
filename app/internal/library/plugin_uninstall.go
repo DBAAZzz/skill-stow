@@ -2,13 +2,16 @@ package library
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -140,7 +143,8 @@ var runPluginCommand = func(ctx context.Context, c pluginCmd) (stdout, stderr []
 	return out.Bytes(), errOut.Bytes(), err
 }
 
-// uninstallResult 读 claude 的 --json 打出的那一行；读不出就用退出码和标准错误。
+// uninstallResult 读 claude 的 --json 打出的那一行；读不出或说失败了却没写
+// 原因，就用标准错误和退出码。
 func uninstallResult(stdout, stderr []byte, runErr error) error {
 	var res struct {
 		Outcome string `json:"outcome"`
@@ -156,13 +160,16 @@ func uninstallResult(stdout, stderr []byte, runErr error) error {
 		return nil
 	case res.Message != "":
 		return errors.New(res.Message)
-	case runErr == nil:
+	case runErr == nil && res.Outcome != "failed":
 		return nil
 	}
 	if msg := strings.TrimSpace(string(stderr)); msg != "" {
 		return errors.New(msg)
 	}
-	return runErr
+	if runErr != nil {
+		return runErr
+	}
+	return errors.New(locales.PluginUninstallFailedNoReason())
 }
 
 // findClaudeBinary 找 claude 命令。从访达打开的应用拿不到终端的 PATH，
@@ -197,7 +204,8 @@ func (l *Library) uninstallCodexPlugin(ctx context.Context, s *Skill) error {
 	if ctx.Err() != nil {
 		return errors.New(locales.PluginUninstallTimeout())
 	}
-	if !codexPluginInstalled(home, s.install.id) {
+	still, readErr := codexPluginInstalled(home, s.install.id)
+	if readErr == nil && !still {
 		return nil
 	}
 	if msg := strings.TrimSpace(string(stderr)); msg != "" {
@@ -206,19 +214,41 @@ func (l *Library) uninstallCodexPlugin(ctx context.Context, s *Skill) error {
 	if err != nil {
 		return err
 	}
+	if readErr != nil {
+		return readErr
+	}
 	return errors.New(locales.PluginUninstallStillInstalled())
 }
 
-// codexPluginInstalled 报告 Codex 还登记着插件 id：config.toml 里有它，或者
-// 缓存里还有远程安装的标记。
-func codexPluginInstalled(home, id string) bool {
-	src, _ := os.ReadFile(filepath.Join(home, "config.toml"))
-	if ids, _ := parseCodexPlugins(string(src)); slices.Contains(ids, id) {
-		return true
+// codexPluginInstalled 报告 Codex 还登记着插件 id：config.toml 里有它的表
+// （停用了也算），或者缓存里还有远程安装的标记。文件不存在算没登记；读不了、
+// 读不懂时返回错误，这时不知道卸没卸掉。
+func codexPluginInstalled(home, id string) (bool, error) {
+	src, err := os.ReadFile(filepath.Join(home, "config.toml"))
+	switch {
+	case err == nil:
+		plugins, _, err := parseCodexPlugins(string(src))
+		if err != nil {
+			return false, err
+		}
+		if slices.ContainsFunc(plugins, func(p codexPlugin) bool { return p.id == id }) {
+			return true, nil
+		}
+	case !errors.Is(err, os.ErrNotExist):
+		return false, err
 	}
-	name, market, _ := strings.Cut(id, "@")
-	_, err := os.Stat(filepath.Join(home, codexPluginCache, market, name, codexRemoteMarker))
-	return err == nil
+	name, market, ok := strings.Cut(id, "@")
+	if !ok || name == "" || market == "" {
+		return false, nil
+	}
+	_, err = os.Stat(filepath.Join(home, codexPluginCache, market, name, codexRemoteMarker))
+	switch {
+	case err == nil:
+		return true, nil
+	case errors.Is(err, os.ErrNotExist):
+		return false, nil
+	}
+	return false, err
 }
 
 // codexCandidates 是 codex 命令可能在的位置，测试里换成假的。从访达打开的应用
@@ -229,7 +259,10 @@ var codexCandidates = func(home string) []string {
 		out = append([]string{p}, out...)
 	}
 	nvm, _ := filepath.Glob(filepath.Join(home, ".nvm/versions/node/*/bin/codex"))
-	slices.Reverse(nvm) // 版本号大的在后，先试它
+	// 先试 Node 版本号大的：按数字比，v22 排在 v9 前面
+	slices.SortStableFunc(nvm, func(a, b string) int {
+		return compareNodeVersions(nodeVersionOf(b), nodeVersionOf(a))
+	})
 	out = append(out, nvm...)
 	for _, app := range []string{"/Applications/Codex.app", filepath.Join(home, "Applications/Codex.app")} {
 		out = append(out, filepath.Join(app, "Contents/Resources/codex"))
@@ -255,17 +288,109 @@ func findCodexBinary(home string) string {
 	return ""
 }
 
+// nodeVersionOf 是 nvm 路径 …/versions/node/v22.1.0/bin/codex 里的版本目录名。
+func nodeVersionOf(codexPath string) string {
+	return filepath.Base(filepath.Dir(filepath.Dir(codexPath)))
+}
+
+// compareNodeVersions 按数字逐段比 v22.1.0 这样的版本号；读不出数字的段算 0，
+// 都一样时按原文比。
+func compareNodeVersions(a, b string) int {
+	pa := strings.Split(strings.TrimPrefix(a, "v"), ".")
+	pb := strings.Split(strings.TrimPrefix(b, "v"), ".")
+	for i := range max(len(pa), len(pb)) {
+		var x, y int
+		if i < len(pa) {
+			x, _ = strconv.Atoi(pa[i])
+		}
+		if i < len(pb) {
+			y, _ = strconv.Atoi(pb[i])
+		}
+		if c := cmp.Compare(x, y); c != 0 {
+			return c
+		}
+	}
+	return strings.Compare(a, b)
+}
+
 // npmCodexNative 是 npm 包 @openai/codex（pkg 是包目录）里随平台装的原生程序。
 func npmCodexNative(pkg string) string {
+	return npmCodexNativeFor(pkg, runtime.GOOS, runtime.GOARCH)
+}
+
+// npmCodexNativeFor 在包里找 goos/goarch 能跑的原生程序。包里可能带好几个
+// 平台的 vendor 目录：先挑目录名写明这个系统和架构的，再挑没写平台的，写着
+// 别的系统或架构的不用。
+func npmCodexNativeFor(pkg, goos, goarch string) string {
+	var neutral string
 	for _, pattern := range []string{"node_modules/@openai/codex-*/vendor/*/bin/codex", "vendor/*/bin/codex", "vendor/*/codex/codex"} {
 		found, _ := filepath.Glob(filepath.Join(pkg, pattern))
 		for _, f := range found {
-			if isExecutable(f) {
+			if !isExecutable(f) {
+				continue
+			}
+			switch vendorPlatformMatch(vendorTarget(f), goos, goarch) {
+			case platformMatch:
 				return f
+			case platformUnknown:
+				if neutral == "" {
+					neutral = f
+				}
 			}
 		}
 	}
+	return neutral
+}
+
+// vendorTarget 是原生程序所在的 vendor 子目录名，如 aarch64-apple-darwin。
+func vendorTarget(f string) string {
+	for dir := filepath.Dir(f); dir != filepath.Dir(dir); dir = filepath.Dir(dir) {
+		if filepath.Base(filepath.Dir(dir)) == "vendor" {
+			return filepath.Base(dir)
+		}
+	}
 	return ""
+}
+
+type platformFit int
+
+const (
+	platformUnknown platformFit = iota // 目录名没写系统和架构
+	platformMatch                      // 写的就是这个系统和架构
+	platformForeign                    // 写的是别的系统或架构
+)
+
+// 目录名里表示系统、架构的词，按 Go 的 GOOS、GOARCH 归类。
+var (
+	osWords   = map[string]string{"darwin": "darwin", "apple": "darwin", "macos": "darwin", "linux": "linux", "windows": "windows", "win32": "windows"}
+	archWords = map[string]string{"aarch64": "arm64", "arm64": "arm64", "x86_64": "amd64", "x64": "amd64", "amd64": "amd64"}
+)
+
+// vendorPlatformMatch 看 vendor 目录名（rust 的 aarch64-apple-darwin 或 npm 的
+// darwin-arm64 这样）是不是给 goos/goarch 用的。
+func vendorPlatformMatch(target, goos, goarch string) platformFit {
+	var gotOS, gotArch string
+	for _, w := range strings.Split(strings.ToLower(target), "-") {
+		if v, ok := osWords[w]; ok {
+			if gotOS != "" && gotOS != v {
+				return platformForeign
+			}
+			gotOS = v
+		}
+		if v, ok := archWords[w]; ok {
+			if gotArch != "" && gotArch != v {
+				return platformForeign
+			}
+			gotArch = v
+		}
+	}
+	switch {
+	case gotOS != "" && gotOS != goos, gotArch != "" && gotArch != goarch:
+		return platformForeign
+	case gotOS == goos && gotArch == goarch:
+		return platformMatch
+	}
+	return platformUnknown
 }
 
 func isExecutable(p string) bool {
@@ -312,11 +437,11 @@ func (l *Library) uninstallWorkBuddyPlugin(ctx context.Context, s *Skill, dir st
 	if msg := workBuddyFailure(stdout); msg != "" {
 		return errors.New(msg)
 	}
+	if msg := strings.TrimSpace(string(stderr)); msg != "" {
+		return errors.New(msg)
+	}
 	if err != nil {
 		return err
-	}
-	if msg := strings.TrimSpace(string(stderr)); msg != "" && readErr != nil {
-		return errors.New(msg)
 	}
 	return errors.New(locales.PluginUninstallStillInstalled())
 }

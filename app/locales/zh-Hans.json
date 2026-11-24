@@ -7954,5 +7954,10 @@
         "type": "String"
       }
     }
+  },
+  "pluginUninstallFailedNoReason": "命令报告卸载失败，但没有说明原因。",
+  "@pluginUninstallFailedNoReason": {
+    "description": "卸载插件失败的原因：命令说失败了却没写原因",
+    "placeholders": {}
   }
 }

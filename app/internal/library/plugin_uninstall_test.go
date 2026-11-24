@@ -213,6 +213,25 @@ func TestWorkBuddyUninstallFailsWhenThePluginIsStillRegistered(t *testing.T) {
 	}
 }
 
+func TestWorkBuddyUninstallPassesOnTheCliErrorOutput(t *testing.T) {
+	// Given codebuddy 命令行没卸掉插件，标准输出没说原因，原因写在标准错误里
+	home := pluginHome(t, "user", "")
+	old := runPluginCommand
+	runPluginCommand = func(context.Context, pluginCmd) ([]byte, []byte, error) {
+		return []byte("Uninstalling plugin(s): find-skills@codebuddy-plugins-official...\n"), []byte("Error: EACCES: permission denied\n"), nil
+	}
+	t.Cleanup(func() { runPluginCommand = old })
+	l := Scan(home)
+
+	// When 卸载 find-skills
+	err := l.UninstallPlugin(byName(l, "find-skills"))
+
+	// Then 把标准错误里的原因告诉用户
+	if err == nil || err.Error() != "Error: EACCES: permission denied" {
+		t.Errorf("得到 %v", err)
+	}
+}
+
 func TestWorkBuddyUninstallReportsWhenTheAppIsMissing(t *testing.T) {
 	// Given 找不到 WorkBuddy 应用
 	home := pluginHome(t, "user", "")
@@ -257,6 +276,9 @@ func TestUninstallResultUsesTheCommandsOwnMessage(t *testing.T) {
 		{"失败时用命令的说明", string(failed), "", errors.New("exit status 1"), `Plugin "x@y" not found in installed plugins`},
 		{"没有 JSON 时用标准错误", "", "boom\n", errors.New("exit status 1"), "boom"},
 		{"什么都没有时用退出码", "", "", errors.New("exit status 2"), "exit status 2"},
+		{"说失败了没写原因时用标准错误", `{"outcome":"failed"}`, "permission denied\n", nil, "permission denied"},
+		{"说失败了没写原因时用退出码", `{"outcome":"failed"}`, "", errors.New("exit status 3"), "exit status 3"},
+		{"说失败了什么原因都没有", `{"outcome":"failed"}`, "", nil, "命令报告卸载失败，但没有说明原因。"},
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			err := uninstallResult([]byte(c.stdout), []byte(c.stderr), c.runErr)

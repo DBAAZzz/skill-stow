@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const codex = "codex"
@@ -31,24 +32,28 @@ const (
 type codexPlugin struct {
 	id       string // 名称@市场
 	remoteID string // 远程目录里的 ID；本地市场的为空
+	disabled bool   // config.toml 里写了 enabled = false
 }
 
-// codexPluginSkills 读 Codex 装了的插件里的技能。
+// codexPluginSkills 读 Codex 装了的插件里的技能。config.toml 和远程安装标记
+// 里都有的插件按 id 合成一个，留着远程 ID 好查它的安装策略；停用的插件不算。
 func (sc *scanner) codexPluginSkills(a Agent, seen map[string]bool) []*Skill {
 	home := filepath.Join(sc.home, a.Home)
 	src, _ := os.ReadFile(filepath.Join(home, "config.toml"))
-	ids, markets := parseCodexPlugins(string(src))
-	plugins := make([]codexPlugin, 0, len(ids))
-	for _, id := range ids {
-		plugins = append(plugins, codexPlugin{id: id})
+	plugins, markets, _ := parseCodexPlugins(string(src))
+	for _, r := range codexRemotePlugins(home) {
+		if i := slices.IndexFunc(plugins, func(p codexPlugin) bool { return p.id == r.id }); i >= 0 {
+			plugins[i].remoteID = r.remoteID
+			continue
+		}
+		plugins = append(plugins, r)
 	}
-	plugins = append(plugins, codexRemotePlugins(home)...)
 	catalog := codexCatalogPolicies(home)
 	manifests := map[string]map[string]string{}
 	var out []*Skill
 	for _, p := range plugins {
 		name, market, ok := strings.Cut(p.id, "@")
-		if !ok {
+		if !ok || p.disabled {
 			continue
 		}
 		dir := latestVersionDir(filepath.Join(home, codexPluginCache, market, name))
@@ -74,34 +79,40 @@ func (sc *scanner) codexPluginSkills(a Agent, seen map[string]bool) []*Skill {
 	return out
 }
 
-// parseCodexPlugins 从 config.toml 读出登记的插件（名称@市场，按出现顺序）
-// 和本地市场的目录。读不懂的配置当作没有插件。
-func parseCodexPlugins(src string) (plugins []string, markets map[string]string) {
+// parseCodexPlugins 从 config.toml 读出登记的插件（名称@市场，按出现顺序，
+// 带是否停用）和本地市场的目录。读不懂的配置返回错误。
+func parseCodexPlugins(src string) (plugins []codexPlugin, markets map[string]string, err error) {
 	markets = map[string]string{}
 	statements, err := tomlStatements(src)
 	if err != nil {
-		return nil, markets
+		return nil, markets, err
 	}
 	var section []string
+	current := -1 // section 是 [plugins."名称@市场"] 时它在 plugins 里的下标
 	for _, s := range statements {
 		if strings.HasPrefix(s, "[") {
-			section = tomlKeyPath(strings.Trim(s, "[]"))
-			if len(section) == 2 && section[0] == "plugins" && !slices.Contains(plugins, section[1]) {
-				plugins = append(plugins, section[1])
+			section, current = tomlKeyPath(strings.Trim(s, "[]")), -1
+			if len(section) == 2 && section[0] == "plugins" {
+				current = slices.IndexFunc(plugins, func(p codexPlugin) bool { return p.id == section[1] })
+				if current < 0 {
+					plugins = append(plugins, codexPlugin{id: section[1]})
+					current = len(plugins) - 1
+				}
 			}
 			continue
 		}
-		if len(section) != 2 || section[0] != "marketplaces" {
-			continue
-		}
 		key, value, _ := strings.Cut(s, "=")
-		if strings.TrimSpace(key) == "source" {
-			if dir, ok := tomlString(strings.TrimSpace(value)); ok {
+		key, value = strings.TrimSpace(key), strings.TrimSpace(value)
+		switch {
+		case current >= 0 && key == "enabled":
+			plugins[current].disabled = value == "false"
+		case len(section) == 2 && section[0] == "marketplaces" && key == "source":
+			if dir, ok := tomlString(value); ok {
 				markets[section[1]] = dir
 			}
 		}
 	}
-	return plugins, markets
+	return plugins, markets, nil
 }
 
 // tomlKeyPath 把点分的键（如 plugins."a@b"）拆成各段，去掉引号。
@@ -111,12 +122,12 @@ func tomlKeyPath(key string) []string {
 		var part string
 		switch rest[0] {
 		case '"', '\'':
-			end := strings.IndexByte(rest[1:], rest[0])
+			end := tomlQuoteEnd(rest)
 			if end < 0 {
 				return nil
 			}
-			part, _ = tomlString(rest[:end+2])
-			rest = rest[end+2:]
+			part, _ = tomlString(rest[:end+1])
+			rest = rest[end+1:]
 		default:
 			end := strings.IndexByte(rest, '.')
 			if end < 0 {
@@ -129,6 +140,20 @@ func tomlKeyPath(key string) []string {
 		rest = strings.TrimSpace(rest)
 	}
 	return out
+}
+
+// tomlQuoteEnd 是 s 开头那个带引号的键的闭合引号的下标，找不到返回 -1。
+// 基本字符串（双引号）里反斜杠转义下一个字符；字面字符串（单引号）没有转义。
+func tomlQuoteEnd(s string) int {
+	for i := 1; i < len(s); i++ {
+		switch {
+		case s[0] == '"' && s[i] == '\\':
+			i++
+		case s[i] == s[0]:
+			return i
+		}
+	}
+	return -1
 }
 
 // tomlString 读一个 TOML 字符串值："基本字符串" 或 '字面字符串'。
@@ -184,8 +209,20 @@ func codexCatalogPolicies(home string) map[string]string {
 			cats = append(cats, c)
 		}
 	}
-	// 时间是 RFC 3339，按字符串比就是按时间；没写时间的最旧
-	slices.SortFunc(cats, func(a, b catalog) int { return strings.Compare(a.FetchedAt, b.FetchedAt) })
+	// 按拉取时间排，时间读不出的最旧；读不出的之间按原文排，结果才稳定
+	slices.SortStableFunc(cats, func(a, b catalog) int {
+		ta, errA := time.Parse(time.RFC3339Nano, a.FetchedAt)
+		tb, errB := time.Parse(time.RFC3339Nano, b.FetchedAt)
+		switch {
+		case errA != nil && errB != nil:
+			return strings.Compare(a.FetchedAt, b.FetchedAt)
+		case errA != nil:
+			return -1
+		case errB != nil:
+			return 1
+		}
+		return ta.Compare(tb)
+	})
 	out := map[string]string{}
 	for _, c := range cats {
 		for _, p := range c.Plugins {
