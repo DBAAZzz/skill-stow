@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 // 模型把更新说明包在这对标签里输出，前后的思考和寒暄一律丢掉。
@@ -21,6 +22,12 @@ const (
 const dotSeparators = "\u00b7\u2022\u2027\u22c5\u30fb"
 
 var numberedItemRe = regexp.MustCompile(`^(\d+)\. \S`)
+
+// 更新窗口里一条说明只该是一句短话；超过这个长度基本是把实现细节也写进去了。
+const (
+	maxZHItemRunes = 50
+	maxENItemRunes = 140
+)
 
 // runApply 把模型写的更新说明换进 CHANGELOG 的 "## <版本>" 一节。
 // 说明不合格时返回错误且不改文件，发版 PR 保留 bump 生成的 commit 原文草稿。
@@ -81,7 +88,7 @@ func extractTaggedNotes(output string) (string, error) {
 
 // lintReleaseNotes 检查更新窗口能正确显示、且确实被改写过的说明：
 // 中英文两节条数相同，都是从 1 开始的单行编号列表，中文一节是中文、英文一节没有中文，
-// 不用点号拼接，也不是原样照抄的 Conventional Commits 标题。
+// 每条是不超长的一句话，不用点号拼接，也不是原样照抄的 Conventional Commits 标题。
 func lintReleaseNotes(notes string) error {
 	zh, en, err := splitBilingual(notes)
 	if err != nil {
@@ -104,6 +111,15 @@ func lintReleaseNotes(notes string) error {
 		}
 		if containsHan(enItems[i]) {
 			return fmt.Errorf("English item %d contains Chinese text: %q", i+1, enItems[i])
+		}
+		if n := utf8.RuneCountInString(zhItems[i]); n > maxZHItemRunes {
+			return fmt.Errorf("中文 item %d has %d characters, keep it under %d: %q", i+1, n, maxZHItemRunes, zhItems[i])
+		}
+		if strings.Contains(strings.TrimSuffix(zhItems[i], "。"), "。") {
+			return fmt.Errorf("中文 item %d has more than one sentence: %q", i+1, zhItems[i])
+		}
+		if n := utf8.RuneCountInString(enItems[i]); n > maxENItemRunes {
+			return fmt.Errorf("English item %d has %d characters, keep it under %d: %q", i+1, n, maxENItemRunes, enItems[i])
 		}
 		for _, item := range []string{zhItems[i], enItems[i]} {
 			if strings.ContainsAny(item, dotSeparators) {

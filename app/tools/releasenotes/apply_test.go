@@ -70,15 +70,18 @@ func TestApplyReplacesDraftWithModelNotes(t *testing.T) {
 
 func TestApplyLeavesChangelogAloneWhenNotesAreRejected(t *testing.T) {
 	cases := map[string]string{
-		"no tags":            goodNotes,
-		"raw commit headers": "<release-notes>\n中文\n\n1. feat(browse): 卸载插件\n\nEnglish\n\n1. feat(browse): uninstall plugins\n</release-notes>",
-		"english under 中文":   "<release-notes>\n中文\n\n1. Uninstall plugins\n\nEnglish\n\n1. Uninstall plugins\n</release-notes>",
-		"chinese in English": "<release-notes>\n中文\n\n1. 卸载插件\n\nEnglish\n\n1. 卸载插件\n</release-notes>",
-		"bullet list":        "<release-notes>\n中文\n\n- 卸载插件\n\nEnglish\n\n- Uninstall plugins\n</release-notes>",
-		"item count differs": "<release-notes>\n中文\n\n1. 卸载插件\n2. 修复图标\n\nEnglish\n\n1. Uninstall plugins\n</release-notes>",
-		"numbering skips":    "<release-notes>\n中文\n\n1. 卸载插件\n3. 修复图标\n\nEnglish\n\n1. Uninstall plugins\n3. Fix icons\n</release-notes>",
-		"dot separator":      "<release-notes>\n中文\n\n1. 插件 · 卸载\n\nEnglish\n\n1. Plugins · uninstall\n</release-notes>",
-		"missing English":    "<release-notes>\n中文\n\n1. 卸载插件\n</release-notes>",
+		"no tags":               goodNotes,
+		"raw commit headers":    "<release-notes>\n中文\n\n1. feat(browse): 卸载插件\n\nEnglish\n\n1. feat(browse): uninstall plugins\n</release-notes>",
+		"english under 中文":      "<release-notes>\n中文\n\n1. Uninstall plugins\n\nEnglish\n\n1. Uninstall plugins\n</release-notes>",
+		"chinese in English":    "<release-notes>\n中文\n\n1. 卸载插件\n\nEnglish\n\n1. 卸载插件\n</release-notes>",
+		"bullet list":           "<release-notes>\n中文\n\n- 卸载插件\n\nEnglish\n\n- Uninstall plugins\n</release-notes>",
+		"item count differs":    "<release-notes>\n中文\n\n1. 卸载插件\n2. 修复图标\n\nEnglish\n\n1. Uninstall plugins\n</release-notes>",
+		"numbering skips":       "<release-notes>\n中文\n\n1. 卸载插件\n3. 修复图标\n\nEnglish\n\n1. Uninstall plugins\n3. Fix icons\n</release-notes>",
+		"dot separator":         "<release-notes>\n中文\n\n1. 插件 · 卸载\n\nEnglish\n\n1. Plugins · uninstall\n</release-notes>",
+		"missing English":       "<release-notes>\n中文\n\n1. 卸载插件\n</release-notes>",
+		"chinese item too long": "<release-notes>\n中文\n\n1. " + strings.Repeat("卸", 51) + "\n\nEnglish\n\n1. Uninstall plugins\n</release-notes>",
+		"english item too long": "<release-notes>\n中文\n\n1. 卸载插件\n\nEnglish\n\n1. " + strings.Repeat("a", 141) + "\n</release-notes>",
+		"two chinese sentences": "<release-notes>\n中文\n\n1. 可以卸载插件。列表会刷新。\n\nEnglish\n\n1. Uninstall plugins\n</release-notes>",
 	}
 	for name, output := range cases {
 		t.Run(name, func(t *testing.T) {

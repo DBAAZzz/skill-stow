@@ -175,20 +175,32 @@ jobs:
             -e "s|{{CONTEXT}}|$context|g" \
             ../.github/release-notes-prompt.md)"
 
+          # 没通过格式检查时把报错交回给 Claude 再写一次，第二次还不行就保留原文草稿。
           output="$RUNNER_TEMP/claude-notes.txt"
-          if ! (cd .. && timeout 600 claude -p "$prompt" \
-              --model "$RELEASE_NOTES_MODEL" \
-              --max-turns 30 \
-              --permission-mode dontAsk \
-              --allowedTools "Read" "Grep" "Glob" "Bash(git show:*)" "Bash(git log:*)" "Bash(git diff:*)" \
-              --add-dir "$RUNNER_TEMP" \
-              --output-format text) > "$output"; then
-            fallback "Claude 调用失败"
-          fi
-          if ! go run ./tools/releasenotes apply -version "$NEXT_VERSION" -changelog CHANGELOG.md -notes "$output" 2> "$RUNNER_TEMP/apply.err"; then
+          for attempt in 1 2; do
+            if ! (cd .. && timeout 600 claude -p "$prompt" \
+                --model "$RELEASE_NOTES_MODEL" \
+                --max-turns 30 \
+                --permission-mode dontAsk \
+                --allowedTools "Read" "Grep" "Glob" "Bash(git show:*)" "Bash(git log:*)" "Bash(git diff:*)" \
+                --add-dir "$RUNNER_TEMP" \
+                --output-format text) > "$output"; then
+              fallback "Claude 调用失败"
+            fi
+            if go run ./tools/releasenotes apply -version "$NEXT_VERSION" -changelog CHANGELOG.md -notes "$output" 2> "$RUNNER_TEMP/apply.err"; then
+              break
+            fi
             cat "$RUNNER_TEMP/apply.err"
-            fallback "输出未通过格式检查：$(tail -n1 "$RUNNER_TEMP/apply.err")"
-          fi
+            [ "$attempt" = 1 ] || fallback "输出两次都未通过格式检查：$(tail -n1 "$RUNNER_TEMP/apply.err")"
+            prompt="$prompt
+
+          你上一次输出的是：
+
+          $(cat "$output")
+
+          它没有通过格式检查，错误是：$(tail -n1 "$RUNNER_TEMP/apply.err")
+          按上面的写法要求整体改好，重新输出完整的 <release-notes>。"
+          done
           echo "status=polished" >> "$GITHUB_OUTPUT"
           echo "已用 $RELEASE_NOTES_MODEL 改写 v$NEXT_VERSION 的更新说明" >> "$GITHUB_STEP_SUMMARY"
 
