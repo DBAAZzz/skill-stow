@@ -251,3 +251,35 @@ func TestHoveringOneSkillOfAMultiSkillPluginOffersNoUninstall(t *testing.T) {
 		t.Errorf("多技能插件里单张卡片悬停时不应有「卸载」：%q", tt.Texts())
 	}
 }
+
+func TestUserDisablesACodexBuiltinSkillFromItsPane(t *testing.T) {
+	// Given Codex 的系统技能 imagegen
+	home, _ := filepath.EvalSymlinks(t.TempDir())
+	dir := filepath.Join(home, ".codex/skills/.system/imagegen")
+	must(t, os.MkdirAll(dir, 0o755))
+	must(t, os.WriteFile(filepath.Join(dir, "SKILL.md"), []byte("---\nname: imagegen\ndescription: 生成和编辑图片\n---\n"), 0o644))
+	config := filepath.Join(home, ".codex/config.toml")
+	must(t, os.WriteFile(config, []byte("model = \"gpt-5\"\n"), 0o644))
+	a := newApp(library.Scan(home))
+	tt := newUITester(a.view, 1280, 800)
+	must(t, tt.Click("内置"))
+	tt.Advance(paneDuration)
+
+	// When 选中它，在详情栏拨掉 Codex 的开关
+	must(t, tt.Click("生成和编辑图片"))
+	tt.Advance(paneDuration)
+	if !tt.HasText("内置 Skill 删不掉，Codex 每次启动都会放回来。停用写在 Codex 的配置里，随时可以重新启用。") {
+		t.Fatalf("详情栏应说明内置技能只能停用：%q", tt.Texts())
+	}
+	must(t, tt.Click("开关 Codex"))
+	tt.Advance(paneDuration)
+
+	// Then Codex 的配置按路径停用了它，卡片显示已停用
+	b, _ := os.ReadFile(config)
+	if !strings.Contains(string(b), "enabled = false") {
+		t.Errorf("config.toml 应停用 imagegen：\n%s", b)
+	}
+	if !tt.HasText("已停用") {
+		t.Errorf("卡片应显示已停用：%q", tt.Texts())
+	}
+}

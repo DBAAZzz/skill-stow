@@ -141,7 +141,7 @@ func (s *Skill) EnabledIn(agent string) bool { return slices.Contains(s.Enabled,
 
 // SetEnabled 启用或停用：只改启用关系，不动技能本身（示例数据用）。
 func (s *Skill) SetEnabled(agent string, on bool) {
-	if s.Source != Mine {
+	if !s.nativeManaged() {
 		return
 	}
 	if s.Available == nil {
@@ -377,7 +377,7 @@ func (l *Library) Tidy(s *Skill) error {
 // Enable 只控制已经可发现的技能，不创建或删除链接。
 func (l *Library) Enable(s *Skill, agent string, on bool) (err error) {
 	defer l.track("native", toggleOp(on), s.Name+" @ "+agent)(&err)
-	if s.Source != Mine {
+	if !s.nativeManaged() {
 		return errors.New(locales.LibraryReadOnlyToggle())
 	}
 	if !s.DiscoveredIn(agent) {

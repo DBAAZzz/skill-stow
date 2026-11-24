@@ -18537,3 +18537,19 @@ func PluginUninstallNoCodex() string { return In(i18n.Locale()).PluginUninstallN
 func (msgs Messages) PluginUninstallNoCodex() string {
 	return Catalog.Format(msgs.locale, "pluginUninstallNoCodex", nil)
 }
+
+// InspectorBuiltinDisableOnly says "内置 Skill 删不掉，{agent} 每次启动都会放回来。停用写在 {agent} …"
+// in the language the app shows.
+//
+// 详情栏：能停用的内置技能（Codex 的）开关下的说明
+func InspectorBuiltinDisableOnly(agent string) string {
+	return In(i18n.Locale()).InspectorBuiltinDisableOnly(agent)
+}
+
+// InspectorBuiltinDisableOnly says "内置 Skill 删不掉，{agent} 每次启动都会放回来。停用写在 {agent} …"
+// in the language of msgs.
+//
+// 详情栏：能停用的内置技能（Codex 的）开关下的说明
+func (msgs Messages) InspectorBuiltinDisableOnly(agent string) string {
+	return Catalog.Format(msgs.locale, "inspectorBuiltinDisableOnly", map[string]any{"agent": agent})
+}

@@ -91,6 +91,16 @@ func (s *Skill) AllDisabled() bool {
 	return true
 }
 
+// nativeManaged 报告 s 的启用状态由这里读写：我的技能，和 Codex 的内置技能
+// （Codex 的系统技能和默认装上的插件删不掉，下次启动会放回来，只能在
+// config.toml 里按路径停用）。
+func (s *Skill) nativeManaged() bool { return s.Source == Mine || s.codexBuiltin() }
+
+func (s *Skill) codexBuiltin() bool { return s.Source == Builtin && s.Provider == codex }
+
+// CanToggleBuiltin 报告内置技能 s 能在这里启用、停用。
+func (s *Skill) CanToggleBuiltin() bool { return s.codexBuiltin() }
+
 // nativeAgents 是能在这里按技能启停的 Agent：都改它们自己的配置文件。
 var nativeAgents = []string{"claude-code", "codex", "gemini", "opencode", "zcode"}
 
@@ -206,7 +216,7 @@ func (l *Library) refreshNative() {
 	}
 
 	for _, s := range l.Skills {
-		if s.Source == Mine {
+		if s.nativeManaged() {
 			l.applyNative(s)
 		}
 	}
@@ -536,7 +546,7 @@ func (l *Library) setNative(s *Skill, id string, on bool) error {
 	delete(s.States, id)
 	defer func() {
 		for _, skill := range l.Skills {
-			if skill.Source == Mine {
+			if skill.nativeManaged() {
 				l.applyNative(skill)
 			}
 		}

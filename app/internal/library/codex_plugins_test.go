@@ -182,6 +182,51 @@ func TestFindCodexUsesTheNativeBinaryOfAnNpmInstall(t *testing.T) {
 	}
 }
 
+func TestDisablingACodexBuiltinSkillWritesCodexConfig(t *testing.T) {
+	// Given Codex 的系统技能 imagegen
+	home := codexHome(t)
+	config := filepath.Join(home, ".codex/config.toml")
+	before, _ := os.ReadFile(config)
+	l := Scan(home)
+	img := codexSkill(l, "imagegen")
+	if !img.CanToggleBuiltin() || !img.State(codex).Enabled {
+		t.Fatalf("imagegen 应能停用、现在启用着：%+v", img.State(codex))
+	}
+
+	// When 停用它
+	must(t, l.Enable(img, codex, false))
+
+	// Then config.toml 里按路径记下停用，重新扫描读出已停用
+	after, _ := os.ReadFile(config)
+	if !strings.Contains(string(after), "enabled = false") || !strings.Contains(string(after), filepath.Join(img.Real, "SKILL.md")) {
+		t.Errorf("config.toml 应按路径停用 imagegen：\n%s", after)
+	}
+	if img = codexSkill(Scan(home), "imagegen"); img.State(codex).Enabled || !img.AllDisabled() {
+		t.Errorf("重新扫描后 imagegen 应是停用的：%+v", img.State(codex))
+	}
+
+	// When 再启用它
+	l = Scan(home)
+	must(t, l.Enable(codexSkill(l, "imagegen"), codex, true))
+
+	// Then config.toml 回到原样
+	if restored, _ := os.ReadFile(config); string(restored) != string(before) {
+		t.Errorf("启用后 config.toml 应回到原样：\n%s", restored)
+	}
+}
+
+func TestOtherBuiltinSkillsStayReadOnly(t *testing.T) {
+	// Given WorkBuddy 预装的插件技能
+	home := pluginHome(t, "user", "")
+	l := Scan(home)
+	docx := byName(l, "tencent-docx")
+
+	// Then 不能在这里停用
+	if docx.CanToggleBuiltin() || l.Enable(docx, "workbuddy", false) == nil {
+		t.Error("只有 Codex 的内置技能能在这里停用")
+	}
+}
+
 func TestParseCodexPluginsReadsQuotedKeys(t *testing.T) {
 	plugins, markets := parseCodexPlugins(codexConfig("/m") + "\n[plugins]\nfoo = 1\n[plugins.\"x@y\".nested]\na = 1\n")
 	if !slices.Equal(plugins, []string{"alpha@local-m", "beta@local-m"}) || markets["local-m"] != "/m" {

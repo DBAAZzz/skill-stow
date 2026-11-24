@@ -462,6 +462,11 @@ func (sc *scanner) plugins() []*Skill {
 		}
 		out = append(out, sc.builtinSkills(a, seen)...)
 	}
+	for _, s := range out {
+		if s.codexBuiltin() {
+			s.Available = []string{codex} // 只有 Codex 读到，启用状态按它的 config.toml 算
+		}
+	}
 	return out
 }
 

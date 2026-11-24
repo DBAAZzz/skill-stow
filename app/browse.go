@@ -466,6 +466,10 @@ var pinSpring = ui.Animation{Spring: ui.SpringOptions{Duration: 380 * time.Milli
 func (a *app) cardFooter(c *ui.Context, s *library.Skill) {
 	switch s.Source {
 	case library.Builtin, library.ViaPlugin:
+		if s.AllDisabled() {
+			ui.Text(c, locales.CommonDisabled()).FontSize(12).TextColor(colTextDisabled)
+			return
+		}
 		agentBadge(c, s.Provider, 14)
 		ui.Text(c, library.AgentName(s.Provider)).FontSize(12).SingleLine().Shrink(0)
 		if s.Plugin != "" {

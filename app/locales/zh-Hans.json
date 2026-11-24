@@ -7945,5 +7945,14 @@
   "@pluginUninstallNoCodex": {
     "description": "卸载插件失败的原因：本机没有 Codex 命令行",
     "placeholders": {}
+  },
+  "inspectorBuiltinDisableOnly": "内置 Skill 删不掉，{agent} 每次启动都会放回来。停用写在 {agent} 的配置里，随时可以重新启用。",
+  "@inspectorBuiltinDisableOnly": {
+    "description": "详情栏：能停用的内置技能（Codex 的）开关下的说明",
+    "placeholders": {
+      "agent": {
+        "type": "String"
+      }
+    }
   }
 }

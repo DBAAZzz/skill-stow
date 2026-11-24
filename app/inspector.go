@@ -30,7 +30,11 @@ func (a *app) inspector(c *ui.Context, s *library.Skill, coll *library.Collectio
 				a.paneHeader(c, s, iconLock, nil)
 				defectsCallout(c, s)
 				label(c, locales.CommonEnabledFor())
-				a.pluginReadOnlyNote(c, s, s.Source, s.Provider, s.Plugin)
+				if s.CanToggleBuiltin() {
+					a.builtinToggle(c, s)
+				} else {
+					a.pluginReadOnlyNote(c, s, s.Source, s.Provider, s.Plugin)
+				}
 				a.securityPane(c, s)
 				a.usagePane(c, s)
 				a.infoPane(c, s, "", colTextMuted)
@@ -398,6 +402,21 @@ func (a *app) projectTips(c *ui.Context, s *library.Skill) {
 			})
 		}
 	})
+}
+
+// builtinToggle 是能停用的内置技能（Codex 的）在详情栏的开关：删不掉，
+// 只能在 Agent 的配置里停用。
+func (a *app) builtinToggle(c *ui.Context, s *library.Skill) {
+	ag, ok := a.lib.AgentByID(s.Provider)
+	if !ok {
+		return
+	}
+	box(c, func() { a.agentToggle(c.Key(ag.ID), s, ag, true) })
+	caption(c, locales.InspectorBuiltinDisableOnly(ag.DisplayName()))
+	a.nativeTips(c, s)
+	if a.err != "" {
+		errorLine(c, a.err)
+	}
 }
 
 // pluginNote 说明只读的技能为什么不能在这里停用：内置的随 Agent 生效；
