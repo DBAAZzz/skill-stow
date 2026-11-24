@@ -18523,3 +18523,17 @@ func PluginUninstallStillInstalled() string { return In(i18n.Locale()).PluginUni
 func (msgs Messages) PluginUninstallStillInstalled() string {
 	return Catalog.Format(msgs.locale, "pluginUninstallStillInstalled", nil)
 }
+
+// PluginUninstallNoCodex says "找不到 codex 命令。请先安装 Codex 命令行，或者在 Codex 的插件管理里卸载。"
+// in the language the app shows.
+//
+// 卸载插件失败的原因：本机没有 Codex 命令行
+func PluginUninstallNoCodex() string { return In(i18n.Locale()).PluginUninstallNoCodex() }
+
+// PluginUninstallNoCodex says "找不到 codex 命令。请先安装 Codex 命令行，或者在 Codex 的插件管理里卸载。"
+// in the language of msgs.
+//
+// 卸载插件失败的原因：本机没有 Codex 命令行
+func (msgs Messages) PluginUninstallNoCodex() string {
+	return Catalog.Format(msgs.locale, "pluginUninstallNoCodex", nil)
+}

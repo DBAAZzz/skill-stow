@@ -7940,5 +7940,10 @@
   "@pluginUninstallStillInstalled": {
     "description": "卸载插件失败的原因：命令跑完插件还在",
     "placeholders": {}
+  },
+  "pluginUninstallNoCodex": "找不到 codex 命令。请先安装 Codex 命令行，或者在 Codex 的插件管理里卸载。",
+  "@pluginUninstallNoCodex": {
+    "description": "卸载插件失败的原因：本机没有 Codex 命令行",
+    "placeholders": {}
   }
 }

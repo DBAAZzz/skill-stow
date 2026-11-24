@@ -27,10 +27,11 @@ const (
 	workBuddy  = "workbuddy"
 )
 
-// CanUninstallPlugin 报告 s 所在的插件能不能在这里卸载：用户给 Claude Code
-// 或 WorkBuddy 装的插件可以，靠它们自己的命令行卸载。内置的不行，Agent 会再装回来。
+// CanUninstallPlugin 报告 s 所在的插件能不能在这里卸载：用户给 Claude Code、
+// WorkBuddy 或 Codex 装的插件可以，靠它们自己的命令行卸载。内置的不行，Agent
+// 会再装回来。
 func (l *Library) CanUninstallPlugin(s *Skill) bool {
-	return s != nil && s.Source == ViaPlugin && (s.Provider == claudeCode || s.Provider == workBuddy) &&
+	return s != nil && s.Source == ViaPlugin && slices.Contains([]string{claudeCode, workBuddy, codex}, s.Provider) &&
 		(s.install != nil || !l.disk)
 }
 
@@ -58,13 +59,23 @@ func (l *Library) UninstallCommand(s *Skill) string {
 		return ""
 	}
 	name := "claude"
-	if s.Provider == workBuddy {
+	switch s.Provider {
+	case workBuddy:
 		name = "codebuddy"
+	case codex:
+		name = "codex"
 	}
 	return strings.Join(slices.Concat([]string{name}, uninstallArgs(s)), " ")
 }
 
 func uninstallArgs(s *Skill) []string {
+	if s.Provider == codex {
+		id := s.Plugin
+		if s.install != nil {
+			id = s.install.id
+		}
+		return []string{"plugin", "remove", id}
+	}
 	id, scope := s.Plugin, "user"
 	if s.install != nil {
 		id = s.install.id
@@ -100,8 +111,11 @@ func (l *Library) UninstallPlugin(s *Skill) (err error) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
-	if s.Provider == workBuddy {
+	switch s.Provider {
+	case workBuddy:
 		return l.uninstallWorkBuddyPlugin(ctx, s, dir)
+	case codex:
+		return l.uninstallCodexPlugin(ctx, s)
 	}
 	bin := findClaudeBinary(l.Home)
 	if bin == "" {
@@ -165,6 +179,90 @@ func findClaudeBinary(home string) string {
 	} {
 		if isExecutable(p) {
 			return p
+		}
+	}
+	return ""
+}
+
+// uninstallCodexPlugin 用 codex plugin remove 卸载插件。它卸一个没装的插件也
+// 照样成功退出，所以跑完重读配置和缓存，插件还在就算失败。
+func (l *Library) uninstallCodexPlugin(ctx context.Context, s *Skill) error {
+	bin := findCodexBinary(l.Home)
+	if bin == "" {
+		return errors.New(locales.PluginUninstallNoCodex())
+	}
+	ag, _ := l.agentByID(codex)
+	home := filepath.Join(l.Home, ag.Home)
+	_, stderr, err := runPluginCommand(ctx, pluginCmd{bin: bin, args: append(uninstallArgs(s), "--json"), dir: l.Home})
+	if ctx.Err() != nil {
+		return errors.New(locales.PluginUninstallTimeout())
+	}
+	if !codexPluginInstalled(home, s.install.id) {
+		return nil
+	}
+	if msg := strings.TrimSpace(string(stderr)); msg != "" {
+		return errors.New(msg)
+	}
+	if err != nil {
+		return err
+	}
+	return errors.New(locales.PluginUninstallStillInstalled())
+}
+
+// codexPluginInstalled 报告 Codex 还登记着插件 id：config.toml 里有它，或者
+// 缓存里还有远程安装的标记。
+func codexPluginInstalled(home, id string) bool {
+	src, _ := os.ReadFile(filepath.Join(home, "config.toml"))
+	if ids, _ := parseCodexPlugins(string(src)); slices.Contains(ids, id) {
+		return true
+	}
+	name, market, _ := strings.Cut(id, "@")
+	_, err := os.Stat(filepath.Join(home, codexPluginCache, market, name, codexRemoteMarker))
+	return err == nil
+}
+
+// codexCandidates 是 codex 命令可能在的位置，测试里换成假的。从访达打开的应用
+// 拿不到终端的 PATH，所以还要看 Homebrew、nvm 和 Codex 应用里的。
+var codexCandidates = func(home string) []string {
+	out := []string{"/opt/homebrew/bin/codex", "/usr/local/bin/codex", filepath.Join(home, ".local/bin/codex")}
+	if p, err := exec.LookPath("codex"); err == nil {
+		out = append([]string{p}, out...)
+	}
+	nvm, _ := filepath.Glob(filepath.Join(home, ".nvm/versions/node/*/bin/codex"))
+	slices.Reverse(nvm) // 版本号大的在后，先试它
+	out = append(out, nvm...)
+	for _, app := range []string{"/Applications/Codex.app", filepath.Join(home, "Applications/Codex.app")} {
+		out = append(out, filepath.Join(app, "Contents/Resources/codex"))
+	}
+	return out
+}
+
+// findCodexBinary 找能直接运行的 codex。npm 装的 codex 是要 node 才能跑的
+// 脚本，应用里不一定有 node，所以换成同一个包里的原生程序。
+func findCodexBinary(home string) string {
+	for _, c := range codexCandidates(home) {
+		real, err := filepath.EvalSymlinks(c)
+		if err != nil {
+			continue
+		}
+		if strings.HasSuffix(real, ".js") {
+			real = npmCodexNative(filepath.Dir(filepath.Dir(real)))
+		}
+		if real != "" && isExecutable(real) {
+			return real
+		}
+	}
+	return ""
+}
+
+// npmCodexNative 是 npm 包 @openai/codex（pkg 是包目录）里随平台装的原生程序。
+func npmCodexNative(pkg string) string {
+	for _, pattern := range []string{"node_modules/@openai/codex-*/vendor/*/bin/codex", "vendor/*/bin/codex", "vendor/*/codex/codex"} {
+		found, _ := filepath.Glob(filepath.Join(pkg, pattern))
+		for _, f := range found {
+			if isExecutable(f) {
+				return f
+			}
 		}
 	}
 	return ""

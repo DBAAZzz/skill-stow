@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"testing"
 )
 
@@ -88,6 +89,96 @@ func TestCodexPluginsAreSortedByTheirInstallPolicy(t *testing.T) {
 	}
 	if got := len(l.PluginSkills(codexSkill(l, "alpha-a"))); got != 2 {
 		t.Errorf("alpha 插件应带 2 个技能，实际 %d", got)
+	}
+}
+
+// fakeCodex 让 findCodexBinary 找到假 home 里的一个可执行文件。
+func fakeCodex(t *testing.T, home string) string {
+	t.Helper()
+	bin := filepath.Join(home, "bin/codex")
+	must(t, os.MkdirAll(filepath.Dir(bin), 0o755))
+	must(t, os.WriteFile(bin, []byte("#!/bin/sh\n"), 0o755))
+	old := codexCandidates
+	codexCandidates = func(string) []string { return []string{bin} }
+	t.Cleanup(func() { codexCandidates = old })
+	return bin
+}
+
+func TestUninstallingACodexPluginRunsCodexPluginRemove(t *testing.T) {
+	// Given 用户装的 Codex 插件 alpha
+	home := codexHome(t)
+	bin := fakeCodex(t, home)
+	config := filepath.Join(home, ".codex/config.toml")
+	calls := fakeRun(t, func(pluginCmd) (string, error) {
+		// 像 codex 那样把登记从 config.toml 里拿掉
+		b, _ := os.ReadFile(config)
+		s := strings.Replace(string(b), "[plugins.\"alpha@local-m\"]\nenabled = true\n", "", 1)
+		return `{"pluginId":"alpha@local-m"}`, os.WriteFile(config, []byte(s), 0o644)
+	})
+	l := Scan(home)
+	alpha := codexSkill(l, "alpha-a")
+
+	// When 卸载它
+	if !l.CanUninstallPlugin(alpha) {
+		t.Fatal("Codex 用户装的插件应能在这里卸载")
+	}
+	if err := l.UninstallPlugin(alpha); err != nil {
+		t.Fatal(err)
+	}
+
+	// Then 执行 codex plugin remove，确认框里写的也是它
+	want := []string{"plugin", "remove", "alpha@local-m", "--json"}
+	if len(*calls) != 1 || (*calls)[0].bin != bin || !slices.Equal((*calls)[0].args, want) {
+		t.Errorf("执行了 %+v，应为 %s %v", *calls, bin, want)
+	}
+	if got := l.UninstallCommand(alpha); got != "codex plugin remove alpha@local-m" {
+		t.Errorf("确认框里的命令 %q", got)
+	}
+}
+
+func TestCodexUninstallFailsWhenThePluginIsStillRegistered(t *testing.T) {
+	// Given codex plugin remove 对没卸掉的插件也照样成功退出
+	home := codexHome(t)
+	fakeCodex(t, home)
+	fakeRun(t, func(pluginCmd) (string, error) { return `{"pluginId":"gamma@remote-m"}`, nil })
+	l := Scan(home)
+
+	// When 卸载远程装的 gamma，缓存里的安装标记还在
+	err := l.UninstallPlugin(codexSkill(l, "gamma-a"))
+
+	// Then 按磁盘判断没卸掉
+	if err == nil || err.Error() != "命令执行完了，但插件仍然登记为已安装。" {
+		t.Errorf("得到 %v", err)
+	}
+}
+
+func TestCodexBuiltinPluginsCannotBeUninstalled(t *testing.T) {
+	l := Scan(codexHome(t))
+	for _, name := range []string{"beta-a", "delta-a", "imagegen"} {
+		if l.CanUninstallPlugin(codexSkill(l, name)) {
+			t.Errorf("%s 是内置的，不应能卸载", name)
+		}
+	}
+}
+
+func TestFindCodexUsesTheNativeBinaryOfAnNpmInstall(t *testing.T) {
+	// Given npm 装的 codex：bin/codex 链到包里的 codex.js，原生程序在平台包里
+	root, _ := filepath.EvalSymlinks(t.TempDir())
+	pkg := filepath.Join(root, "lib/node_modules/@openai/codex")
+	native := filepath.Join(pkg, "node_modules/@openai/codex-darwin-arm64/vendor/aarch64-apple-darwin/bin/codex")
+	must(t, os.MkdirAll(filepath.Dir(native), 0o755))
+	must(t, os.WriteFile(native, []byte("bin"), 0o755))
+	must(t, os.MkdirAll(filepath.Join(pkg, "bin"), 0o755))
+	must(t, os.WriteFile(filepath.Join(pkg, "bin/codex.js"), []byte("#!/usr/bin/env node\n"), 0o755))
+	must(t, os.MkdirAll(filepath.Join(root, "bin"), 0o755))
+	must(t, os.Symlink(filepath.Join(pkg, "bin/codex.js"), filepath.Join(root, "bin/codex")))
+	old := codexCandidates
+	codexCandidates = func(string) []string { return []string{filepath.Join(root, "bin/codex")} }
+	t.Cleanup(func() { codexCandidates = old })
+
+	// Then 用原生程序，不用要 node 才能跑的脚本
+	if got := findCodexBinary(root); got != native {
+		t.Errorf("找到 %q，应为 %q", got, native)
 	}
 }
 

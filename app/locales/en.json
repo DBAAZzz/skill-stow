@@ -1284,5 +1284,6 @@
   "pluginUninstallNoCli": "Couldn't find the claude command. Install the Claude Code CLI first, or run /plugin uninstall in Claude Code.",
   "pluginUninstallTimeout": "The command didn't finish within a minute, so it was stopped.",
   "pluginUninstallNoWorkBuddy": "Couldn't find the WorkBuddy app. Make sure it's in the Applications folder, or uninstall the plugin from WorkBuddy's plugin manager.",
-  "pluginUninstallStillInstalled": "The command finished, but the plugin is still listed as installed."
+  "pluginUninstallStillInstalled": "The command finished, but the plugin is still listed as installed.",
+  "pluginUninstallNoCodex": "Couldn't find the codex command. Install the Codex CLI first, or uninstall the plugin from Codex's plugin manager."
 }
