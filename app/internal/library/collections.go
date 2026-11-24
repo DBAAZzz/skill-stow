@@ -136,7 +136,12 @@ func (l *Library) collect(lock map[string]installed) {
 		s.Collection = nil
 		switch {
 		case s.Plugin != "": // 插件装的和 Agent 预装的插件
-			add("plugin:"+s.Provider+"/"+s.Plugin, s.Plugin, SetPlugin, s).Provider = s.Provider
+			// 不同市场可能有同名插件（Codex 的 visualize 自带一份、远程目录又有一份），按注册名分开
+			key := s.Plugin
+			if s.install != nil {
+				key = s.install.id
+			}
+			add("plugin:"+s.Provider+"/"+key, s.Plugin, SetPlugin, s).Provider = s.Provider
 		case s.Source != Mine:
 		case s.Shared && lock[s.Name].Source != "":
 			in := lock[s.Name]

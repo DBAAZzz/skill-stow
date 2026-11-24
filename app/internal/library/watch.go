@@ -154,6 +154,13 @@ func (l *Library) watchPlanWithLimit(limit int) WatchPlan {
 				addDir(pluginDir)
 			}
 		}
+		if a.ID == codex {
+			// Codex 从远程目录装插件只在缓存里新建 市场/名称 目录，不改 config.toml
+			markets, _ := filepath.Glob(filepath.Join(homePath(a.Home), codexPluginCache, "*"))
+			for _, m := range markets {
+				addDir(m)
+			}
+		}
 	}
 	addFile(filepath.Join(l.Home, ".agents", ".skill-lock.json"))
 	for _, rel := range []string{

@@ -457,6 +457,9 @@ func (sc *scanner) plugins() []*Skill {
 	var out []*Skill
 	for _, a := range sc.lib.Agents {
 		out = append(out, sc.pluginSkills(a, seen)...)
+		if a.ID == codex {
+			out = append(out, sc.codexPluginSkills(a, seen)...)
+		}
 		out = append(out, sc.builtinSkills(a, seen)...)
 	}
 	return out
@@ -488,37 +491,45 @@ func (sc *scanner) pluginSkills(a Agent, seen map[string]bool) []*Skill {
 	}
 	slices.Sort(names)
 	for _, name := range names {
-		for _, inst := range reg.Plugins[name] {
-			dirs := []string{inst.InstallPath}
-			if subs, err := os.ReadDir(filepath.Join(inst.InstallPath, "skills")); err == nil {
-				for _, d := range subs {
-					dirs = append(dirs, filepath.Join(inst.InstallPath, "skills", d.Name()))
-				}
-			}
-			for _, d := range dirs {
-				real, err := realPath(d)
-				if err != nil || seen[real] || !isSkill(real) {
-					continue
-				}
-				seen[real] = true
-				md := readSkillMD(real)
-				n := filepath.Base(d)
-				plugin, market, _ := strings.Cut(name, "@")
-				src := ViaPlugin
-				if preinstalled(market, preset[name]) {
-					src = Builtin
-				}
-				if d == inst.InstallPath {
-					// 插件本身就是一个技能：目录名是版本号，用插件名
-					n = plugin
-				}
-				out = append(out, &Skill{
-					ID: "builtin:" + real, Name: n, Description: md.Description,
-					Source: src, Provider: a.ID, Plugin: plugin, Dir: real, Real: real,
-					install: &pluginInstall{id: name, scope: inst.Scope, project: inst.ProjectPath},
-				})
-			}
+		_, market, _ := strings.Cut(name, "@")
+		src := ViaPlugin
+		if preinstalled(market, preset[name]) {
+			src = Builtin
 		}
+		for _, inst := range reg.Plugins[name] {
+			out = append(out, sc.installedPluginSkills(a, inst.InstallPath, src,
+				&pluginInstall{id: name, scope: inst.Scope, project: inst.ProjectPath}, seen)...)
+		}
+	}
+	return out
+}
+
+// installedPluginSkills 读一个装好的插件里的技能：skills 下的每个子目录，
+// 和插件目录本身是技能的情况（目录名是版本号，用插件名）。
+func (sc *scanner) installedPluginSkills(a Agent, dir string, src Source, inst *pluginInstall, seen map[string]bool) []*Skill {
+	plugin, _, _ := strings.Cut(inst.id, "@")
+	dirs := []string{dir}
+	if subs, err := os.ReadDir(filepath.Join(dir, "skills")); err == nil {
+		for _, d := range subs {
+			dirs = append(dirs, filepath.Join(dir, "skills", d.Name()))
+		}
+	}
+	var out []*Skill
+	for _, d := range dirs {
+		real, err := realPath(d)
+		if err != nil || seen[real] || !isSkill(real) {
+			continue
+		}
+		seen[real] = true
+		md := readSkillMD(real)
+		n := filepath.Base(d)
+		if d == dir {
+			n = plugin
+		}
+		out = append(out, &Skill{
+			ID: "builtin:" + real, Name: n, Description: md.Description,
+			Source: src, Provider: a.ID, Plugin: plugin, Dir: real, Real: real, install: inst,
+		})
 	}
 	return out
 }

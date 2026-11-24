@@ -25,10 +25,11 @@ type tomlSkill struct {
 var tomlTokens = regexp.MustCompile(`(?s:"""(?:\\.|[^\\])*?"""|'''.*?''')|"(?:\\.|[^"\\\r\n])*"|'[^'\r\n]*'|#[^\r\n]*|[\[\]{}\n]|[^"'#\[\]{}\n]+`)
 var tomlSkillTable = regexp.MustCompile(`^(?:skills|"skills"|'skills')\s*\.\s*(?:config|"config"|'config')$`)
 
-// Read only skill selectors; unrelated TOML values are left uninterpreted.
-func parseTOMLSkills(src string) ([]tomlSkill, error) {
-	var out []tomlSkill
-	section, statement := "", ""
+// tomlStatements 把 TOML 切成一条条语句（表头或 key = value）。字符串和注释
+// 里的换行、括号不算，多行的数组和内联表算一条。
+func tomlStatements(src string) ([]string, error) {
+	var out []string
+	statement := ""
 	depth, end := 0, 0
 	src += "\n"
 	for _, span := range tomlTokens.FindAllStringIndex(src, -1) {
@@ -53,11 +54,26 @@ func parseTOMLSkills(src string) ([]tomlSkill, error) {
 			statement += token
 			continue
 		}
-		s := strings.TrimSpace(statement)
-		statement = ""
-		if s == "" {
-			continue
+		if s := strings.TrimSpace(statement); s != "" {
+			out = append(out, s)
 		}
+		statement = ""
+	}
+	if end != len(src) || depth != 0 {
+		return nil, &configParseError{locales.NativeUnterminatedTomlValue()}
+	}
+	return out, nil
+}
+
+// Read only skill selectors; unrelated TOML values are left uninterpreted.
+func parseTOMLSkills(src string) ([]tomlSkill, error) {
+	statements, err := tomlStatements(src)
+	if err != nil {
+		return nil, err
+	}
+	var out []tomlSkill
+	section := ""
+	for _, s := range statements {
 		if strings.HasPrefix(s, "[") {
 			section = strings.TrimSpace(strings.Trim(s, "[]"))
 			if tomlSkillTable.MatchString(section) {
@@ -101,9 +117,6 @@ func parseTOMLSkills(src string) ([]tomlSkill, error) {
 			}
 			v.enabled = value == "true"
 		}
-	}
-	if end != len(src) || depth != 0 {
-		return nil, &configParseError{locales.NativeUnterminatedTomlValue()}
 	}
 	return out, nil
 }
