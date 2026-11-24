@@ -154,9 +154,9 @@ func (a *app) setCard(c *ui.Context, coll *library.Collection, matched int) {
 						ui.Image(c, av).Size(26, 26).Fit(ui.Cover)
 					})
 				} else {
-					ui.Icon(c, iconStack).Size(15, 15).TextColor(colAccent).Shrink(0)
+					setIcon(c, 15, 13)
 				}
-				ui.Text(c, coll.Name).FontWeight(600).SingleLine().Shrink(1).MinWidth(0)
+				ui.Text(c, coll.Name).FontSize(13).FontWeight(600).SingleLine().Shrink(1).MinWidth(0)
 				ui.Spacer(c)
 				countPill(c, matched, len(coll.Skills))
 			})
@@ -330,10 +330,20 @@ func (a *app) dependNote(c *ui.Context, s *library.Skill) {
 
 // ——— 详情栏（c1-c）———
 
+// setIcon 是集合名称前的叠卡图标。行里居中对的是整行字高，而集合名多是
+// 小写英文，字身落在行中线以下，图标看着偏上；按字号往下挪一点，对准大写
+// 字母和小写字母字身的中间，名称是中文时也不显得偏低。
+func setIcon(c *ui.Context, size, fontSize float32) {
+	ui.Icon(c, iconStack).Size(size, size).TextColor(colAccent).Shrink(0).Translate(0, fontSize*opticalDrop)
+}
+
+// opticalDrop 是标题前图标按字号往下挪的比例，量截图得出。
+const opticalDrop = 0.06
+
 // setPane 是选中集合时的详情栏：整组的开关、包含哪些技能、从哪里来。
 func (a *app) setPane(c *ui.Context, coll *library.Collection) {
 	ui.Row(c).Gap(7).AlignItems(ui.Center).Children(func() {
-		ui.Icon(c, iconStack).Size(18, 18).TextColor(colAccent).Shrink(0)
+		setIcon(c, 18, 18)
 		ui.Text(c, coll.Name).FontSize(18).FontWeight(600).LetterSpacing(-0.2).MinWidth(0)
 	})
 	// 标题下不再写「集合、几个技能、哪天装的」：图标说明是集合，「包含」写了

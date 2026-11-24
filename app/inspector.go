@@ -418,13 +418,22 @@ func viaPlugin(coll *library.Collection) bool {
 	return len(coll.Skills) > 0 && coll.Skills[0].Source == library.ViaPlugin
 }
 
+// 只读说明的字号和行高；锁图标和字一样大，按第一行的高度居中。
+const (
+	noteSize    = 13
+	noteLeading = 1.5
+)
+
 // readOnlyNote 是带锁的只读说明；action 不为 nil 时在说明下面画操作。
 func readOnlyNote(c *ui.Context, text string, action func()) {
 	box(c, func() {
 		ui.Row(c).Padding(10, 12).Gap(8).AlignItems(ui.Start).TextColor(colTextSecondary).Children(func() {
-			ui.Icon(c, iconLock).Size(13, 13).Margin(2, 0, 0, 0)
+			// 锁放在和第一行文字一样高的盒子里居中，和第一行对齐
+			ui.Box(c).Height(noteSize * noteLeading).Center().Shrink(0).Children(func() {
+				ui.Icon(c, iconLock).Size(noteSize, noteSize)
+			})
 			ui.Column(c).Gap(6).AlignItems(ui.Start).Grow(1).MinWidth(0).Children(func() {
-				ui.Text(c, text).FontSize(13).LineHeight(1.5)
+				ui.Text(c, text).FontSize(noteSize).LineHeight(noteLeading)
 				if action != nil {
 					action()
 				}

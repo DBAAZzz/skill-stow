@@ -57,7 +57,7 @@ var (
 	iconFolderFill   = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 7.2A2.2 2.2 0 0 1 5.2 5h3.9a2 2 0 0 1 1.4.6L12 7h6.8A2.2 2.2 0 0 1 21 9.2v8.6a2.2 2.2 0 0 1-2.2 2.2H5.2A2.2 2.2 0 0 1 3 17.8z"/></svg>`))
 	iconChevronRight = icon(`<path d="m9 5.5 6.5 6.5L9 18.5"/>`)
 	iconChevronDown  = icon(`<path d="m5.5 9 6.5 6.5L18.5 9"/>`)
-	iconStack        = icon(`<rect x="3.5" y="8" width="17" height="12" rx="2.2"/><path d="M5.5 5h13M7.5 2.5h9"/>`)
+	iconStack        = icon(`<rect x="3.5" y="8.75" width="17" height="12" rx="2.2"/><path d="M5.5 5.75h13M7.5 3.25h9"/>`)
 	iconCheck        = icon(`<path d="m5 12.5 4.5 4.5L19 7.5"/>`)
 	iconBatch        = icon(`<rect x="3.5" y="4.5" width="6" height="6" rx="1.5"/><path d="m4.9 7.6 1.2 1.2 2.2-2.4M13 7.5h7.5"/><rect x="3.5" y="13.5" width="6" height="6" rx="1.5"/><path d="M13 16.5h7.5"/>`)
 	iconSidebar      = icon(`<rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="M9.5 4.5v15M5.8 8.5h1.2M5.8 11h1.2M5.8 13.5h1.2"/>`)
