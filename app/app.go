@@ -96,6 +96,7 @@ type app struct {
 
 	pal           paletteState // ⌘K 搜索弹窗（palette.go）
 	del           deleteState
+	plug          pluginState
 	enableConfirm *enableConfirmation
 	collect       *library.Skill          // 待确认收进技能库的项目技能
 	filters       map[string]*skillFilter // 浏览页工具栏按作用域保存的筛选条件
@@ -291,6 +292,7 @@ func (a *app) view(c *ui.Context) {
 		a.linkedDialog(c)
 	}
 	a.deleteDialogs(c)
+	a.uninstallPluginDialog(c)
 	a.palette(c)
 	a.welcomeLayer(c)
 }

@@ -163,8 +163,20 @@ func (a *app) setCard(c *ui.Context, coll *library.Collection, matched int) {
 			ui.Column(c).Height(40).Margin(4, 0, 0, 0).Children(func() {
 				ui.Text(c, coll.Preview(6)).FontSize(13).FixedLineHeight(20).MaxLines(2).TextColor(colTextSecondary)
 			})
-			ui.Row(c).Height(18).Margin(10, 0, 0, 0).Gap(5).AlignItems(ui.Center).TextColor(colTextMuted).Children(func() {
-				a.setFooter(c, coll, 16, 3)
+			// 指针停在能卸载的插件集合上时，底栏淡出，换成和技能卡片一样浮上来的操作
+			shown := float32(0)
+			if card.Hovered() && !batch && a.canUninstallSet(coll) {
+				shown = 1
+			}
+			t := card.Animate("actions", shown, actionsFade)
+			ui.Row(c).Height(18).Margin(10, 0, 0, 0).Children(func() {
+				ui.Row(c).Grow(1).MinWidth(0).Gap(5).AlignItems(ui.Center).TextColor(colTextMuted).Opacity(max(0, 1-2*t)).Children(func() {
+					a.setFooter(c, coll, 16, 3)
+				})
+				if t > 0 || shown > 0 {
+					ui.Row(c).Absolute().Top(0).Left(0).Right(0).Height(18).Gap(4).AlignItems(ui.Center).
+						Opacity(t).Translate(0, (1-t)*actionsRise).Children(func() { a.setCardActions(c, coll) })
+				}
 			})
 		})
 	})
@@ -333,7 +345,7 @@ func (a *app) setPane(c *ui.Context, coll *library.Collection) {
 		if viaPlugin(coll) {
 			src = library.ViaPlugin
 		}
-		readOnlyNote(c, pluginNote(src, coll.Provider, coll.Name))
+		a.pluginReadOnlyNote(c, coll.Skills[0], src, coll.Provider, coll.Name)
 	} else {
 		a.setSwitches(c, coll)
 	}

@@ -594,6 +594,7 @@ func (a *app) usageSkillMenu(fm *frostedMenu, s *library.Skill) {
 	fm.separator()
 	a.fileItems(fm, s)
 	if s.ReadOnly() {
+		a.uninstallPluginItem(fm, s)
 		return
 	}
 	fm.separator()

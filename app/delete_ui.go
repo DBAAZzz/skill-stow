@@ -180,6 +180,7 @@ func (a *app) skillMenu(fm *frostedMenu, s *library.Skill) {
 	}
 	a.fileItems(fm, s)
 	if s.ReadOnly() {
+		a.uninstallPluginItem(fm, s)
 		return
 	}
 	fm.separator()
@@ -209,8 +210,9 @@ func (a *app) deleteItem(fm *frostedMenu, s *library.Skill) {
 }
 
 // cardActions 是指针停在我的技能卡片上时底部那一行（del6-c）：
-// 左边预览、在 Finder 中显示，右边红色的删除。两个蓝色按钮之间只靠间距
-// 分开，不加分隔符，和 macOS 并排的链接按钮一样。
+// 左边预览、在 Finder 中显示，右边红色的删除；独自成一个插件的技能右边是
+// 卸载插件。两个蓝色按钮之间只靠间距分开，不加分隔符，和 macOS 并排的链接
+// 按钮一样。
 func (a *app) cardActions(c *ui.Context, s *library.Skill) {
 	ui.Row(c).Gap(16).AlignItems(ui.Center).Children(func() {
 		if cardAction(c, locales.ActionPreview(), colAccent).Clicked() {
@@ -221,6 +223,12 @@ func (a *app) cardActions(c *ui.Context, s *library.Skill) {
 		}
 	})
 	ui.Spacer(c)
+	if s.ReadOnly() {
+		if cardAction(c, locales.ActionUninstall(), colDangerText).Clicked() {
+			a.requestUninstallPlugin(s)
+		}
+		return
+	}
 	if cardAction(c, locales.ActionDelete(), colDangerText).Clicked() {
 		a.requestDelete(s)
 	}

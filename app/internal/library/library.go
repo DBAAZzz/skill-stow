@@ -110,6 +110,8 @@ type Skill struct {
 	projectLinks []string  // 扫描到的项目内链接，可与原件不同名
 	globalLinks  []string  // 项目技能：全局目录里指向它的链接
 	KeptLinks    bool      // 项目技能：全局链接是有意建的，不再提醒
+
+	install *pluginInstall // 插件装的：installed_plugins.json 里的哪次安装；示例数据为 nil
 }
 
 // ReadOnly 报告技能是否只读：内置与插件装的不能删除或修改；项目技能可以删除但不能启用/停用。

@@ -473,6 +473,8 @@ func (sc *scanner) pluginSkills(a Agent, seen map[string]bool) []*Skill {
 	var reg struct {
 		Plugins map[string][]struct {
 			InstallPath string `json:"installPath"`
+			Scope       string `json:"scope"`
+			ProjectPath string `json:"projectPath"`
 		} `json:"plugins"`
 	}
 	if json.Unmarshal(b, &reg) != nil {
@@ -513,6 +515,7 @@ func (sc *scanner) pluginSkills(a Agent, seen map[string]bool) []*Skill {
 				out = append(out, &Skill{
 					ID: "builtin:" + real, Name: n, Description: md.Description,
 					Source: src, Provider: a.ID, Plugin: plugin, Dir: real, Real: real,
+					install: &pluginInstall{id: name, scope: inst.Scope, project: inst.ProjectPath},
 				})
 			}
 		}

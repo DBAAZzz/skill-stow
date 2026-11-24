@@ -30,7 +30,7 @@ func (a *app) inspector(c *ui.Context, s *library.Skill, coll *library.Collectio
 				a.paneHeader(c, s, iconLock, nil)
 				defectsCallout(c, s)
 				label(c, locales.CommonEnabledFor())
-				readOnlyNote(c, pluginNote(s.Source, s.Provider, s.Plugin))
+				a.pluginReadOnlyNote(c, s, s.Source, s.Provider, s.Plugin)
 				a.securityPane(c, s)
 				a.usagePane(c, s)
 				a.infoPane(c, s, "", colTextMuted)
@@ -343,7 +343,7 @@ func (a *app) projectSkillPane(c *ui.Context, s *library.Skill) {
 	}
 	label(c, locales.ImportWhoCanRead())
 	if len(s.Reads) == 0 {
-		readOnlyNote(c, locales.InspectorNoAgentReadsDirectory())
+		readOnlyNote(c, locales.InspectorNoAgentReadsDirectory(), nil)
 	} else {
 		box(c, func() {
 			for i, r := range s.Reads {
@@ -401,7 +401,7 @@ func (a *app) projectTips(c *ui.Context, s *library.Skill) {
 }
 
 // pluginNote 说明只读的技能为什么不能在这里停用：内置的随 Agent 生效；
-// 插件装的随插件生效，要不用了得在 Agent 里卸载整个插件。
+// 插件装的随插件生效，这里卸载不了的要在 Agent 里卸载整个插件。
 func pluginNote(src library.Source, provider, plugin string) string {
 	agent := library.AgentName(provider)
 	switch {
@@ -409,8 +409,6 @@ func pluginNote(src library.Source, provider, plugin string) string {
 		return locales.InspectorPluginWithAgent(agent)
 	case src != library.ViaPlugin:
 		return locales.InspectorBuiltinWithAgent(agent)
-	case provider == "claude-code":
-		return locales.InspectorPluginUninstallCommand(plugin, agent)
 	}
 	return locales.InspectorPluginUninstallManager(plugin, agent)
 }
@@ -420,11 +418,17 @@ func viaPlugin(coll *library.Collection) bool {
 	return len(coll.Skills) > 0 && coll.Skills[0].Source == library.ViaPlugin
 }
 
-func readOnlyNote(c *ui.Context, text string) {
+// readOnlyNote 是带锁的只读说明；action 不为 nil 时在说明下面画操作。
+func readOnlyNote(c *ui.Context, text string, action func()) {
 	box(c, func() {
 		ui.Row(c).Padding(10, 12).Gap(8).AlignItems(ui.Start).TextColor(colTextSecondary).Children(func() {
 			ui.Icon(c, iconLock).Size(13, 13).Margin(2, 0, 0, 0)
-			ui.Text(c, text).FontSize(13).LineHeight(1.5).Grow(1)
+			ui.Column(c).Gap(6).AlignItems(ui.Start).Grow(1).MinWidth(0).Children(func() {
+				ui.Text(c, text).FontSize(13).LineHeight(1.5)
+				if action != nil {
+					action()
+				}
+			})
 		})
 	})
 }

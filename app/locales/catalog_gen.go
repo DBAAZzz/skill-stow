@@ -5738,22 +5738,6 @@ func (msgs Messages) InspectorBuiltinWithAgent(agent string) string {
 	return Catalog.Format(msgs.locale, "inspectorBuiltinWithAgent", map[string]any{"agent": agent})
 }
 
-// InspectorPluginUninstallCommand says "随插件 {plugin} 安装，只在 {agent} 里生效，这里不能停用。要卸载，在 {agent} 里运行 /plugin…"
-// in the language the app shows.
-//
-// 详情栏：Claude Code 插件装的技能
-func InspectorPluginUninstallCommand(plugin string, agent string) string {
-	return In(i18n.Locale()).InspectorPluginUninstallCommand(plugin, agent)
-}
-
-// InspectorPluginUninstallCommand says "随插件 {plugin} 安装，只在 {agent} 里生效，这里不能停用。要卸载，在 {agent} 里运行 /plugin…"
-// in the language of msgs.
-//
-// 详情栏：Claude Code 插件装的技能
-func (msgs Messages) InspectorPluginUninstallCommand(plugin string, agent string) string {
-	return Catalog.Format(msgs.locale, "inspectorPluginUninstallCommand", map[string]any{"plugin": plugin, "agent": agent})
-}
-
 // InspectorPluginUninstallManager says "随插件 {plugin} 安装，只在 {agent} 里生效，这里不能停用。要卸载，在 {agent} …"
 // in the language the app shows.
 //
@@ -18316,4 +18300,226 @@ func DeleteImpactReadsLibrary() string { return In(i18n.Locale()).DeleteImpactRe
 // 删除确认框：这个 Agent 读的就是 Skill 库里的原件
 func (msgs Messages) DeleteImpactReadsLibrary() string {
 	return Catalog.Format(msgs.locale, "deleteImpactReadsLibrary", nil)
+}
+
+// InspectorPluginUninstallHere says "随插件 {plugin} 安装，只在 {agent} …"
+// in the language the app shows.
+//
+// 详情栏：可以在这里卸载的 Claude Code
+// 插件装的技能和集合
+func InspectorPluginUninstallHere(plugin string, agent string) string {
+	return In(i18n.Locale()).InspectorPluginUninstallHere(plugin, agent)
+}
+
+// InspectorPluginUninstallHere says "随插件 {plugin} 安装，只在 {agent} …"
+// in the language of msgs.
+//
+// 详情栏：可以在这里卸载的 Claude Code
+// 插件装的技能和集合
+func (msgs Messages) InspectorPluginUninstallHere(plugin string, agent string) string {
+	return Catalog.Format(msgs.locale, "inspectorPluginUninstallHere", map[string]any{"plugin": plugin, "agent": agent})
+}
+
+// ActionUninstallPluginEllipsis says "卸载插件…"
+// in the language the app shows.
+//
+// 详情栏说明里的链接和技能卡片右键菜单项：卸载技能所在的插件
+func ActionUninstallPluginEllipsis() string { return In(i18n.Locale()).ActionUninstallPluginEllipsis() }
+
+// ActionUninstallPluginEllipsis says "卸载插件…"
+// in the language of msgs.
+//
+// 详情栏说明里的链接和技能卡片右键菜单项：卸载技能所在的插件
+func (msgs Messages) ActionUninstallPluginEllipsis() string {
+	return Catalog.Format(msgs.locale, "actionUninstallPluginEllipsis", nil)
+}
+
+// PluginUninstallTitle says "卸载插件 {plugin}？"
+// in the language the app shows.
+//
+// 卸载插件确认框的标题
+func PluginUninstallTitle(plugin string) string {
+	return In(i18n.Locale()).PluginUninstallTitle(plugin)
+}
+
+// PluginUninstallTitle says "卸载插件 {plugin}？"
+// in the language of msgs.
+//
+// 卸载插件确认框的标题
+func (msgs Messages) PluginUninstallTitle(plugin string) string {
+	return Catalog.Format(msgs.locale, "pluginUninstallTitle", map[string]any{"plugin": plugin})
+}
+
+// PluginUninstallBody says "会在本机执行下面的 {agent} 命令，插件带的 {count} 个 Skill 和它的命令、Agent、Hook …"
+// in the language the app shows.
+//
+// 卸载插件确认框的说明
+func PluginUninstallBody(agent string, count int) string {
+	return In(i18n.Locale()).PluginUninstallBody(agent, count)
+}
+
+// PluginUninstallBody says "会在本机执行下面的 {agent} 命令，插件带的 {count} 个 Skill 和它的命令、Agent、Hook …"
+// in the language of msgs.
+//
+// 卸载插件确认框的说明
+func (msgs Messages) PluginUninstallBody(agent string, count int) string {
+	return Catalog.Format(msgs.locale, "pluginUninstallBody", map[string]any{"agent": agent, "count": count})
+}
+
+// PluginUninstallCommandLabel says "执行的命令"
+// in the language the app shows.
+//
+// 卸载插件确认框：命令那一组的小标题
+func PluginUninstallCommandLabel() string { return In(i18n.Locale()).PluginUninstallCommandLabel() }
+
+// PluginUninstallCommandLabel says "执行的命令"
+// in the language of msgs.
+//
+// 卸载插件确认框：命令那一组的小标题
+func (msgs Messages) PluginUninstallCommandLabel() string {
+	return Catalog.Format(msgs.locale, "pluginUninstallCommandLabel", nil)
+}
+
+// PluginUninstallSkillsLabel says "一起移除的 Skill"
+// in the language the app shows.
+//
+// 卸载插件确认框：技能列表那一组的小标题
+func PluginUninstallSkillsLabel() string { return In(i18n.Locale()).PluginUninstallSkillsLabel() }
+
+// PluginUninstallSkillsLabel says "一起移除的 Skill"
+// in the language of msgs.
+//
+// 卸载插件确认框：技能列表那一组的小标题
+func (msgs Messages) PluginUninstallSkillsLabel() string {
+	return Catalog.Format(msgs.locale, "pluginUninstallSkillsLabel", nil)
+}
+
+// ActionUninstall says "卸载"
+// in the language the app shows.
+//
+// 卸载插件确认框的红色按钮
+func ActionUninstall() string { return In(i18n.Locale()).ActionUninstall() }
+
+// ActionUninstall says "卸载"
+// in the language of msgs.
+//
+// 卸载插件确认框的红色按钮
+func (msgs Messages) ActionUninstall() string {
+	return Catalog.Format(msgs.locale, "actionUninstall", nil)
+}
+
+// ActionUninstalling says "正在卸载…"
+// in the language the app shows.
+//
+// 卸载插件确认框：命令还在执行时的按钮
+func ActionUninstalling() string { return In(i18n.Locale()).ActionUninstalling() }
+
+// ActionUninstalling says "正在卸载…"
+// in the language of msgs.
+//
+// 卸载插件确认框：命令还在执行时的按钮
+func (msgs Messages) ActionUninstalling() string {
+	return Catalog.Format(msgs.locale, "actionUninstalling", nil)
+}
+
+// PluginUninstalled says "已卸载插件 {plugin}"
+// in the language the app shows.
+//
+// 卸载插件成功后的提示条
+func PluginUninstalled(plugin string) string { return In(i18n.Locale()).PluginUninstalled(plugin) }
+
+// PluginUninstalled says "已卸载插件 {plugin}"
+// in the language of msgs.
+//
+// 卸载插件成功后的提示条
+func (msgs Messages) PluginUninstalled(plugin string) string {
+	return Catalog.Format(msgs.locale, "pluginUninstalled", map[string]any{"plugin": plugin})
+}
+
+// PluginUninstallFailed says "没能卸载插件 {plugin}：{err}"
+// in the language the app shows.
+//
+// 卸载插件失败的提示条；err 是命令给出的原因
+func PluginUninstallFailed(plugin string, err string) string {
+	return In(i18n.Locale()).PluginUninstallFailed(plugin, err)
+}
+
+// PluginUninstallFailed says "没能卸载插件 {plugin}：{err}"
+// in the language of msgs.
+//
+// 卸载插件失败的提示条；err 是命令给出的原因
+func (msgs Messages) PluginUninstallFailed(plugin string, err string) string {
+	return Catalog.Format(msgs.locale, "pluginUninstallFailed", map[string]any{"plugin": plugin, "err": err})
+}
+
+// PluginUninstallUnsupported says "这个插件不能在这里卸载。"
+// in the language the app shows.
+//
+// 卸载插件失败的原因：不是 Claude Code 用户装的插件
+func PluginUninstallUnsupported() string { return In(i18n.Locale()).PluginUninstallUnsupported() }
+
+// PluginUninstallUnsupported says "这个插件不能在这里卸载。"
+// in the language of msgs.
+//
+// 卸载插件失败的原因：不是 Claude Code 用户装的插件
+func (msgs Messages) PluginUninstallUnsupported() string {
+	return Catalog.Format(msgs.locale, "pluginUninstallUnsupported", nil)
+}
+
+// PluginUninstallNoCli says "找不到 claude 命令。请先安装 Claude Code 命令行，或者在 Claude Code 里运行 /plugin uninstall。"
+// in the language the app shows.
+//
+// 卸载插件失败的原因：本机没有 Claude Code 命令行
+func PluginUninstallNoCli() string { return In(i18n.Locale()).PluginUninstallNoCli() }
+
+// PluginUninstallNoCli says "找不到 claude 命令。请先安装 Claude Code 命令行，或者在 Claude Code 里运行 /plugin uninstall。"
+// in the language of msgs.
+//
+// 卸载插件失败的原因：本机没有 Claude Code 命令行
+func (msgs Messages) PluginUninstallNoCli() string {
+	return Catalog.Format(msgs.locale, "pluginUninstallNoCli", nil)
+}
+
+// PluginUninstallTimeout says "命令一分钟还没有执行完，已停止等待。"
+// in the language the app shows.
+//
+// 卸载插件失败的原因：命令超时
+func PluginUninstallTimeout() string { return In(i18n.Locale()).PluginUninstallTimeout() }
+
+// PluginUninstallTimeout says "命令一分钟还没有执行完，已停止等待。"
+// in the language of msgs.
+//
+// 卸载插件失败的原因：命令超时
+func (msgs Messages) PluginUninstallTimeout() string {
+	return Catalog.Format(msgs.locale, "pluginUninstallTimeout", nil)
+}
+
+// PluginUninstallNoWorkBuddy says "找不到 WorkBuddy 应用。请确认它装在「应用程序」文件夹里，或者在 WorkBuddy …"
+// in the language the app shows.
+//
+// 卸载插件失败的原因：找不到 WorkBuddy
+// 应用和它自带的命令行
+func PluginUninstallNoWorkBuddy() string { return In(i18n.Locale()).PluginUninstallNoWorkBuddy() }
+
+// PluginUninstallNoWorkBuddy says "找不到 WorkBuddy 应用。请确认它装在「应用程序」文件夹里，或者在 WorkBuddy …"
+// in the language of msgs.
+//
+// 卸载插件失败的原因：找不到 WorkBuddy
+// 应用和它自带的命令行
+func (msgs Messages) PluginUninstallNoWorkBuddy() string {
+	return Catalog.Format(msgs.locale, "pluginUninstallNoWorkBuddy", nil)
+}
+
+// PluginUninstallStillInstalled says "命令执行完了，但插件仍然登记为已安装。"
+// in the language the app shows.
+//
+// 卸载插件失败的原因：命令跑完插件还在
+func PluginUninstallStillInstalled() string { return In(i18n.Locale()).PluginUninstallStillInstalled() }
+
+// PluginUninstallStillInstalled says "命令执行完了，但插件仍然登记为已安装。"
+// in the language of msgs.
+//
+// 卸载插件失败的原因：命令跑完插件还在
+func (msgs Messages) PluginUninstallStillInstalled() string {
+	return Catalog.Format(msgs.locale, "pluginUninstallStillInstalled", nil)
 }

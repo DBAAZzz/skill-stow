@@ -159,9 +159,10 @@ func (a *app) skillCard(c *ui.Context, s *library.Skill, footer func()) {
 		fadeIn(ui.Column(c).Height(40).Margin(4, 0, 0, 0), back, cardSettle).Children(func() {
 			descText(c, s).FontSize(13).FixedLineHeight(20).MaxLines(2)
 		})
-		// 指针停在我的技能上时，底部淡出，换成从下面浮上来的操作（del6-c）
+		// 指针停在我的技能、或独自成一个插件的技能上时，底部淡出，换成从下面
+		// 浮上来的操作（del6-c）
 		shown := float32(0)
-		if hovered && !s.ReadOnly() && !batch {
+		if hovered && !batch && (!s.ReadOnly() || a.soloPlugin(s)) {
 			shown = 1
 		}
 		t := card.Animate("actions", shown, actionsFade)

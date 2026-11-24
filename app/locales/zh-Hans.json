@@ -2699,18 +2699,6 @@
       }
     }
   },
-  "inspectorPluginUninstallCommand": "随插件 {plugin} 安装，只在 {agent} 里生效，这里不能停用。要卸载，在 {agent} 里运行 /plugin uninstall {plugin}。",
-  "@inspectorPluginUninstallCommand": {
-    "description": "详情栏：Claude Code 插件装的技能",
-    "placeholders": {
-      "plugin": {
-        "type": "String"
-      },
-      "agent": {
-        "type": "String"
-      }
-    }
-  },
   "inspectorPluginUninstallManager": "随插件 {plugin} 安装，只在 {agent} 里生效，这里不能停用。要卸载，在 {agent} 的插件管理里卸载。",
   "@inspectorPluginUninstallManager": {
     "description": "详情栏：其他 Agent 的插件装的技能",
@@ -7848,5 +7836,109 @@
   "deleteImpactReadsLibrary": "读的是 Skill 库，原件移走后就没有了",
   "@deleteImpactReadsLibrary": {
     "description": "删除确认框：这个 Agent 读的就是 Skill 库里的原件"
+  },
+  "inspectorPluginUninstallHere": "随插件 {plugin} 安装，只在 {agent} 里生效，这里不能单独停用。不再需要时可以卸载整个插件。",
+  "@inspectorPluginUninstallHere": {
+    "description": "详情栏：可以在这里卸载的 Claude Code 插件装的技能和集合",
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      },
+      "agent": {
+        "type": "String"
+      }
+    }
+  },
+  "actionUninstallPluginEllipsis": "卸载插件…",
+  "@actionUninstallPluginEllipsis": {
+    "description": "详情栏说明里的链接和技能卡片右键菜单项：卸载技能所在的插件",
+    "placeholders": {}
+  },
+  "pluginUninstallTitle": "卸载插件 {plugin}？",
+  "@pluginUninstallTitle": {
+    "description": "卸载插件确认框的标题",
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginUninstallBody": "会在本机执行下面的 {agent} 命令，插件带的 {count} 个 Skill 和它的命令、Agent、Hook 一起移除。卸载后不能在这里撤销，要再用时在 {agent} 里重新安装。",
+  "@pluginUninstallBody": {
+    "description": "卸载插件确认框的说明",
+    "placeholders": {
+      "agent": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pluginUninstallCommandLabel": "执行的命令",
+  "@pluginUninstallCommandLabel": {
+    "description": "卸载插件确认框：命令那一组的小标题",
+    "placeholders": {}
+  },
+  "pluginUninstallSkillsLabel": "一起移除的 Skill",
+  "@pluginUninstallSkillsLabel": {
+    "description": "卸载插件确认框：技能列表那一组的小标题",
+    "placeholders": {}
+  },
+  "actionUninstall": "卸载",
+  "@actionUninstall": {
+    "description": "卸载插件确认框的红色按钮",
+    "placeholders": {}
+  },
+  "actionUninstalling": "正在卸载…",
+  "@actionUninstalling": {
+    "description": "卸载插件确认框：命令还在执行时的按钮",
+    "placeholders": {}
+  },
+  "pluginUninstalled": "已卸载插件 {plugin}",
+  "@pluginUninstalled": {
+    "description": "卸载插件成功后的提示条",
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginUninstallFailed": "没能卸载插件 {plugin}：{err}",
+  "@pluginUninstallFailed": {
+    "description": "卸载插件失败的提示条；err 是命令给出的原因",
+    "placeholders": {
+      "plugin": {
+        "type": "String"
+      },
+      "err": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginUninstallUnsupported": "这个插件不能在这里卸载。",
+  "@pluginUninstallUnsupported": {
+    "description": "卸载插件失败的原因：不是 Claude Code 用户装的插件",
+    "placeholders": {}
+  },
+  "pluginUninstallNoCli": "找不到 claude 命令。请先安装 Claude Code 命令行，或者在 Claude Code 里运行 /plugin uninstall。",
+  "@pluginUninstallNoCli": {
+    "description": "卸载插件失败的原因：本机没有 Claude Code 命令行",
+    "placeholders": {}
+  },
+  "pluginUninstallTimeout": "命令一分钟还没有执行完，已停止等待。",
+  "@pluginUninstallTimeout": {
+    "description": "卸载插件失败的原因：命令超时",
+    "placeholders": {}
+  },
+  "pluginUninstallNoWorkBuddy": "找不到 WorkBuddy 应用。请确认它装在「应用程序」文件夹里，或者在 WorkBuddy 的插件管理里卸载。",
+  "@pluginUninstallNoWorkBuddy": {
+    "description": "卸载插件失败的原因：找不到 WorkBuddy 应用和它自带的命令行",
+    "placeholders": {}
+  },
+  "pluginUninstallStillInstalled": "命令执行完了，但插件仍然登记为已安装。",
+  "@pluginUninstallStillInstalled": {
+    "description": "卸载插件失败的原因：命令跑完插件还在",
+    "placeholders": {}
   }
 }

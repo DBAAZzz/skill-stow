@@ -41,6 +41,7 @@ const (
 	fromLink                       // 打开外部链接
 	fromImport                     // 添加技能
 	fromAppData                    // 应用自己的数据文件坏了、已备份
+	fromPlugin                     // 卸载插件
 )
 
 // toastAction 是提示条右边的文字按钮，如「撤销 ⌘Z」。
