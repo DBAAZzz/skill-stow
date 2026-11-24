@@ -2,6 +2,24 @@
 
 每个版本一节，标题是 `## <版本>`。这一节就是应用内更新窗口里的「更新说明」，先写中文、再写英文。用编号列表，不用 `-`：更新窗口会把无序列表画成圆点。
 
+## 0.6.0
+
+中文
+
+1. 可以看到 Codex 插件里自带的 Skill 了
+2. 可以直接在应用里卸载 Claude Code、WorkBuddy 和 Codex 安装的插件
+3. Codex 自带的 Skill 删不掉，但可以在详情里停用
+4. 卸载插件时不再被后台扫描打断，完成后列表自动刷新
+5. WorkBuddy 预装的插件按内置处理，不再提供卸载
+
+English
+
+1. You can now see the skills that come with Codex plugins in your library.
+2. You can now uninstall plugins you installed for Claude Code, WorkBuddy, and Codex, right from the app.
+3. Codex's built-in skills can't be deleted, but you can now disable them in their details.
+4. Background scans no longer interrupt a plugin uninstall, and the list refreshes once it finishes.
+5. WorkBuddy's preinstalled plugins are now treated as built-in and can't be uninstalled.
+
 ## 0.5.0
 
 中文
