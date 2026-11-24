@@ -18305,8 +18305,8 @@ func (msgs Messages) DeleteImpactReadsLibrary() string {
 // InspectorPluginUninstallHere says "随插件 {plugin} 安装，只在 {agent} …"
 // in the language the app shows.
 //
-// 详情栏：可以在这里卸载的 Claude Code
-// 插件装的技能和集合
+// 详情栏：可以在这里卸载的插件（Claude
+// Code、WorkBuddy、Codex）装的技能和集合
 func InspectorPluginUninstallHere(plugin string, agent string) string {
 	return In(i18n.Locale()).InspectorPluginUninstallHere(plugin, agent)
 }
@@ -18314,8 +18314,8 @@ func InspectorPluginUninstallHere(plugin string, agent string) string {
 // InspectorPluginUninstallHere says "随插件 {plugin} 安装，只在 {agent} …"
 // in the language of msgs.
 //
-// 详情栏：可以在这里卸载的 Claude Code
-// 插件装的技能和集合
+// 详情栏：可以在这里卸载的插件（Claude
+// Code、WorkBuddy、Codex）装的技能和集合
 func (msgs Messages) InspectorPluginUninstallHere(plugin string, agent string) string {
 	return Catalog.Format(msgs.locale, "inspectorPluginUninstallHere", map[string]any{"plugin": plugin, "agent": agent})
 }
@@ -18566,4 +18566,22 @@ func PluginUninstallFailedNoReason() string { return In(i18n.Locale()).PluginUni
 // 卸载插件失败的原因：命令说失败了却没写原因
 func (msgs Messages) PluginUninstallFailedNoReason() string {
 	return Catalog.Format(msgs.locale, "pluginUninstallFailedNoReason", nil)
+}
+
+// CollectionBuiltinToggleEach says "内置 Skill 删不掉，{agent} 每次启动都会放回来。要停用其中的 Skill，在各个 Skill …"
+// in the language the app shows.
+//
+// 集合详情栏：由能单独停用的内置技能（Codex
+// 的）组成的插件集合
+func CollectionBuiltinToggleEach(agent string) string {
+	return In(i18n.Locale()).CollectionBuiltinToggleEach(agent)
+}
+
+// CollectionBuiltinToggleEach says "内置 Skill 删不掉，{agent} 每次启动都会放回来。要停用其中的 Skill，在各个 Skill …"
+// in the language of msgs.
+//
+// 集合详情栏：由能单独停用的内置技能（Codex
+// 的）组成的插件集合
+func (msgs Messages) CollectionBuiltinToggleEach(agent string) string {
+	return Catalog.Format(msgs.locale, "collectionBuiltinToggleEach", map[string]any{"agent": agent})
 }

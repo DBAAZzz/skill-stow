@@ -84,8 +84,14 @@ func (a *app) addToAgent(s *library.Skill, id string) {
 	a.changed()
 }
 func (a *app) nativeTips(c *ui.Context, s *library.Skill) {
+	a.nativeTipsFor(c, s, a.lib.Visible())
+}
+
+// nativeTipsFor 是 agents 里这些 Agent 的提示。内置技能的开关属于它的 Agent，
+// 那个 Agent 在设置里隐藏了也要显示它的提示。
+func (a *app) nativeTipsFor(c *ui.Context, s *library.Skill, agents []library.Agent) {
 	var tips []library.Agent
-	for _, ag := range a.lib.Visible() {
+	for _, ag := range agents {
 		if st := s.State(ag.ID); st.Discoverable && st.Message != "" {
 			tips = append(tips, ag)
 		}

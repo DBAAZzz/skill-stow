@@ -413,8 +413,8 @@ func (a *app) builtinToggle(c *ui.Context, s *library.Skill) {
 	}
 	box(c, func() { a.agentToggle(c.Key(ag.ID), s, ag, true) })
 	caption(c, locales.InspectorBuiltinDisableOnly(ag.DisplayName()))
-	a.nativeTips(c, s)
-	if a.err != "" {
+	a.nativeTipsFor(c, s, []library.Agent{ag})
+	if a.err != "" && a.errAgent == "" {
 		errorLine(c, a.err)
 	}
 }

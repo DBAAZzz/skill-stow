@@ -885,7 +885,10 @@ func (a *app) usagePreviewPane(c *ui.Context, s *library.Skill) {
 	a.lib.LoadFiles(s)
 	var menu func(fm *frostedMenu)
 	if s.ReadOnly() {
-		menu = func(fm *frostedMenu) { a.fileItems(fm, s) }
+		menu = func(fm *frostedMenu) {
+			a.fileItems(fm, s)
+			a.uninstallPluginItem(fm, s)
+		}
 	} else {
 		menu = func(fm *frostedMenu) { a.paneMenu(fm, s) }
 	}

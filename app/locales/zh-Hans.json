@@ -7839,7 +7839,7 @@
   },
   "inspectorPluginUninstallHere": "随插件 {plugin} 安装，只在 {agent} 里生效，这里不能单独停用。不再需要时可以卸载整个插件。",
   "@inspectorPluginUninstallHere": {
-    "description": "详情栏：可以在这里卸载的 Claude Code 插件装的技能和集合",
+    "description": "详情栏：可以在这里卸载的插件（Claude Code、WorkBuddy、Codex）装的技能和集合",
     "placeholders": {
       "plugin": {
         "type": "String"
@@ -7959,5 +7959,14 @@
   "@pluginUninstallFailedNoReason": {
     "description": "卸载插件失败的原因：命令说失败了却没写原因",
     "placeholders": {}
+  },
+  "collectionBuiltinToggleEach": "内置 Skill 删不掉，{agent} 每次启动都会放回来。要停用其中的 Skill，在各个 Skill 的详情里单独停用。",
+  "@collectionBuiltinToggleEach": {
+    "description": "集合详情栏：由能单独停用的内置技能（Codex 的）组成的插件集合",
+    "placeholders": {
+      "agent": {
+        "type": "String"
+      }
+    }
   }
 }

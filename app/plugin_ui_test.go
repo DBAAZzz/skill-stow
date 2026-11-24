@@ -283,3 +283,109 @@ func TestUserDisablesACodexBuiltinSkillFromItsPane(t *testing.T) {
 		t.Errorf("卡片应显示已停用：%q", tt.Texts())
 	}
 }
+
+// codexImagegenTester 用假 home 打开应用：Codex 带系统技能 imagegen。
+func codexImagegenTester(t *testing.T) (a *app, tt *ui.Tester, home string) {
+	t.Helper()
+	home, _ = filepath.EvalSymlinks(t.TempDir())
+	dir := filepath.Join(home, ".codex/skills/.system/imagegen")
+	must(t, os.MkdirAll(dir, 0o755))
+	must(t, os.WriteFile(filepath.Join(dir, "SKILL.md"), []byte("---\nname: imagegen\ndescription: 生成和编辑图片\n---\n"), 0o644))
+	must(t, os.WriteFile(filepath.Join(home, ".codex/config.toml"), []byte("model = \"gpt-5\"\n"), 0o644))
+	a = newApp(library.Scan(home))
+	tt = newUITester(a.view, 1280, 800)
+	must(t, tt.Click("内置"))
+	tt.Advance(paneDuration)
+	return a, tt, home
+}
+
+func TestFailedCodexBuiltinToggleShowsItsReasonOnce(t *testing.T) {
+	for name, hide := range map[string]bool{"Codex 显示着": false, "Codex 在设置里隐藏了": true} {
+		t.Run(name, func(t *testing.T) {
+			// Given Codex 的配置目录写不进去
+			a, tt, home := codexImagegenTester(t)
+			if hide {
+				a.lib.Settings.HiddenAgents = []string{"codex"}
+			}
+			codexDir := filepath.Join(home, ".codex")
+			must(t, os.Chmod(codexDir, 0o555))
+			t.Cleanup(func() { _ = os.Chmod(codexDir, 0o755) })
+			must(t, tt.Click("生成和编辑图片"))
+			tt.Advance(paneDuration)
+
+			// When 在详情栏拨掉 Codex 的开关
+			must(t, tt.Click("开关 Codex"))
+			tt.Advance(paneDuration)
+
+			// Then 失败原因只在 Codex 那条提示里出现一次
+			if a.err == "" {
+				t.Fatal("写不进配置时停用应失败")
+			}
+			n := 0
+			for _, text := range tt.Texts() {
+				n += strings.Count(text, a.err)
+			}
+			if n != 1 {
+				t.Errorf("失败原因应出现一次，实际 %d 次：%q", n, tt.Texts())
+			}
+		})
+	}
+}
+
+func TestCodexBuiltinPluginSetPointsToEachSkillsToggle(t *testing.T) {
+	// Given Codex 默认装上的插件 kit 带 kit-a、kit-b 两个内置技能
+	home, _ := filepath.EvalSymlinks(t.TempDir())
+	codexDir := filepath.Join(home, ".codex")
+	market := filepath.Join(codexDir, "markets/bundled")
+	must(t, os.MkdirAll(filepath.Join(market, ".agents/plugins"), 0o755))
+	must(t, os.WriteFile(filepath.Join(market, ".agents/plugins/marketplace.json"),
+		[]byte(`{"plugins":[{"name":"kit","policy":{"installation":"INSTALLED_BY_DEFAULT"}}]}`), 0o644))
+	for _, name := range []string{"kit-a", "kit-b"} {
+		dir := filepath.Join(codexDir, "plugins/cache/bundled/kit/1.0.0/skills", name)
+		must(t, os.MkdirAll(dir, 0o755))
+		must(t, os.WriteFile(filepath.Join(dir, "SKILL.md"), []byte("---\nname: "+name+"\ndescription: 插件里的技能 "+name+"\n---\n"), 0o644))
+	}
+	must(t, os.WriteFile(filepath.Join(codexDir, "config.toml"), []byte("[marketplaces.bundled]\nsource = \""+market+"\"\n\n[plugins.\"kit@bundled\"]\nenabled = true\n"), 0o644))
+	a := newApp(library.Scan(home))
+	tt := newUITester(a.view, 1280, 800)
+	must(t, tt.Click("内置"))
+	tt.Advance(paneDuration)
+
+	// When 选中 kit 集合
+	must(t, tt.Click("kit"))
+	tt.Advance(paneDuration)
+
+	// Then 说明到各个技能的详情里单独停用，不说不能停用
+	if a.coll == nil || a.coll.Name != "kit" {
+		t.Fatalf("应选中 kit 集合：%v %q", a.coll, tt.Texts())
+	}
+	if !tt.HasText("内置 Skill 删不掉，Codex 每次启动都会放回来。要停用其中的 Skill，在各个 Skill 的详情里单独停用。") {
+		t.Errorf("集合详情应指向各技能的开关：%q", tt.Texts())
+	}
+	if tt.HasText("插件里的 Skill 随 Codex 一起生效，这里不能停用。") {
+		t.Errorf("不应说不能停用：%q", tt.Texts())
+	}
+}
+
+func TestUsagePreviewMenuOffersPluginUninstall(t *testing.T) {
+	// Given 使用情况页选中了插件 document-skills 里的 docx
+	a := newApp(library.Sample())
+	a.scope = scopeUsage
+	for _, s := range a.lib.Skills {
+		if s.Source == library.ViaPlugin && s.Plugin == "document-skills" && s.Name == "docx" {
+			a.selected = s
+		}
+	}
+	tt := newUITester(a.view, 1280, 800)
+	tt.Advance(paneDuration)
+
+	// When 从详情栏的「…」菜单选「卸载插件…」
+	clickMenuButton(t, tt, "更多操作")
+	clickMenuItem(t, tt, "卸载插件…")
+	tt.Frame()
+
+	// Then 和列表右键菜单一样弹出卸载整个插件的确认框
+	if !a.plug.open || !tt.HasText("卸载插件 document-skills？") {
+		t.Errorf("应弹出卸载确认框：%q", tt.Texts())
+	}
+}

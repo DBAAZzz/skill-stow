@@ -1287,5 +1287,6 @@
   "pluginUninstallStillInstalled": "The command finished, but the plugin is still listed as installed.",
   "pluginUninstallNoCodex": "Couldn't find the codex command. Install the Codex CLI first, or uninstall the plugin from Codex's plugin manager.",
   "inspectorBuiltinDisableOnly": "Built-in skills can't be deleted; {agent} puts them back every time it starts. Disabling is saved in {agent}'s config, and you can turn it back on anytime.",
-  "pluginUninstallFailedNoReason": "The command reported that the uninstall failed but didn't say why."
+  "pluginUninstallFailedNoReason": "The command reported that the uninstall failed but didn't say why.",
+  "collectionBuiltinToggleEach": "Built-in skills can't be deleted; {agent} puts them back every time it starts. To disable one of these skills, open it and turn it off in its own details."
 }

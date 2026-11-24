@@ -349,14 +349,19 @@ func (a *app) setPane(c *ui.Context, coll *library.Collection) {
 	// 标题下不再写「集合、几个技能、哪天装的」：图标说明是集合，「包含」写了
 	// 几个，安装日期在「来源」里
 
-	if coll.ReadOnly() {
+	switch {
+	case coll.ReadOnly() && coll.Skills[0].CanToggleBuiltin():
+		// Codex 的内置技能能一个个停用，只是整组没有开关
+		label(c, locales.CommonEnabledFor())
+		readOnlyNote(c, locales.CollectionBuiltinToggleEach(library.AgentName(coll.Provider)), nil)
+	case coll.ReadOnly():
 		label(c, locales.CommonEnabledFor())
 		src := library.Builtin
 		if viaPlugin(coll) {
 			src = library.ViaPlugin
 		}
 		a.pluginReadOnlyNote(c, coll.Skills[0], src, coll.Provider, coll.Name)
-	} else {
+	default:
 		a.setSwitches(c, coll)
 	}
 
