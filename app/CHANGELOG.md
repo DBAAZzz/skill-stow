@@ -2,6 +2,22 @@
 
 每个版本一节，标题是 `## <版本>`。这一节就是应用内更新窗口里的「更新说明」，先写中文、再写英文。用编号列表，不用 `-`：更新窗口会把无序列表画成圆点。
 
+## 0.7.0
+
+中文
+
+1. 打开应用时会回到上次停留的页面，不再每次都从同一页开始
+2. 技能市场里的技能可以直接拖到其他应用或复制链接，右键还能在 GitHub 或网页上打开
+3. 技能市场的搜索框可以看到最近搜过的 10 次搜索，点一下就能再搜
+4. 在技能市场按 Esc 会先关闭右侧的详情，再按一次才清空搜索
+
+English
+
+1. The app reopens on the page you were on last time instead of always starting on the same one
+2. Market skills can be dragged into other apps or copied as a link, and the right-click menu opens them on GitHub or the web
+3. The Skill Market search box lists your last 10 searches, so you can run one again with a click
+4. Pressing Esc in the Skill Market now closes the detail pane first, and clears the search on the next press
+
 ## 0.6.0
 
 中文
