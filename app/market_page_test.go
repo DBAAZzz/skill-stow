@@ -367,6 +367,21 @@ func TestMarketSnapshots(t *testing.T) {
 	tt.Frame()
 	shot(tt, "m1-browse.png")
 
+	for _, q := range slices.Backward([]string{"pdf", "react testing", "anthropics/skills", "npx skills add remotion-dev/skills",
+		"supabase", "https://clawhub.ai/awspace/skills/pdf", "design system", "https://mintlify.com/docs", "video"}) {
+		a.lib.NoteMarketSearch(q)
+	}
+	tt.Key(ui.Cmd, ui.KeyF)
+	tt.Advance(menuEnterAnim.Duration)
+	if r, ok := tt.Find("anthropics/skills"); ok {
+		tt.Move(r.X+r.W/2, r.Y+r.H/2)
+	}
+	shot(tt, "m7-recent-searches.png")
+	a.lib.ClearMarketSearches()
+	tt.Key(0, ui.KeyEscape)
+	tt.Move(0, 0)
+	tt.Frame()
+
 	must(t, tt.Click("find-skills"))
 	shot(tt, "m2-selected.png")
 
@@ -382,7 +397,7 @@ func TestMarketSnapshots(t *testing.T) {
 	a.syncMarketSearchState()
 	a.triggerMarketSearchNow("pdf")
 	tt.Frame()
-	if acc, ok := tt.AccessByRole(ui.RoleTextField, locales.MarketTitle()); ok {
+	if acc, ok := tt.AccessByRole(ui.RoleComboBox, locales.MarketTitle()); ok {
 		tt.ClickAt(acc.Bounds.X+acc.Bounds.W-6, acc.Bounds.Y+acc.Bounds.H/2)
 		tt.Key(0, ui.KeyRight)
 	}
@@ -394,7 +409,7 @@ func TestMarketSnapshots(t *testing.T) {
 	a.imp.input = "https://github.com/anthropics/skills"
 	a.syncMarketSearchState()
 	tt.Frame()
-	if acc, ok := tt.AccessByRole(ui.RoleTextField, locales.MarketTitle()); ok {
+	if acc, ok := tt.AccessByRole(ui.RoleComboBox, locales.MarketTitle()); ok {
 		tt.ClickAt(acc.Bounds.X+acc.Bounds.W-10, acc.Bounds.Y+acc.Bounds.H/2)
 		tt.Key(0, ui.KeyRight)
 	}
@@ -469,7 +484,7 @@ func TestMarketSearchBarWidthScalesAcrossModesAndWindows(t *testing.T) {
 
 	fieldBounds := func() ui.Rect {
 		t.Helper()
-		acc, ok := tt.AccessByRole(ui.RoleTextField, locales.MarketTitle())
+		acc, ok := tt.AccessByRole(ui.RoleComboBox, locales.MarketTitle())
 		if !ok {
 			t.Fatal("找不到Skill 市场搜索输入框")
 		}

@@ -7559,6 +7559,18 @@
   "@marketSearchPlaceholder": {
     "description": "云市场顶部搜索与粘贴框占位提示"
   },
+  "marketRecentSearches": "最近搜索",
+  "@marketRecentSearches": {
+    "description": "Skill 市场聚焦空搜索框时弹出的下拉标题，也是它的辅助功能名称"
+  },
+  "marketClearRecentSearches": "清除最近搜索",
+  "@marketClearRecentSearches": {
+    "description": "Skill 市场最近搜索下拉底部清空全部记录的选项"
+  },
+  "marketRemoveRecentSearch": "从最近搜索中移除",
+  "@marketRemoveRecentSearch": {
+    "description": "Skill 市场最近搜索下拉里每一行右边 × 按钮的提示与辅助功能名称"
+  },
   "marketViewAllTime": "总榜",
   "@marketViewAllTime": {
     "description": "skills.sh 标签：总榜"

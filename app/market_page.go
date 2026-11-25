@@ -57,6 +57,15 @@ type marketPageState struct {
 
 	searchBox ui.Handle
 	scroll    ui.ScrollState
+	// 上一帧搜索框是否有焦点、是否为空：两者有一个刚变成真时打开最近搜索
+	recentFocused, recentEmpty bool
+	// searchFocused 跟着搜索框的焦点走，置 false 让它失去焦点
+	searchFocused bool
+	// recentOpen：上一帧最近搜索下拉开着；recentLeft：下拉开着时点了别处，
+	// 焦点离开了搜索框；focusAsked：程序（⌘F）要了焦点，还没拿到；dropFocus：
+	// 焦点是下拉收起时被还回来的，要放掉；caretToEnd：选中一条最近搜索后，
+	// 等下一遍构建搜索框拿到新文字，再把光标放到末尾
+	recentOpen, recentLeft, focusAsked, dropFocus, caretToEnd bool
 
 	feeds         map[marketFeedKey]*marketFeedState
 	extras        *library.MarketExtras
@@ -389,45 +398,28 @@ func (a *app) marketSearchGroup(c *ui.Context, mode marketMode, reading bool) {
 		field.Children(func() {
 			ic := iconSearch
 			if mode == marketModeLink {
-				ic = iconLink
-				if src, err := library.ParseImportInput(st.input); err == nil {
-					switch src.Kind {
-					case library.ImportGitHub:
-						ic = iconGitHub
-					case library.ImportWebsite:
-						ic = iconGlobe
-					case library.ImportClawHub:
-						ic = iconClawHub
-					}
-				} else if strings.Contains(st.input, "github") || strings.Count(st.input, "/") == 1 {
-					ic = iconGitHub
-				}
+				ic = marketLinkIcon(st.input)
 			}
 			ui.Icon(c, ic).Size(14, 14).TextColor(colTextMuted).ContentTransition(labelTransition)
-			in := ui.TextInputBase(c.Key("market-input"), &st.input).Bind(&m.searchBox).
+			cb := suggestInput(c.Key("market-input"), &st.input)
+			in := cb.Input.Bind(&m.searchBox).FocusBind(&m.searchFocused, true).
 				Placeholder(locales.MarketSearchPlaceholder()).FontSize(13).Grow(1).
 				Label(locales.MarketTitle()).Disabled(reading)
 			if reading {
 				in.TextColor(colTextSecondary)
 			}
 			if m.focusReq {
-				m.focusReq = false
+				m.focusReq, m.focusAsked = false, true
 				m.searchBox.Focus(c)
 				in.SetTextSelection(0, utf8.RuneCountInString(st.input))
 			}
+			if m.caretToEnd {
+				m.caretToEnd = false
+				n := utf8.RuneCountInString(st.input)
+				in.SetTextSelection(n, n)
+			}
 			if in.Changed() {
 				st.err = nil
-			}
-			if in.Shortcut(0, ui.KeyEscape) && !reading && st.input != "" {
-				a.clearMarketInput()
-			}
-			if in.Submitted() {
-				switch mode {
-				case marketModeLink:
-					a.startImport(st.input)
-				case marketModeSearch:
-					a.triggerMarketSearchNow(st.input)
-				}
 			}
 			if st.input == "" {
 				badge := ui.Text(c, "⌘F").FontSize(11).TextColor(colTextMuted).Padding(1, 5).Radius(4).Background(colBgCard).Shrink(0)
@@ -442,6 +434,28 @@ func (a *app) marketSearchGroup(c *ui.Context, mode marketMode, reading bool) {
 					a.clearMarketInput()
 				}
 			}
+
+			a.marketRecentSearches(c, cb, field, reading)
+			if v, ok := cb.Chosen(); ok {
+				a.chooseMarketRecent(v)
+				m.caretToEnd = true
+				return
+			}
+			if in.Shortcut(0, ui.KeyEscape) && !reading && st.input != "" {
+				a.clearMarketInput()
+			}
+			if in.Submitted() {
+				switch mode {
+				case marketModeLink:
+					if canReadMarketInput(st.input) {
+						a.noteMarketInput()
+					}
+					a.startImport(st.input)
+				case marketModeSearch:
+					a.noteMarketInput()
+					a.triggerMarketSearchNow(st.input)
+				}
+			}
 		})
 
 		if mode == marketModeLink {
@@ -452,6 +466,7 @@ func (a *app) marketSearchGroup(c *ui.Context, mode marketMode, reading bool) {
 				}
 			case canReadMarketInput(st.input):
 				if filledButton(c, locales.ImportRead(), colAccent).Shrink(0).Clicked() {
+					a.noteMarketInput()
 					a.startImport(st.input)
 				}
 			default:
@@ -459,6 +474,121 @@ func (a *app) marketSearchGroup(c *ui.Context, mode marketMode, reading bool) {
 			}
 		}
 	})
+}
+
+// marketLinkIcon 是搜索框里一段链接的来源图标：GitHub、网站、ClawHub，认不出时是链接。
+func marketLinkIcon(raw string) *ui.SVG {
+	if src, err := library.ParseImportInput(raw); err == nil {
+		switch src.Kind {
+		case library.ImportGitHub:
+			return iconGitHub
+		case library.ImportWebsite:
+			return iconGlobe
+		case library.ImportClawHub:
+			return iconClawHub
+		}
+	} else if strings.Contains(raw, "github") || strings.Count(raw, "/") == 1 {
+		return iconGitHub
+	}
+	return iconLink
+}
+
+// marketRecentChoiceClear 是最近搜索下拉里「清除最近搜索」那一项的值，
+// 不会和记下的文字重复：记下的文字去掉了首尾空白。
+const marketRecentChoiceClear = "\x00clear"
+
+// marketRecentSearches 在搜索框获得焦点、框里为空时，挂出最近搜索下拉。
+// 获得焦点或清空文字的那一刻打开；Esc 收起后等下次聚焦、点击或按 ↓ 再打开；
+// 一打字就收起，页面照常出搜索结果。
+func (a *app) marketRecentSearches(c *ui.Context, cb ui.ComboboxParts, field ui.Element, reading bool) {
+	m := &a.mkt
+	hist := a.lib.Settings.MarketSearches
+	focused := cb.Input.Focused()
+	// 下拉开着时点了别处，下拉收起后 MyGo 会把焦点还给打开它的搜索框，
+	// 下拉随之又弹出来。不是用户点回、Tab 回或 ⌘F 要回来的焦点，就再放掉。
+	// 放焦点要等 searchFocused 跟上这次焦点（下一遍构建）才生效
+	if focused && !m.recentFocused {
+		if m.recentLeft && !m.focusAsked && !cb.Input.PressedInside() && !cb.Input.FocusVisible() {
+			m.dropFocus = true
+		}
+		m.recentLeft, m.focusAsked = false, false
+	}
+	if m.dropFocus {
+		if focused {
+			m.searchFocused, focused = false, false
+		} else {
+			m.dropFocus = false
+		}
+	}
+	// 只认点了别处：切到别的应用、⌘K、⌘, 这些不是点出去的，回来时焦点照常留着
+	if !focused && m.recentFocused && m.recentOpen && cb.Input.PressedOutside() {
+		m.recentLeft = true
+	}
+	empty := strings.TrimSpace(a.imp.input) == ""
+	show := focused && empty && !reading && len(hist) > 0
+	switch {
+	case !show:
+		cb.SetOpen(false)
+	case !m.recentFocused || !m.recentEmpty:
+		cb.SetOpen(true)
+	}
+	m.recentFocused, m.recentEmpty, m.recentOpen = focused, empty, cb.Open()
+
+	suggestPopup(c, cb, field, locales.MarketRecentSearches(), func(sm *suggestMenu) {
+		if !show {
+			return
+		}
+		sm.header(locales.MarketRecentSearches())
+		for _, q := range hist {
+			q := q
+			ic := iconClock
+			if classifyMarketInput(q) == marketModeLink {
+				ic = marketLinkIcon(q)
+			}
+			sm.item(q, q, withIcon(ic), withAccessory(func(c *ui.Context, row ui.Element) {
+				if !row.Highlighted() {
+					return
+				}
+				x := ui.ButtonBase(c).Size(20, 20).Margin(0, -4, 0, 0).Radius(5).Center().Shrink(0).
+					Label(locales.MarketRemoveRecentSearch()).Tooltip(locales.MarketRemoveRecentSearch())
+				tintInk(x)
+				x.TextColor(colTextMuted)
+				x.Children(func() { ui.Icon(c, iconClose).Size(12, 12) })
+				if x.Clicked() {
+					a.lib.ForgetMarketSearch(q)
+				}
+			}))
+		}
+		sm.separator()
+		sm.item(marketRecentChoiceClear, locales.MarketClearRecentSearches())
+	})
+}
+
+// chooseMarketRecent 处理在最近搜索下拉里选中的一项：清空全部，或把这段
+// 文字填回搜索框，立刻搜索（链接则开始读取），并把它排到最前。
+func (a *app) chooseMarketRecent(v string) {
+	if v == marketRecentChoiceClear {
+		a.lib.ClearMarketSearches()
+		return
+	}
+	a.imp.input, a.imp.err = v, nil
+	a.lib.NoteMarketSearch(v)
+	switch classifyMarketInput(v) {
+	case marketModeLink:
+		a.startImport(v)
+	case marketModeSearch:
+		a.syncMarketSearchState()
+		a.triggerMarketSearchNow(v)
+	}
+}
+
+// noteMarketInput 把搜索框里正在搜索或读取的文字记进最近搜索。只在用户
+// 明确用了这次搜索时调用：回车、读取链接、点开一个搜索结果；打字过程中
+// 自动搜出来的半截词不记。
+func (a *app) noteMarketInput() {
+	if classifyMarketInput(a.imp.input) != marketModeBrowse {
+		a.lib.NoteMarketSearch(a.imp.input)
+	}
 }
 
 func canReadMarketInput(raw string) bool {
@@ -825,7 +955,12 @@ func (a *app) marketHandleNavigation(c *ui.Context, mode marketMode) {
 		c.OnWindowShortcut(0, ui.KeyUp, func() { move(-1) })
 		if a.mkt.selected != nil {
 			ref := a.mkt.selected.ImportRef
-			c.OnWindowShortcut(0, ui.KeyEnter, func() { a.startImport(ref) })
+			c.OnWindowShortcut(0, ui.KeyEnter, func() {
+				if mode == marketModeSearch {
+					a.noteMarketInput()
+				}
+				a.startImport(ref)
+			})
 		}
 	}
 }
@@ -1023,6 +1158,9 @@ func (a *app) marketItemsList(c *ui.Context, items []library.MarketItem, inTopic
 			}
 			if row.Clicked() {
 				a.mkt.picked = true
+				if isSearch {
+					a.noteMarketInput()
+				}
 				if selected {
 					a.mkt.selected = nil
 				} else {
@@ -1031,6 +1169,9 @@ func (a *app) marketItemsList(c *ui.Context, items []library.MarketItem, inTopic
 				}
 			}
 			if row.DoubleClicked() {
+				if isSearch {
+					a.noteMarketInput()
+				}
 				a.startImport(it.ImportRef)
 			}
 		}
@@ -1251,6 +1392,9 @@ func (a *app) marketPane(c *ui.Context, it library.MarketItem, isSearch bool) {
 			}
 			ui.Row(c).Gap(8).Children(func() {
 				if dialogButton(c, locales.MarketViewAndAdd(), true).Clicked() {
+					if isSearch {
+						a.noteMarketInput()
+					}
 					a.startImport(it.ImportRef)
 				}
 				if dialogButton(c, locales.MarketOpenOnWeb(), false).Clicked() {

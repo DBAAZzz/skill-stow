@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/egoist/mygo/plugins/glass"
 	"github.com/egoist/mygo/ui"
 )
 
@@ -26,6 +27,15 @@ const (
 )
 
 type menuGlass struct{}
+
+// suggestGlass 是挂在输入框下的建议列表的材质：比菜单少压一层白，
+// 后面的页面透得更明显，读起来仍靠模糊托底。
+type suggestGlass struct{}
+
+func (suggestGlass) PaintMaterial(p *ui.Painter, box ui.Rect, radii [4]float32) {
+	glass.Blur{Radius: 10}.PaintMaterial(p, box, radii)
+	p.FillRadii(box, radii, colBgGlass)
+}
 
 func (menuGlass) PaintMaterial(p *ui.Painter, box ui.Rect, radii [4]float32) {
 	frostedGlass{}.PaintMaterial(p, box, radii)
@@ -326,6 +336,7 @@ type menuItemOpts struct {
 	a11yLabel  string
 	icon       *ui.SVG
 	badge      func(c *ui.Context)
+	accessory  func(c *ui.Context, row ui.Element) // 行尾的小控件，如删除这一条的 ×
 	shortcut   string
 	trailing   string
 	subtitle   string
@@ -362,6 +373,10 @@ func withTrailCheck() menuOpt              { return func(o *menuItemOpts) { o.tr
 func withChecked(v bool) menuOpt           { return func(o *menuItemOpts) { o.checkMark = true; o.checked = v; o.activeBg = v } }
 func withIconMuted() menuOpt               { return func(o *menuItemOpts) { o.iconMuted = true } }
 func withActiveBg() menuOpt                { return func(o *menuItemOpts) { o.activeBg = true } }
+
+func withAccessory(fn func(c *ui.Context, row ui.Element)) menuOpt {
+	return func(o *menuItemOpts) { o.accessory = fn }
+}
 
 func (fm *frostedMenu) triggered(el ui.Element, o menuItemOpts) bool {
 	if el.Highlighted() {
@@ -426,11 +441,13 @@ func (fm *frostedMenu) submenu(label, value string, opts []menuOpt, subOpts menu
 }
 
 // header 是菜单里一组的标题：半粗的小字，note 是右边的灰色说明。
-func (fm *frostedMenu) header(title, note string) {
-	ui.Row(fm.ctx()).Height(26).Padding(0, menuRowPadX).Gap(8).AlignItems(ui.Center).Shrink(0).Children(func() {
-		ui.Text(fm.ctx(), title).FontSize(12).FontWeight(600).TextColor(colTextSecondary).SingleLine()
+func (fm *frostedMenu) header(title, note string) { menuHeader(fm.ctx(), title, note) }
+
+func menuHeader(c *ui.Context, title, note string) {
+	ui.Row(c).Height(26).Padding(0, menuRowPadX).Gap(8).AlignItems(ui.Center).Shrink(0).Children(func() {
+		ui.Text(c, title).FontSize(12).FontWeight(600).TextColor(colTextSecondary).SingleLine()
 		if note != "" {
-			ui.Text(fm.ctx(), note).FontSize(12).TextColor(colTextMuted).SingleLine()
+			ui.Text(c, note).FontSize(12).TextColor(colTextMuted).SingleLine()
 		}
 	})
 }
@@ -440,8 +457,10 @@ func (fm *frostedMenu) note(text string) {
 	ui.Text(fm.ctx(), text).FontSize(12).LineHeight(1.5).TextColor(colTextMuted).Padding(4, menuRowPadX, 6, menuRowPadX)
 }
 
-func (fm *frostedMenu) separator() {
-	ui.Box(fm.ctx()).Height(edgeSpread).Margin(4, 5).Background(colBorderSubtle).Shrink(0)
+func (fm *frostedMenu) separator() { menuSeparator(fm.ctx()) }
+
+func menuSeparator(c *ui.Context) {
+	ui.Box(c).Height(edgeSpread).Margin(4, 5).Background(colBorderSubtle).Shrink(0)
 }
 
 func (fm *frostedMenu) row(label string, o menuItemOpts) ui.Element {
@@ -460,6 +479,13 @@ func (fm *frostedMenu) row(label string, o menuItemOpts) ui.Element {
 	default:
 		el = fm.parts().Item()
 	}
+	styleMenuRow(c, el, label, o, fm.padLead)
+	return el
+}
+
+// styleMenuRow 给菜单行画上统一的样子：图标、名称、说明、右侧附注，
+// 悬停时的底色。下拉菜单的项和输入框建议列表的项都用它。
+func styleMenuRow(c *ui.Context, el ui.Element, label string, o menuItemOpts, padLead bool) {
 	accessible := o.a11yLabel
 	if accessible == "" {
 		accessible = label
@@ -500,7 +526,7 @@ func (fm *frostedMenu) row(label string, o menuItemOpts) ui.Element {
 		el.Background(colInkHover)
 	}
 
-	hasLead := o.badge != nil || o.icon != nil || o.checkMark || fm.padLead
+	hasLead := o.badge != nil || o.icon != nil || o.checkMark || padLead
 	iconFg := colTextBody
 	if o.danger {
 		iconFg = colDangerText
@@ -556,6 +582,54 @@ func (fm *frostedMenu) row(label string, o menuItemOpts) ui.Element {
 		if o.isSub {
 			ui.Icon(c, iconChevronRight).Size(12, 12).TextColor(colTextMuted).Shrink(0)
 		}
+		if o.accessory != nil {
+			o.accessory(c, el)
+		}
 	})
+}
+
+// ——— 输入框下面的建议列表 ———
+
+// suggestInput 是带建议列表的文本输入框：焦点一直留在输入框里，↑↓ 在
+// 建议之间移动，回车或点击选中一项（cb.Chosen）。列表用 suggestPopup 画。
+func suggestInput(c *ui.Context, text *string) ui.ComboboxParts {
+	return ui.ComboboxBase(c, text)
+}
+
+// suggestMenu 只在 suggestPopup 的回调那一次构建里有效，同 frostedMenu。
+type suggestMenu struct {
+	ctx func() *ui.Context
+	cb  func() ui.ComboboxParts
+}
+
+// suggestPopup 在 field（输入框外面那一圈）下沿挂出毛玻璃建议列表：
+// 左边对齐、同宽，面板、行与下拉菜单一个样子。build 里一项也没画时不显示。
+// 要在 cb.Chosen 之前调用。
+func suggestPopup(c *ui.Context, cb ui.ComboboxParts, field ui.Element, label string, build func(sm *suggestMenu)) ui.Element {
+	return cb.Popup(func(panel ui.Element) {
+		styleMenuPanel(c, panel, menuPanelOpts{width: field.Bounds().W})
+		panel.Material(suggestGlass{})
+		panel.AttachTo(field, ui.AnchorBottomStart, ui.AnchorTopStart).Margin(menuGap, 0, 0, 0).Label(label)
+		panel.AttachedOrigin().Transition(dropdownMenuTransition)
+		build(&suggestMenu{
+			ctx: func() *ui.Context { return c },
+			cb:  func() ui.ComboboxParts { return cb },
+		})
+	})
+}
+
+func (sm *suggestMenu) header(title string) { menuHeader(sm.ctx(), title, "") }
+
+func (sm *suggestMenu) separator() { menuSeparator(sm.ctx()) }
+
+// item 是一条建议，选中时 cb.Chosen 返回 value。
+func (sm *suggestMenu) item(value, label string, opts ...menuOpt) ui.Element {
+	var o menuItemOpts
+	for _, fn := range opts {
+		fn(&o)
+	}
+	c := sm.ctx().Key(value)
+	el := sm.cb().Item(value)
+	styleMenuRow(c, el, label, o, false)
 	return el
 }

@@ -17432,6 +17432,52 @@ func (msgs Messages) MarketSearchPlaceholder() string {
 	return Catalog.Format(msgs.locale, "marketSearchPlaceholder", nil)
 }
 
+// MarketRecentSearches says "最近搜索"
+// in the language the app shows.
+//
+// Skill
+// 市场聚焦空搜索框时弹出的下拉标题，也是它的辅助功能名称
+func MarketRecentSearches() string { return In(i18n.Locale()).MarketRecentSearches() }
+
+// MarketRecentSearches says "最近搜索"
+// in the language of msgs.
+//
+// Skill
+// 市场聚焦空搜索框时弹出的下拉标题，也是它的辅助功能名称
+func (msgs Messages) MarketRecentSearches() string {
+	return Catalog.Format(msgs.locale, "marketRecentSearches", nil)
+}
+
+// MarketClearRecentSearches says "清除最近搜索"
+// in the language the app shows.
+//
+// Skill 市场最近搜索下拉底部清空全部记录的选项
+func MarketClearRecentSearches() string { return In(i18n.Locale()).MarketClearRecentSearches() }
+
+// MarketClearRecentSearches says "清除最近搜索"
+// in the language of msgs.
+//
+// Skill 市场最近搜索下拉底部清空全部记录的选项
+func (msgs Messages) MarketClearRecentSearches() string {
+	return Catalog.Format(msgs.locale, "marketClearRecentSearches", nil)
+}
+
+// MarketRemoveRecentSearch says "从最近搜索中移除"
+// in the language the app shows.
+//
+// Skill 市场最近搜索下拉里每一行右边 ×
+// 按钮的提示与辅助功能名称
+func MarketRemoveRecentSearch() string { return In(i18n.Locale()).MarketRemoveRecentSearch() }
+
+// MarketRemoveRecentSearch says "从最近搜索中移除"
+// in the language of msgs.
+//
+// Skill 市场最近搜索下拉里每一行右边 ×
+// 按钮的提示与辅助功能名称
+func (msgs Messages) MarketRemoveRecentSearch() string {
+	return Catalog.Format(msgs.locale, "marketRemoveRecentSearch", nil)
+}
+
 // MarketViewAllTime says "总榜"
 // in the language the app shows.
 //

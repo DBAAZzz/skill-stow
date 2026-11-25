@@ -216,6 +216,7 @@ func (a *app) importClipRow(c *ui.Context) {
 		if linkButton(c, locales.ImportPasteAndRead()).Shrink(0).Clicked() {
 			st.input, st.clipSeen = st.clip, st.clip
 			st.clip = ""
+			a.noteMarketInput()
 			a.startImport(st.input)
 		}
 		if iconButton(c, iconClose, locales.ActionNoThanks()).Size(20, 20).Clicked() {

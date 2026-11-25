@@ -32,6 +32,8 @@ type Settings struct {
 	WelcomeVersion   int      `json:"welcomeVersion,omitempty"`  // 看过的欢迎面板版本，比当前的小就在启动时再显示
 	// 最近在阅读视图里打开的技能，新的在前，⌘K 空输入时列出
 	RecentSkills []RecentSkill `json:"recentSkills,omitempty"`
+	// Skill 市场搜索框里搜过、读取过的文字，新的在前，聚焦空搜索框时列出
+	MarketSearches []string `json:"marketSearches,omitempty"`
 }
 
 // RecentSkill 是打开过的一个技能和打开的时间。
@@ -48,6 +50,34 @@ func (l *Library) NoteOpened(s *Skill, at time.Time) {
 	r := slices.DeleteFunc(slices.Clone(l.Settings.RecentSkills), func(r RecentSkill) bool { return r.ID == s.ID })
 	r = append([]RecentSkill{{ID: s.ID, At: at}}, r...)
 	l.Settings.RecentSkills = r[:min(len(r), maxRecentSkills)]
+	l.SaveSettings()
+}
+
+// maxMarketSearches 是 Skill 市场搜索框记住几条最近搜索。
+const maxMarketSearches = 10
+
+// NoteMarketSearch 把 Skill 市场搜索框里的一段文字记为最近搜索，排到最前，
+// 再写下设置。首尾空白不算；同样的文字不分大小写只留一条，用这次的写法。
+func (l *Library) NoteMarketSearch(q string) {
+	q = strings.TrimSpace(q)
+	if q == "" {
+		return
+	}
+	r := slices.DeleteFunc(slices.Clone(l.Settings.MarketSearches), func(s string) bool { return strings.EqualFold(s, q) })
+	r = append([]string{q}, r...)
+	l.Settings.MarketSearches = r[:min(len(r), maxMarketSearches)]
+	l.SaveSettings()
+}
+
+// ForgetMarketSearch 从最近搜索里去掉一条，再写下设置。
+func (l *Library) ForgetMarketSearch(q string) {
+	l.Settings.MarketSearches = slices.DeleteFunc(slices.Clone(l.Settings.MarketSearches), func(s string) bool { return s == q })
+	l.SaveSettings()
+}
+
+// ClearMarketSearches 清空最近搜索，再写下设置。
+func (l *Library) ClearMarketSearches() {
+	l.Settings.MarketSearches = nil
 	l.SaveSettings()
 }
 
