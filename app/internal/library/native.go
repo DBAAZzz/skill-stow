@@ -106,6 +106,9 @@ var nativeAgents = []string{"claude-code", "codex", "gemini", "opencode", "zcode
 
 func nativeSupported(id string) bool { return slices.Contains(nativeAgents, id) }
 
+// NativeToggleSupported 报告能不能在应用里按技能启停 id 这个 Agent（改它自己的配置文件）。
+func NativeToggleSupported(id string) bool { return nativeSupported(id) }
+
 // pathKeyed 报告 Agent 按 SKILL.md 的路径而不是名称记停用：不会连带同名技能。
 func pathKeyed(id string) bool { return id == "codex" || id == "zcode" }
 
