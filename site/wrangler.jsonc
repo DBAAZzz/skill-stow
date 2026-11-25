@@ -1,0 +1,18 @@
+// 官网 skillstow.xyz：只有静态资源的 Worker，内容由 app/tools/sitegen 生成到 dist/。
+// 部署：在 site/ 下执行 npx wrangler deploy（CI 见 .github/workflows/site.yml）。
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "skill-stow",
+  "compatibility_date": "2026-11-23",
+  "assets": {
+    "directory": "./dist",
+    // 找不到的路径返回 dist/404.html，状态码仍是 404
+    "not_found_handling": "404-page",
+    // /agents/codex 跳到 /agents/codex/，和 canonical 保持一致
+    "html_handling": "auto-trailing-slash"
+  },
+  // 只在正式地址上提供；不开 workers.dev 地址，免得同一份内容在两个域名上被搜索引擎收录
+  "routes": [{ "pattern": "skillstow.xyz", "custom_domain": true }],
+  "workers_dev": false,
+  "preview_urls": false
+}

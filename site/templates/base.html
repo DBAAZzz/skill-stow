@@ -1,0 +1,104 @@
+{{define "base" -}}
+<!doctype html>
+<html lang="{{.Lang.Tag}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.Title}}</title>
+<meta name="description" content="{{.Description}}">
+{{- if .Page.NoIndex}}
+<meta name="robots" content="noindex">
+{{- else}}
+<link rel="canonical" href="{{.URL}}">
+{{- range .Alternates}}
+<link rel="alternate" hreflang="{{.Tag}}" href="{{.URL}}">
+{{- end}}
+<link rel="alternate" hreflang="x-default" href="{{.Base}}{{.Page.Path}}">
+{{- end}}
+<meta property="og:type" content="{{if eq .Page.Kind "home"}}website{{else}}article{{end}}">
+<meta property="og:site_name" content="Skill Stow">
+<meta property="og:title" content="{{.Title}}">
+<meta property="og:description" content="{{.Description}}">
+<meta property="og:url" content="{{.URL}}">
+<meta property="og:image" content="{{.Base}}/og.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:locale" content="{{if eq .Lang.Code "zh"}}zh_CN{{else}}en_US{{end}}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="color-scheme" content="light dark">
+{{- /* /favicon.ico 给直接请求这个路径的浏览器和爬虫；PNG 边长是 48 的倍数，Google 搜索结果才会显示 */}}
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+{{- if eq .Lang.Code "zh"}}
+{{- /* 中文页用小米官方网页字体服务的 MiSans：按字切片，只下载页面上用到的字。
+     字体由小米托管，不自己裁剪或分发（MiSans 许可协议第 2 条）；页脚按协议注明了用的是 MiSans。 */}}
+<link rel="preconnect" href="https://cdn-file.hyperos.mi.com" crossorigin>
+<link rel="stylesheet" href="https://cdn-font.hyperos.mi.com/font/css?family=MiSans_VF:VF:Chinese_Simplify,Latin&amp;display=swap">
+{{- end}}
+<link rel="stylesheet" href="/style.css">
+<script src="/site.js" defer></script>
+{{- if eq .Page.Kind "home"}}
+<link rel="stylesheet" href="/home.css">
+{{- /* 有 JS 且没开「减少动态效果」时才把内容藏起来等着演，否则直接显示终态 */}}
+<script>if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("js")</script>
+<script src="/home.js" defer></script>
+{{- end}}
+<script type="application/ld+json">{{.Schema}}</script>
+</head>
+<body class="page-{{.Page.Kind}}">
+<header class="site-header" id="top">
+  {{- /* 只有导航链接随语言变长变短，而且从左边排起；右边几样东西两种语言下宽度一样，切换语言时不会挪位置 */}}
+  <div class="wrap bar">
+    <a class="brand" href="{{link "/"}}"><img src="/favicon.png" width="28" height="28" alt="">Skill Stow</a>
+    <nav class="nav" aria-label="{{t "nav.label"}}">
+      <a href="{{link "/"}}#features">{{t "nav.features"}}</a>
+      <a href="{{link "/agent-skills/"}}"{{if eq .Page.Kind "guide"}} aria-current="page"{{end}}>{{t "nav.guide"}}</a>
+      <a href="{{link "/agents/"}}"{{if or (eq .Page.Kind "agents") (eq .Page.Kind "agent")}} aria-current="page"{{end}}>{{t "nav.agents"}}</a>
+    </nav>
+    <div class="actions">
+      {{- if not .Page.NoIndex}}{{$p := .Page.Path}}{{$cur := .Lang.Code}}{{$pos := 0}}{{range $i, $l := .Langs}}{{if eq $l.Code $cur}}{{$pos = $i}}{{end}}{{end}}
+      {{- /* 白色滑块是 ::before，--pos 是当前语言的序号；site.js 点击时先把它滑过去再跳页 */}}
+      <div class="lang-switch" role="group" aria-label="{{t "nav.language"}}" style="--pos:{{$pos}}">
+        {{- range .Langs}}{{if eq .Code $cur}}
+        <span class="on" aria-current="true" lang="{{.Tag}}">{{.Label}}</span>
+        {{- else}}
+        <a href="{{.Prefix}}{{$p}}" hreflang="{{.Tag}}" lang="{{.Tag}}">{{.Label}}</a>
+        {{- end}}{{end}}
+      </div>
+      {{- end}}
+      <a class="icon-link" href="{{.Repo}}" aria-label="GitHub" title="GitHub">{{template "github-mark"}}</a>
+      <a class="btn btn-small" href="{{.Download}}">{{t "nav.download"}}</a>
+    </div>
+  </div>
+</header>
+<main>
+{{.Main}}
+</main>
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div>
+      <a class="brand" href="{{link "/"}}"><img src="/favicon.png" width="24" height="24" alt="">Skill Stow</a>
+      <p>{{t "footer.tagline"}}</p>
+    </div>
+    <div>
+      <h2>{{t "footer.product"}}</h2>
+      <a href="{{.Download}}">{{t "cta.download"}}</a>
+      <a href="{{.Repo}}">{{t "footer.source"}}</a>
+      <a href="{{.Repo}}/blob/main/app/CHANGELOG.md">{{t "footer.changelog"}}</a>
+      <a href="{{.Repo}}/issues">{{t "footer.issues"}}</a>
+    </div>
+    <div>
+      <h2>{{t "footer.learn"}}</h2>
+      <a href="{{link "/agent-skills/"}}">{{t "nav.guide"}}</a>
+      <a href="{{link "/agents/"}}">{{t "nav.agents"}}</a>
+      <a href="{{link "/agents/claude-code/"}}">{{(agent "claude-code").Name}}</a>
+      <a href="{{link "/agents/codex/"}}">{{(agent "codex").Name}}</a>
+      <a href="{{link "/agents/cursor/"}}">{{(agent "cursor").Name}}</a>
+    </div>
+  </div>
+  <div class="wrap footer-note">{{t "footer.license"}}{{if eq .Lang.Code "zh"}} {{t "footer.font"}}{{end}}</div>
+</footer>
+</body>
+</html>
+{{end}}

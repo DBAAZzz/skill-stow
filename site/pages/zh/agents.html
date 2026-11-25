@@ -1,0 +1,50 @@
+{{define "title"}}{{len .Agents}} 个 AI 编程 Agent 的 Skill 目录对照表{{end}}
+{{define "description"}}汇总 Claude Code、Codex、Cursor、Gemini CLI、Copilot 等 {{len .Agents}} 个 Agent 的全局与项目 Skill 目录、共享路径及原生启停支持情况。{{end}}
+
+{{define "main"}}
+<article class="doc">
+  <div class="wrap">
+    <div class="narrow">
+      {{template "breadcrumbs" .}}
+      <h1>{{len .Agents}} 个 AI Agent 的 Skill 目录</h1>
+      <p class="updated">更新于 {{.Updated}}</p>
+      <div class="answer">
+        <p>大多数 AI 编程 Agent 会从主目录下的专属目录（例如 <code>~/.claude/skills</code> 或 <code>~/.codex/skills</code>）及各项目内的目录加载 Skill。不少 Agent 还会读取通用目录 <code>~/.agents/skills</code>，放一份即可多端共用。目前仅 {{len .Native}} 个 Agent 支持通过原生配置文件单独停用某个 Skill：{{agentLinks .Native}}。</p>
+      </div>
+    </div>
+
+    {{template "folder-table" .}}
+
+    <div class="narrow">
+      <h2 id="shared">通用目录：~/.agents/skills</h2>
+      <p><a href="https://agentskills.io">Agent Skills</a> 采用统一结构——一个包含 <code>SKILL.md</code> 的目录，因此不同 Agent 可以共用同一路径。以下 Agent 会在全局读取 <code>~/.agents/skills</code>：</p>
+      <p>{{agentLinks (sharedReaders .Agents)}}。</p>
+      <p>此外，部分 Agent 还会跨目录读取其他 Agent 的专属目录：</p>
+      <ul>
+        {{- range crossReads .Agents}}
+        <li><a href="{{link "/agents/"}}{{.Agent.ID}}/">{{.Agent.Name}}</a> 会读取 {{range $i, $d := .Dirs}}{{if $i}} 和 {{end}}<code>{{home $d}}</code>{{end}}</li>
+        {{- end}}
+      </ul>
+      <p>因此，存放在某一位置的 Skill 可能会被比预期更多的 Agent 加载。Skill Stow 会为每个 Skill 准确标注所有实际读取它的 Agent。</p>
+
+      <h2 id="toggle">支持按 Skill 独立启停的 Agent</h2>
+      <p>目录决定 Agent 能发现哪些 Skill；单个 Skill 是否启用则取决于原生配置支持，目前仅 {{len .Native}} 个 Agent 提供该项设置：</p>
+      <ul class="config-list">
+        {{- range .Native}}
+        <li><a href="{{link "/agents/"}}{{.ID}}/">{{.Name}}</a> <code>{{.Native.File}}</code></li>
+        {{- end}}
+      </ul>
+      <p>其余 Agent 目录中的 Skill 均处于「始终启用」状态。<a href="{{link "/agent-skills/"}}#disable">查看停用 Skill 的配置写法 →</a></p>
+
+      <p class="note">本页由 Skill Stow <a href="{{.Repo}}/blob/main/app/internal/library/agents.go">源代码</a>中的 Agent 目录表自动生成，依据各 Agent 官方文档及 vercel-labs/skills 列表维护。如发现路径出入，欢迎<a href="{{.Repo}}/issues">提交 issue</a>。</p>
+    </div>
+  </div>
+</article>
+
+<section class="band final">
+  <div class="wrap narrow center">
+    <h2>在一个窗口中统一查看所有目录</h2>
+    {{template "cta" .}}
+  </div>
+</section>
+{{end}}

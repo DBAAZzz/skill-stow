@@ -1,0 +1,124 @@
+{{define "title"}}Agent Skills Guide: SKILL.md Folders, Config & Security{{end}}
+{{define "description"}}How SKILL.md works in Claude Code, Codex, Cursor, and more: skill folders, installation, per-agent toggles, security checks, and updates on Mac.{{end}}
+
+{{define "main"}}
+<article class="doc">
+  <div class="wrap narrow">
+    {{template "breadcrumbs" .}}
+    <h1>Agent skills: folders, configuration, and security</h1>
+    <p class="updated">Updated {{.Updated}}</p>
+
+    <div class="answer">
+      <p>An agent skill is a directory containing a <code>SKILL.md</code> file that defines instructions and assets for a specific task. Agents such as Claude Code, Codex, and Cursor load skills from a home-directory folder (for example <code>~/.claude/skills</code>), the shared <code>~/.agents/skills</code> directory, and per-project folders. Installing a skill places its directory in one of those paths; disabling one requires either a native agent config entry or removing it from the folder.</p>
+    </div>
+
+    <nav class="toc" aria-label="On this page">
+      <a href="#what">Skill structure</a>
+      <a href="#where">Where skills are stored</a>
+      <a href="#install">Installing skills</a>
+      <a href="#disable">Disabling a skill</a>
+      <a href="#security">Pre-install security checks</a>
+      <a href="#update">Updating skills</a>
+      <a href="#cleanup">Cleaning up your library</a>
+    </nav>
+
+    <h2 id="what">Skill structure</h2>
+    <p>Every skill is a folder whose only required file is <code>SKILL.md</code>: YAML frontmatter with a name and description, followed by Markdown instructions. The directory may also bundle scripts, templates, and reference documents referenced by those instructions.</p>
+    <pre><code>pdf-tools/
+  SKILL.md
+  scripts/
+    extract.py
+  reference.md</code></pre>
+    <pre><code>---
+name: pdf-tools
+description: Extract text and tables from PDF files. Use when the user asks to read or convert a PDF.
+---
+
+# PDF tools
+
+Run scripts/extract.py with the file path...</code></pre>
+    <p>At session start, the agent reads only the name and description of each available skill, loading the full body when a task matches. Clear descriptions specify both what the skill does and when to trigger it—and keeping unused skills around still consumes context on every session.</p>
+    <p>Because the format is shared across agents (see <a href="https://agentskills.io">agentskills.io</a>), a single skill folder works in Claude Code, Codex, Cursor, Gemini CLI, and others. Only the directory paths each agent scans differ.</p>
+
+    <h2 id="where">Where skills are stored</h2>
+    <p>AI coding agents discover skills from three locations:</p>
+    <ul>
+      <li><strong>Agent-specific global folders</strong>, such as <code>~/.claude/skills</code> for Claude Code or <code>~/.codex/skills</code> for Codex. Skills here apply across all projects.</li>
+      <li><strong>The shared global folder</strong> <code>~/.agents/skills</code>. Currently {{len (sharedReaders .Agents)}} agents read it—including Codex, Cursor, Gemini CLI, and GitHub Copilot—so a single copy serves all of them. Claude Code does not read this directory.</li>
+      <li><strong>Project-level folders</strong>, such as <code>.claude/skills</code> or <code>.agents/skills</code> at the repository root. These skills are scoped to that project and can be version-controlled alongside its code.</li>
+    </ul>
+    <p>Some agents also scan another agent's folder. Cursor, for example, reads <code>~/.claude/skills</code> and <code>~/.codex/skills</code>, meaning a skill can be active in more agents than its folder name implies.</p>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Agent</th><th>Global folders</th><th>Project folders</th></tr></thead>
+      <tbody>
+      {{- range $i, $a := .Agents}}{{if lt $i 8}}
+      <tr><th scope="row"><a href="{{link "/agents/"}}{{$a.ID}}/">{{$a.Name}}</a></th><td>{{range $a.Global}}<code>{{home .Path}}</code> {{end}}</td><td>{{range $a.Project}}<code>{{.Path}}</code> {{end}}</td></tr>
+      {{- end}}{{end}}
+      </tbody>
+    </table>
+    </div>
+    <p><a href="{{link "/agents/"}}">Compare skill folders for all {{len .Agents}} agents →</a></p>
+
+    <h2 id="install">Installing skills</h2>
+    <p>Installing a skill places its directory in one of the paths above. Three workflows are common:</p>
+    <ol>
+      <li><strong>Copy the folder manually</strong> into <code>~/.agents/skills</code>, an individual agent's global folder, or a project folder. Verify that <code>SKILL.md</code> sits directly inside the skill directory rather than nested one level deeper.</li>
+      <li><strong>Use the <code>skills</code> CLI</strong>: <code>npx skills add owner/repo</code> fetches skills from GitHub and links them into your chosen agents. CLI installers typically store one canonical copy and symlink it into each agent's directory—deleting the source breaks every dependent link.</li>
+      <li><strong>Use <a href="{{link "/"}}">Skill Stow</a></strong>: paste a GitHub URL, <code>owner/repo</code>, an <code>npx skills add …</code> command, or a website URL, or drop a local folder or <code>.zip</code> archive. Select the target skills and destinations, with an offline security check run before anything is written.</li>
+    </ol>
+    <p>Newly installed skills are typically loaded on the next session. If an agent is already running, open a new session or restart it.</p>
+
+    <h2 id="disable">Disabling a skill</h2>
+    <p>Directories control visibility. Turning a skill off without deleting it requires native configuration support, which currently exists in {{len .Native}} agents:</p>
+    {{- range .Native}}
+    <h3><a href="{{link "/agents/"}}{{.ID}}/">{{.Name}}</a></h3>
+    <p>Edit <code>{{.Native.File}}</code>.{{if .PathKeyed}} Because the toggle is keyed by the path to <code>SKILL.md</code>, a same-named skill in another directory is unaffected.{{end}}</p>
+    <pre><code>{{.Native.Snippet}}</code></pre>
+    {{- end}}
+    <p>In all other agents, any skill present in a scanned folder is always on. To disable it for one agent, remove it from that agent's folders. If the skill lives in a shared directory, removing it affects every agent reading that folder; move it out of the shared directory and symlink it only where needed.</p>
+    <p>Skill Stow displays a per-agent toggle for every skill. For the {{len .Native}} agents above, it writes the exact config entry while preserving the rest of the file; for all others, it marks the skill as Always On.</p>
+
+    <h2 id="security">Pre-install security checks</h2>
+    <p>Skills inherit your agent's permissions: their instructions direct agent behavior, and their bundled scripts may execute on your Mac. Before installing a third-party skill, inspect <code>SKILL.md</code> and every accompanying file for:</p>
+    <ul>
+      <li><strong>Remote code execution</strong>: <code>curl … | sh</code> pipelines, downloads followed by <code>chmod +x</code>, or obfuscated base64 payloads decoded and executed at runtime.</li>
+      <li><strong>Credential access</strong>: reads of <code>~/.ssh</code>, cloud credentials, <code>.env</code> files, or browser data—especially paired with outbound network calls.</li>
+      <li><strong>Prompt injection directives</strong>: instructions telling the agent to ignore prior rules, conceal actions, skip confirmation, or exfiltrate conversation history.</li>
+      <li><strong>Hidden content</strong>: invisible Unicode characters, bidirectional text overrides, and directives concealed inside HTML comments.</li>
+      <li><strong>Destructive or persistent changes</strong>: broad <code>rm -rf</code> commands, or modifications to shell profiles, login items, or launch agents.</li>
+    </ul>
+    <p>Skill Stow runs these checks offline across every file in a skill on import and whenever files change, linking each finding to its exact line. For GitHub sources, skills.sh audit results are shown alongside. Rule-based checks catch common risk patterns rather than every possible technique—use them to focus your review, not as a guarantee of safety.</p>
+
+    <h2 id="update">Updating skills</h2>
+    <p>Copied skills do not update automatically. Updating a GitHub-sourced skill means comparing your local copy against the latest upstream commit before replacing it. Watch for two hazards: overwriting local edits you made, and pulling in new scripts or instructions that require a fresh security review.</p>
+    <p>Skill Stow tracks the source commit of each GitHub skill, surfaces upstream updates, and displays a file-by-file diff before writing changes. Locally modified skills wait for explicit confirmation, and replaced versions move to the Trash by default.</p>
+
+    <h2 id="cleanup">Cleaning up your library</h2>
+    <p>Across several agents and projects, the same structural issues accumulate over time:</p>
+    <ul>
+      <li>duplicate copies of the same skill across directories, sometimes with diverged edits</li>
+      <li>broken symlinks pointing to folders that were moved or deleted</li>
+      <li><code>SKILL.md</code> files referencing missing scripts or documentation</li>
+      <li>global symlinks pointing into a project directory that break whenever the project moves</li>
+    </ul>
+    <p>Skill Stow's Tidy Up collects these issues into a single view. Identical copies merge in one click, diverged copies open side by side for comparison, and removed files move safely to the Trash.</p>
+
+    <section class="faq">
+      <h2>Frequently asked questions</h2>
+      <details class="qa"><summary>What is a SKILL.md file?</summary><p><code>SKILL.md</code> is the manifest that defines an agent skill: YAML frontmatter containing the skill's name and trigger description, followed by Markdown instructions. The agent reads the header upfront and loads the full body only when relevant.</p></details>
+      <details class="qa"><summary>How do skills differ from CLAUDE.md or AGENTS.md?</summary><p><code>CLAUDE.md</code> and <code>AGENTS.md</code> are loaded into every session of a project. A skill loads on demand when a task matches and can bundle scripts and reference files. Keep always-on project rules in project files, and package specialized workflows as skills.</p></details>
+      <details class="qa"><summary>Can one skill work across multiple agents?</summary><p>Yes. Because the <code>SKILL.md</code> format is shared, the same folder works across compatible agents. Place it in <code>~/.agents/skills</code> for agents that read the shared folder, or symlink it into each agent's own directory.</p></details>
+      <details class="qa"><summary>Are third-party agent skills safe to install?</summary><p>Only as safe as their code and instructions. Skills can include executable scripts and prompts that steer agent behavior, so inspect the files or run a security check before installing from an untrusted source.</p></details>
+      <details class="qa"><summary>How can I list every skill installed on my Mac?</summary><p>Inspect each agent's global skill folder, <code>~/.agents/skills</code>, and the skill folders inside your projects. Skill Stow scans all {{len .Agents}} agents and your projects automatically, showing which agents read each skill.</p></details>
+    </section>
+  </div>
+</article>
+
+<section class="band final">
+  <div class="wrap narrow center">
+    <h2>Manage the entire workflow in one Mac app</h2>
+    {{template "cta" .}}
+  </div>
+</section>
+{{end}}
