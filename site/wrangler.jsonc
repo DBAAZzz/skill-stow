@@ -14,5 +14,14 @@
   // 只在正式地址上提供；不开 workers.dev 地址，免得同一份内容在两个域名上被搜索引擎收录
   "routes": [{ "pattern": "skillstow.xyz", "custom_domain": true }],
   "workers_dev": false,
+  // 和控制台里打开的日志设置保持一致，免得下次部署把它改回去。只有静态资源，
+  // 不记每次请求的调用日志
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": false,
+      "persist": true
+    }
+  },
   "preview_urls": false
 }
