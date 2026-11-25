@@ -34,6 +34,8 @@ type Settings struct {
 	RecentSkills []RecentSkill `json:"recentSkills,omitempty"`
 	// Skill 市场搜索框里搜过、读取过的文字，新的在前，聚焦空搜索框时列出
 	MarketSearches []string `json:"marketSearches,omitempty"`
+	// 主窗口上次停在的侧边栏页面，启动时回到这一页；空为「我的」
+	LastScope string `json:"lastScope,omitempty"`
 }
 
 // RecentSkill 是打开过的一个技能和打开的时间。
@@ -55,6 +57,15 @@ func (l *Library) NoteOpened(s *Skill, at time.Time) {
 
 // maxMarketSearches 是 Skill 市场搜索框记住几条最近搜索。
 const maxMarketSearches = 10
+
+// NoteLastScope 记下主窗口现在停在的侧边栏页面，变了才写设置。
+func (l *Library) NoteLastScope(scope string) {
+	if l.Settings.LastScope == scope {
+		return
+	}
+	l.Settings.LastScope = scope
+	_ = l.SaveSettings()
+}
 
 // NoteMarketSearch 把 Skill 市场搜索框里的一段文字记为最近搜索，排到最前，
 // 再写下设置。首尾空白不算；同样的文字不分大小写只留一条，用这次的写法。

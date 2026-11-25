@@ -177,6 +177,7 @@ func newApp(lib *library.Library) *app {
 		projectsOpen: true,
 		appUpd:       noAppUpdates{},
 	}
+	a.restoreScope()
 	a.set.scannedAt = time.Now()
 	if lib.Home != "" {
 		a.upd.report = lib.Updates()
@@ -188,7 +189,25 @@ func newApp(lib *library.Library) *app {
 	return a
 }
 
+// restoreScope 回到上次停在的侧边栏页面。第一次打开、记下的页面不认得、
+// 项目已经移除了，都停在「我的」。
+func (a *app) restoreScope() {
+	last := a.lib.Settings.LastScope
+	switch {
+	case last == string(library.ScopeBuiltin), last == scopeImport, last == scopeUpdates, last == scopeUsage:
+		a.scope = last
+	case last == scopeTidy:
+		a.scope = last
+		a.enterTidy()
+	default:
+		if dir, ok := strings.CutPrefix(last, projectPrefix); ok && a.lib.KnownProject(dir) != nil {
+			a.scope = last
+		}
+	}
+}
+
 func (a *app) view(c *ui.Context) {
+	a.lib.NoteLastScope(a.scope)
 	prevWin := a.menuBuildWin
 	a.menuBuildWin = menuWinMain
 	defer func() { a.menuBuildWin = prevWin }()
