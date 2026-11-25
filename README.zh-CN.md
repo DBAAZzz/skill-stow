@@ -4,7 +4,7 @@
 
 **一个 Mac 应用，管好你用的所有 AI Agent 的 Skill。** 哪个 Agent 读得到哪个 Skill 一目了然；可以按 Agent 单独开关，添加和更新前先过一遍安全检查；散落在 `~/.claude`、`~/.codex`、`~/.cursor` 等目录里的重复副本和断掉的链接，也能一次清理干净。
 
-免费开源（MIT）。支持 macOS 12 及以上，Apple Silicon 和 Intel 都能用。不用注册账号，没有遥测。[下载最新版](https://github.com/DBAAZzz/skill-stow/releases/latest)，第一次打开的步骤见[安装](#安装)。
+免费开源（MIT）。支持 macOS 12 及以上，Apple Silicon 和 Intel 都能用。不用注册账号，没有遥测。[下载最新版](https://github.com/DBAAZzz/skill-stow/releases/latest)，第一次打开的步骤见[安装](#安装)。官网：[skillstow.xyz](https://skillstow.xyz/zh/)。
 
 ![Skill Stow：「我的 Skill」与右侧详情栏](docs/screenshots/zh/main.png)
 

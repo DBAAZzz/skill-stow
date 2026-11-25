@@ -4,7 +4,7 @@ English · [中文](README.zh-CN.md)
 
 **One Mac app for the skills of every AI agent you use.** See which agent reads which skill, turn skills on or off per agent, add and update them with a security check first, and clean up the copies and broken links that pile up across `~/.claude`, `~/.codex`, `~/.cursor` and the rest.
 
-Free and open source (MIT). macOS 12 or later, Apple Silicon and Intel. No account, no telemetry. [Download the latest version](https://github.com/DBAAZzz/skill-stow/releases/latest), then see [Install](#install) for the first launch.
+Free and open source (MIT). macOS 12 or later, Apple Silicon and Intel. No account, no telemetry. [Download the latest version](https://github.com/DBAAZzz/skill-stow/releases/latest), then see [Install](#install) for the first launch. Website: [skillstow.xyz](https://skillstow.xyz).
 
 ![Skill Stow: the My Skills library with the inspector open](docs/screenshots/en/main.png)
 
