@@ -441,8 +441,14 @@ func (a *app) marketSearchGroup(c *ui.Context, mode marketMode, reading bool) {
 				m.caretToEnd = true
 				return
 			}
-			if in.Shortcut(0, ui.KeyEscape) && !reading && st.input != "" {
-				a.clearMarketInput()
+			// 和窗口的 Esc 同一顺序：先关右边的详情，再清空搜索
+			if in.Shortcut(0, ui.KeyEscape) && !reading {
+				switch {
+				case m.selected != nil:
+					m.selected = nil
+				case st.input != "":
+					a.clearMarketInput()
+				}
 			}
 			if in.Submitted() {
 				switch mode {

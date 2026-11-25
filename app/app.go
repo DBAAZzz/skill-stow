@@ -479,10 +479,10 @@ func (a *app) back() {
 		a.closeUpdateCompare()
 	case a.scope == scopeImport && a.imp.cmp != nil:
 		a.imp.cmp = nil
+	case a.scope == scopeImport && a.imp.batch == nil && a.mkt.selected != nil: // 先关右边的详情，搜索结果留着
+		a.mkt.selected = nil
 	case a.scope == scopeImport && a.imp.batch == nil && a.imp.cancel == nil && strings.TrimSpace(a.imp.input) != "":
 		a.clearMarketInput()
-	case a.scope == scopeImport && a.imp.batch == nil && a.mkt.selected != nil:
-		a.mkt.selected = nil
 	case a.batch.on:
 		a.exitBatch()
 	case a.scope == scopeUsage && a.del.picking:

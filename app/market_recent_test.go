@@ -263,6 +263,46 @@ func TestMarketRecentSearchesCloseAndLetGoOfTheFocusWhenClickingElsewhere(t *tes
 	}
 }
 
+func TestMarketEscapeClosesTheSkillPaneBeforeClearingTheSearch(t *testing.T) {
+	// Given 搜了 pdf，点开搜索结果里的一个 Skill，右边出了详情
+	a, tt, _, _ := newRecentMarketTester(t)
+	clickMarketSearchBox(t, tt)
+	tt.Type("pdf")
+	tt.Frame()
+	tt.Key(0, ui.KeyEnter)
+	tt.Advance(paneDuration)
+	r, ok := tt.Find("23.5万")
+	if !ok {
+		t.Fatalf("找不到搜索结果：%q", tt.Texts())
+	}
+	tt.ClickAt(r.X, r.Y+r.H/2)
+	tt.Advance(paneDuration)
+	if a.mkt.selected == nil {
+		t.Fatalf("点搜索结果应打开详情：%q", tt.Texts())
+	}
+
+	// When 按 Esc
+	tt.Key(0, ui.KeyEscape)
+	tt.Advance(paneDuration)
+
+	// Then 只关掉详情，搜索词和结果都还在
+	if a.mkt.selected != nil {
+		t.Fatal("Esc 应关掉右边的详情")
+	}
+	if a.imp.input != "pdf" {
+		t.Fatalf("Esc 先关详情，不应清空搜索：输入框 = %q", a.imp.input)
+	}
+
+	// When 再按 Esc
+	tt.Key(0, ui.KeyEscape)
+	tt.Frame()
+
+	// Then 才清空搜索
+	if a.imp.input != "" {
+		t.Fatalf("第二次 Esc 应清空搜索：输入框 = %q", a.imp.input)
+	}
+}
+
 func TestMarketSearchBoxKeepsTheFocusAfterSwitchingToAnotherAppAndBack(t *testing.T) {
 	// Given 点进空搜索框，最近搜索开着
 	_, tt, _, _ := newRecentMarketTester(t, "pdf")
@@ -297,5 +337,40 @@ func TestMarketRecentSearchChosenPutsTheCaretAtTheEnd(t *testing.T) {
 	// Then 字接在后面
 	if a.imp.input != "pdf form" {
 		t.Fatalf("输入框 = %q，应为 pdf form", a.imp.input)
+	}
+}
+
+func TestMarketEscapeInTheSearchBoxClosesTheSkillPaneFirst(t *testing.T) {
+	// Given 搜了 pdf，点开一个结果，又点回搜索框
+	a, tt, _, _ := newRecentMarketTester(t)
+	clickMarketSearchBox(t, tt)
+	tt.Type("pdf")
+	tt.Frame()
+	tt.Key(0, ui.KeyEnter)
+	tt.Advance(paneDuration)
+	r, ok := tt.Find("23.5万")
+	if !ok {
+		t.Fatalf("找不到搜索结果：%q", tt.Texts())
+	}
+	tt.ClickAt(r.X, r.Y+r.H/2)
+	tt.Advance(paneDuration)
+	clickMarketSearchBox(t, tt)
+
+	// When 在搜索框里按 Esc
+	tt.Key(0, ui.KeyEscape)
+	tt.Advance(paneDuration)
+
+	// Then 先关详情，搜索留着
+	if a.mkt.selected != nil || a.imp.input != "pdf" {
+		t.Fatalf("应只关详情：selected=%v input=%q", a.mkt.selected != nil, a.imp.input)
+	}
+
+	// When 再按 Esc
+	tt.Key(0, ui.KeyEscape)
+	tt.Frame()
+
+	// Then 清空搜索
+	if a.imp.input != "" {
+		t.Fatalf("第二次 Esc 应清空搜索：%q", a.imp.input)
 	}
 }
