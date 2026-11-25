@@ -1,0 +1,50 @@
+{{define "title"}}Skill Folders for {{len .Agents}} AI Coding Agents (SKILL.md){{end}}
+{{define "description"}}Global and project SKILL.md paths for Claude Code, Codex, Cursor, Gemini CLI, Copilot, and {{add (len .Agents) -5}} more AI agents, plus shared folders and toggles.{{end}}
+
+{{define "main"}}
+<article class="doc">
+  <div class="wrap">
+    <div class="narrow">
+      {{template "breadcrumbs" .}}
+      <h1>Skill folders across {{len .Agents}} AI coding agents</h1>
+      <p class="updated">Updated {{.Updated}}</p>
+      <div class="answer">
+        <p>Most AI coding agents load skills from a home-directory folder such as <code>~/.claude/skills</code> or <code>~/.codex/skills</code>, alongside a project-level folder inside each repository. Many also read the shared <code>~/.agents/skills</code> directory, allowing a single copy to serve multiple agents. Only {{len .Native}} agents ({{agentLinks .Native}}) support disabling individual skills through native configuration.</p>
+      </div>
+    </div>
+
+    {{template "folder-table" .}}
+
+    <div class="narrow">
+      <h2 id="shared">The shared directory: ~/.agents/skills</h2>
+      <p>The <a href="https://agentskills.io">Agent Skills</a> format is standardized across tools—a folder containing a <code>SKILL.md</code> file—which allows agents to share a single directory. These agents read <code>~/.agents/skills</code> globally:</p>
+      <p>{{agentLinks (sharedReaders .Agents)}}.</p>
+      <p>Several agents also scan another agent's dedicated folder:</p>
+      <ul>
+        {{- range crossReads .Agents}}
+        <li><a href="{{link "/agents/"}}{{.Agent.ID}}/">{{.Agent.Name}}</a> reads {{range $i, $d := .Dirs}}{{if $i}} and {{end}}<code>{{home $d}}</code>{{end}}</li>
+        {{- end}}
+      </ul>
+      <p>As a result, a skill stored in one path may be loaded by more agents than expected. Skill Stow maps and displays the exact set of agents reading every skill.</p>
+
+      <h2 id="toggle">Per-skill toggle support</h2>
+      <p>Directories control which skills an agent discovers; whether an individual skill is active depends on native config support, available in {{len .Native}} agents:</p>
+      <ul class="config-list">
+        {{- range .Native}}
+        <li><a href="{{link "/agents/"}}{{.ID}}/">{{.Name}}</a> <code>{{.Native.File}}</code></li>
+        {{- end}}
+      </ul>
+      <p>In every other agent, skills present in its scanned folders are always on. <a href="{{link "/agent-skills/"}}#disable">See how per-skill disabling works →</a></p>
+
+      <p class="note">Generated directly from the agent catalog in Skill Stow's <a href="{{.Repo}}/blob/main/app/internal/library/agents.go">source code</a>, maintained against each agent's official documentation and the vercel-labs/skills directory list. Spotted a discrepancy? <a href="{{.Repo}}/issues">Open an issue</a>.</p>
+    </div>
+  </div>
+</article>
+
+<section class="band final">
+  <div class="wrap narrow center">
+    <h2>Inspect every skill directory in one window</h2>
+    {{template "cta" .}}
+  </div>
+</section>
+{{end}}

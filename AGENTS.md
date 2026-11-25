@@ -87,6 +87,14 @@ README 的截图在 `docs/screenshots/zh/`、`docs/screenshots/en/`，每个功�
 
 发版前想本地预览渲染后的 Release 说明，可在 `app/` 下执行 `go run ./tools/releasenotes render -version <版本> -override ../docs/releases/v<版本>.md -dmg-name skill-stow-<版本>.dmg -sha256 <预览占位>`。CI 不可用时在本机构建：在 `app/` 下执行 `MYGO_UPDATER_PRIVATE_KEY="$(cat ~/Library/Application\ Support/mygo/update-keys/mygo-update.key)" go tool mygo build -platform darwin/universal -upload`，再运行 `app/tools/releasenotes` 更新草稿说明并核对附件。
 
+## 官网
+
+官网 skillstow.xyz 的模板和文案在 `site/`，由 `app/tools/sitegen` 生成，`main` 有改动时由 `.github/workflows/site.yml` 部署到 Cloudflare（只有静态资源的 Worker `skill-stow`，配置在 `site/wrangler.jsonc`）。用法和约定见 [site/README.md](site/README.md)。
+
+- 每个 Agent 一页，数据来自 `internal/library/agents.go`；首页图标墙读应用 `app/agents.go` 的 `brands` 表。改了 Agent 目录、图标或能开关的 Agent，跑一遍 `go test ./tools/sitegen`。
+- README 截图（`docs/screenshots/`）网站也在用，重新生成后网站跟着更新。
+- 官网不是应用界面，不走 `locales/`，但同样中英两份一起改，同样不用点号拼接信息。
+
 ## 提交规范
 
 提交信息遵循 [Conventional Commits](https://www.conventionalcommits.org/zh-hans/)：`<type>(<scope>): <subject>`。一个提交只做一件事，按功能拆分。

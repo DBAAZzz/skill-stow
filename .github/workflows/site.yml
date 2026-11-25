@@ -1,0 +1,70 @@
+name: Site
+
+# 生成官网 skillstow.xyz（app/tools/sitegen）并部署到 Cloudflare Worker skill-stow
+# （只有静态资源，配置在 site/wrangler.jsonc）。
+# 需要仓库 secret：CLOUDFLARE_API_TOKEN（用「Edit Cloudflare Workers」模板创建）
+# 和 CLOUDFLARE_ACCOUNT_ID。拉取请求只生成和测试，不部署。
+on:
+  push:
+    branches: [main]
+    paths:
+      - site/**
+      - docs/screenshots/**
+      - app/tools/sitegen/**
+      - app/internal/library/agents.go
+      - app/internal/library/native.go
+      - app/agents.go
+      - app/assets/agents/**
+      - app/mygo.json
+      - .github/workflows/site.yml
+  pull_request:
+    paths:
+      - site/**
+      - app/tools/sitegen/**
+      - app/agents.go
+      - .github/workflows/site.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # 页面的「更新于」和 sitemap 的 lastmod 取自 git 历史
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: app/go.mod
+          cache-dependency-path: app/go.sum
+
+      # 截图转 WebP 要用 cwebp；没装时生成器只出 PNG
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq webp
+
+      - run: go test ./tools/sitegen/...
+
+      - run: go run ./tools/sitegen
+
+      - name: Check screenshots have WebP versions
+        run: ls ../site/dist/img/en/*.webp ../site/dist/img/zh/*.webp
+
+      - name: Deploy to Cloudflare
+        if: github.event_name != 'pull_request'
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: site
+          command: deploy

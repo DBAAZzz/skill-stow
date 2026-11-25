@@ -1,0 +1,102 @@
+{{define "title"}}Skill Stow：在 Mac 上统一管理 Claude Code、Codex、Cursor 的 Skill{{end}}
+{{define "description"}}开源原生 Mac 应用，统一管理 {{len .Agents}} 个 AI Agent 的 Skill：查看各 Agent 实际读取范围、按原生配置独立启停、离线安全检查及差异对比更新。{{end}}
+
+{{define "main"}}
+<section class="hero" id="hero">
+  <div class="glow" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="dots" aria-hidden="true"></div>
+  <img class="appicon" src="/app-icon.png" width="104" height="104" alt="">
+  <h1 class="split">所有 AI Agent 的 Skill，<span class="grad">一处管好。</span></h1>
+  <p class="sub enter" style="--d:.75s">看清每个 Agent 加载了什么，运行前先做检查，按 Agent 单独开关。</p>
+  <div class="ctas enter" style="--d:.9s">
+    <a class="btn" href="{{.Download}}">{{template "apple-mark"}}{{t "cta.download"}}</a>
+    <a class="btn btn-ghost" href="{{.Repo}}">{{t "cta.github"}}</a>
+  </div>
+  <p class="meta-line enter" style="--d:1.05s"><span>免费开源</span><span>macOS 12 或更高版本</span><span>v{{.Version}}</span><a href="#first-launch">首次打开说明</a></p>
+  <div class="stage wrap">
+    <div class="tilt">
+      <div class="window">{{heroShot "main" "Skill Stow：技能库，右侧检查器显示一个 Skill 在哪些 Agent 中启用"}}</div>
+      <div class="float sec">{{crop "security" 679 264 1617 620 "高风险问题，直接指到具体的行"}}</div>
+      <div class="float tog">{{crop "main" 1312 529 1742 1054 "按 Agent 开关同一个 Skill"}}</div>
+    </div>
+  </div>
+</section>
+
+<section class="agents wrap">
+  <p class="eyebrow reveal">支持 <span class="count" data-to="{{len .Agents}}">{{len .Agents}}</span> 个 Agent</p>
+  <h2 class="reveal" style="--d:.08s">Claude Code、Codex、Cursor，<br>还有你在用的其他 Agent。</h2>
+  <ul class="tiles" aria-label="支持的 Agent">
+    {{- range $i, $a := .Agents}}
+    <li style="--i:{{$i}}"><a href="{{link "/agents/"}}{{.ID}}/" data-name="{{.Name}}" aria-label="{{.Name}}">{{.Icon}}</a></li>
+    {{- end}}
+  </ul>
+</section>
+
+<section id="features" class="wrap">
+  <div class="pillar">
+    <div class="copy">
+      <p class="eyebrow reveal"><b>01</b>看清</p>
+      <h2 class="reveal" style="--d:.06s">哪个 Agent 读哪个 Skill，一目了然。</h2>
+      <p class="reveal" style="--d:.12s">通用目录、各 Agent 目录和项目一起扫描，按 Agent 分列排好。</p>
+      <a class="more reveal" style="--d:.18s" href="{{link "/agents/"}}">各 Agent 的 Skill 目录 <span aria-hidden="true">›</span></a>
+    </div>
+    <div class="shot swap reveal" style="--d:.1s">
+      {{shot "main" "卡片视图：每个 Skill 和加载它的 Agent"}}
+      <div class="over">{{shot "board" "看板视图：每个 Agent 一列"}}</div>
+      <span class="edge" aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <div class="pillar flip risk">
+    <div class="copy">
+      <p class="eyebrow danger reveal"><b>02</b>检查</p>
+      <h2 class="reveal" style="--d:.06s">有风险的 Skill，运行前就拦下。</h2>
+      <p class="reveal" style="--d:.12s">离线检查每一个文件，问题直接定位到行。</p>
+      <a class="more reveal" style="--d:.18s" href="{{link "/agent-skills/"}}#security">检查哪些内容 <span aria-hidden="true">›</span></a>
+    </div>
+    <div class="visual reveal" style="--d:.1s">
+      <div class="scan">
+        {{crop "security" 679 264 1617 620 "安全检查：高风险问题和对应的行"}}
+        <span class="ring" style="left:2%;top:5.4%;width:7.3%;height:7.6%"></span>
+        <span class="lines" style="top:35.1%;height:11.2%"></span>
+        <span class="lines" style="top:59%;height:11.2%"></span>
+        <span class="annot" style="top:40.7%">读取 SSH 私钥</span>
+        <span class="annot" style="top:64.6%">把它发往外部地址</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pillar ctl">
+    <div class="copy">
+      <p class="eyebrow ok reveal"><b>03</b>开关</p>
+      <h2 class="reveal" style="--d:.06s">任何 Skill，都能只对一个 Agent 关掉。</h2>
+      <p class="reveal" style="--d:.12s">直接写入 Agent 自己的配置，界面上看到的就是 Agent 实际加载的。</p>
+      <a class="more reveal" style="--d:.18s" href="{{link "/agents/"}}">支持按 Skill 开关的 Agent <span aria-hidden="true">›</span></a>
+    </div>
+    <div class="visual demo reveal" style="--d:.1s">
+      {{template "switch-demo" .}}
+    </div>
+  </div>
+
+  {{template "feature-bento" .}}
+</section>
+
+<section class="final">
+  <img class="appicon reveal" src="/app-icon.png" width="84" height="84" alt="">
+  <h2 class="reveal" style="--d:.08s">把 Skill 管得井井有条。</h2>
+  <p class="lead reveal" style="--d:.16s">免费，支持 macOS 12 或更高版本，Apple 芯片和 Intel 均可。</p>
+  <div class="ctas reveal" style="--d:.24s"><a class="btn" href="{{.Download}}">{{template "apple-mark"}}{{t "cta.download"}}</a></div>
+</section>
+
+<section class="faq">
+  <h2 class="reveal">常见问题</h2>
+  <div class="reveal" style="--d:.06s">
+    <details class="qa"><summary>Skill Stow 是否收费？</summary><div class="a"><p>完全免费。Skill Stow 基于 MIT 协议开源，无需注册账号，也没有付费版本。</p></div></details>
+    <details class="qa"><summary>支持哪些 Agent？</summary><div class="a"><p>支持读取 {{len .Agents}} 个 Agent 的 Skill 目录，包括 Claude Code、Codex、Cursor、Gemini CLI、GitHub Copilot、OpenCode、Windsurf、Cline、Kiro、Trae、Qwen Code 和通义灵码，也可在「设置 › Agent 管理」中添加自定义目录。按 Skill 独立启停目前支持原生配置允许该操作的 {{len .Native}} 个 Agent：{{range $i, $a := .Native}}{{if $i}}、{{end}}{{$a.Name}}{{end}}。</p></div></details>
+    <details class="qa"><summary>与 <code>npx skills</code> 有什么区别？</summary><div class="a"><p><code>npx skills</code> 负责在命令行中安装 Skill。Skill Stow 则统一呈现所有 Agent 与项目中已安装的 Skill，自动识别由 <code>npx skills</code> 安装的集合，并提供按 Agent 启停、离线安全检查、差异对比更新与目录整理功能。两者可以配合使用。</p></div></details>
+    <details class="qa"><summary>会修改我 Mac 上的文件吗？</summary><div class="a"><p>仅在你主动操作时才会写入。启停开关只修改对应 Agent 配置文件中与 Skill 相关的字段；导入、更新、删除与「整理」会变更 Skill 目录，所有被移除的文件默认移至废纸篓。</p></div></details>
+    <details class="qa" id="first-launch"><summary>macOS 提示无法打开 Skill Stow，怎么办？</summary><div class="a"><p>应用暂未使用 Apple 开发者 ID 签名，首次打开时 macOS 会要求确认一次。macOS 15 及以上：先打开一次应用，再到「系统设置 › 隐私与安全性」中点击「仍要打开」。macOS 12 至 14：在「应用程序」中按住 Control 点按应用，选择「打开」。之后的更新可在「Skill Stow › 检查应用更新…」中完成，也可以<a href="{{.Repo}}/blob/main/README.zh-CN.md#从源码运行">从源码构建</a>。</p></div></details>
+    <details class="qa"><summary>是否提供 Windows 或 Linux 版本？</summary><div class="a"><p>暂不提供。Skill Stow 是原生 macOS 应用，支持 macOS 12 及以上系统，兼容 Apple Silicon 与 Intel 芯片。</p></div></details>
+  </div>
+</section>
+{{end}}

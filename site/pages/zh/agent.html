@@ -1,0 +1,106 @@
+{{define "title"}}{{.Agent.Name}} Skill 目录：存放路径、安装与配置{{end}}
+{{define "description"}}{{.Agent.Name}} 从 {{home .Agent.Skills}} {{if gt (len .Agent.Global) 1}}等 {{len .Agent.Global}} 个全局目录{{end}}加载 Skill。查看其全部全局与项目路径，以及安装、停用与安全检查方法。{{end}}
+
+{{define "main"}}
+{{$a := .Agent}}
+<article class="doc">
+  <div class="wrap narrow">
+    {{template "breadcrumbs" .}}
+    <h1>{{$a.Name}} 的 Skill 目录</h1>
+    <p class="updated">更新于 {{.Updated}}</p>
+
+    <div class="answer">
+      <p>{{$a.Name}} 从 <code>{{home $a.Skills}}</code> 加载全局 Skill{{if gt (len $a.Global) 1}}，同时也会扫描 {{range $i, $f := $a.Global}}{{if $i}}{{if gt $i 1}}、{{end}}<code>{{home $f.Path}}</code>{{end}}{{end}}{{end}}。
+      {{- if $a.Project}}在项目内，它读取项目根目录下的 {{range $i, $f := $a.Project}}{{if $i}}、{{end}}<code>{{$f.Path}}</code>{{end}}。{{end}}
+      每个 Skill 均为一个包含 <code>SKILL.md</code> 的目录。</p>
+      <p>{{if $a.Native}}单个 Skill 可在 <code>{{$a.Native.File}}</code> 中独立停用。{{else}}{{$a.Name}} 暂不支持按 Skill 单独停用，上述目录中的 Skill 均处于「始终启用」状态。{{end}}</p>
+    </div>
+
+    <h2 id="folders">{{$a.Name}} 读取的目录</h2>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>目录</th><th>范围</th><th>其他读取方</th></tr></thead>
+      <tbody>
+      {{- range $i, $f := $a.Global}}
+      <tr><td><code>{{home $f.Path}}</code></td><td>{{if eq $i 0}}全局（专属目录）{{else}}全局（共享目录）{{end}}</td><td>{{if $f.Readers}}{{agentLinks $f.Readers}}{{else}}<span class="muted">无其他 Agent</span>{{end}}</td></tr>
+      {{- end}}
+      {{- range $a.Project}}
+      <tr><td><code>&lt;项目&gt;/{{.Path}}</code></td><td>项目目录</td><td>{{if .Readers}}{{agentLinks .Readers}}{{else}}<span class="muted">无其他 Agent</span>{{end}}</td></tr>
+      {{- end}}
+      {{- range $a.Builtin}}
+      <tr><td><code>{{home .}}</code></td><td>内置 Skill</td><td><span class="muted">{{$a.Name}} 内置</span></td></tr>
+      {{- end}}
+      {{- if $a.Plugins}}
+      <tr><td><code>{{home $a.Plugins}}</code></td><td>插件 Skill</td><td><span class="muted">仅已安装插件</span></td></tr>
+      {{- end}}
+      </tbody>
+    </table>
+    </div>
+    <p>当本机存在 <code>{{home $a.Home}}</code> 目录时，Skill Stow 会将 {{$a.Name}} 识别为已安装。
+    {{- if $a.SharesWith}}由于 {{$a.Name}} 与 {{agentLinks $a.SharesWith}} 共用全局目录，放入其中的 Skill 会同时对这些 Agent 生效。{{end}}</p>
+
+    <h2 id="install">为 {{$a.Name}} 安装 Skill</h2>
+    <ol>
+      <li>将 Skill 目录放入 <code>{{home $a.Skills}}</code>，确保路径结构为 <code>{{home $a.Skills}}/&lt;skill-name&gt;/SKILL.md</code>。{{if $a.Project}}若仅作用于单个项目，则放入 <code>&lt;项目&gt;/{{(index $a.Project 0).Path}}/&lt;skill-name&gt;/SKILL.md</code>。{{end}}</li>
+      {{- if and $a.ReadsShared (gt (len $a.Global) 1)}}
+      <li>也可安装至通用目录 <code>~/.agents/skills</code>，{{$a.Name}} 同样会扫描该路径。若希望同一 Skill 在多个 Agent 中复用，建议选择此目录。</li>
+      {{- end}}
+      <li>通过 <a href="{{link "/"}}">Skill Stow</a> 安装：点击「添加 Skill」，粘贴 GitHub 链接、<code>owner/repo</code> 或 <code>npx skills add …</code> 命令，并将目标设为 {{$a.Name}}。每个 Skill 在写入磁盘前都会执行离线安全检查。</li>
+    </ol>
+
+    <h2 id="disable">在 {{$a.Name}} 中停用单个 Skill</h2>
+    {{- if $a.Native}}
+    <p>{{$a.Name}} 将按 Skill 启停的状态保存在 <code>{{$a.Native.File}}</code> 中。停用名为 <code>pdf-tools</code> 的 Skill 时，配置如下：</p>
+    <pre><code>{{$a.Native.Snippet}}</code></pre>
+    {{- if $a.PathKeyed}}
+    <p>{{$a.Name}} 按 <code>SKILL.md</code> 的完整路径记录停用状态，不会影响其他目录中的同名 Skill。</p>
+    {{- end}}
+    <p>在 Skill Stow 右侧详情栏中切换 {{$a.Name}} 开关，应用会自动写入上述配置项并保留文件其余内容。正在运行的会话可能需要重启后生效，需要时应用会给出提示。</p>
+    {{- else}}
+    <p>{{$a.Name}} 没有针对单个 Skill 的原生停用配置，上述目录中的 Skill 均处于「始终启用」状态。如需停止 {{$a.Name}} 加载某个 Skill，请将其从对应目录移出；通过 Skill Stow 移除的文件会进入废纸篓，随时可恢复。</p>
+    {{- if $a.SharesWith}}
+    <p>若该 Skill 位于多 Agent 共享目录中，直接移出将导致其他读取方也无法使用。建议不要将其放在共享目录，而是通过 Skill Stow 的「添加到其他 Agent…」仅链接至需要的 Agent。</p>
+    {{- end}}
+    {{- end}}
+
+    {{- if $a.Builtin}}
+    <h2 id="builtin">内置 Skill</h2>
+    <p>{{$a.Name}} 内置的 Skill 位于 {{range $i, $b := $a.Builtin}}{{if $i}} 和 {{end}}<code>{{home $b}}</code>{{end}}，在 Skill Stow 中归类于「内置」。{{if $a.BuiltinToggle}}直接删除会在 {{$a.Name}} 下次启动时自动恢复，因此 Skill Stow 会改为在 <code>{{$a.Native.File}}</code> 中按路径将其停用。{{end}}</p>
+    {{- end}}
+    {{- if $a.Plugins}}
+    <h2 id="plugins">插件中的 Skill</h2>
+    <p>随 {{$a.Name}} 插件附带的 Skill 位于 <code>{{home $a.Plugins}}</code>。Skill Stow 会解析已安装的插件，并将插件内的 Skill 按插件归组展示。</p>
+    {{- end}}
+
+    <h2 id="check">运行前的安全检查</h2>
+    <p>Skill 可能附带可由 {{$a.Name}} 直接执行的脚本。从网络安装前，建议检查 <code>SKILL.md</code> 及全部脚本文件，重点排查远程下载执行、读取 SSH 私钥或凭据以及诱导 Agent 跳过确认的指令。Skill Stow 会在本地离线扫描所有文件，并将每条结果精确链接至对应代码行。<a href="{{link "/agent-skills/"}}#security">查看完整安全审查清单 →</a></p>
+    {{- if $a.Usage}}
+    <p>Skill Stow 还会读取本机 {{$a.Name}} 的会话日志，统计每个 Skill 的实际调用频次，便于识别并清理长期闲置的 Skill。</p>
+    {{- end}}
+
+    <section class="faq">
+      <h2>常见问题</h2>
+      <details class="qa"><summary>{{$a.Name}} 的 Skill 存放在哪个目录？</summary><p>全局 Skill 位于 <code>{{home $a.Skills}}</code>{{if $a.Project}}，项目级 Skill 位于项目根目录下的 {{range $i, $f := $a.Project}}{{if $i}} 或 {{end}}<code>{{$f.Path}}</code>{{end}}{{end}}。每个 Skill 均为一个包含 <code>SKILL.md</code> 的文件夹。</p></details>
+      <details class="qa"><summary>{{$a.Name}} 会读取 ~/.agents/skills 吗？</summary><p>{{if $a.ReadsShared}}会。{{$a.Name}} 会在全局扫描通用目录 <code>~/.agents/skills</code>，安装在此处的 Skill 对它直接可见。{{else}}全局不会。{{$a.Name}} 仅扫描自身的全局目录 <code>{{home $a.Skills}}</code>。{{if $a.ProjectShared}}但在项目内，它会读取 <code>.agents/skills</code>。{{end}}{{end}}</p></details>
+      <details class="qa"><summary>能否在 {{$a.Name}} 中单独停用某个 Skill？</summary><p>{{if $a.Native}}可以，在 <code>{{$a.Native.File}}</code> 中添加对应配置即可。在 Skill Stow 中切换开关时，应用会自动完成写入。{{else}}暂不支持通过配置停用。其扫描目录中的 Skill 均处于「始终启用」状态，如需停用请将 Skill 从对应目录移出。{{end}}</p></details>
+      <details class="qa"><summary>如何查看 Mac 上 {{$a.Name}} 的全部 Skill？</summary><p>Skill Stow 会将 {{$a.Name}} 实际读取的全部 Skill（包括专属目录、共享目录与项目目录）汇总到看板视图的独立一列中。手动排查则需按上表逐个目录查看。</p></details>
+    </section>
+
+    <p class="note">本页由 Skill Stow <a href="{{.Repo}}/blob/main/app/internal/library/agents.go">源代码</a>中的 Agent 目录表自动生成，依据各 Agent 官方文档维护。若你使用的 {{$a.Name}} 版本路径有所不同，可在 Skill Stow 的「设置 › Agent 管理」中手动添加，或<a href="{{.Repo}}/issues">提交 issue</a>。</p>
+  </div>
+</article>
+
+<section class="band final">
+  <div class="wrap narrow center">
+    <h2>统一管理 {{$a.Name}} 与其他 Agent 的 Skill</h2>
+    {{template "cta" .}}
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="center">其他 Agent 的 Skill 目录</h2>
+    {{template "agent-chips" .}}
+  </div>
+</section>
+{{end}}

@@ -1,0 +1,124 @@
+{{define "title"}}Agent Skill 指南：SKILL.md 目录结构、安装配置与安全审查{{end}}
+{{define "description"}}详解 SKILL.md 在 Claude Code、Codex、Cursor 等 Agent 中的工作机制：全局与项目目录、安装方式、按 Agent 启停、离线安全审查与更新维护。{{end}}
+
+{{define "main"}}
+<article class="doc">
+  <div class="wrap narrow">
+    {{template "breadcrumbs" .}}
+    <h1>Agent Skill 指南：目录结构、配置与安全审查</h1>
+    <p class="updated">更新于 {{.Updated}}</p>
+
+    <div class="answer">
+      <p>Agent Skill 是一个包含 <code>SKILL.md</code> 的目录，用于为 AI Agent 定义特定任务的操作说明与辅助资源。Claude Code、Codex、Cursor 等 Agent 会从用户主目录下的专属目录（例如 <code>~/.claude/skills</code>）、通用目录 <code>~/.agents/skills</code> 以及各项目内的目录加载 Skill。安装只需将目录置于对应路径；如需停用，可在支持该功能的 Agent 配置中关闭，或将其从目录中移出。</p>
+    </div>
+
+    <nav class="toc" aria-label="本页内容">
+      <a href="#what">Skill 的结构</a>
+      <a href="#where">Skill 的存放位置</a>
+      <a href="#install">安装 Skill</a>
+      <a href="#disable">停用单个 Skill</a>
+      <a href="#security">安装前的安全审查</a>
+      <a href="#update">更新 Skill</a>
+      <a href="#cleanup">清理与整理</a>
+    </nav>
+
+    <h2 id="what">Skill 的结构</h2>
+    <p>每个 Skill 都是一个独立文件夹，唯一必需的文件是 <code>SKILL.md</code>：顶部为包含名称与简介的 YAML frontmatter，正文为 Markdown 格式的操作说明。文件夹内还可附带说明中引用的脚本、模板与参考文档。</p>
+    <pre><code>pdf-tools/
+  SKILL.md
+  scripts/
+    extract.py
+  reference.md</code></pre>
+    <pre><code>---
+name: pdf-tools
+description: Extract text and tables from PDF files. Use when the user asks to read or convert a PDF.
+---
+
+# PDF tools
+
+Run scripts/extract.py with the file path...</code></pre>
+    <p>会话启动时，Agent 会预先读取所有可用 Skill 的名称与简介，仅在任务匹配时才加载正文内容。因此，清晰的简介应同时说明用途与触发条件；保留过多闲置 Skill，也会在每次会话中占用额外的上下文空间。</p>
+    <p>主流 Agent 采用相同的格式规范（详见 <a href="https://agentskills.io">agentskills.io</a>），同一份 Skill 目录可在 Claude Code、Codex、Cursor、Gemini CLI 等工具间通用，差异仅在于各自的扫描路径。</p>
+
+    <h2 id="where">Skill 的存放位置</h2>
+    <p>AI 编程 Agent 通常从三类路径发现 Skill：</p>
+    <ul>
+      <li><strong>Agent 专属全局目录</strong>：例如 Claude Code 的 <code>~/.claude/skills</code> 或 Codex 的 <code>~/.codex/skills</code>，其中的 Skill 在所有项目中均可用。</li>
+      <li><strong>通用全局目录</strong> <code>~/.agents/skills</code>：目前有 {{len (sharedReaders .Agents)}} 个 Agent 读取该路径，包括 Codex、Cursor、Gemini CLI 与 GitHub Copilot，放置一份即可多端共用。Claude Code 不读取该目录。</li>
+      <li><strong>项目级目录</strong>：例如项目根目录下的 <code>.claude/skills</code> 或 <code>.agents/skills</code>。这类 Skill 仅对当前项目生效，并可随代码仓库一同提交。</li>
+    </ul>
+    <p>部分 Agent 还会跨目录读取其他 Agent 的 Skill。例如 Cursor 会同时读取 <code>~/.claude/skills</code> 与 <code>~/.codex/skills</code>，因此一个 Skill 的实际生效范围往往超出目录名本身。</p>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Agent</th><th>全局目录</th><th>项目目录</th></tr></thead>
+      <tbody>
+      {{- range $i, $a := .Agents}}{{if lt $i 8}}
+      <tr><th scope="row"><a href="{{link "/agents/"}}{{$a.ID}}/">{{$a.Name}}</a></th><td>{{range $a.Global}}<code>{{home .Path}}</code> {{end}}</td><td>{{range $a.Project}}<code>{{.Path}}</code> {{end}}</td></tr>
+      {{- end}}{{end}}
+      </tbody>
+    </table>
+    </div>
+    <p><a href="{{link "/agents/"}}">查看全部 {{len .Agents}} 个 Agent 的目录对照表 →</a></p>
+
+    <h2 id="install">安装 Skill</h2>
+    <p>安装 Skill 的本质是将其目录放入上述路径之一，常见有三种方式：</p>
+    <ol>
+      <li><strong>手动复制目录</strong>：将文件夹复制到 <code>~/.agents/skills</code>、某个 Agent 的专属目录或项目目录中。需确保 <code>SKILL.md</code> 直接位于 Skill 目录下，不要多嵌套一层目录。</li>
+      <li><strong>使用 <code>skills</code> 命令行工具</strong>：运行 <code>npx skills add owner/repo</code> 从 GitHub 仓库拉取 Skill 并配置到所选 Agent。这类工具通常只保留一份实体副本，并在各 Agent 目录中创建符号链接——若直接删除原件，所有链接都会失效。</li>
+      <li><strong>使用 <a href="{{link "/"}}">Skill Stow</a></strong>：粘贴 GitHub 链接、<code>owner/repo</code>、<code>npx skills add …</code> 命令或网页地址，或直接拖入文件夹与 <code>.zip</code> 压缩包。选定目标 Skill 与安装位置后，每个 Skill 在写入前都会执行离线安全检查。</li>
+    </ol>
+    <p>新安装的 Skill 通常会在下一次会话中生效。如果 Agent 正在运行，请新建会话或重启应用。</p>
+
+    <h2 id="disable">停用单个 Skill</h2>
+    <p>目录决定 Agent 的可见范围；要在不删除文件的前提下停用单个 Skill，需要 Agent 原生配置支持。目前有 {{len .Native}} 个 Agent 提供该能力：</p>
+    {{- range .Native}}
+    <h3><a href="{{link "/agents/"}}{{.ID}}/">{{.Name}}</a></h3>
+    <p>编辑 <code>{{.Native.File}}</code>。{{if .PathKeyed}}该开关按 <code>SKILL.md</code> 的完整路径记录，不会影响其他目录中的同名 Skill。{{end}}</p>
+    <pre><code>{{.Native.Snippet}}</code></pre>
+    {{- end}}
+    <p>其他 Agent 扫描目录中的 Skill 均处于「始终启用」状态。若需阻止某个 Agent 加载特定 Skill，需将其从对应目录移出。如果该 Skill 位于多 Agent 共享目录中，直接移除会影响所有读取方；建议将其移出共享目录，再仅链接至需要的 Agent。</p>
+    <p>Skill Stow 为每个 Skill 提供按 Agent 划分的开关视图。针对上述 {{len .Native}} 个 Agent，应用会直接写入规范的配置项并保留文件其余内容；其余 Agent 则标注为「始终启用」。</p>
+
+    <h2 id="security">安装前的安全审查</h2>
+    <p>Skill 以当前 Agent 的权限运行：其中的指令会直接影响 Agent 行为，附带的脚本也可能在本机执行。在安装第三方来源的 Skill 前，建议通读 <code>SKILL.md</code> 及同目录下的所有文件，重点排查：</p>
+    <ul>
+      <li><strong>远程代码执行</strong>：<code>curl … | sh</code> 管道命令、下载后执行 <code>chmod +x</code>，或将 base64 编码内容解码后直接运行的脚本。</li>
+      <li><strong>敏感凭据访问</strong>：读取 <code>~/.ssh</code>、云服务凭据、<code>.env</code> 文件或浏览器数据的逻辑，尤其是伴随对外网络请求的情况。</li>
+      <li><strong>针对 Agent 的提示词注入</strong>：要求 Agent「忽略之前的指令」「不要告知用户」「跳过确认」，或将对话记录发送至外部地址。</li>
+      <li><strong>隐藏文本与混淆</strong>：不可见 Unicode 字符、双向文本控制字符，以及藏在 HTML 注释中的指令。</li>
+      <li><strong>破坏性或持久化改动</strong>：大范围路径的 <code>rm -rf</code> 操作，或修改 shell 配置、登录项与启动代理（LaunchAgent）。</li>
+    </ul>
+    <p>Skill Stow 会在导入时及文件发生变更后，对 Skill 内的所有文件执行离线规则扫描，并将每条风险精确链接至代码行；来自 GitHub 的来源还会同步呈现 skills.sh 的安全审计。基于规则的检查可以发现常见风险模式，但无法穷尽所有攻击手法，它用于辅助你定位审查重点，不能替代对绝对安全的保证。</p>
+
+    <h2 id="update">更新 Skill</h2>
+    <p>本地复制的 Skill 不会自动更新。更新来自 GitHub 的 Skill 时，需要先与上游最新 commit 对比后再替换，并留意两点风险：直接覆盖会丢失你的本地修改，而更新中新增的脚本或指令同样需要重新进行安全审查。</p>
+    <p>Skill Stow 会记录每个 GitHub Skill 的来源 commit，自动列出上游存在新提交的项目，并在应用更改前展示逐文件差异。本地修改过的 Skill 会等待你确认后再处理，替换下来的旧版本默认移至废纸篓。</p>
+
+    <h2 id="cleanup">清理与整理</h2>
+    <p>同时使用多个 Agent 和项目一段时间后，目录中通常会逐渐积累以下问题：</p>
+    <ul>
+      <li>同一 Skill 被重复复制到多个目录，甚至衍生出内容不一致的副本</li>
+      <li>符号链接指向的目标目录已被移动或删除</li>
+      <li><code>SKILL.md</code> 中引用了不存在的脚本或参考文档</li>
+      <li>全局符号链接指向某个项目目录，一旦项目移动便会失效</li>
+    </ul>
+    <p>Skill Stow 的「整理」功能会将上述问题集中呈现：内容完全一致的副本可单次点击合并，产生分歧的副本支持左右对比，所有被移除的文件均默认进入废纸篓。</p>
+
+    <section class="faq">
+      <h2>常见问题</h2>
+      <details class="qa"><summary>SKILL.md 是什么？</summary><p><code>SKILL.md</code> 是定义 Agent Skill 的核心清单文件：开头以 YAML frontmatter 声明名称与适用场景，正文以 Markdown 编写操作说明。Agent 会先读取头部元数据，仅在任务匹配时加载正文。</p></details>
+      <details class="qa"><summary>Skill 与 CLAUDE.md、AGENTS.md 有什么区别？</summary><p><code>CLAUDE.md</code> 与 <code>AGENTS.md</code> 会在项目的每次会话中固定加载；Skill 仅在任务需要时按需加载，并可附带脚本与参考文件。适合将长期通用的项目规范写入项目文档，将特定工作流封装为 Skill。</p></details>
+      <details class="qa"><summary>同一个 Skill 可以在多个 Agent 中共用吗？</summary><p>可以。由于 <code>SKILL.md</code> 格式通用，同一份目录可在兼容的 Agent 间复用。将其放入 <code>~/.agents/skills</code> 可供所有读取共享目录的 Agent 使用，也可分别链接到各 Agent 的专属目录。</p></details>
+      <details class="qa"><summary>安装第三方 Agent Skill 安全吗？</summary><p>安全性完全取决于其内容。Skill 可能包含可执行脚本及改变 Agent 行为的指令，因此在安装来源不明的 Skill 前，务必先审查文件内容或运行安全检查。</p></details>
+      <details class="qa"><summary>如何查看 Mac 上已安装的全部 Skill？</summary><p>需要依次检查你使用的每个 Agent 的全局目录、<code>~/.agents/skills</code> 以及各项目内的 Skill 目录。Skill Stow 可一次性扫描 {{len .Agents}} 个 Agent 与本地项目，并标明每个 Skill 的实际读取方。</p></details>
+    </section>
+  </div>
+</article>
+
+<section class="band final">
+  <div class="wrap narrow center">
+    <h2>在一个原生 Mac 应用中完成以上全部工作</h2>
+    {{template "cta" .}}
+  </div>
+</section>
+{{end}}

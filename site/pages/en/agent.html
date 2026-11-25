@@ -1,0 +1,106 @@
+{{define "title"}}Where {{.Agent.Name}} Stores Skills: Folders & Config{{end}}
+{{define "description"}}{{.Agent.Name}} loads skills from {{home .Agent.Skills}}{{if gt (len .Agent.Global) 1}} and {{add (len .Agent.Global) -1}} more global path{{if gt (len .Agent.Global) 2}}s{{end}}{{end}}. See all global and project folders, setup, and config options.{{end}}
+
+{{define "main"}}
+{{$a := .Agent}}
+<article class="doc">
+  <div class="wrap narrow">
+    {{template "breadcrumbs" .}}
+    <h1>Where {{$a.Name}} stores skills</h1>
+    <p class="updated">Updated {{.Updated}}</p>
+
+    <div class="answer">
+      <p>{{$a.Name}} loads global skills from <code>{{home $a.Skills}}</code>{{if gt (len $a.Global) 1}}, and also scans {{range $i, $f := $a.Global}}{{if $i}}{{if gt $i 1}}, {{end}}<code>{{home $f.Path}}</code>{{end}}{{end}}{{end}}.
+      {{- if $a.Project}} Within a project, it reads {{range $i, $f := $a.Project}}{{if $i}}, {{end}}<code>{{$f.Path}}</code>{{end}} relative to the repository root.{{end}}
+      Each skill is a directory containing a <code>SKILL.md</code> file.</p>
+      <p>{{if $a.Native}}Individual skills can be disabled in <code>{{$a.Native.File}}</code>.{{else}}{{$a.Name}} does not support per-skill toggles, so every skill in these directories is always on.{{end}}</p>
+    </div>
+
+    <h2 id="folders">Skill directories for {{$a.Name}}</h2>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Directory</th><th>Scope</th><th>Also read by</th></tr></thead>
+      <tbody>
+      {{- range $i, $f := $a.Global}}
+      <tr><td><code>{{home $f.Path}}</code></td><td>{{if eq $i 0}}Global (dedicated){{else}}Global (shared){{end}}</td><td>{{if $f.Readers}}{{agentLinks $f.Readers}}{{else}}<span class="muted">None</span>{{end}}</td></tr>
+      {{- end}}
+      {{- range $a.Project}}
+      <tr><td><code>&lt;project&gt;/{{.Path}}</code></td><td>Project</td><td>{{if .Readers}}{{agentLinks .Readers}}{{else}}<span class="muted">None</span>{{end}}</td></tr>
+      {{- end}}
+      {{- range $a.Builtin}}
+      <tr><td><code>{{home .}}</code></td><td>Built-in</td><td><span class="muted">Bundled with {{$a.Name}}</span></td></tr>
+      {{- end}}
+      {{- if $a.Plugins}}
+      <tr><td><code>{{home $a.Plugins}}</code></td><td>Plugin</td><td><span class="muted">Installed plugins only</span></td></tr>
+      {{- end}}
+      </tbody>
+    </table>
+    </div>
+    <p>Skill Stow detects {{$a.Name}} as installed when <code>{{home $a.Home}}</code> exists on your Mac.
+    {{- if $a.SharesWith}} Because {{$a.Name}} shares {{if gt (len $a.Global) 1}}global folders{{else}}its global folder{{end}} with {{agentLinks $a.SharesWith}}, any skill placed there becomes active across all of them.{{end}}</p>
+
+    <h2 id="install">Installing a skill for {{$a.Name}}</h2>
+    <ol>
+      <li>Place the skill folder in <code>{{home $a.Skills}}</code> so its manifest lives at <code>{{home $a.Skills}}/&lt;skill-name&gt;/SKILL.md</code>.{{if $a.Project}} To scope a skill to a single repository, place it at <code>&lt;project&gt;/{{(index $a.Project 0).Path}}/&lt;skill-name&gt;/SKILL.md</code> instead.{{end}}</li>
+      {{- if and $a.ReadsShared (gt (len $a.Global) 1)}}
+      <li>Alternatively, install into the shared <code>~/.agents/skills</code> folder, which {{$a.Name}} also scans. Use this path for skills you want available across multiple agents.</li>
+      {{- end}}
+      <li>With <a href="{{link "/"}}">Skill Stow</a>: click Add Skills, paste a GitHub URL, <code>owner/repo</code>, or <code>npx skills add …</code> command, and select {{$a.Name}} as the target. Every skill runs through an offline security check before it is written to disk.</li>
+    </ol>
+
+    <h2 id="disable">Disabling a skill in {{$a.Name}}</h2>
+    {{- if $a.Native}}
+    <p>{{$a.Name}} stores per-skill toggle state in <code>{{$a.Native.File}}</code>. To disable a skill named <code>pdf-tools</code>, add:</p>
+    <pre><code>{{$a.Native.Snippet}}</code></pre>
+    {{- if $a.PathKeyed}}
+    <p>Because {{$a.Name}} keys the setting by the path to <code>SKILL.md</code>, a same-named skill in another directory remains unaffected.</p>
+    {{- end}}
+    <p>In Skill Stow, toggling the {{$a.Name}} switch in the inspector writes this exact entry while preserving the rest of the file. Running sessions may require a restart to reflect the change; the app notifies you when needed.</p>
+    {{- else}}
+    <p>{{$a.Name}} has no native setting to disable individual skills, so every skill in the directories above is always on. To stop {{$a.Name}} from loading a skill, remove it from those folders. Skill Stow moves removed items to the Trash so they can be restored.</p>
+    {{- if $a.SharesWith}}
+    <p>If the skill resides in a shared directory, removing it affects every agent that reads that folder. Store it outside the shared folder and link it only to the agents that need it via Add to Another Agent… in Skill Stow.</p>
+    {{- end}}
+    {{- end}}
+
+    {{- if $a.Builtin}}
+    <h2 id="builtin">Built-in skills</h2>
+    <p>{{$a.Name}} bundles built-in skills in {{range $i, $b := $a.Builtin}}{{if $i}} and {{end}}<code>{{home $b}}</code>{{end}}, which Skill Stow displays under Built-in.{{if $a.BuiltinToggle}} Deleting them does not persist because {{$a.Name}} restores them on next launch, so Skill Stow disables them by path in <code>{{$a.Native.File}}</code> instead.{{end}}</p>
+    {{- end}}
+    {{- if $a.Plugins}}
+    <h2 id="plugins">Plugin skills</h2>
+    <p>Skills bundled with {{$a.Name}} plugins live under <code>{{home $a.Plugins}}</code>. Skill Stow reads installed plugins and displays their skills grouped by plugin alongside your own.</p>
+    {{- end}}
+
+    <h2 id="check">Security checks before running skills</h2>
+    <p>Skills can include scripts that {{$a.Name}} may execute with your permissions. Before installing a skill from the internet, review <code>SKILL.md</code> and every script for remote code execution, access to SSH keys or credentials, and prompt instructions attempting to bypass confirmations. Skill Stow performs these checks offline across every file and links each finding to the exact line. <a href="{{link "/agent-skills/"}}#security">Read the full security checklist →</a></p>
+    {{- if $a.Usage}}
+    <p>Skill Stow also tracks how often {{$a.Name}} invokes each skill using local session logs on your Mac, helping you identify skills that are never used.</p>
+    {{- end}}
+
+    <section class="faq">
+      <h2>Frequently asked questions</h2>
+      <details class="qa"><summary>Where does {{$a.Name}} store skills?</summary><p>Global skills are stored in <code>{{home $a.Skills}}</code>{{if $a.Project}}, and project-scoped skills live in {{range $i, $f := $a.Project}}{{if $i}} or {{end}}<code>{{$f.Path}}</code>{{end}} inside the repository{{end}}. Each skill is a folder containing a <code>SKILL.md</code> file.</p></details>
+      <details class="qa"><summary>Does {{$a.Name}} read ~/.agents/skills?</summary><p>{{if $a.ReadsShared}}Yes. {{$a.Name}} scans the shared <code>~/.agents/skills</code> directory globally, so skills placed there are available to it.{{else}}Not globally. {{$a.Name}} only scans its own global folder, <code>{{home $a.Skills}}</code>.{{if $a.ProjectShared}} Within projects, however, it does read <code>.agents/skills</code>.{{end}}{{end}}</p></details>
+      <details class="qa"><summary>Can I disable a single skill in {{$a.Name}}?</summary><p>{{if $a.Native}}Yes, by adding an entry to <code>{{$a.Native.File}}</code>. Skill Stow updates this config automatically when you toggle the switch.{{else}}Not via configuration. Every skill in its scanned folders is always on, so remove the skill from those directories to prevent {{$a.Name}} from loading it.{{end}}</p></details>
+      <details class="qa"><summary>How can I view every {{$a.Name}} skill on my Mac?</summary><p>Skill Stow aggregates every skill {{$a.Name}} loads—from its own folder, shared directories, and your projects—into a single board column. Manually, you would inspect each path listed in the table above.</p></details>
+    </section>
+
+    <p class="note">Generated from the agent catalog in Skill Stow's <a href="{{.Repo}}/blob/main/app/internal/library/agents.go">source code</a>, maintained against each agent's official documentation. If your version of {{$a.Name}} uses a custom path, add it under Settings › Agents or <a href="{{.Repo}}/issues">open an issue</a>.</p>
+  </div>
+</article>
+
+<section class="band final">
+  <div class="wrap narrow center">
+    <h2>Manage {{$a.Name}} skills alongside every other agent</h2>
+    {{template "cta" .}}
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="center">Skill directories for other agents</h2>
+    {{template "agent-chips" .}}
+  </div>
+</section>
+{{end}}
