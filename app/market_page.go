@@ -10,6 +10,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/egoist/mygo/i18n"
+	"github.com/egoist/mygo/transfer"
 	"github.com/egoist/mygo/ui"
 
 	"skillmanager/internal/library"
@@ -56,7 +57,9 @@ type marketPageState struct {
 	focusReq bool
 
 	searchBox ui.Handle
-	scroll    ui.ScrollState
+	// copied 是刚复制的地址，详情里的「复制链接」按钮暂时显示成「已复制」
+	copied string
+	scroll ui.ScrollState
 	// 上一帧搜索框是否有焦点、是否为空：两者有一个刚变成真时打开最近搜索
 	recentFocused, recentEmpty bool
 	// searchFocused 跟着搜索框的焦点走，置 false 让它失去焦点
@@ -960,6 +963,8 @@ func (a *app) marketHandleNavigation(c *ui.Context, mode marketMode) {
 		c.OnWindowShortcut(0, ui.KeyDown, func() { move(1) })
 		c.OnWindowShortcut(0, ui.KeyUp, func() { move(-1) })
 		if a.mkt.selected != nil {
+			sel := *a.mkt.selected
+			c.OnWindowShortcut(ui.Cmd, ui.KeyC, func() { a.copyMarketLink(sel, true) })
 			ref := a.mkt.selected.ImportRef
 			c.OnWindowShortcut(0, ui.KeyEnter, func() {
 				if mode == marketModeSearch {
@@ -1159,6 +1164,7 @@ func (a *app) marketItemsList(c *ui.Context, items []library.MarketItem, inTopic
 		for _, it := range items {
 			selected := a.mkt.selected != nil && sameMarketItem(*a.mkt.selected, it)
 			row := a.marketRow(c.Key(string(it.Source)+":"+it.ID), it, selected, inTopic, isSearch)
+			a.marketRowActions(c, row, it, isSearch)
 			if selected && keyMoved {
 				row.ScrollIntoView()
 			}
@@ -1396,16 +1402,26 @@ func (a *app) marketPane(c *ui.Context, it library.MarketItem, isSearch bool) {
 			if desc := strings.TrimSpace(it.Description); desc != "" {
 				ui.Text(c, desc).FontSize(13).LineHeight(1.55).TextColor(colTextBody).MaxLines(6)
 			}
-			ui.Row(c).Gap(8).Children(func() {
+			// 主按钮占满一行，复制和打开平分下一行：三个并排放不下
+			ui.Column(c).Gap(8).Children(func() {
 				if dialogButton(c, locales.MarketViewAndAdd(), true).Clicked() {
 					if isSearch {
 						a.noteMarketInput()
 					}
 					a.startImport(it.ImportRef)
 				}
-				if dialogButton(c, locales.MarketOpenOnWeb(), false).Clicked() {
-					a.openExternalURL(it.WebURL)
-				}
+				ui.Row(c).Gap(8).Children(func() {
+					copyLabel := locales.MarketCopyLink()
+					if link := marketItemLink(it); link != "" && a.mkt.copied == link {
+						copyLabel = locales.CommonCopied()
+					}
+					if dialogButton(c.Key("market-copy-link"), copyLabel, false).Grow(1).Basis(0).Tooltip(marketItemLink(it)).Clicked() {
+						a.copyMarketLink(it, false)
+					}
+					if dialogButton(c, locales.MarketOpenOnWeb(), false).Grow(1).Basis(0).Clicked() {
+						a.openExternalURL(it.WebURL)
+					}
+				})
 			})
 
 			a.marketPaneDataGroup(c, it)
@@ -1518,7 +1534,7 @@ func (a *app) clearMarketSearchKeepingBrowse() {
 }
 
 func (a *app) marketPaneLinksGroup(c *ui.Context, it library.MarketItem) {
-	if it.Source != library.MarketSkillsSh || strings.Count(it.Repo, "/") != 1 {
+	if marketGitHubRepo(it) == "" {
 		return
 	}
 	marketSectionHeading(c, locales.MarketSectionLinks())
@@ -1537,6 +1553,85 @@ func (a *app) marketPaneLinksGroup(c *ui.Context, it library.MarketItem) {
 			}
 		})
 	})
+}
+
+// marketGitHubRepo 是 skills.sh 上一个 Skill 所在的 GitHub 仓库 owner/repo；
+// ClawHub 上的、认不出仓库的是空串。
+func marketGitHubRepo(it library.MarketItem) string {
+	if it.Source != library.MarketSkillsSh || strings.Count(it.Repo, "/") != 1 {
+		return ""
+	}
+	return it.Repo
+}
+
+// marketItemLink 是拖出去、复制时给出的地址：有 GitHub 仓库的给仓库地址，
+// 拿去给 Agent 看代码最直接；没有的给它在市场的网页。
+func marketItemLink(it library.MarketItem) string {
+	if repo := marketGitHubRepo(it); repo != "" {
+		return "https://github.com/" + repo
+	}
+	return it.WebURL
+}
+
+// marketRowActions 给一行加上拿走这个 Skill 的两种方式：拖到别的应用
+// （Agent 的输入框、终端），放下的是它的地址；右键菜单。
+func (a *app) marketRowActions(c *ui.Context, row ui.Element, it library.MarketItem, isSearch bool) {
+	link := marketItemLink(it)
+	if d, err := transfer.URLData(link); err == nil {
+		row.DragData(d)
+	}
+	key := "market." + string(it.Source) + ":" + it.ID
+	// 和访达一样，右键的那一行同时被选中：菜单上写的 ⌘C 复制的就是它
+	if *a.menuOpen(key) && (a.mkt.selected == nil || !sameMarketItem(*a.mkt.selected, it)) {
+		cp := it
+		a.mkt.selected = &cp
+	}
+	a.contextMenu(c, row, key, true, func(fm *frostedMenu) {
+		if fm.action(locales.MarketViewAndAdd(), withIcon(iconPlus)) {
+			if isSearch {
+				a.noteMarketInput()
+			}
+			a.startImport(it.ImportRef)
+		}
+		fm.separator()
+		if repo := marketGitHubRepo(it); repo != "" {
+			if fm.action(locales.MarketOpenOnGitHub(), withIcon(iconGitHub)) {
+				a.openExternalURL("https://github.com/" + repo)
+			}
+		}
+		if fm.action(locales.MarketOpenOnWeb(), withIcon(iconGlobe)) {
+			a.openExternalURL(it.WebURL)
+		}
+		fm.separator()
+		if fm.action(locales.MarketCopyLink(), withIcon(iconLink), withShortcut("⌘C")) {
+			a.copyMarketLink(it, true)
+		}
+	})
+}
+
+// copyMarketLink 把 it 的地址写进剪贴板。从详情的按钮复制时按钮自己变成
+// 「已复制」；按 ⌘C 或从右键菜单复制时看不到按钮，notice 为真，弹提示条
+// 说复制了什么。
+func (a *app) copyMarketLink(it library.MarketItem, notice bool) {
+	link := marketItemLink(it)
+	if err := a.writeClipboard(link); err != nil {
+		a.notify(fromLink, toastError, locales.MarketCopyLinkFailed(err.Error()))
+		return
+	}
+	// 自己复制出去的，切回应用时不再当成剪贴板里待读取的链接来提示
+	a.imp.clipSeen = link
+	if a.imp.clip == link {
+		a.imp.clip = ""
+	}
+	a.mkt.copied = link
+	a.later(copiedFor, func() {
+		if a.mkt.copied == link {
+			a.mkt.copied = ""
+		}
+	})
+	if notice {
+		a.notify(fromLink, toastOK, locales.MarketLinkCopied(link))
+	}
 }
 
 func marketSectionHeading(c *ui.Context, text string) {

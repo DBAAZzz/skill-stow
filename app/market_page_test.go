@@ -384,6 +384,11 @@ func TestMarketSnapshots(t *testing.T) {
 
 	must(t, tt.Click("find-skills"))
 	shot(tt, "m2-selected.png")
+	must(t, tt.RightClick("hyperframes-cli"))
+	tt.Advance(menuEnterAnim.Duration)
+	shot(tt, "m8-row-menu.png")
+	tt.Key(0, ui.KeyEscape)
+	tt.Advance(menuEnterAnim.Duration)
 
 	must(t, tt.Click("ClawHub"))
 	tt.Advance(segmentedSpring.Spring.Duration)

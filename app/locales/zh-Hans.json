@@ -7716,6 +7716,32 @@
   "@marketOpenOnWeb": {
     "description": "详情栏次按钮：用浏览器打开原技能页面"
   },
+  "marketOpenOnGitHub": "在 GitHub 中打开",
+  "@marketOpenOnGitHub": {
+    "description": "Skill 市场右键菜单：用浏览器打开这个 Skill 所在的 GitHub 仓库"
+  },
+  "marketCopyLink": "复制链接",
+  "@marketCopyLink": {
+    "description": "Skill 市场详情栏按钮和右键菜单：复制这个 Skill 的地址（skills.sh 上的是 GitHub 仓库地址，ClawHub 上的是网页地址）"
+  },
+  "marketLinkCopied": "已复制 {link}",
+  "@marketLinkCopied": {
+    "description": "Skill 市场按 ⌘C 或用右键菜单复制地址后的提示条",
+    "placeholders": {
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "marketCopyLinkFailed": "复制链接失败：{err}",
+  "@marketCopyLinkFailed": {
+    "description": "Skill 市场复制地址时写剪贴板失败",
+    "placeholders": {
+      "err": {
+        "type": "String"
+      }
+    }
+  },
   "marketSectionData": "数据",
   "@marketSectionData": {
     "description": "详情栏数据分组小标题"

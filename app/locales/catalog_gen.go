@@ -17968,6 +17968,68 @@ func (msgs Messages) MarketOpenOnWeb() string {
 	return Catalog.Format(msgs.locale, "marketOpenOnWeb", nil)
 }
 
+// MarketOpenOnGitHub says "在 GitHub 中打开"
+// in the language the app shows.
+//
+// Skill 市场右键菜单：用浏览器打开这个 Skill 所在的
+// GitHub 仓库
+func MarketOpenOnGitHub() string { return In(i18n.Locale()).MarketOpenOnGitHub() }
+
+// MarketOpenOnGitHub says "在 GitHub 中打开"
+// in the language of msgs.
+//
+// Skill 市场右键菜单：用浏览器打开这个 Skill 所在的
+// GitHub 仓库
+func (msgs Messages) MarketOpenOnGitHub() string {
+	return Catalog.Format(msgs.locale, "marketOpenOnGitHub", nil)
+}
+
+// MarketCopyLink says "复制链接"
+// in the language the app shows.
+//
+// Skill 市场详情栏按钮和右键菜单：复制这个 Skill
+// 的地址（skills.sh 上的是 GitHub 仓库地址，ClawHub
+// 上的是网页地址）
+func MarketCopyLink() string { return In(i18n.Locale()).MarketCopyLink() }
+
+// MarketCopyLink says "复制链接"
+// in the language of msgs.
+//
+// Skill 市场详情栏按钮和右键菜单：复制这个 Skill
+// 的地址（skills.sh 上的是 GitHub 仓库地址，ClawHub
+// 上的是网页地址）
+func (msgs Messages) MarketCopyLink() string {
+	return Catalog.Format(msgs.locale, "marketCopyLink", nil)
+}
+
+// MarketLinkCopied says "已复制 {link}"
+// in the language the app shows.
+//
+// Skill 市场按 ⌘C 或用右键菜单复制地址后的提示条
+func MarketLinkCopied(link string) string { return In(i18n.Locale()).MarketLinkCopied(link) }
+
+// MarketLinkCopied says "已复制 {link}"
+// in the language of msgs.
+//
+// Skill 市场按 ⌘C 或用右键菜单复制地址后的提示条
+func (msgs Messages) MarketLinkCopied(link string) string {
+	return Catalog.Format(msgs.locale, "marketLinkCopied", map[string]any{"link": link})
+}
+
+// MarketCopyLinkFailed says "复制链接失败：{err}"
+// in the language the app shows.
+//
+// Skill 市场复制地址时写剪贴板失败
+func MarketCopyLinkFailed(err string) string { return In(i18n.Locale()).MarketCopyLinkFailed(err) }
+
+// MarketCopyLinkFailed says "复制链接失败：{err}"
+// in the language of msgs.
+//
+// Skill 市场复制地址时写剪贴板失败
+func (msgs Messages) MarketCopyLinkFailed(err string) string {
+	return Catalog.Format(msgs.locale, "marketCopyLinkFailed", map[string]any{"err": err})
+}
+
 // MarketSectionData says "数据"
 // in the language the app shows.
 //

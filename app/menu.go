@@ -202,6 +202,8 @@ func resolveMenuHotkey(o menuItemOpts) menuHotkey {
 	switch o.shortcut {
 	case "⌘⌫":
 		return menuHotkey{mods: ui.Cmd, key: ui.KeyBackspace, valid: true}
+	case "⌘C":
+		return menuHotkey{mods: ui.Cmd, key: ui.KeyC, valid: true}
 	case "Space":
 		return menuHotkey{mods: 0, key: ui.KeySpace, needNoHighlight: true, valid: true}
 	}
