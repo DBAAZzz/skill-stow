@@ -2,6 +2,16 @@
 
 每个版本一节，标题是 `## <版本>`。这一节就是应用内更新窗口里的「更新说明」，先写中文、再写英文。用编号列表，不用 `-`：更新窗口会把无序列表画成圆点。
 
+## 0.7.1
+
+中文
+
+1. 没拖进「应用程序」就直接打开的应用，更新时会提示先移到「应用程序」再更新
+
+English
+
+1. If you open the app without moving it to Applications first, it now tells you to move it there before it can update
+
 ## 0.7.0
 
 中文
