@@ -7357,6 +7357,10 @@
   "@settingsAppUpdateUnavailable": {
     "description": "设置 › 通用 › 应用更新：这份应用不能自己更新（开发版、没有写入权限的位置），不解释原因"
   },
+  "settingsAppUpdateMoveToApplications": "移到「应用程序」后可更新",
+  "@settingsAppUpdateMoveToApplications": {
+    "description": "设置 › 通用 › 应用更新：应用被 macOS 隔离在临时位置运行（没拖进「应用程序」就打开），移过去才能自己更新"
+  },
   "settingsCheckForUpdates": "检查更新…",
   "@settingsCheckForUpdates": {
     "description": "设置 › 通用 › 应用更新：按钮，打开更新窗口检查"
@@ -7368,6 +7372,15 @@
   "settingsAutoCheckAppUpdates": "自动检查更新",
   "@settingsAutoCheckAppUpdates": {
     "description": "设置 › 通用 › 应用更新：后台自动检查的开关"
+  },
+  "appUpdateMoveToApplicationsMessage": "把 {app} 移到「应用程序」文件夹，重新打开后即可更新。",
+  "@appUpdateMoveToApplicationsMessage": {
+    "description": "更新窗口：应用被 macOS 隔离在临时位置运行时的说明；app 由更新窗口填入应用名",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
   },
   "appUpdateUnavailableMessage": "{app} 不能自行更新。",
   "@appUpdateUnavailableMessage": {

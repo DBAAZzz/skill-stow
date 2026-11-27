@@ -16988,6 +16988,24 @@ func (msgs Messages) SettingsAppUpdateUnavailable() string {
 	return Catalog.Format(msgs.locale, "settingsAppUpdateUnavailable", nil)
 }
 
+// SettingsAppUpdateMoveToApplications says "移到「应用程序」后可更新"
+// in the language the app shows.
+//
+// 设置 › 通用 › 应用更新：应用被 macOS
+// 隔离在临时位置运行（没拖进「应用程序」就打开），移过去才能自己更新
+func SettingsAppUpdateMoveToApplications() string {
+	return In(i18n.Locale()).SettingsAppUpdateMoveToApplications()
+}
+
+// SettingsAppUpdateMoveToApplications says "移到「应用程序」后可更新"
+// in the language of msgs.
+//
+// 设置 › 通用 › 应用更新：应用被 macOS
+// 隔离在临时位置运行（没拖进「应用程序」就打开），移过去才能自己更新
+func (msgs Messages) SettingsAppUpdateMoveToApplications() string {
+	return Catalog.Format(msgs.locale, "settingsAppUpdateMoveToApplications", nil)
+}
+
 // SettingsCheckForUpdates says "检查更新…"
 // in the language the app shows.
 //
@@ -17030,6 +17048,26 @@ func SettingsAutoCheckAppUpdates() string { return In(i18n.Locale()).SettingsAut
 // 设置 › 通用 › 应用更新：后台自动检查的开关
 func (msgs Messages) SettingsAutoCheckAppUpdates() string {
 	return Catalog.Format(msgs.locale, "settingsAutoCheckAppUpdates", nil)
+}
+
+// AppUpdateMoveToApplicationsMessage says "把 {app} 移到「应用程序」文件夹，重新打开后即可更新。"
+// in the language the app shows.
+//
+// 更新窗口：应用被 macOS
+// 隔离在临时位置运行时的说明；app
+// 由更新窗口填入应用名
+func AppUpdateMoveToApplicationsMessage(app string) string {
+	return In(i18n.Locale()).AppUpdateMoveToApplicationsMessage(app)
+}
+
+// AppUpdateMoveToApplicationsMessage says "把 {app} 移到「应用程序」文件夹，重新打开后即可更新。"
+// in the language of msgs.
+//
+// 更新窗口：应用被 macOS
+// 隔离在临时位置运行时的说明；app
+// 由更新窗口填入应用名
+func (msgs Messages) AppUpdateMoveToApplicationsMessage(app string) string {
+	return Catalog.Format(msgs.locale, "appUpdateMoveToApplicationsMessage", map[string]any{"app": app})
 }
 
 // AppUpdateUnavailableMessage says "{app} 不能自行更新。"

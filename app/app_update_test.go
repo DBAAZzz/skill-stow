@@ -15,12 +15,14 @@ import (
 // fakeAppUpdates 是测试里的应用更新，记下检查和开关的调用。
 type fakeAppUpdates struct {
 	enabled, auto bool
+	translocated  bool
 	last          time.Time
 	available     string
 	checks        int
 }
 
 func (f *fakeAppUpdates) Enabled() bool              { return f.enabled }
+func (f *fakeAppUpdates) Translocated() bool         { return f.translocated }
 func (f *fakeAppUpdates) Check()                     { f.checks++ }
 func (f *fakeAppUpdates) AutomaticChecks() bool      { return f.auto }
 func (f *fakeAppUpdates) SetAutomaticChecks(on bool) { f.auto = on }
@@ -77,6 +79,21 @@ func TestAppUpdatesInGeneralSettings(t *testing.T) {
 			t.Fatalf("不能更新时按钮和开关应禁用：检查 %d 次，自动检查 %v", upd.checks, upd.auto)
 		}
 	})
+
+	t.Run("translocated by macOS", func(t *testing.T) {
+		upd.translocated = true
+		st.Frame()
+		if !st.HasText("移到「应用程序」后可更新") || st.HasText("不能自行更新") {
+			t.Errorf("被隔离运行时应提示移到「应用程序」：%q", st.Texts())
+		}
+	})
+}
+
+func TestTranslocatedAppIsRecognizedByItsPath(t *testing.T) {
+	moved := "/private/var/folders/jz/v2/T/AppTranslocation/36C8661A/d/Skill Stow.app/Contents/MacOS/Skill Stow"
+	if !translocated(moved) || translocated("/Applications/Skill Stow.app/Contents/MacOS/Skill Stow") {
+		t.Error("只有 AppTranslocation 下的路径算被隔离运行")
+	}
 }
 
 func TestAppUpdateCheckedLabel(t *testing.T) {
@@ -97,9 +114,11 @@ func TestAppUpdateCheckedLabel(t *testing.T) {
 
 func TestAppUpdateStringsKeepThePluginPlaceholder(t *testing.T) {
 	// 插件注册时检查占位符个数，不对会在启动时 panic
-	for lang, s := range appUpdateStrings() {
-		if n := strings.Count(s.UnavailableMessage, "%"); n != 1 || !strings.Contains(s.UnavailableMessage, "%[1]s") {
-			t.Errorf("%s: UnavailableMessage = %q，要恰好一个 %%[1]s", lang, s.UnavailableMessage)
+	for _, moved := range []bool{false, true} {
+		for lang, s := range appUpdateStrings(moved) {
+			if n := strings.Count(s.UnavailableMessage, "%"); n != 1 || !strings.Contains(s.UnavailableMessage, "%[1]s") {
+				t.Errorf("%s（translocated=%v）: UnavailableMessage = %q，要恰好一个 %%[1]s", lang, moved, s.UnavailableMessage)
+			}
 		}
 	}
 }
@@ -115,7 +134,7 @@ func clickSwitch(t *testing.T, st *ui.Tester, name string) {
 }
 
 func TestAppUpdatesStayOfflineUntilTurnedOn(t *testing.T) {
-	if !appUpdateOptions().DisableAutomaticChecks {
+	if !appUpdateOptions(false).DisableAutomaticChecks {
 		t.Error("默认不应在后台检查更新：README 承诺只在用户操作时联网")
 	}
 }

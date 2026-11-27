@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"strings"
 	"time"
 
 	"github.com/egoist/mygo"
@@ -17,6 +19,9 @@ import (
 type appUpdater interface {
 	// Enabled 报告这份应用能不能自己更新：开发版、装在没有写权限的位置时不能。
 	Enabled() bool
+	// Translocated 报告应用是否被 macOS 隔离在只读的临时位置运行（App
+	// Translocation：下载后没拖进「应用程序」就打开），这时移过去才能更新。
+	Translocated() bool
 	// Check 打开更新窗口检查，立即返回。
 	Check()
 	AutomaticChecks() bool
@@ -31,6 +36,7 @@ type appUpdater interface {
 type noAppUpdates struct{}
 
 func (noAppUpdates) Enabled() bool           { return false }
+func (noAppUpdates) Translocated() bool      { return false }
 func (noAppUpdates) Check()                  {}
 func (noAppUpdates) AutomaticChecks() bool   { return false }
 func (noAppUpdates) SetAutomaticChecks(bool) {}
@@ -38,35 +44,48 @@ func (noAppUpdates) LastCheck() time.Time    { return time.Time{} }
 func (noAppUpdates) Available() string       { return "" }
 
 // pluginUpdates 是 updater 插件提供的更新。
-type pluginUpdates struct{ enabled bool }
+type pluginUpdates struct{ enabled, translocated bool }
 
 // useAppUpdates 注册原生更新窗口并返回它的更新；必须在 App.Run 之前调用。
 // 默认不在后台检查（README 承诺只在用户操作时联网），打开设置里的开关后
 // 才每天检查一次。检查完成、用户在更新窗口里作答或改了开关后，在主线程
 // 调 changed 重画设置页。
 func useAppUpdates(changed func()) appUpdater {
-	mygo.Use(native.New(appUpdateOptions()))
+	exe, _ := os.Executable()
+	moved := translocated(exe)
+	mygo.Use(native.New(appUpdateOptions(moved)))
 	updater.OnChange(changed)
 	// Enabled 每次都要在安装目录旁试建临时目录，运行期间安装位置不会变，只问一次
-	return pluginUpdates{enabled: mygo.Updater.Enabled()}
+	return pluginUpdates{enabled: mygo.Updater.Enabled(), translocated: moved}
 }
 
-func appUpdateOptions() updater.Options {
-	return updater.Options{DisableAutomaticChecks: true, Strings: appUpdateStrings()}
+// translocated 报告 exe 是否在 macOS 为隔离应用挂出的只读临时路径里。
+func translocated(exe string) bool {
+	return strings.Contains(exe, "/AppTranslocation/")
+}
+
+func appUpdateOptions(translocated bool) updater.Options {
+	return updater.Options{DisableAutomaticChecks: true, Strings: appUpdateStrings(translocated)}
 }
 
 // appUpdateStrings 换掉插件「不能更新」的说明：默认说法让人去软件包管理器
-// 里更新，对从磁盘映像拖出来用的 Mac 应用不成立，这里只说不能自行更新。
-func appUpdateStrings() map[string]updater.Strings {
+// 里更新，对从磁盘映像拖出来用的 Mac 应用不成立，这里只说不能自行更新；
+// 被隔离运行时改说移到「应用程序」。
+func appUpdateStrings(translocated bool) map[string]updater.Strings {
 	strs := map[string]updater.Strings{}
 	for _, lang := range appLanguages {
 		// 插件用 fmt 把应用名填进 %[1]s，并在注册时检查占位符个数
-		strs[lang] = updater.Strings{UnavailableMessage: locales.In(lang).AppUpdateUnavailableMessage("%[1]s")}
+		msg := locales.In(lang).AppUpdateUnavailableMessage("%[1]s")
+		if translocated {
+			msg = locales.In(lang).AppUpdateMoveToApplicationsMessage("%[1]s")
+		}
+		strs[lang] = updater.Strings{UnavailableMessage: msg}
 	}
 	return strs
 }
 
 func (p pluginUpdates) Enabled() bool            { return p.enabled }
+func (p pluginUpdates) Translocated() bool       { return p.translocated }
 func (pluginUpdates) Check()                     { updater.CheckForUpdates() }
 func (pluginUpdates) AutomaticChecks() bool      { return updater.AutomaticChecks() }
 func (pluginUpdates) SetAutomaticChecks(on bool) { updater.SetAutomaticChecks(on) }
@@ -96,8 +115,11 @@ func (a *app) appUpdateGroup(c *ui.Context) {
 	setBox(c, func() {
 		setRow(c).Children(func() {
 			sub := locales.SettingsAppUpdateUnavailable()
-			if u.Enabled() {
+			switch {
+			case u.Enabled():
 				sub = appUpdateChecked(u.LastCheck(), time.Now())
+			case u.Translocated():
+				sub = locales.SettingsAppUpdateMoveToApplications()
 			}
 			rowText(c, locales.SettingsAppVersion(appVersion()), sub, false)
 			label := locales.SettingsCheckForUpdates()
